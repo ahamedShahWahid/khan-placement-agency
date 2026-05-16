@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import field_validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 Environment = Literal["local", "dev", "staging", "prod"]
@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     service_name: str
     log_level: LogLevel = "INFO"
     log_format: LogFormat = "text"
+    db_url: str = Field(..., description="SQLAlchemy DSN; must use postgresql+asyncpg driver.")
 
     @field_validator("log_level", mode="before")
     @classmethod
@@ -42,3 +43,10 @@ class Settings(BaseSettings):
     @classmethod
     def _lower_log_format(cls, v: object) -> object:
         return v.lower() if isinstance(v, str) else v
+
+    @field_validator("db_url")
+    @classmethod
+    def _enforce_async_driver(cls, v: str) -> str:
+        if not v.startswith("postgresql+asyncpg://"):
+            raise ValueError("db_url must use the postgresql+asyncpg:// driver")
+        return v
