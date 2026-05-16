@@ -1,6 +1,6 @@
 # KPA API
 
-FastAPI service for the Khan Placement Agency platform. This directory contains the backend foundations + DB layer. Auth and domain code land in follow-on plans.
+FastAPI service for the Khan Placement Agency platform. This directory contains the backend foundations, DB layer, and the resume upload data plane. Auth, parsing, and matching code land in follow-on plans.
 
 ## Requirements
 
@@ -126,6 +126,35 @@ curl -s http://127.0.0.1:8000/ready | python -m json.tool
 
 `/ready` returns 200 when Postgres responds to `SELECT 1`, 503 otherwise. Use it for load-balancer readiness checks; use `/health` (no DB) for liveness.
 
+## Resume uploads
+
+Two endpoints, both nested under an applicant id:
+
+```
+POST   /v1/applicants/{applicant_id}/resumes
+GET    /v1/applicants/{applicant_id}/resumes/{resume_id}
+```
+
+POST accepts `multipart/form-data` with one field `file`. Content-type is checked against `KPA_ALLOWED_RESUME_CONTENT_TYPES`; size against `KPA_MAX_UPLOAD_BYTES`. The file is persisted under `KPA_STORAGE_ROOT` (gitignored `var/` by default); the resume row in `kpa.resumes` lands with `parse_status=pending`. Parsing is a later plan.
+
+There's no auth in this slice — the applicant id is supplied directly in the URL. The `/v1/applicants/me/resumes` alias lands with the auth plan.
+
+Quick test from the shell once the server is running:
+
+```bash
+# Create a user + applicant first via psql (until signup endpoints exist).
+PGPASSWORD=kpa psql -h localhost -U kpa -d kpa <<'SQL'
+INSERT INTO kpa.users (id, email, role) VALUES (gen_random_uuid(), 'demo@example.com', 'applicant');
+INSERT INTO kpa.applicants (id, user_id, full_name)
+SELECT gen_random_uuid(), id, 'Demo' FROM kpa.users WHERE email = 'demo@example.com';
+SELECT id FROM kpa.applicants WHERE full_name = 'Demo';
+SQL
+
+APPLICANT_ID=<paste the id from above>
+curl -s -X POST "http://127.0.0.1:8000/v1/applicants/$APPLICANT_ID/resumes" \
+    -F "file=@/path/to/cv.pdf" | python -m json.tool
+```
+
 ### Run with JSON logs (prod-style)
 
 For Fluent Bit / Elasticsearch compatibility, flip the log format:
@@ -174,6 +203,9 @@ All settings are read from environment variables prefixed `KPA_`:
 | `KPA_ENV`          | yes      | —       | `local` \| `dev` \| `staging` \| `prod` |
 | `KPA_SERVICE_NAME` | yes      | —       | Reported in `/health`           |
 | `KPA_DB_URL`       | yes      | —       | SQLAlchemy DSN; must use the `postgresql+asyncpg://` driver |
+| `KPA_STORAGE_ROOT` | no       | `var/uploads` | Filesystem root for `LocalFileStorage`. Relative paths resolve against CWD. |
+| `KPA_MAX_UPLOAD_BYTES` | no   | `10485760` | Max bytes per upload (10 MiB).                      |
+| `KPA_ALLOWED_RESUME_CONTENT_TYPES` | no | (pdf, doc, docx) | Comma-separated content-type whitelist. |
 | `KPA_LOG_LEVEL`    | no       | `INFO`  | Stdlib log level                |
 | `KPA_LOG_FORMAT`   | no       | `text`  | `text` (key=value) or `json`    |
 
@@ -185,7 +217,7 @@ The service refuses to boot if required variables are missing or invalid.
 api/
 ├── alembic.ini
 ├── src/kpa/
-│   ├── app_factory.py        # create_app() — middlewares + routes + engine
+│   ├── app_factory.py        # create_app() — middlewares + routes + engine + storage
 │   ├── main.py               # uvicorn entry point
 │   ├── settings.py
 │   ├── middleware/
@@ -193,13 +225,16 @@ api/
 │   │   └── error_handler.py  # RFC 7807 problem+json
 │   ├── observability/
 │   │   └── logging.py        # structlog config
+│   ├── integrations/
+│   │   └── storage/          # Storage protocol + LocalFileStorage
 │   ├── db/
 │   │   ├── session.py        # async engine, sessionmaker, get_session dep
-│   │   ├── models.py         # Base, User, Applicant
+│   │   ├── models.py         # Base, User, Applicant, Resume
 │   │   └── migrations/       # alembic env + versions/
 │   └── routes/
 │       ├── health.py         # GET /health (liveness)
-│       └── ready.py          # GET /ready (readiness, DB ping)
+│       ├── ready.py          # GET /ready (readiness, DB ping)
+│       └── resumes.py        # /v1/applicants/{aid}/resumes …
 └── tests/
     ├── unit/                 # no DB required
     └── integration/          # require local Postgres (savepoint isolation)
