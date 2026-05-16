@@ -6,7 +6,12 @@ These tests only verify lifecycle + wiring against a stubbed engine.
 
 from __future__ import annotations
 
+from unittest.mock import AsyncMock, MagicMock
+
 import pytest
+from fastapi import Depends, Request
+from fastapi.testclient import TestClient
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from kpa.db import session as session_module
 
@@ -23,13 +28,69 @@ def test_create_engine_uses_settings_db_url(monkeypatch: pytest.MonkeyPatch) -> 
     assert engine.dialect.name == "postgresql"
 
 
-async def test_get_session_yields_and_closes(monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_get_session_yields_session_from_app_state() -> None:
+    """get_session pulls the sessionmaker off request.app.state and yields one session."""
+    fake_session = AsyncMock(spec=AsyncSession)
+    sm = MagicMock(spec=async_sessionmaker)
+    # async_sessionmaker is callable; calling it returns an async context manager.
+    sm.return_value.__aenter__.return_value = fake_session
+    sm.return_value.__aexit__.return_value = None
+
+    request = MagicMock(spec=Request)
+    request.app.state.db_sessionmaker = sm
+
+    yielded = []
+    async for s in session_module.get_session(request):
+        yielded.append(s)
+
+    assert yielded == [fake_session]
+    fake_session.rollback.assert_not_awaited()
+
+
+async def test_get_session_rolls_back_on_exception() -> None:
+    """If the consumer raises, get_session calls rollback before propagating."""
+    fake_session = AsyncMock(spec=AsyncSession)
+    sm = MagicMock(spec=async_sessionmaker)
+    sm.return_value.__aenter__.return_value = fake_session
+    sm.return_value.__aexit__.return_value = None
+
+    request = MagicMock(spec=Request)
+    request.app.state.db_sessionmaker = sm
+
+    gen = session_module.get_session(request)
+    await gen.__anext__()  # enter the with-block, get the session
+    with pytest.raises(RuntimeError, match="boom"):
+        await gen.athrow(RuntimeError("boom"))
+
+    fake_session.rollback.assert_awaited_once()
+
+
+def test_get_session_can_be_used_as_fastapi_dependency(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Route registration must succeed when Depends(get_session) is used.
+
+    Regression guard for the original parameter-shape bug. We don't need a
+    live DB — we override the dependency with a stub that yields a sentinel.
+    """
     monkeypatch.setenv("KPA_ENV", "local")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://u:p@h:5432/d")
 
-    # We don't need a real DB connection for this lifecycle test.
-    sm = session_module.make_sessionmaker(session_module.create_engine_from_settings())
-    async for s in session_module.get_session(sm):
-        assert s is not None
-        assert not s.is_active or s.is_active  # exists; will be closed on context exit
+    from kpa.app_factory import create_app
+
+    app = create_app()
+
+    sentinel = object()
+
+    async def _stub_session():
+        yield sentinel
+
+    app.dependency_overrides[session_module.get_session] = _stub_session
+
+    @app.get("/_probe")
+    async def _probe(s=Depends(session_module.get_session)):  # noqa: B008
+        return {"ok": s is sentinel}
+
+    with TestClient(app) as client:
+        response = client.get("/_probe")
+    assert response.status_code == 200
+    assert response.json() == {"ok": True}
