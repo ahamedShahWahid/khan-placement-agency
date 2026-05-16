@@ -8,6 +8,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 
 from kpa import __version__
+from kpa.middleware.request_id import RequestIdMiddleware
 from kpa.routes import health
 from kpa.settings import Settings
 
@@ -20,6 +21,7 @@ def create_app() -> FastAPI:
         openapi_url="/openapi.json",
     )
     app.state.settings = settings
+    app.add_middleware(RequestIdMiddleware)
     # /health is intentionally not under /v1 — ALB and Kubernetes probes target
     # it directly. Versioned API routes will be mounted with prefix="/v1" later.
     app.include_router(health.router)
