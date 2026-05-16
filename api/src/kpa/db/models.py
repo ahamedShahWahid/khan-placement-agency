@@ -15,9 +15,9 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Annotated, Any
 
-from sqlalchemy import Boolean, DateTime, Index, String, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Integer, Numeric, String, func
 from sqlalchemy import Enum as SAEnum
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -90,3 +90,28 @@ class User(Base):
         Index("ix_users_phone_live", "phone", postgresql_where="deleted_at IS NULL"),
         {"schema": "kpa"},
     )
+
+
+class Applicant(Base):
+    """Applicant profile — see spec §5."""
+
+    __tablename__ = "applicants"
+
+    id: Mapped[UuidPK]
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("kpa.users.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+    )
+    full_name: Mapped[str] = mapped_column(String(200), nullable=False)
+    locations: Mapped[list[str]] = mapped_column(
+        ARRAY(String(100)), nullable=False, server_default="{}"
+    )
+    notice_period_days: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    current_ctc: Mapped[float | None] = mapped_column(Numeric(12, 2), nullable=True)
+    expected_ctc: Mapped[float | None] = mapped_column(Numeric(12, 2), nullable=True)
+    years_experience: Mapped[float | None] = mapped_column(Numeric(4, 1), nullable=True)
+    created_at: Mapped[CreatedAt]
+    updated_at: Mapped[UpdatedAt]
+    deleted_at: Mapped[DeletedAt]
