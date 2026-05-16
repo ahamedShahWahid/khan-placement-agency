@@ -13,6 +13,7 @@ def test_ready_returns_200_when_db_reachable(db_url: str, monkeypatch: pytest.Mo
     monkeypatch.setenv("KPA_DB_URL", db_url)
 
     from kpa.app_factory import create_app  # import after env is set
+
     with TestClient(create_app()) as c:
         response = c.get("/ready")
     assert response.status_code == 200
@@ -29,6 +30,7 @@ def test_ready_returns_503_when_db_unreachable(monkeypatch: pytest.MonkeyPatch) 
     )
 
     from kpa.app_factory import create_app
+
     # raise_server_exceptions=False is NOT needed — the /ready handler catches all
     # exceptions (including bare OSError from asyncpg) and returns 503 gracefully.
     # Kept False as a safety net so asyncpg teardown noise doesn't fail the test.

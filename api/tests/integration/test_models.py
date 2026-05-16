@@ -17,9 +17,7 @@ async def test_create_user_and_applicant(session: AsyncSession) -> None:
     user = User(email="a@example.com", role=UserRole.APPLICANT)
     session.add(user)
     await session.flush()
-    applicant = Applicant(
-        user_id=user.id, full_name="A. Test", locations=["Bengaluru", "Pune"]
-    )
+    applicant = Applicant(user_id=user.id, full_name="A. Test", locations=["Bengaluru", "Pune"])
     session.add(applicant)
     await session.commit()
 
@@ -41,9 +39,7 @@ async def test_cascade_delete_user_deletes_applicant(session: AsyncSession) -> N
     await session.delete(user)
     await session.commit()
 
-    remaining = (
-        await session.execute(select(Applicant).where(Applicant.user_id == user.id))
-    ).all()
+    remaining = (await session.execute(select(Applicant).where(Applicant.user_id == user.id))).all()
     assert remaining == []
 
 

@@ -21,7 +21,9 @@ def upgrade() -> None:
     op.execute("CREATE SCHEMA IF NOT EXISTS kpa")
 
     user_role = postgresql.ENUM(
-        "applicant", "recruiter", "admin",
+        "applicant",
+        "recruiter",
+        "admin",
         name="user_role",
         schema="kpa",
         create_type=True,
@@ -57,12 +59,18 @@ def upgrade() -> None:
         schema="kpa",
     )
     op.create_index(
-        "ix_users_email_live", "users", ["email"],
-        schema="kpa", postgresql_where=sa.text("deleted_at IS NULL"),
+        "ix_users_email_live",
+        "users",
+        ["email"],
+        schema="kpa",
+        postgresql_where=sa.text("deleted_at IS NULL"),
     )
     op.create_index(
-        "ix_users_phone_live", "users", ["phone"],
-        schema="kpa", postgresql_where=sa.text("deleted_at IS NULL"),
+        "ix_users_phone_live",
+        "users",
+        ["phone"],
+        schema="kpa",
+        postgresql_where=sa.text("deleted_at IS NULL"),
     )
 
     op.create_table(
