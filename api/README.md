@@ -8,7 +8,9 @@ follow-on plans.
 
 - Python 3.12
 - [uv](https://docs.astral.sh/uv/) 0.5+
-- Docker (for container builds + future local Postgres/Redis)
+- Postgres 16 (Homebrew — set up in the *Database* section of this README once the DB layer lands)
+
+Docker is **not** required for MVP work. Containerization rejoins the project at the deploy-target step (see `IMPLEMENTATION_SPEC.md` §11.1 / §13 P5).
 
 ## First-time setup
 
@@ -91,15 +93,6 @@ uv run pytest -v
 uv run ruff check src/ tests/
 uv run ruff format src/ tests/
 uv run mypy
-```
-
-## Container build
-
-```bash
-docker build -t kpa-api:dev .
-docker run --rm -e KPA_ENV=local -e KPA_SERVICE_NAME=kpa-api \
-  -e KPA_LOG_LEVEL=INFO -e KPA_LOG_FORMAT=text \
-  -p 8000:8000 kpa-api:dev
 ```
 
 ## Configuration

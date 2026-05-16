@@ -1,9 +1,11 @@
-# KPA — Implementation Spec v0.1
+# KPA — Implementation Spec v0.2
 
 **Source of truth for product scope:** `~/Downloads/KPA_Enhanced_BRD_v1_1.pdf` (BRD/PRD v1.1, dated 2026-05-15).
-**This document:** how we build it. Owner: Ahamed. Status: first draft.
+**This document:** how we build it. Owner: Ahamed. Status: MVP-first draft.
 
 > Frontend decision (overrides BRD): **Flutter for mobile + web from a single Dart codebase.** Next.js is out of scope. A separate static/SSR surface for SEO-sensitive pages is an open decision (see §14).
+
+> **MVP-first sequencing (v0.2 change):** the goal of the next several plans is a *working MVP*, not the production-grade runtime described in §11. Until launch, dev runs locally on Homebrew Postgres + `uvicorn`; Docker, EKS, Helm, ArgoCD, ECR, and Terraform are explicitly **deferred**. §11 now describes both the MVP runtime and the post-MVP scale path; §13 sequences toward the MVP shape first. Pick the deploy target in P5, not earlier.
 
 ---
 
@@ -32,25 +34,26 @@ Explicitly **out** of MVP:
                                         │ HTTPS / JSON
                                         ▼
                           ┌────────────────────────────┐
-                          │  CloudFront  →  ALB        │
+                          │  CDN  →  Load balancer     │
+                          │  (post-MVP; see §11)       │
                           └─────────────┬──────────────┘
                                         ▼
                           ┌────────────────────────────┐
-                          │  FastAPI (EKS) — REST API  │
+                          │  FastAPI — REST API        │
                           │  Async (uvicorn workers)   │
                           └──┬───────┬─────────┬───────┘
                              │       │         │
               ┌──────────────┘       │         └──────────────┐
               ▼                      ▼                        ▼
       ┌──────────────┐       ┌──────────────┐         ┌──────────────┐
-      │  Postgres    │       │  Redis       │         │  S3          │
-      │  + pgvector  │       │  cache + bro │         │  resumes,    │
-      │  (RDS)       │       │  ker         │         │  exports     │
+      │  Postgres    │       │  Redis       │         │  Object      │
+      │  + pgvector  │       │  cache +     │         │  storage     │
+      │              │       │  broker      │         │  (S3 / local)│
       └──────────────┘       └──────┬───────┘         └──────────────┘
                                     │
                                     ▼
                           ┌────────────────────────────┐
-                          │  Celery workers (EKS)      │
+                          │  Celery workers            │
                           │  - parse  - ingest         │
                           │  - embed  - score          │
                           │  - notify - export/delete  │
@@ -419,15 +422,34 @@ p95 latency budget per BRD: ≤ 400 ms for GETs on the read replica. Hot endpoin
 
 ## 11. Infrastructure
 
-- AWS region: `ap-south-1` (Mumbai), per BRD.
-- Compute: EKS, one cluster per env (`dev`, `staging`, `prod`). Node groups: `api-pool` (general-purpose), `worker-pool` (CPU-heavier, separate ASG). Karpenter for opportunistic scale-out on ingest spikes.
+The MVP path is deliberately small — local first, with one minimal hosted footprint at launch. Heavier infrastructure (EKS, Helm, GitOps, IaC) is **deferred** until the product is validated.
+
+### 11.1 MVP runtime
+
+- **Local dev:**
+  - Python service: `uv run uvicorn kpa.main:app --reload` (no container required).
+  - Postgres 16: Homebrew (`brew install postgresql@16`, `brew services start postgresql@16`). One local cluster, two databases: `kpa` (dev) and `kpa_test` (integration tests). pgvector via `CREATE EXTENSION vector;` once we hit P1.
+  - Redis: deferred to the plan that introduces Celery (P3-era); until then the API runs synchronously where possible.
+  - Object storage: local filesystem under `./var/uploads/` during dev; an S3 bucket can be slotted in via `integrations/storage_s3.py` once the parse pipeline lands.
+  - Secrets: a git-ignored `.env` file loaded by `uv run --env-file=.env ...`. No AWS at this stage.
+- **CI:** GitHub Actions runs ruff + mypy + pytest (unit + integration) against a Postgres service container provided by the workflow (the *one* container in the loop, owned by CI, not the developer). The repo itself ships no Dockerfile/compose file.
+- **Deployment target for MVP launch:** **TBD — picked at P5 (§13).** Candidates considered: Fly.io (region: BOM/SIN, DPDP-friendly), Render (region: SIN), a small EC2 box. The choice is intentionally late so we keep options open until we know real traffic shape, latency requirements, and budget. Whatever we pick must be in/near `ap-south-1` to honour the DPDP residency commitment (§9.2).
+
+### 11.2 Post-MVP scale path (informational, not active work)
+
+Once MVP traffic and product-market fit are established, the following sections are the planned evolution — **do not build these for MVP**:
+
+- AWS region `ap-south-1` (Mumbai), per BRD.
+- Compute: EKS, one cluster per env (`dev`, `staging`, `prod`). Node groups: `api-pool`, `worker-pool`. Karpenter for ingest-spike scale-out.
 - Postgres: RDS Postgres 16 with one read replica. Multi-AZ in prod.
-- Redis: ElastiCache with replication group; one logical cluster, separate logical DBs for cache vs broker vs rate-limit.
-- Object storage: S3 buckets per purpose (`kpa-resumes-{env}`, `kpa-exports-{env}`, `kpa-static-{env}`). Lifecycle: resumes versioned + 90-day glacier transition; exports 7-day expiry.
+- Redis: ElastiCache replication group; separate logical DBs for cache / broker / rate-limit.
+- Object storage: S3 buckets per purpose (`kpa-resumes-{env}`, `kpa-exports-{env}`, `kpa-static-{env}`). Lifecycle: resumes versioned + 90-day Glacier transition; exports 7-day expiry.
 - CDN: CloudFront in front of the static Flutter web bundle and S3-served public assets.
-- Secrets: AWS Secrets Manager (rotating where supported) + Parameter Store (non-secret config).
-- IaC: Terraform for AWS resources; Helm charts for app deployment. ArgoCD watches `infra/` repo for GitOps.
-- CI/CD: GitHub Actions — build, test, type-check, OpenAPI snapshot, OWASP dep check, container build, push to ECR, ArgoCD sync.
+- Secrets: AWS Secrets Manager (rotating where supported) + Parameter Store.
+- IaC: Terraform for AWS resources; Helm charts for app deployment. ArgoCD on `infra/` for GitOps.
+- CI/CD evolution: GitHub Actions extended with container build → push to ECR → ArgoCD sync.
+
+Code-level abstractions (the storage interface, the LLM provider interface, the engine factory in `db/session.py`) are designed so the swap from MVP runtime to this footprint is a configuration change, not a rewrite.
 
 ---
 
@@ -445,12 +467,13 @@ p95 latency budget per BRD: ≤ 400 ms for GETs on the read replica. Hot endpoin
 Phases are sized for sequencing, not for a fixed calendar. Each phase ends with a demoable slice.
 
 **P0 — Foundations (1–2 weeks)**
-- Repo scaffolds (Flutter app, FastAPI service, Terraform, Helm).
-- Auth (Google + Apple + phone-OTP), `users`/`applicants` models, `GET /me`.
-- Dev env on EKS, CI green, OpenAPI codegen in place.
+- Repo scaffolds (Flutter app, FastAPI service). **No** Terraform/Helm/Docker yet — local dev only.
+- Local Postgres via Homebrew; Alembic migrations; first models (`users`, `applicants`).
+- Auth (Google + Apple + phone-OTP), `GET /me`.
+- CI green (ruff + mypy + pytest unit + pytest integration against a CI-provided Postgres), OpenAPI codegen in place.
 
 **P1 — Resume parse + embed (2 weeks)**
-- S3 presigned upload, parse worker, embedding worker, status surfacing.
+- Local-filesystem upload first; S3 presigned upload behind the same `storage` interface, switched on by env. Parse worker, embedding worker, status surfacing.
 - Gold dataset + parse F1 eval in CI (gate: ≥ 0.85 before P2; ≥ 0.90 before launch).
 
 **P2 — Jobs + matching (3 weeks)**
@@ -459,11 +482,13 @@ Phases are sized for sequencing, not for a fixed calendar. Each phase ends with 
 
 **P3 — Notifications + applications (1–2 weeks)**
 - Outbox + push + email; application tracking; saved jobs.
+- First introduction of Redis (locally via Homebrew) + Celery — still no Docker required for dev.
 
 **P4 — DPDP + admin (2 weeks)**
 - Consent screens; DSR export/delete pipelines; admin moderation + audit log viewer; MFA for admins.
 
 **P5 — Hardening + launch (2 weeks)**
+- **Pick the deploy target** (§11.1) and ship a single non-prod environment behind a real domain. This is the first point at which a container image, hosted DB, and managed Redis are required.
 - Load testing to BRD targets, security review (P0/P1 → zero), Lighthouse pass on Flutter web, RBAC review, runbooks.
 
 Approved-source ingestion (§6.2) is **off the critical path** for MVP and starts only after legal review concludes.

@@ -2,9 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Land the persistence layer for KPA — async SQLAlchemy 2.x against Postgres 16, Alembic migrations under the `kpa` schema, the first two domain tables (`users`, `applicants`), a `/ready` endpoint that verifies DB connectivity, and a local-dev `docker-compose.yml` so a fresh checkout reaches green tests with one command. No auth, no API surface beyond the readiness probe — those are the next plans.
+**Goal:** Land the persistence layer for KPA — async SQLAlchemy 2.x against Postgres 16, Alembic migrations under the `kpa` schema, the first two domain tables (`users`, `applicants`), and a `/ready` endpoint that verifies DB connectivity. A fresh checkout reaches green tests with one prerequisite: a locally running Postgres 16 from Homebrew. No auth, no API surface beyond the readiness probe — those are the next plans.
 
-**Architecture:** Following IMPLEMENTATION_SPEC.md §4.1 layout: `src/kpa/db/{session.py,models.py,migrations/}`. Async engine + `async_sessionmaker`, FastAPI dep `get_session()` yielding `AsyncSession`. UUID primary keys, soft delete via `deleted_at TIMESTAMPTZ NULL` on every domain table (spec §5). Alembic runs synchronously (the convention for async-SQLAlchemy projects); the runtime app stays async. One schema `kpa`; `search_path` set on the engine. Integration tests use `testcontainers-postgres` so the test DB is a real Postgres 16 (no SQLite, no mocks — Postgres-specific features will arrive in later plans).
+> **MVP-first note (v2 of this plan):** Docker is intentionally **out** of this plan. Per IMPLEMENTATION_SPEC.md §11.1, dev runs on Homebrew Postgres and CI runs against a Postgres service container the workflow provides. The repo ships no `docker-compose.yml` and no `Dockerfile` at this stage. The goal is to keep the on-ramp to a working MVP as short as possible; containerization rejoins the plan at P5 when we pick a deploy target.
+
+**Architecture:** Following IMPLEMENTATION_SPEC.md §4.1 layout: `src/kpa/db/{session.py,models.py,migrations/}`. Async engine + `async_sessionmaker`, FastAPI dep `get_session()` yielding `AsyncSession`. UUID primary keys, soft delete via `deleted_at TIMESTAMPTZ NULL` on every domain table (spec §5). Alembic runs synchronously (the convention for async-SQLAlchemy projects); the runtime app stays async. One schema `kpa`; `search_path` set on the engine. Integration tests connect to a `kpa_test` database on the same local Postgres, run Alembic once per session, and isolate per-test writes with a connect-scoped transaction + `join_transaction_mode="create_savepoint"` (so tests can freely call `await session.commit()` and the outer transaction still rolls back at fixture teardown). No SQLite, no mocks — Postgres-specific features (ARRAY, partial indexes, ENUM) light up immediately; pgvector lands in a later plan.
 
 **Deferred to later plans (intentionally):**
 - R/W split (spec §5) — single engine for now; routing dependency is a P5 hardening concern.
@@ -12,8 +14,9 @@
 - Remaining §5 tables (employers, jobs, matches, resumes, notifications, consents, dsr_requests, audit_logs, ingest_*) — separate plans, one slice at a time.
 - Migration history rebase tooling, automatic-revision-on-model-change CI — when the model surface is large enough to warrant it.
 - User-creation endpoints — land with the auth plan.
+- Any container or deploy story — deferred to P5 (§11.1 of the spec).
 
-**Tech additions:** SQLAlchemy 2.x async, asyncpg, Alembic, testcontainers-postgres. No new linters; existing ruff + mypy --strict cover the new code.
+**Tech additions:** SQLAlchemy 2.x async, asyncpg, Alembic. No new linters; existing ruff + mypy --strict cover the new code. **Not added:** testcontainers, docker-compose.
 
 **Working branch:** `feat/p0-db-layer-and-user-model` branched **off `feat/p0-backend-foundations`** (i.e., stacked on PR #1). When PR #1 merges, rebase onto `main`. This avoids re-establishing the FastAPI scaffolding and lets the DB code integrate with `app.state.settings` immediately.
 
@@ -23,11 +26,10 @@
 
 ```
 api/
-├── docker-compose.yml                 # local Postgres 16
-├── pyproject.toml                     # + sqlalchemy[asyncio], asyncpg, alembic, testcontainers[postgresql]
+├── pyproject.toml                     # + sqlalchemy[asyncio], asyncpg, alembic
 ├── alembic.ini                        # alembic config
 ├── .env.example                       # + KPA_DB_URL
-├── README.md                          # + DB setup section
+├── README.md                          # + DB setup section (Homebrew Postgres)
 ├── src/kpa/
 │   ├── settings.py                    # + db_url field
 │   ├── app_factory.py                 # + register /ready router
@@ -43,17 +45,19 @@ api/
 │   └── routes/
 │       └── ready.py                   # GET /ready with DB ping
 └── tests/
-    ├── conftest.py                    # + docker-skip marker + db fixture
+    ├── conftest.py                    # unchanged
     ├── unit/
     │   ├── test_settings.py           # + db_url validation
     │   └── test_session.py            # session lifecycle (mocked engine)
     └── integration/
         ├── __init__.py
-        ├── conftest.py                # testcontainers Postgres fixture
+        ├── conftest.py                # local-Postgres fixture + savepoint isolation
         ├── test_migrations.py         # alembic upgrade head succeeds
         ├── test_models.py             # CRUD + soft-delete + cascade
         └── test_ready.py              # /ready returns 200 with live DB, 503 without
 ```
+
+No `docker-compose.yml`, no `Dockerfile` — that's intentional (see the MVP-first note above).
 
 ---
 
@@ -62,7 +66,7 @@ api/
 **Files:**
 - Modify: `api/pyproject.toml`
 
-- [ ] **Step 1: Add dependencies to `[project]` and `[dependency-groups.dev]`**
+- [ ] **Step 1: Add dependencies to `[project]`**
 
 `[project].dependencies` adds:
 ```toml
@@ -71,10 +75,7 @@ api/
 "alembic>=1.14,<2",
 ```
 
-`[dependency-groups].dev` adds:
-```toml
-"testcontainers[postgresql]>=4.8,<5",
-```
+No new dev dependencies — integration tests use stdlib `os` and the same SQLAlchemy/asyncpg/alembic already in `[project]`.
 
 - [ ] **Step 2: Resolve and verify install**
 
@@ -95,7 +96,7 @@ Expected: prints three version strings, no errors.
 
 ```bash
 git add api/pyproject.toml api/uv.lock
-git commit -m "chore(api): add sqlalchemy async, asyncpg, alembic, testcontainers"
+git commit -m "chore(api): add sqlalchemy async, asyncpg, alembic"
 ```
 
 ---
@@ -191,58 +192,57 @@ git commit -m "feat(api): add required KPA_DB_URL setting with async-driver vali
 
 ---
 
-### Task 3: docker-compose for local Postgres 16
+### Task 3: Local Postgres 16 via Homebrew (no commit — setup only)
 
-**Files:**
-- Create: `api/docker-compose.yml`
+This task installs a real Postgres 16 on the dev machine and creates the two databases the rest of the plan needs (`kpa` for dev, `kpa_test` for integration tests). It produces **no committed files** — it's one-time machine setup that the README will document at Task 11.
 
-- [ ] **Step 1: Write `docker-compose.yml`**
+**Files:** none (machine setup).
 
-```yaml
-# Local Postgres 16 for kpa-api development.
-# Brought up by: `docker compose up -d`
-# Tear down + wipe: `docker compose down -v`
-
-services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: kpa-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: kpa
-      POSTGRES_PASSWORD: kpa
-      POSTGRES_DB: kpa
-    ports:
-      - "5432:5432"
-    volumes:
-      - kpa-pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U kpa -d kpa"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-
-volumes:
-  kpa-pgdata:
-```
-
-- [ ] **Step 2: Smoke-test locally (skip if no Docker daemon)**
+- [ ] **Step 1: Install Postgres 16 via Homebrew**
 
 ```bash
-docker compose up -d
-docker compose ps   # postgres should be "healthy" within ~10s
-docker compose exec postgres psql -U kpa -d kpa -c "SELECT version();"
-docker compose down
+brew install postgresql@16
+brew services start postgresql@16
+# Add to PATH for this shell if `psql` isn't found (brew prints the exact line):
+#   echo 'export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"' >> ~/.zshrc
 ```
 
-If Docker daemon is not running, mark this step as deferred and document in the commit message. Tests will still pass via testcontainers when Docker becomes available.
+Verify:
+```bash
+psql --version            # expect: psql (PostgreSQL) 16.x
+pg_isready                # expect: /tmp:5432 - accepting connections
+```
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 2: Create the `kpa` role and two databases**
+
+Homebrew Postgres trusts the local OS user by default; we create a dedicated `kpa` role so the connection string in `.env` matches what CI uses and what the rest of the team's machines will look like.
 
 ```bash
-git add api/docker-compose.yml
-git commit -m "chore(api): add docker-compose for local Postgres 16"
+psql -d postgres <<'SQL'
+CREATE ROLE kpa WITH LOGIN PASSWORD 'kpa' CREATEDB;
+CREATE DATABASE kpa OWNER kpa;
+CREATE DATABASE kpa_test OWNER kpa;
+SQL
 ```
+
+(`CREATEDB` on the role makes future `kpa_test` resets cheap if we ever need them.)
+
+Verify the connection the app will use:
+```bash
+PGPASSWORD=kpa psql -h localhost -U kpa -d kpa -c "SELECT current_database(), current_user;"
+# expect one row: kpa | kpa
+PGPASSWORD=kpa psql -h localhost -U kpa -d kpa_test -c "SELECT current_database();"
+# expect: kpa_test
+```
+
+- [ ] **Step 3: Confirm `.env` matches**
+
+`api/.env` should already have (from the Settings task, next):
+```
+KPA_DB_URL=postgresql+asyncpg://kpa:kpa@localhost:5432/kpa
+```
+
+Nothing to commit at this step — the README update in Task 11 will record this setup for anyone joining the project.
 
 ---
 
@@ -784,25 +784,26 @@ def downgrade() -> None:
     op.execute("DROP SCHEMA IF EXISTS kpa")
 ```
 
-- [ ] **Step 5: Smoke-test the migration locally (requires Docker)**
+- [ ] **Step 5: Smoke-test the migration against local Postgres**
+
+Assumes `brew services start postgresql@16` is running and the `kpa` database exists (Task 3).
 
 ```bash
-docker compose up -d
 cd api
 KPA_ENV=local KPA_SERVICE_NAME=kpa-api \
   KPA_DB_URL=postgresql+asyncpg://kpa:kpa@localhost:5432/kpa \
   uv run alembic upgrade head
 # Verify
-docker compose exec postgres psql -U kpa -d kpa -c "\dt kpa.*"
+PGPASSWORD=kpa psql -h localhost -U kpa -d kpa -c "\dt kpa.*"
 # Should list kpa.users and kpa.applicants.
 KPA_ENV=local KPA_SERVICE_NAME=kpa-api \
   KPA_DB_URL=postgresql+asyncpg://kpa:kpa@localhost:5432/kpa \
   uv run alembic downgrade base
-docker compose exec postgres psql -U kpa -d kpa -c "\dt kpa.*"
+PGPASSWORD=kpa psql -h localhost -U kpa -d kpa -c "\dt kpa.*"
 # Should list nothing.
 ```
 
-If Docker is unavailable: skip this step; the integration tests in Task 9 will exercise the migration via testcontainers.
+If Postgres isn't running yet, finish Task 3 first; the integration tests in Task 9 also exercise the migration.
 
 - [ ] **Step 6: Commit**
 
@@ -813,7 +814,7 @@ git commit -m "feat(api): add Alembic migrations and initial users+applicants sc
 
 ---
 
-### Task 9: Integration tests (testcontainers Postgres)
+### Task 9: Integration tests (local Postgres + savepoint isolation)
 
 **Files:**
 - Create: `api/tests/integration/__init__.py`
@@ -822,55 +823,70 @@ git commit -m "feat(api): add Alembic migrations and initial users+applicants sc
 - Create: `api/tests/integration/test_models.py`
 - Modify: `api/pyproject.toml` (add `integration` marker)
 
+**Why no testcontainers:** we want the MVP on-ramp to stay short. The whole team (and CI) already has Postgres available — locally via Homebrew, in CI via a GitHub Actions service container. Bringing testcontainers + Docker into the dev loop is unnecessary weight at this stage. Per-test isolation is achieved with a SQLAlchemy 2.0 trick: bind the session to a live connection that owns an outer transaction, and use `join_transaction_mode="create_savepoint"` so test code can `commit()` against a savepoint while the outer transaction rolls back at fixture teardown.
+
 - [ ] **Step 1: Register the `integration` marker**
 
 In `pyproject.toml` `[tool.pytest.ini_options]`:
 ```toml
 markers = [
-    "integration: tests that require Docker for a real Postgres instance",
+    "integration: tests that require a running local Postgres (see README §Database)",
 ]
 ```
 
-- [ ] **Step 2: Write the testcontainers fixture**
+- [ ] **Step 2: Write the local-Postgres fixture**
 
 Create `tests/integration/__init__.py` (empty).
 
 Create `tests/integration/conftest.py`:
 ```python
-"""Integration test fixtures — real Postgres 16 via testcontainers."""
+"""Integration test fixtures — real Postgres 16 from local Homebrew.
+
+Per-test isolation strategy: each test gets an `AsyncSession` bound to a
+connection that holds an outer transaction. The session uses SQLAlchemy 2.0's
+``join_transaction_mode="create_savepoint"`` so test code can freely call
+``await session.commit()`` — that commits a savepoint, not the outer txn — and
+the fixture rolls back the outer transaction at teardown. No truncation, no
+container churn, fast.
+"""
 
 from __future__ import annotations
 
+import os
 from collections.abc import AsyncIterator, Iterator
 
 import pytest
 import pytest_asyncio
 from alembic import command
 from alembic.config import Config
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from testcontainers.postgres import PostgresContainer
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 
 pytestmark = pytest.mark.integration
 
 
-@pytest.fixture(scope="session")
-def postgres_container() -> Iterator[PostgresContainer]:
-    with PostgresContainer("postgres:16-alpine") as pg:
-        yield pg
+DEFAULT_TEST_DB_URL = "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa_test"
 
 
 @pytest.fixture(scope="session")
-def db_url(postgres_container: PostgresContainer) -> str:
-    raw = postgres_container.get_connection_url()
-    # testcontainers returns psycopg2 driver by default; swap to asyncpg.
-    return raw.replace("postgresql+psycopg2://", "postgresql+asyncpg://").replace(
-        "postgresql://", "postgresql+asyncpg://", 1
-    )
+def db_url() -> str:
+    """Connection URL for the integration test database.
+
+    Defaults to the local Homebrew Postgres set up in the README. Override
+    via ``KPA_TEST_DB_URL`` in CI (where Postgres runs as a service
+    container) or on a teammate's machine with a different layout.
+    """
+    return os.environ.get("KPA_TEST_DB_URL", DEFAULT_TEST_DB_URL)
 
 
 @pytest.fixture(scope="session")
 def migrated_db(db_url: str, monkeypatch_session: pytest.MonkeyPatch) -> str:
+    """Apply alembic upgrade head against the test database once per session."""
     monkeypatch_session.setenv("KPA_ENV", "local")
     monkeypatch_session.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch_session.setenv("KPA_DB_URL", db_url)
@@ -879,14 +895,25 @@ def migrated_db(db_url: str, monkeypatch_session: pytest.MonkeyPatch) -> str:
     return db_url
 
 
-@pytest.fixture
-async def session(migrated_db: str) -> AsyncIterator[AsyncSession]:
-    engine = create_async_engine(migrated_db)
-    sm = async_sessionmaker(engine, expire_on_commit=False)
-    async with sm() as s:
-        yield s
-        await s.rollback()
-    await engine.dispose()
+@pytest.fixture(scope="session")
+def engine(migrated_db: str) -> AsyncEngine:
+    """Session-scoped async engine. No explicit dispose — relies on process exit."""
+    return create_async_engine(migrated_db)
+
+
+@pytest_asyncio.fixture
+async def session(engine: AsyncEngine) -> AsyncIterator[AsyncSession]:
+    """Per-test session with savepoint-based rollback isolation."""
+    async with engine.connect() as connection:
+        trans = await connection.begin()
+        sm = async_sessionmaker(
+            bind=connection,
+            expire_on_commit=False,
+            join_transaction_mode="create_savepoint",
+        )
+        async with sm() as s:
+            yield s
+        await trans.rollback()
 
 
 @pytest.fixture(scope="session")
@@ -895,6 +922,8 @@ def monkeypatch_session() -> Iterator[pytest.MonkeyPatch]:
     yield mp
     mp.undo()
 ```
+
+If `pytest_asyncio` is not yet imported elsewhere as a fixture, the import here is sufficient. The `migrated_db` fixture is a no-op on subsequent runs because Alembic's `upgrade head` short-circuits when the DB is already at head — the `kpa_test` schema persists across runs by design.
 
 - [ ] **Step 3: Migration smoke test**
 
@@ -1011,20 +1040,20 @@ async def test_unique_email_constraint(session: AsyncSession) -> None:
 
 - [ ] **Step 5: Run integration tests**
 
+Prereq: brew Postgres is running and `kpa_test` exists (Task 3).
+
 ```bash
 cd api
 uv run pytest tests/integration -v -m integration
 ```
 
-Expected: 7 tests pass (1 round-trip migration check + 2 index checks + 4 model checks; counts may shift as tests evolve).
-
-If Docker is unavailable, document that integration tests are CI-only.
+Expected: 7 tests pass (1 round-trip migration check + 2 index checks + 4 model checks; counts may shift as tests evolve). On a fresh `kpa_test` database, the first run also applies migrations; subsequent runs are no-ops on the schema side.
 
 - [ ] **Step 6: Commit**
 
 ```bash
 git add api/tests/integration/ api/pyproject.toml
-git commit -m "test(api): add integration tests against testcontainers Postgres"
+git commit -m "test(api): add integration tests against local Postgres with savepoint isolation"
 ```
 
 ---
@@ -1160,27 +1189,40 @@ Insert after "Run locally":
 ````markdown
 ## Database
 
-Local dev uses a Postgres 16 container managed by `docker compose`.
+Local dev runs Postgres 16 directly via Homebrew — no Docker required for MVP work. CI runs the same Postgres as a GitHub Actions service container.
 
-### First-time setup
+### First-time setup (one-time, per machine)
 
 ```bash
-docker compose up -d                # starts Postgres on localhost:5432
-uv run alembic upgrade head         # applies migrations
+brew install postgresql@16
+brew services start postgresql@16
+
+# Create the role and the two databases (dev + integration tests).
+psql -d postgres <<'SQL'
+CREATE ROLE kpa WITH LOGIN PASSWORD 'kpa' CREATEDB;
+CREATE DATABASE kpa OWNER kpa;
+CREATE DATABASE kpa_test OWNER kpa;
+SQL
+
+uv run alembic upgrade head         # applies migrations to the dev DB
 ```
 
-The connection string lives in `.env`:
+The dev connection string lives in `.env`:
 ```
 KPA_DB_URL=postgresql+asyncpg://kpa:kpa@localhost:5432/kpa
 ```
 
+Integration tests connect to `kpa_test` by default; override with `KPA_TEST_DB_URL` if your local Postgres isn't on `localhost:5432`.
+
 ### Reset the database
 
 ```bash
-docker compose down -v              # wipes the volume
-docker compose up -d
+psql -d postgres -c "DROP DATABASE kpa;"
+psql -d postgres -c "CREATE DATABASE kpa OWNER kpa;"
 uv run alembic upgrade head
 ```
+
+(For `kpa_test`, repeat with `kpa_test`. Day-to-day this isn't necessary — integration tests use savepoint rollback for isolation, so the test DB stays clean across runs.)
 
 ### Generate a new migration
 
@@ -1200,36 +1242,34 @@ surface is small. Revisit once the table count grows past ~10.
 curl -s http://127.0.0.1:8000/ready | python -m json.tool
 ```
 
-`/ready` returns 200 when Postgres responds to `SELECT 1`, 503 otherwise.
-Use it for Kubernetes readiness probes; use `/health` (no DB) for liveness.
+`/ready` returns 200 when Postgres responds to `SELECT 1`, 503 otherwise. Use it for load-balancer readiness checks; use `/health` (no DB) for liveness.
 ````
 
-Also update the env-vars table to add `KPA_DB_URL`.
+Also update the env-vars table to add `KPA_DB_URL`, and remove the Docker line from the Requirements section (Docker is no longer required for MVP work).
 
 - [ ] **Step 2: Commit**
 
 ```bash
 git add api/README.md
-git commit -m "docs(api): document docker-compose, alembic, and /ready in README"
+git commit -m "docs(api): document Homebrew Postgres, alembic, and /ready in README"
 ```
 
 ---
 
 ## Final check
 
-After all tasks are complete, run the full local pipeline from `api/`:
+After all tasks are complete, run the full local pipeline from `api/` (assumes `brew services start postgresql@16` is running and both `kpa` and `kpa_test` exist):
 
 ```bash
-docker compose up -d
 uv run alembic upgrade head
 uv run ruff check src/ tests/
 uv run ruff format --check src/ tests/
 uv run mypy
 uv run pytest -v                    # unit only by default
-uv run pytest -v -m integration     # integration tier
+uv run pytest -v -m integration     # integration tier (hits kpa_test)
 ```
 
-All seven must exit 0 (the two `pytest` runs are separate by design — unit tests should not require Docker).
+All six must exit 0. The two `pytest` runs stay separate by design — unit tests must not require a live database, and the integration suite is the only thing that does.
 
 Then push the branch and open a PR against `main` (or against `feat/p0-backend-foundations` for a stacked PR if PR #1 hasn't merged yet).
 
