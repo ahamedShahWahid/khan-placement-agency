@@ -15,6 +15,7 @@ def app_with_boom(monkeypatch: pytest.MonkeyPatch) -> TestClient:
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_LOG_LEVEL", "INFO")
     monkeypatch.setenv("KPA_LOG_FORMAT", "text")
+    monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://u:p@h:5432/d")
 
     app = create_app()
 

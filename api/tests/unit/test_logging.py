@@ -18,6 +18,7 @@ def test_configure_logging_text_format_renders_key_equals_value(
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_LOG_LEVEL", "INFO")
     monkeypatch.setenv("KPA_LOG_FORMAT", "text")
+    monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://u:p@h:5432/d")
 
     configure_logging()
     log = structlog.get_logger("test")
@@ -39,6 +40,7 @@ def test_configure_logging_respects_log_level(
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_LOG_LEVEL", "WARNING")
     monkeypatch.setenv("KPA_LOG_FORMAT", "text")
+    monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://u:p@h:5432/d")
 
     configure_logging()
     log = structlog.get_logger("test")
@@ -57,6 +59,7 @@ def test_configure_logging_does_not_stack_handlers(
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_LOG_LEVEL", "INFO")
     monkeypatch.setenv("KPA_LOG_FORMAT", "text")
+    monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://u:p@h:5432/d")
 
     configure_logging()
     configure_logging()
