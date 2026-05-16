@@ -9,12 +9,14 @@ from fastapi import FastAPI
 
 from kpa import __version__
 from kpa.middleware.request_id import RequestIdMiddleware
+from kpa.observability.logging import configure_logging
 from kpa.routes import health
 from kpa.settings import Settings
 
 
 def create_app() -> FastAPI:
     settings = Settings()  # validated; raises on misconfiguration
+    configure_logging()
     app = FastAPI(
         title="Khan Placement Agency API",
         version=__version__,
