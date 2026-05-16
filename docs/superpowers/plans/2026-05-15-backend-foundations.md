@@ -1044,14 +1044,24 @@ def _problem(
     )
 
 
+def _phrase_for(status: int) -> str:
+    try:
+        return HTTPStatus(status).phrase
+    except ValueError:
+        return "Error"
+
+
 def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(HTTPException)
     async def _handle_http_exception(request: Request, exc: HTTPException) -> JSONResponse:
-        status = exc.status_code
-        title = HTTPStatus(status).phrase if status in HTTPStatus._value2member_map_ else "Error"
         detail = exc.detail if isinstance(exc.detail, str) else str(exc.detail)
         request_id = getattr(request.state, "request_id", "unknown")
-        return _problem(status=status, title=title, detail=detail, request_id=request_id)
+        return _problem(
+            status=exc.status_code,
+            title=_phrase_for(exc.status_code),
+            detail=detail,
+            request_id=request_id,
+        )
 
     @app.exception_handler(Exception)
     async def _handle_unhandled(request: Request, exc: Exception) -> JSONResponse:
