@@ -1017,6 +1017,8 @@ import structlog
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 
+from kpa.middleware.request_id import REQUEST_ID_HEADER
+
 _log = structlog.get_logger(__name__)
 
 
@@ -1072,12 +1074,17 @@ def register_error_handlers(app: FastAPI) -> None:
             path=request.url.path,
             method=request.method,
         )
-        return _problem(
+        response = _problem(
             status=500,
             title="Internal Server Error",
             detail="An unexpected error occurred.",
             request_id=request_id,
         )
+        # Starlette's ServerErrorMiddleware is outside RequestIdMiddleware, so a
+        # response produced here never re-enters the middleware that would
+        # normally attach the header. Set it explicitly to preserve correlation.
+        response.headers[REQUEST_ID_HEADER] = request_id
+        return response
 ```
 
 - [ ] **Step 4: Wire it into the app factory**
