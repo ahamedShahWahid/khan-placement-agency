@@ -77,7 +77,13 @@ class User(Base):
     email: Mapped[str | None] = mapped_column(String(254), nullable=True, unique=True)
     phone: Mapped[str | None] = mapped_column(String(20), nullable=True, unique=True)
     role: Mapped[UserRole] = mapped_column(
-        SAEnum(UserRole, name="user_role", native_enum=True, schema="kpa"),
+        SAEnum(
+            UserRole,
+            name="user_role",
+            native_enum=True,
+            schema="kpa",
+            values_callable=lambda x: [e.value for e in x],
+        ),
         nullable=False,
     )
     mfa_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
