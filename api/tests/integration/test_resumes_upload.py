@@ -181,3 +181,39 @@ async def test_get_resume_from_wrong_applicant_returns_404(
     response = await async_client.get(f"/v1/applicants/{intruder.id}/resumes/{posted['id']}")
 
     assert response.status_code == 404
+
+
+@pytest.mark.integration
+async def test_get_resume_404_detail_is_uniform(
+    async_client: httpx.AsyncClient, session: AsyncSession
+) -> None:
+    """All GET 404 cases must return the same `detail` to avoid leaking
+    whether the applicant id or the resume id was the missing piece.
+    """
+    real_applicant = await _make_applicant(session)
+    other_applicant = await _make_applicant(session)
+    post = await async_client.post(
+        f"/v1/applicants/{real_applicant.id}/resumes",
+        files={"file": ("cv.pdf", _TINY_PDF, "application/pdf")},
+    )
+    real_resume_id = post.json()["id"]
+
+    bogus_applicant = uuid.uuid4()
+    bogus_resume = uuid.uuid4()
+
+    cases = [
+        # Unknown applicant + random resume id.
+        f"/v1/applicants/{bogus_applicant}/resumes/{bogus_resume}",
+        # Real applicant + unknown resume id.
+        f"/v1/applicants/{real_applicant.id}/resumes/{bogus_resume}",
+        # Wrong applicant + real resume id.
+        f"/v1/applicants/{other_applicant.id}/resumes/{real_resume_id}",
+    ]
+
+    details = []
+    for url in cases:
+        response = await async_client.get(url)
+        assert response.status_code == 404, url
+        details.append(response.json().get("detail"))
+
+    assert len(set(details)) == 1, f"detail messages leak info: {details}"

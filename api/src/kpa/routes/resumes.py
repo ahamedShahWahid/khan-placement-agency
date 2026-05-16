@@ -122,16 +122,18 @@ async def get_resume(
     resume_id: UUID,
     session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> Resume:
-    # Apply the same live-applicant check as POST so we don't leak the
-    # resume's existence to callers using an unknown applicant id.
-    await _load_live_applicant(session, applicant_id)
-
+    # Single JOIN'd query so all 404 cases (unknown applicant, unknown
+    # resume, wrong applicant) collapse to the same detail message — see
+    # the commit message for why uniform 404s matter.
     row = (
         await session.execute(
-            select(Resume).where(
+            select(Resume)
+            .join(Applicant, Resume.applicant_id == Applicant.id)
+            .where(
                 Resume.id == resume_id,
                 Resume.applicant_id == applicant_id,
                 Resume.deleted_at.is_(None),
+                Applicant.deleted_at.is_(None),
             )
         )
     ).scalar_one_or_none()
