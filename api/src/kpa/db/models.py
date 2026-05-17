@@ -15,9 +15,9 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Annotated, Any
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Integer, Numeric, String, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Integer, Numeric, String, Text, func
 from sqlalchemy import Enum as SAEnum
-from sqlalchemy.dialects.postgresql import ARRAY, UUID
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -118,6 +118,52 @@ class Applicant(Base):
     current_ctc: Mapped[float | None] = mapped_column(Numeric(12, 2), nullable=True)
     expected_ctc: Mapped[float | None] = mapped_column(Numeric(12, 2), nullable=True)
     years_experience: Mapped[float | None] = mapped_column(Numeric(4, 1), nullable=True)
+    created_at: Mapped[CreatedAt]
+    updated_at: Mapped[UpdatedAt]
+    deleted_at: Mapped[DeletedAt]
+
+
+class ResumeParseStatus(StrEnum):
+    PENDING = "pending"
+    PARSING = "parsing"
+    PARSED = "parsed"
+    FAILED = "failed"
+
+
+class Resume(Base):
+    """Uploaded resume — see spec §6.1 and the P1.0 design doc.
+
+    In this slice, every row is created with parse_status='pending' and never
+    transitions. The parse worker plan moves rows through parsing → parsed/failed.
+    """
+
+    __tablename__ = "resumes"
+
+    id: Mapped[UuidPK]
+    applicant_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("kpa.applicants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    storage_key: Mapped[str] = mapped_column(String(512), nullable=False)
+    original_filename: Mapped[str] = mapped_column(String(255), nullable=False)
+    content_type: Mapped[str] = mapped_column(String(127), nullable=False)
+    size_bytes: Mapped[int] = mapped_column(Integer, nullable=False)
+    parse_status: Mapped[ResumeParseStatus] = mapped_column(
+        SAEnum(
+            ResumeParseStatus,
+            name="resume_parse_status",
+            native_enum=True,
+            schema="kpa",
+            values_callable=lambda x: [e.value for e in x],
+        ),
+        nullable=False,
+        default=ResumeParseStatus.PENDING,
+        server_default=ResumeParseStatus.PENDING.value,
+    )
+    parsed_json: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    parse_error: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[CreatedAt]
     updated_at: Mapped[UpdatedAt]
     deleted_at: Mapped[DeletedAt]
