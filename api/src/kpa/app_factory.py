@@ -13,7 +13,7 @@ from kpa.db.session import create_engine_from_settings, make_sessionmaker
 from kpa.middleware.error_handler import register_error_handlers
 from kpa.middleware.request_id import RequestIdMiddleware
 from kpa.observability.logging import configure_logging
-from kpa.routes import auth, health, ready
+from kpa.routes import auth, health, me, ready
 from kpa.settings import Settings
 
 
@@ -41,6 +41,7 @@ def create_app() -> FastAPI:
     app.include_router(health.router)
     app.include_router(ready.router)
     app.include_router(auth.router)
+    app.include_router(me.router)
 
     @app.on_event("shutdown")
     async def _close_engine() -> None:
