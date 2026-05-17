@@ -1,0 +1,64 @@
+"""Auth routes — Google sign-in, refresh, logout.
+
+Per spec §10 and the auth design doc. ``POST /v1/auth/oauth/google`` replaces
+the spec's literal ``/callback`` endpoint because the flow is client-driven
+ID-token exchange.
+
+TODO(infra): per-IP and per-user rate limiting (spec §9.3) — requires Redis,
+deferred to the P3 / observability plan.
+"""
+
+from __future__ import annotations
+
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, status
+from pydantic import BaseModel, Field
+
+from kpa.auth.service import AuthService, get_auth_service
+
+router = APIRouter(prefix="/v1/auth", tags=["auth"])
+
+
+class GoogleSignInRequest(BaseModel):
+    id_token: str = Field(..., min_length=1)
+
+
+class SignInUser(BaseModel):
+    id: UUID
+    email: str
+    role: str
+    applicant_id: UUID
+    is_new_user: bool
+
+
+class SignInResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "Bearer"
+    expires_in: int
+    user: SignInUser
+
+
+@router.post(
+    "/oauth/google",
+    response_model=SignInResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def sign_in_with_google(
+    payload: GoogleSignInRequest,
+    service: AuthService = Depends(get_auth_service),  # noqa: B008
+) -> SignInResponse:
+    result = await service.sign_in_with_google(payload.id_token)
+    return SignInResponse(
+        access_token=result.access_token,
+        refresh_token=result.refresh_token,
+        expires_in=result.expires_in,
+        user=SignInUser(
+            id=result.user.id,
+            email=result.user.email or "",
+            role=result.user.role.value,
+            applicant_id=result.applicant.id,
+            is_new_user=result.is_new_user,
+        ),
+    )
