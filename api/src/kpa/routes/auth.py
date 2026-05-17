@@ -13,6 +13,7 @@ from __future__ import annotations
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
+from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
 from kpa.auth.service import AuthService, get_auth_service
@@ -90,3 +91,20 @@ async def refresh_token(
         refresh_token=result.refresh_token,
         expires_in=result.expires_in,
     )
+
+
+class LogoutRequest(BaseModel):
+    refresh_token: str = Field(..., min_length=1)
+
+
+@router.post(
+    "/logout",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+)
+async def logout(
+    payload: LogoutRequest,
+    service: AuthService = Depends(get_auth_service),  # noqa: B008
+) -> Response:
+    await service.logout(payload.refresh_token)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

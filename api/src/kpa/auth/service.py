@@ -249,6 +249,22 @@ class AuthService:
             expires_in=self._settings.jwt_access_ttl_seconds,
         )
 
+    async def logout(self, presented_token: str) -> None:
+        """Revoke the presented refresh token. Idempotent: silent on unknown."""
+        token_hash = sha256_token_hash(presented_token)
+        row = (
+            await self._session.execute(
+                select(RefreshToken).where(RefreshToken.token_hash == token_hash)
+            )
+        ).scalar_one_or_none()
+        if row is None or row.revoked_at is not None:
+            return  # No oracle on token existence.
+
+        row.revoked_at = datetime.now(UTC)
+        row.revocation_reason = "logout"
+        await self._session.flush()
+        await self._session.commit()
+
     async def _revoke_family(self, family_id: UUID, *, reason: str) -> None:
         """Revoke all currently-unrevoked rows in the family.
 
