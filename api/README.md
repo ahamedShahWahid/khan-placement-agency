@@ -176,8 +176,52 @@ All settings are read from environment variables prefixed `KPA_`:
 | `KPA_DB_URL`       | yes      | —       | SQLAlchemy DSN; must use the `postgresql+asyncpg://` driver |
 | `KPA_LOG_LEVEL`    | no       | `INFO`  | Stdlib log level                |
 | `KPA_LOG_FORMAT`   | no       | `text`  | `text` (key=value) or `json`    |
+| `KPA_JWT_SECRET`   | yes      | —       | HS256 signing secret; min 32 bytes |
+| `KPA_JWT_ACCESS_TTL_SECONDS`  | no | `600`     | Access token lifetime (10 min default) |
+| `KPA_JWT_REFRESH_TTL_SECONDS` | no | `2592000` | Refresh token lifetime (30 d default)  |
+| `KPA_GOOGLE_OAUTH_CLIENT_IDS` | yes | —        | CSV of Google Client IDs (web/iOS/Android) |
+| `KPA_GOOGLE_JWKS_URL`         | no | `https://www.googleapis.com/oauth2/v3/certs` | Override for tests / offline dev |
+| `KPA_GOOGLE_JWKS_CACHE_TTL_SECONDS` | no | `3600` | JWKS in-process cache TTL |
+| `KPA_AUTH_REQUIRE_EMAIL_VERIFIED`   | no | `false` | Reject Google sign-ins without `email_verified=true` |
 
 The service refuses to boot if required variables are missing or invalid.
+
+## Auth
+
+Three sign-in/session endpoints plus one identity endpoint:
+
+```
+POST   /v1/auth/oauth/google          # Google ID token → access + refresh
+POST   /v1/auth/refresh               # rotate refresh; new access + refresh
+POST   /v1/auth/logout                # revoke refresh (idempotent 204)
+GET    /v1/me                         # current user + applicant payload
+```
+
+The Google flow is **client-driven** — the Flutter app obtains a Google ID
+token via the official SDK and POSTs it to `/v1/auth/oauth/google`. The
+backend verifies the token against Google's JWKS, upserts the user, and
+mints an HS256 access JWT (10 min) plus an opaque rotating refresh token
+(30 d, sha256-hashed at rest).
+
+There's no `/callback` redirect endpoint — the spec's prior `/oauth/{provider}/callback`
+naming was inaccurate for client-driven flows and was replaced.
+
+Refresh tokens rotate on every successful refresh. Reuse of an
+already-rotated token triggers full revocation of the family. See
+`docs/superpowers/specs/2026-05-17-auth-google-oauth-applicant-design.md`
+for the design rationale.
+
+### Quick test from the shell
+
+```bash
+# Mint a JWT secret if you don't have one yet:
+openssl rand -base64 48 | tr -d '\n' | tr -d '=' | head -c 64
+
+# Then start the server (with KPA_JWT_SECRET and KPA_GOOGLE_OAUTH_CLIENT_IDS set in .env)
+# and hit /v1/me with a valid Bearer access JWT:
+ACCESS=...   # from a real Google sign-in
+curl -s http://127.0.0.1:8000/v1/me -H "Authorization: Bearer $ACCESS" | python -m json.tool
+```
 
 ## Project layout
 
@@ -197,9 +241,16 @@ api/
 │   │   ├── session.py        # async engine, sessionmaker, get_session dep
 │   │   ├── models.py         # Base, User, Applicant
 │   │   └── migrations/       # alembic env + versions/
+│   ├── auth/
+│   │   ├── dependencies.py    # current_user, optional_current_user
+│   │   ├── google_verifier.py # JWKS-backed Google ID-token verifier
+│   │   ├── service.py         # AuthService — sign-in, refresh, logout
+│   │   └── tokens.py          # HS256 access JWT + opaque refresh primitives
 │   └── routes/
 │       ├── health.py         # GET /health (liveness)
-│       └── ready.py          # GET /ready (readiness, DB ping)
+│       ├── ready.py          # GET /ready (readiness, DB ping)
+│       ├── auth.py           # /v1/auth/oauth/google, /refresh, /logout
+│       └── me.py             # GET /v1/me
 └── tests/
     ├── unit/                 # no DB required
     └── integration/          # require local Postgres (savepoint isolation)
