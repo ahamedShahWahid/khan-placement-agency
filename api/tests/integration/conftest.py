@@ -20,6 +20,7 @@ from alembic import command
 from alembic.config import Config
 from fastapi.testclient import TestClient
 from httpx import ASGITransport, AsyncClient
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -192,3 +193,55 @@ async def async_client(
         yield ac
 
     app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture
+async def concurrent_async_client(
+    migrated_db: str,
+    monkeypatch: pytest.MonkeyPatch,
+    google_verifier: FakeGoogleIdTokenVerifier,
+) -> AsyncIterator[AsyncClient]:
+    """AsyncClient that uses a real connection pool (no shared session override).
+
+    Required for concurrency tests: each HTTP request gets its own DB
+    connection so ``SELECT … FOR UPDATE`` actually serialises concurrent callers
+    on the same token.  Uses NullPool for the cleanup engine so there is no
+    pool-reuse interference with the app's own pool.
+
+    Isolation: the fixture truncates all auth-related tables after the test so
+    subsequent tests start clean (same guarantee as the savepoint rollback
+    strategy used by the other fixtures, just achieved differently).
+    """
+    monkeypatch.setenv("KPA_ENV", "local")
+    monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
+    monkeypatch.setenv("KPA_DB_URL", migrated_db)
+    monkeypatch.setenv("KPA_JWT_SECRET", "x" * 32)
+    monkeypatch.setenv(
+        "KPA_GOOGLE_OAUTH_CLIENT_IDS",
+        "test.apps.googleusercontent.com",
+    )
+
+    from kpa.app_factory import create_app
+
+    app = create_app()
+    app.dependency_overrides[get_google_verifier] = lambda: google_verifier
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
+        yield ac
+
+    app.dependency_overrides.clear()
+    await app.state.db_engine.dispose()
+
+    # Truncate in FK-safe order so subsequent tests start with a clean slate.
+    cleanup_engine = create_async_engine(migrated_db, poolclass=NullPool)
+    async with cleanup_engine.connect() as conn:
+        await conn.execute(
+            text(
+                "TRUNCATE kpa.resumes, kpa.refresh_tokens, kpa.oauth_identities,"
+                " kpa.applicants, kpa.users RESTART IDENTITY CASCADE"
+            )
+        )
+        await conn.commit()
+    await cleanup_engine.dispose()

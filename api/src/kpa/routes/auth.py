@@ -62,3 +62,31 @@ async def sign_in_with_google(
             is_new_user=result.is_new_user,
         ),
     )
+
+
+class RefreshRequest(BaseModel):
+    refresh_token: str = Field(..., min_length=1)
+
+
+class RefreshResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "Bearer"
+    expires_in: int
+
+
+@router.post(
+    "/refresh",
+    response_model=RefreshResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def refresh_token(
+    payload: RefreshRequest,
+    service: AuthService = Depends(get_auth_service),  # noqa: B008
+) -> RefreshResponse:
+    result = await service.refresh(payload.refresh_token)
+    return RefreshResponse(
+        access_token=result.access_token,
+        refresh_token=result.refresh_token,
+        expires_in=result.expires_in,
+    )

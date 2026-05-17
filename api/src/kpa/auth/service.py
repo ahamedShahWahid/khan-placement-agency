@@ -191,6 +191,86 @@ class AuthService:
         await self._session.flush()
         return token
 
+    async def refresh(self, presented_token: str) -> RefreshResult:
+        token_hash = sha256_token_hash(presented_token)
+
+        # Lock the row to serialize concurrent calls on the same token.
+        result = await self._session.execute(
+            select(RefreshToken)
+            .where(RefreshToken.token_hash == token_hash)
+            .with_for_update()
+        )
+        row: RefreshToken | None = result.scalar_one_or_none()
+        if row is None:
+            raise HTTPException(401, "invalid_refresh")
+
+        if row.revoked_at is not None:
+            # REUSE detected — revoke the whole family.
+            await self._revoke_family(row.family_id, reason="reuse_detected")
+            await self._session.commit()
+            raise HTTPException(401, "token_reused")
+
+        if row.expires_at <= datetime.now(UTC):
+            raise HTTPException(401, "expired_refresh")
+
+        # Happy path: rotate.
+        new_token = mint_refresh_token()
+        now = datetime.now(UTC)
+        new_row = RefreshToken(
+            user_id=row.user_id,
+            family_id=row.family_id,
+            token_hash=sha256_token_hash(new_token),
+            issued_at=now,
+            expires_at=now + timedelta(seconds=self._settings.jwt_refresh_ttl_seconds),
+        )
+        self._session.add(new_row)
+        await self._session.flush()
+
+        row.replaced_by_id = new_row.id
+        row.revoked_at = now
+        row.revocation_reason = "rotated"
+        row.last_used_at = now
+        await self._session.flush()
+
+        user = await self._session.get(User, row.user_id)
+        if user is None:
+            raise HTTPException(500, "user_not_found")
+        access = mint_access_token(
+            user_id=user.id,
+            role=user.role.value,
+            secret=self._settings.jwt_secret,
+            ttl_seconds=self._settings.jwt_access_ttl_seconds,
+        )
+
+        await self._session.commit()
+        return RefreshResult(
+            access_token=access,
+            refresh_token=new_token,
+            expires_in=self._settings.jwt_access_ttl_seconds,
+        )
+
+    async def _revoke_family(self, family_id: UUID, *, reason: str) -> None:
+        """Revoke all currently-unrevoked rows in the family.
+
+        Uses a bulk UPDATE so the WHERE clause is re-evaluated atomically per
+        row under Postgres's READ COMMITTED + EvalPlanQual semantics — a
+        concurrent legitimate rotation in this family is correctly waited on
+        and the resulting new row is also caught and revoked.
+
+        Caller is responsible for committing.
+        """
+        from sqlalchemy import update  # local import to keep top-of-file tidy
+
+        await self._session.execute(
+            update(RefreshToken)
+            .where(
+                RefreshToken.family_id == family_id,
+                RefreshToken.revoked_at.is_(None),
+            )
+            .values(revoked_at=datetime.now(UTC), revocation_reason=reason)
+        )
+        await self._session.flush()
+
 
 def get_auth_service(
     request: Request,
