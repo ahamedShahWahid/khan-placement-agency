@@ -16,6 +16,8 @@ def test_settings_loads_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("KPA_LOG_FORMAT", "text")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa")
+    monkeypatch.setenv("KPA_JWT_SECRET", "x" * 32)
+    monkeypatch.setenv("KPA_GOOGLE_OAUTH_CLIENT_IDS", "test.apps.googleusercontent.com")
 
     settings = Settings()
 
@@ -55,6 +57,8 @@ def test_settings_defaults_when_optional_missing(monkeypatch: pytest.MonkeyPatch
     monkeypatch.setenv("KPA_ENV", "local")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa")
+    monkeypatch.setenv("KPA_JWT_SECRET", "x" * 32)
+    monkeypatch.setenv("KPA_GOOGLE_OAUTH_CLIENT_IDS", "test.apps.googleusercontent.com")
 
     settings = Settings()
 
@@ -79,6 +83,8 @@ def test_settings_normalizes_log_level_case(monkeypatch: pytest.MonkeyPatch) -> 
     monkeypatch.setenv("KPA_LOG_LEVEL", "debug")  # lowercase
     monkeypatch.setenv("KPA_LOG_FORMAT", "JSON")  # uppercase
     monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa")
+    monkeypatch.setenv("KPA_JWT_SECRET", "x" * 32)
+    monkeypatch.setenv("KPA_GOOGLE_OAUTH_CLIENT_IDS", "test.apps.googleusercontent.com")
 
     settings = Settings()
 
@@ -90,6 +96,8 @@ def test_settings_loads_db_url(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("KPA_ENV", "local")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa")
+    monkeypatch.setenv("KPA_JWT_SECRET", "x" * 32)
+    monkeypatch.setenv("KPA_GOOGLE_OAUTH_CLIENT_IDS", "test.apps.googleusercontent.com")
 
     settings = Settings()
 
@@ -115,10 +123,89 @@ def test_settings_rejects_db_url_with_wrong_driver(monkeypatch: pytest.MonkeyPat
         Settings()
 
 
-def test_settings_storage_root_defaults_to_var_uploads(monkeypatch: pytest.MonkeyPatch) -> None:
+# ---------------------------------------------------------------------------
+# Auth / JWT + Google OAuth settings
+# ---------------------------------------------------------------------------
+
+
+def _set_minimum_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Set the minimum env vars required by Settings to construct successfully."""
     monkeypatch.setenv("KPA_ENV", "local")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
-    monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa")
+    monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://u:p@h:5432/d")
+    monkeypatch.setenv("KPA_JWT_SECRET", "x" * 32)
+    monkeypatch.setenv(
+        "KPA_GOOGLE_OAUTH_CLIENT_IDS",
+        "abc.apps.googleusercontent.com",
+    )
+
+
+def test_jwt_secret_rejects_short_value(monkeypatch: pytest.MonkeyPatch) -> None:
+    _set_minimum_env(monkeypatch)
+    monkeypatch.setenv("KPA_JWT_SECRET", "x" * 31)  # 31 bytes — one short
+    with pytest.raises(ValidationError, match="jwt_secret must be at least 32"):
+        Settings()
+
+
+def test_jwt_secret_accepts_32_byte_value(monkeypatch: pytest.MonkeyPatch) -> None:
+    _set_minimum_env(monkeypatch)
+    s = Settings()
+    assert s.jwt_secret == "x" * 32
+
+
+def test_jwt_ttl_defaults(monkeypatch: pytest.MonkeyPatch) -> None:
+    _set_minimum_env(monkeypatch)
+    s = Settings()
+    assert s.jwt_access_ttl_seconds == 600
+    assert s.jwt_refresh_ttl_seconds == 2592000
+
+
+def test_jwt_ttl_rejects_non_positive(monkeypatch: pytest.MonkeyPatch) -> None:
+    _set_minimum_env(monkeypatch)
+    monkeypatch.setenv("KPA_JWT_ACCESS_TTL_SECONDS", "0")
+    with pytest.raises(ValidationError):
+        Settings()
+
+
+def test_google_oauth_client_ids_parses_csv(monkeypatch: pytest.MonkeyPatch) -> None:
+    _set_minimum_env(monkeypatch)
+    monkeypatch.setenv(
+        "KPA_GOOGLE_OAUTH_CLIENT_IDS",
+        "web.apps.googleusercontent.com , ios.apps.googleusercontent.com",
+    )
+    s = Settings()
+    assert s.google_oauth_client_ids == [
+        "web.apps.googleusercontent.com",
+        "ios.apps.googleusercontent.com",
+    ]
+
+
+def test_google_oauth_client_ids_rejects_bad_suffix(monkeypatch: pytest.MonkeyPatch) -> None:
+    _set_minimum_env(monkeypatch)
+    monkeypatch.setenv("KPA_GOOGLE_OAUTH_CLIENT_IDS", "notagoogleclient.example.com")
+    with pytest.raises(ValidationError, match="apps.googleusercontent.com"):
+        Settings()
+
+
+def test_google_jwks_url_default(monkeypatch: pytest.MonkeyPatch) -> None:
+    _set_minimum_env(monkeypatch)
+    s = Settings()
+    assert s.google_jwks_url == "https://www.googleapis.com/oauth2/v3/certs"
+
+
+def test_auth_require_email_verified_defaults_false(monkeypatch: pytest.MonkeyPatch) -> None:
+    _set_minimum_env(monkeypatch)
+    s = Settings()
+    assert s.auth_require_email_verified is False
+
+
+# ---------------------------------------------------------------------------
+# Resume upload settings (from P1.0)
+# ---------------------------------------------------------------------------
+
+
+def test_settings_storage_root_defaults_to_var_uploads(monkeypatch: pytest.MonkeyPatch) -> None:
+    _set_minimum_env(monkeypatch)
     monkeypatch.delenv("KPA_STORAGE_ROOT", raising=False)
 
     settings = Settings()
@@ -129,9 +216,7 @@ def test_settings_storage_root_defaults_to_var_uploads(monkeypatch: pytest.Monke
 def test_settings_storage_root_honors_override(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    monkeypatch.setenv("KPA_ENV", "local")
-    monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
-    monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa")
+    _set_minimum_env(monkeypatch)
     monkeypatch.setenv("KPA_STORAGE_ROOT", str(tmp_path))
 
     settings = Settings()
@@ -140,9 +225,7 @@ def test_settings_storage_root_honors_override(
 
 
 def test_settings_max_upload_bytes_defaults_to_10mb(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("KPA_ENV", "local")
-    monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
-    monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa")
+    _set_minimum_env(monkeypatch)
     monkeypatch.delenv("KPA_MAX_UPLOAD_BYTES", raising=False)
 
     settings = Settings()
@@ -151,9 +234,7 @@ def test_settings_max_upload_bytes_defaults_to_10mb(monkeypatch: pytest.MonkeyPa
 
 
 def test_settings_allowed_resume_content_types_defaults(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("KPA_ENV", "local")
-    monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
-    monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa")
+    _set_minimum_env(monkeypatch)
     monkeypatch.delenv("KPA_ALLOWED_RESUME_CONTENT_TYPES", raising=False)
 
     settings = Settings()
@@ -167,9 +248,7 @@ def test_settings_allowed_resume_content_types_defaults(monkeypatch: pytest.Monk
 
 def test_settings_allowed_resume_content_types_parses_csv(monkeypatch: pytest.MonkeyPatch) -> None:
     """Pydantic settings parses comma-separated strings into list[str] for env-var input."""
-    monkeypatch.setenv("KPA_ENV", "local")
-    monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
-    monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa")
+    _set_minimum_env(monkeypatch)
     monkeypatch.setenv("KPA_ALLOWED_RESUME_CONTENT_TYPES", "application/pdf,text/plain")
 
     settings = Settings()
