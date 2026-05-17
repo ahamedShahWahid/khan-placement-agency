@@ -28,23 +28,17 @@ async def test_logout_revokes_refresh_token(
     async_client: httpx.AsyncClient, google_verifier, session
 ) -> None:
     google_verifier.canned["tok"] = _claims()
-    signin = await async_client.post(
-        "/v1/auth/oauth/google", json={"id_token": "tok"}
-    )
+    signin = await async_client.post("/v1/auth/oauth/google", json={"id_token": "tok"})
     assert signin.status_code == 200
     refresh = signin.json()["refresh_token"]
 
-    resp = await async_client.post(
-        "/v1/auth/logout", json={"refresh_token": refresh}
-    )
+    resp = await async_client.post("/v1/auth/logout", json={"refresh_token": refresh})
     assert resp.status_code == 204
     assert resp.content == b""
 
     row = (
         await session.execute(
-            select(RefreshToken).where(
-                RefreshToken.token_hash == sha256_token_hash(refresh)
-            )
+            select(RefreshToken).where(RefreshToken.token_hash == sha256_token_hash(refresh))
         )
     ).scalar_one()
     assert row.revoked_at is not None
@@ -55,16 +49,12 @@ async def test_logout_then_refresh_returns_401(
     async_client: httpx.AsyncClient, google_verifier
 ) -> None:
     google_verifier.canned["tok"] = _claims()
-    signin = await async_client.post(
-        "/v1/auth/oauth/google", json={"id_token": "tok"}
-    )
+    signin = await async_client.post("/v1/auth/oauth/google", json={"id_token": "tok"})
     refresh = signin.json()["refresh_token"]
 
     await async_client.post("/v1/auth/logout", json={"refresh_token": refresh})
 
-    resp = await async_client.post(
-        "/v1/auth/refresh", json={"refresh_token": refresh}
-    )
+    resp = await async_client.post("/v1/auth/refresh", json={"refresh_token": refresh})
     assert resp.status_code == 401
     # The detail can be either token_reused (revoked_at branch in refresh) or
     # token_revoked. Both are acceptable. Spec §9.1 treats logout as a
@@ -75,9 +65,7 @@ async def test_logout_then_refresh_returns_401(
 async def test_logout_unknown_token_returns_204(
     async_client: httpx.AsyncClient,
 ) -> None:
-    resp = await async_client.post(
-        "/v1/auth/logout", json={"refresh_token": "no-such-token"}
-    )
+    resp = await async_client.post("/v1/auth/logout", json={"refresh_token": "no-such-token"})
     assert resp.status_code == 204
     assert resp.content == b""
 
@@ -98,7 +86,5 @@ async def test_logout_does_not_affect_other_users(
     await async_client.post("/v1/auth/logout", json={"refresh_token": alice_refresh})
 
     # Bob's refresh still works.
-    resp = await async_client.post(
-        "/v1/auth/refresh", json={"refresh_token": bob_refresh}
-    )
+    resp = await async_client.post("/v1/auth/refresh", json={"refresh_token": bob_refresh})
     assert resp.status_code == 200

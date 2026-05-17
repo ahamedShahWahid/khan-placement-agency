@@ -187,9 +187,7 @@ async def async_client(
     app.dependency_overrides[get_session] = _shared_session
     app.dependency_overrides[get_google_verifier] = lambda: google_verifier
 
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as ac:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         yield ac
 
     app.dependency_overrides.clear()
@@ -226,9 +224,7 @@ async def concurrent_async_client(
     app = create_app()
     app.dependency_overrides[get_google_verifier] = lambda: google_verifier
 
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as ac:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         yield ac
 
     app.dependency_overrides.clear()

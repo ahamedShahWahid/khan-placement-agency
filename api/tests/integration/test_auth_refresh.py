@@ -40,17 +40,17 @@ async def test_refresh_rotates_token(
     first = await _sign_in(async_client, google_verifier)
     refresh1 = first["refresh_token"]
 
-    resp = await async_client.post(
-        "/v1/auth/refresh", json={"refresh_token": refresh1}
-    )
+    resp = await async_client.post("/v1/auth/refresh", json={"refresh_token": refresh1})
     assert resp.status_code == 200
     body = resp.json()
     assert body["refresh_token"] != refresh1
 
     # Old token row is revoked, replaced_by_id points at the new row.
     rows = (
-        await session.execute(select(RefreshToken).order_by(RefreshToken.issued_at))
-    ).scalars().all()
+        (await session.execute(select(RefreshToken).order_by(RefreshToken.issued_at)))
+        .scalars()
+        .all()
+    )
     assert len(rows) == 2
     old, new = rows
     assert old.revoked_at is not None
@@ -104,17 +104,13 @@ async def test_refresh_expired_token_returns_401(
     # Manually expire the row.
     row = (
         await session.execute(
-            select(RefreshToken).where(
-                RefreshToken.token_hash == sha256_token_hash(refresh1)
-            )
+            select(RefreshToken).where(RefreshToken.token_hash == sha256_token_hash(refresh1))
         )
     ).scalar_one()
     row.expires_at = datetime.now(UTC) - timedelta(seconds=1)
     await session.flush()
 
-    resp = await async_client.post(
-        "/v1/auth/refresh", json={"refresh_token": refresh1}
-    )
+    resp = await async_client.post("/v1/auth/refresh", json={"refresh_token": refresh1})
     assert resp.status_code == 401
     assert resp.json()["detail"] == "expired_refresh"
 

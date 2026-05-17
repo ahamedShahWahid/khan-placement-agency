@@ -139,27 +139,14 @@ def _set_minimum_env(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_jwt_secret_rejects_short_value(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("KPA_ENV", "local")
-    monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
-    monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://u:p@h:5432/d")
+    _set_minimum_env(monkeypatch)
     monkeypatch.setenv("KPA_JWT_SECRET", "x" * 31)  # 31 bytes — one short
-    monkeypatch.setenv(
-        "KPA_GOOGLE_OAUTH_CLIENT_IDS",
-        "abc.apps.googleusercontent.com",
-    )
     with pytest.raises(ValidationError, match="jwt_secret must be at least 32"):
         Settings()
 
 
 def test_jwt_secret_accepts_32_byte_value(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("KPA_ENV", "local")
-    monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
-    monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://u:p@h:5432/d")
-    monkeypatch.setenv("KPA_JWT_SECRET", "x" * 32)
-    monkeypatch.setenv(
-        "KPA_GOOGLE_OAUTH_CLIENT_IDS",
-        "abc.apps.googleusercontent.com",
-    )
+    _set_minimum_env(monkeypatch)
     s = Settings()
     assert s.jwt_secret == "x" * 32
 

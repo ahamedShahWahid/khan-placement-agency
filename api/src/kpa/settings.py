@@ -111,12 +111,12 @@ class Settings(BaseSettings):
     @field_validator("google_oauth_client_ids")
     @classmethod
     def _enforce_google_client_id_suffix(cls, v: list[str]) -> list[str]:
+        if not v:
+            raise ValueError("google_oauth_client_ids must contain at least one entry")
         bad = [x for x in v if not x.endswith(".apps.googleusercontent.com")]
         if bad:
             raise ValueError(
                 "google_oauth_client_ids must end in .apps.googleusercontent.com;"
                 f" bad entries: {bad}"
             )
-        if not v:
-            raise ValueError("google_oauth_client_ids must contain at least one entry")
         return v

@@ -21,9 +21,7 @@ _USER_ID = UUID("11111111-1111-1111-1111-111111111111")
 
 
 def test_mint_access_token_roundtrip_preserves_claims() -> None:
-    token = mint_access_token(
-        user_id=_USER_ID, role="applicant", secret=_SECRET, ttl_seconds=600
-    )
+    token = mint_access_token(user_id=_USER_ID, role="applicant", secret=_SECRET, ttl_seconds=600)
     claims = decode_access_token(token, secret=_SECRET)
 
     assert claims["sub"] == str(_USER_ID)
@@ -35,9 +33,7 @@ def test_mint_access_token_roundtrip_preserves_claims() -> None:
 
 def test_mint_access_token_includes_iat_and_exp() -> None:
     now = int(time.time())
-    token = mint_access_token(
-        user_id=_USER_ID, role="applicant", secret=_SECRET, ttl_seconds=600
-    )
+    token = mint_access_token(user_id=_USER_ID, role="applicant", secret=_SECRET, ttl_seconds=600)
     claims = decode_access_token(token, secret=_SECRET)
     # Allow 5s of slack for clock drift between mint and assertion.
     assert abs(claims["iat"] - now) <= 5
@@ -45,18 +41,14 @@ def test_mint_access_token_includes_iat_and_exp() -> None:
 
 
 def test_decode_rejects_wrong_secret() -> None:
-    token = mint_access_token(
-        user_id=_USER_ID, role="applicant", secret=_SECRET, ttl_seconds=600
-    )
+    token = mint_access_token(user_id=_USER_ID, role="applicant", secret=_SECRET, ttl_seconds=600)
     with pytest.raises(AccessTokenError, match="invalid_access_token"):
         decode_access_token(token, secret="y" * 32)
 
 
 def test_decode_rejects_expired_token() -> None:
     # Mint a token that was valid for 1 second; wait briefly to expire.
-    token = mint_access_token(
-        user_id=_USER_ID, role="applicant", secret=_SECRET, ttl_seconds=1
-    )
+    token = mint_access_token(user_id=_USER_ID, role="applicant", secret=_SECRET, ttl_seconds=1)
     time.sleep(2)
     with pytest.raises(AccessTokenError, match="invalid_access_token"):
         decode_access_token(token, secret=_SECRET)

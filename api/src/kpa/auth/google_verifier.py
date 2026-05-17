@@ -163,9 +163,7 @@ class JwksGoogleIdTokenVerifier:
         if not isinstance(keys, list):
             raise GoogleJwksUnavailableError()
 
-        new_keys = {
-            k["kid"]: k for k in keys if isinstance(k, dict) and "kid" in k
-        }
+        new_keys = {k["kid"]: k for k in keys if isinstance(k, dict) and "kid" in k}
         if not new_keys:
             # Refuse to downgrade a warm cache. If we never had a cache,
             # this is a genuine "JWKS unavailable" state.

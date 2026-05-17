@@ -40,9 +40,7 @@ async def test_me_returns_user_and_applicant(
     signin = await _signin(async_client, google_verifier)
     access = signin["access_token"]
 
-    resp = await async_client.get(
-        "/v1/me", headers={"Authorization": f"Bearer {access}"}
-    )
+    resp = await async_client.get("/v1/me", headers={"Authorization": f"Bearer {access}"})
     assert resp.status_code == 200
     body = resp.json()
     assert body["id"] == signin["user"]["id"]
@@ -78,9 +76,7 @@ async def test_me_invalid_signature_returns_401(
         "wrong-secret-but-still-32-bytes-y",
         algorithm="HS256",
     )
-    resp = await async_client.get(
-        "/v1/me", headers={"Authorization": f"Bearer {forged}"}
-    )
+    resp = await async_client.get("/v1/me", headers={"Authorization": f"Bearer {forged}"})
     assert resp.status_code == 401
     assert resp.json()["detail"] == "invalid_access_token"
 
@@ -100,9 +96,7 @@ async def test_me_expired_token_returns_401(
         "x" * 32,
         algorithm="HS256",
     )
-    resp = await async_client.get(
-        "/v1/me", headers={"Authorization": f"Bearer {expired}"}
-    )
+    resp = await async_client.get("/v1/me", headers={"Authorization": f"Bearer {expired}"})
     assert resp.status_code == 401
     assert resp.json()["detail"] == "invalid_access_token"
 
@@ -118,8 +112,6 @@ async def test_me_deleted_user_returns_401(
     db_user.deleted_at = datetime.now(UTC)
     await session.flush()
 
-    resp = await async_client.get(
-        "/v1/me", headers={"Authorization": f"Bearer {access}"}
-    )
+    resp = await async_client.get("/v1/me", headers={"Authorization": f"Bearer {access}"})
     assert resp.status_code == 401
     assert resp.json()["detail"] == "user_not_found"

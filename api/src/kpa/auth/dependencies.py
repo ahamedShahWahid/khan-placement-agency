@@ -22,11 +22,7 @@ def _extract_bearer_or_raise_401(request: Request) -> str:
     """Return the Bearer token string, or raise 401 missing_bearer_token."""
     raw = request.headers.get("authorization", "")
     parts = raw.split(" ", 1)
-    if (
-        len(parts) != 2
-        or parts[0].lower() != "bearer"
-        or not parts[1].strip()
-    ):
+    if len(parts) != 2 or parts[0].lower() != "bearer" or not parts[1].strip():
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="missing_bearer_token",

@@ -92,6 +92,7 @@ def _build_verifier(jwks_url: str, client_id: str, transport: httpx.MockTranspor
     The verifier exposes an `_http_factory` hook so tests can replace the
     httpx.AsyncClient with one bound to MockTransport.
     """
+
     def factory() -> httpx.AsyncClient:
         return httpx.AsyncClient(transport=transport, timeout=5.0)
 
@@ -106,8 +107,11 @@ def _build_verifier(jwks_url: str, client_id: str, transport: httpx.MockTranspor
 async def test_verify_happy_path(jwks_url: str, client_id: str) -> None:
     private, jwks = _make_keypair_and_jwks(kid="key-1")
     token = _sign_id_token(
-        private_key=private, kid="key-1", sub="google-sub-123",
-        aud=client_id, email="a@example.com",
+        private_key=private,
+        kid="key-1",
+        sub="google-sub-123",
+        aud=client_id,
+        email="a@example.com",
     )
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -128,8 +132,11 @@ async def test_verify_happy_path(jwks_url: str, client_id: str) -> None:
 async def test_verify_rejects_wrong_aud(jwks_url: str, client_id: str) -> None:
     private, jwks = _make_keypair_and_jwks(kid="key-1")
     token = _sign_id_token(
-        private_key=private, kid="key-1", sub="x",
-        aud="some-other-client.apps.googleusercontent.com", email="a@example.com",
+        private_key=private,
+        kid="key-1",
+        sub="x",
+        aud="some-other-client.apps.googleusercontent.com",
+        email="a@example.com",
     )
     transport = httpx.MockTransport(lambda r: httpx.Response(200, json=jwks))
     v = _build_verifier(jwks_url, client_id, transport)
@@ -141,8 +148,11 @@ async def test_verify_rejects_wrong_aud(jwks_url: str, client_id: str) -> None:
 async def test_verify_rejects_wrong_iss(jwks_url: str, client_id: str) -> None:
     private, jwks = _make_keypair_and_jwks(kid="key-1")
     token = _sign_id_token(
-        private_key=private, kid="key-1", sub="x",
-        aud=client_id, email="a@example.com",
+        private_key=private,
+        kid="key-1",
+        sub="x",
+        aud=client_id,
+        email="a@example.com",
         iss="https://accounts.google.com.evil",
     )
     transport = httpx.MockTransport(lambda r: httpx.Response(200, json=jwks))
@@ -155,9 +165,13 @@ async def test_verify_rejects_wrong_iss(jwks_url: str, client_id: str) -> None:
 async def test_verify_rejects_expired_token(jwks_url: str, client_id: str) -> None:
     private, jwks = _make_keypair_and_jwks(kid="key-1")
     token = _sign_id_token(
-        private_key=private, kid="key-1", sub="x",
-        aud=client_id, email="a@example.com",
-        iat=int(time.time()) - 7200, exp=int(time.time()) - 3600,
+        private_key=private,
+        kid="key-1",
+        sub="x",
+        aud=client_id,
+        email="a@example.com",
+        iat=int(time.time()) - 7200,
+        exp=int(time.time()) - 3600,
     )
     transport = httpx.MockTransport(lambda r: httpx.Response(200, json=jwks))
     v = _build_verifier(jwks_url, client_id, transport)
@@ -171,8 +185,11 @@ async def test_verify_rejects_unknown_kid(jwks_url: str, client_id: str) -> None
     # Token signed by key-1 but JWKS only returns key-2 → no matching key.
     _, other_jwks = _make_keypair_and_jwks(kid="key-2")
     token = _sign_id_token(
-        private_key=private, kid="key-1", sub="x",
-        aud=client_id, email="a@example.com",
+        private_key=private,
+        kid="key-1",
+        sub="x",
+        aud=client_id,
+        email="a@example.com",
     )
     transport = httpx.MockTransport(lambda r: httpx.Response(200, json=other_jwks))
     v = _build_verifier(jwks_url, client_id, transport)
@@ -184,8 +201,11 @@ async def test_verify_rejects_unknown_kid(jwks_url: str, client_id: str) -> None
 async def test_jwks_cache_is_reused_on_second_call(jwks_url: str, client_id: str) -> None:
     private, jwks = _make_keypair_and_jwks(kid="key-1")
     token = _sign_id_token(
-        private_key=private, kid="key-1", sub="x",
-        aud=client_id, email="a@example.com",
+        private_key=private,
+        kid="key-1",
+        sub="x",
+        aud=client_id,
+        email="a@example.com",
     )
     fetch_count = 0
 
@@ -205,8 +225,11 @@ async def test_jwks_cache_is_reused_on_second_call(jwks_url: str, client_id: str
 async def test_jwks_unavailable_raises(jwks_url: str, client_id: str) -> None:
     private, _jwks = _make_keypair_and_jwks(kid="key-1")
     token = _sign_id_token(
-        private_key=private, kid="key-1", sub="x",
-        aud=client_id, email="a@example.com",
+        private_key=private,
+        kid="key-1",
+        sub="x",
+        aud=client_id,
+        email="a@example.com",
     )
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -258,8 +281,11 @@ async def test_jwks_empty_keys_with_cold_cache_raises(jwks_url: str, client_id: 
     """A 200 OK with keys=[] when no cache exists must raise GoogleJwksUnavailableError."""
     private, _jwks = _make_keypair_and_jwks(kid="key-1")
     token = _sign_id_token(
-        private_key=private, kid="key-1", sub="x",
-        aud=client_id, email="a@example.com",
+        private_key=private,
+        kid="key-1",
+        sub="x",
+        aud=client_id,
+        email="a@example.com",
     )
     transport = httpx.MockTransport(lambda r: httpx.Response(200, json={"keys": []}))
     v = _build_verifier(jwks_url, client_id, transport)

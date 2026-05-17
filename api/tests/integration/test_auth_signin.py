@@ -37,9 +37,7 @@ async def test_signin_creates_user_applicant_and_identity(
         sub="google-sub-new", email="new@example.com", name="New Person"
     )
 
-    resp = await async_client.post(
-        "/v1/auth/oauth/google", json={"id_token": "new_user_tok"}
-    )
+    resp = await async_client.post("/v1/auth/oauth/google", json={"id_token": "new_user_tok"})
 
     assert resp.status_code == 200
     body = resp.json()
@@ -62,17 +60,13 @@ async def test_signin_creates_user_applicant_and_identity(
     assert db_applicant.full_name == "New Person"
 
     db_identity = (
-        await session.execute(
-            select(OAuthIdentity).where(OAuthIdentity.user_id == user_id)
-        )
+        await session.execute(select(OAuthIdentity).where(OAuthIdentity.user_id == user_id))
     ).scalar_one()
     assert db_identity.provider == OAuthProvider.GOOGLE
     assert db_identity.provider_subject == "google-sub-new"
 
     db_refresh = (
-        await session.execute(
-            select(RefreshToken).where(RefreshToken.user_id == user_id)
-        )
+        await session.execute(select(RefreshToken).where(RefreshToken.user_id == user_id))
     ).scalar_one()
     assert db_refresh.revoked_at is None
 
@@ -88,15 +82,11 @@ async def test_signin_returning_user_updates_last_seen(
         sub="google-sub-alice", email="alice@example.com", name="Alice"
     )
 
-    first = await async_client.post(
-        "/v1/auth/oauth/google", json={"id_token": "alice_tok"}
-    )
+    first = await async_client.post("/v1/auth/oauth/google", json={"id_token": "alice_tok"})
     assert first.status_code == 200
     user_id_1 = first.json()["user"]["id"]
 
-    second = await async_client.post(
-        "/v1/auth/oauth/google", json={"id_token": "alice_tok"}
-    )
+    second = await async_client.post("/v1/auth/oauth/google", json={"id_token": "alice_tok"})
     assert second.status_code == 200
     body2 = second.json()
     assert body2["user"]["id"] == user_id_1
@@ -106,17 +96,25 @@ async def test_signin_returning_user_updates_last_seen(
     n_users = (await session.execute(select(User))).scalars().all()
     assert len(n_users) == 1
     n_idents = (
-        await session.execute(
-            select(OAuthIdentity).where(OAuthIdentity.user_id == uuid.UUID(user_id_1))
+        (
+            await session.execute(
+                select(OAuthIdentity).where(OAuthIdentity.user_id == uuid.UUID(user_id_1))
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     assert len(n_idents) == 1
     # Two refresh tokens — one per sign-in — scoped to this user.
     n_refresh = (
-        await session.execute(
-            select(RefreshToken).where(RefreshToken.user_id == uuid.UUID(user_id_1))
+        (
+            await session.execute(
+                select(RefreshToken).where(RefreshToken.user_id == uuid.UUID(user_id_1))
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     assert len(n_refresh) == 2
 
     # last_seen_at must have been updated by the second sign-in.
@@ -134,9 +132,7 @@ async def test_signin_rejects_invalid_google_token(
     google_verifier,
 ) -> None:
     # No canned tokens registered → fake raises InvalidGoogleTokenError.
-    resp = await async_client.post(
-        "/v1/auth/oauth/google", json={"id_token": "garbage"}
-    )
+    resp = await async_client.post("/v1/auth/oauth/google", json={"id_token": "garbage"})
     assert resp.status_code == 401
     assert resp.json()["detail"] == "invalid_google_token"
 
@@ -149,17 +145,13 @@ async def test_signin_email_collision_returns_409(
     google_verifier.canned["acct_a_tok"] = _claims(
         sub="google-sub-A", email="a@example.com", name="A"
     )
-    first = await async_client.post(
-        "/v1/auth/oauth/google", json={"id_token": "acct_a_tok"}
-    )
+    first = await async_client.post("/v1/auth/oauth/google", json={"id_token": "acct_a_tok"})
     assert first.status_code == 200
 
     # A different Google sub but the same email → 409.
     google_verifier.canned["acct_b_tok"] = _claims(
         sub="google-sub-B", email="a@example.com", name="A doppelganger"
     )
-    second = await async_client.post(
-        "/v1/auth/oauth/google", json={"id_token": "acct_b_tok"}
-    )
+    second = await async_client.post("/v1/auth/oauth/google", json={"id_token": "acct_b_tok"})
     assert second.status_code == 409
     assert second.json()["detail"] == "email_belongs_to_other_user"

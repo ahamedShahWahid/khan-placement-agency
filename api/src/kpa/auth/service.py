@@ -80,10 +80,7 @@ class AuthService:
         except GoogleJwksUnavailableError as exc:
             raise HTTPException(503, "google_jwks_unavailable") from exc
 
-        if (
-            self._settings.auth_require_email_verified
-            and not claims.email_verified
-        ):
+        if self._settings.auth_require_email_verified and not claims.email_verified:
             raise HTTPException(401, "email_not_verified")
 
         user, applicant, is_new_user = await self._upsert_identity(claims)
@@ -112,9 +109,7 @@ class AuthService:
             is_new_user=is_new_user,
         )
 
-    async def _upsert_identity(
-        self, claims: GoogleClaims
-    ) -> tuple[User, Applicant, bool]:
+    async def _upsert_identity(self, claims: GoogleClaims) -> tuple[User, Applicant, bool]:
         """Return (user, applicant, is_new_user) for the given Google claims."""
         existing_ident = (
             await self._session.execute(
@@ -133,9 +128,7 @@ class AuthService:
             user.email = claims.email
             existing_ident.last_seen_at = datetime.now(UTC)
             applicant = (
-                await self._session.execute(
-                    select(Applicant).where(Applicant.user_id == user.id)
-                )
+                await self._session.execute(select(Applicant).where(Applicant.user_id == user.id))
             ).scalar_one()
             await self._session.flush()
             return user, applicant, False
@@ -143,9 +136,7 @@ class AuthService:
         # New identity. Email collision check first.
         collision = (
             await self._session.execute(
-                select(User).where(
-                    User.email == claims.email, User.deleted_at.is_(None)
-                )
+                select(User).where(User.email == claims.email, User.deleted_at.is_(None))
             )
         ).scalar_one_or_none()
         if collision is not None:
@@ -196,9 +187,7 @@ class AuthService:
 
         # Lock the row to serialize concurrent calls on the same token.
         result = await self._session.execute(
-            select(RefreshToken)
-            .where(RefreshToken.token_hash == token_hash)
-            .with_for_update()
+            select(RefreshToken).where(RefreshToken.token_hash == token_hash).with_for_update()
         )
         row: RefreshToken | None = result.scalar_one_or_none()
         if row is None:
