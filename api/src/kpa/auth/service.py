@@ -222,8 +222,8 @@ class AuthService:
         await self._session.flush()
 
         user = await self._session.get(User, row.user_id)
-        if user is None:
-            raise HTTPException(500, "user_not_found")
+        if user is None or user.deleted_at is not None:
+            raise HTTPException(401, "user_not_found")
         access = mint_access_token(
             user_id=user.id,
             role=user.role.value,

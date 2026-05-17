@@ -56,10 +56,10 @@ async def test_logout_then_refresh_returns_401(
 
     resp = await async_client.post("/v1/auth/refresh", json={"refresh_token": refresh})
     assert resp.status_code == 401
-    # The detail can be either token_reused (revoked_at branch in refresh) or
-    # token_revoked. Both are acceptable. Spec §9.1 treats logout as a
-    # revocation; the refresh flow sees revoked_at and surfaces reuse.
-    assert resp.json()["detail"] in {"token_reused", "token_revoked"}
+    # Logout sets revoked_at; replaying that token through refresh hits the
+    # revoked-row branch and triggers reuse detection → token_reused.
+    # (token_revoked is reserved for a future admin-revoke endpoint.)
+    assert resp.json()["detail"] == "token_reused"
 
 
 async def test_logout_unknown_token_returns_204(

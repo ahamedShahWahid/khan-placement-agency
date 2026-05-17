@@ -155,3 +155,27 @@ async def test_signin_email_collision_returns_409(
     second = await async_client.post("/v1/auth/oauth/google", json={"id_token": "acct_b_tok"})
     assert second.status_code == 409
     assert second.json()["detail"] == "email_belongs_to_other_user"
+
+
+async def test_signin_email_not_verified_blocked_when_required(
+    async_client: httpx.AsyncClient,
+    google_verifier,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """When KPA_AUTH_REQUIRE_EMAIL_VERIFIED=true, an unverified-email sign-in is rejected.
+
+    Note: the env var is read at Settings() construction (app startup). Since the
+    async_client fixture has already built the app with email_verified gate off,
+    we have to override the live Settings object on app.state for this test.
+    """
+    settings = async_client._transport.app.state.settings  # type: ignore[attr-defined]
+    monkeypatch.setattr(settings, "auth_require_email_verified", True)
+
+    google_verifier.canned["unverified_tok"] = _claims(
+        sub="g-unverified", email="unverified@example.com", verified=False
+    )
+
+    resp = await async_client.post("/v1/auth/oauth/google", json={"id_token": "unverified_tok"})
+
+    assert resp.status_code == 401
+    assert resp.json()["detail"] == "email_not_verified"
