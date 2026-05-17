@@ -13,6 +13,7 @@ from __future__ import annotations
 import os
 from collections.abc import AsyncIterator, Iterator
 from dataclasses import dataclass
+from pathlib import Path
 
 import pytest
 import pytest_asyncio
@@ -129,13 +130,23 @@ async def session(migrated_db: str) -> AsyncIterator[AsyncSession]:
 def client(
     session: AsyncSession,
     db_url: str,
+    tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     google_verifier: FakeGoogleIdTokenVerifier,
 ) -> Iterator[TestClient]:
-    """TestClient wired to the per-test DB session + fake Google verifier."""
+    """Sync test client for non-async tests.
+
+    Uses TestClient (Starlette sync portal). Suitable only for routes that do
+    NOT exercise asyncpg via a shared ``session`` fixture, because TestClient
+    runs the ASGI app in a separate anyio event loop which conflicts with the
+    asyncpg connection bound to the pytest-asyncio test-function event loop.
+
+    For async tests that share a ``session``, use the ``async_client`` fixture.
+    """
     monkeypatch.setenv("KPA_ENV", "local")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", db_url)
+    monkeypatch.setenv("KPA_STORAGE_ROOT", str(tmp_path))
     monkeypatch.setenv("KPA_JWT_SECRET", "x" * 32)
     monkeypatch.setenv(
         "KPA_GOOGLE_OAUTH_CLIENT_IDS",
@@ -163,13 +174,21 @@ def client(
 async def async_client(
     session: AsyncSession,
     db_url: str,
+    tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     google_verifier: FakeGoogleIdTokenVerifier,
 ) -> AsyncIterator[AsyncClient]:
-    """AsyncClient wired to the per-test DB session + fake Google verifier."""
+    """Async HTTP client for async tests that share a ``session``.
+
+    Uses httpx.AsyncClient with ASGITransport so the ASGI app executes in the
+    same event loop as the async test function. This avoids the asyncpg
+    ``Future attached to a different loop`` error that arises when TestClient's
+    blocking portal creates its own event loop.
+    """
     monkeypatch.setenv("KPA_ENV", "local")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", db_url)
+    monkeypatch.setenv("KPA_STORAGE_ROOT", str(tmp_path))
     monkeypatch.setenv("KPA_JWT_SECRET", "x" * 32)
     monkeypatch.setenv(
         "KPA_GOOGLE_OAUTH_CLIENT_IDS",
@@ -196,6 +215,7 @@ async def async_client(
 @pytest_asyncio.fixture
 async def concurrent_async_client(
     migrated_db: str,
+    tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     google_verifier: FakeGoogleIdTokenVerifier,
 ) -> AsyncIterator[AsyncClient]:
@@ -213,6 +233,7 @@ async def concurrent_async_client(
     monkeypatch.setenv("KPA_ENV", "local")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", migrated_db)
+    monkeypatch.setenv("KPA_STORAGE_ROOT", str(tmp_path))
     monkeypatch.setenv("KPA_JWT_SECRET", "x" * 32)
     monkeypatch.setenv(
         "KPA_GOOGLE_OAUTH_CLIENT_IDS",

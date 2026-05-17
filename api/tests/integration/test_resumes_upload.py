@@ -1,0 +1,219 @@
+"""POST /v1/applicants/{applicant_id}/resumes — upload + persistence."""
+
+from __future__ import annotations
+
+import uuid
+from collections.abc import AsyncIterator
+from pathlib import Path
+
+import httpx
+import pytest
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from kpa.db.models import Applicant, Resume, ResumeParseStatus, User, UserRole
+
+_TINY_PDF = b"%PDF-1.4\n%minimal\n"
+
+
+async def _make_applicant(session: AsyncSession) -> Applicant:
+    user = User(email=f"applicant-{uuid.uuid4()}@example.com", role=UserRole.APPLICANT)
+    session.add(user)
+    await session.flush()
+    applicant = Applicant(user_id=user.id, full_name="Test Applicant")
+    session.add(applicant)
+    await session.commit()
+    return applicant
+
+
+@pytest.mark.integration
+async def test_upload_resume_happy_path(
+    async_client: httpx.AsyncClient, session: AsyncSession, tmp_path: Path
+) -> None:
+    applicant = await _make_applicant(session)
+
+    response = await async_client.post(
+        f"/v1/applicants/{applicant.id}/resumes",
+        files={"file": ("cv.pdf", _TINY_PDF, "application/pdf")},
+    )
+
+    assert response.status_code == 201, response.text
+    body = response.json()
+    assert body["applicant_id"] == str(applicant.id)
+    assert body["original_filename"] == "cv.pdf"
+    assert body["content_type"] == "application/pdf"
+    assert body["size_bytes"] == len(_TINY_PDF)
+    assert body["parse_status"] == "pending"
+
+    resume_id = uuid.UUID(body["id"])
+    row = (await session.execute(select(Resume).where(Resume.id == resume_id))).scalar_one()
+    assert row.parse_status is ResumeParseStatus.PENDING
+
+    on_disk = tmp_path / row.storage_key
+    assert on_disk.is_file()
+    assert on_disk.read_bytes() == _TINY_PDF
+
+
+@pytest.mark.integration
+async def test_upload_resume_unknown_applicant_returns_404(
+    async_client: httpx.AsyncClient,
+) -> None:
+    bogus = uuid.uuid4()
+
+    response = await async_client.post(
+        f"/v1/applicants/{bogus}/resumes",
+        files={"file": ("cv.pdf", _TINY_PDF, "application/pdf")},
+    )
+
+    assert response.status_code == 404
+    assert response.headers["content-type"].startswith("application/problem+json")
+
+
+@pytest.mark.integration
+async def test_upload_resume_rejects_disallowed_content_type(
+    async_client: httpx.AsyncClient, session: AsyncSession, tmp_path: Path
+) -> None:
+    applicant = await _make_applicant(session)
+
+    response = await async_client.post(
+        f"/v1/applicants/{applicant.id}/resumes",
+        files={"file": ("notes.txt", b"hello", "text/plain")},
+    )
+
+    assert response.status_code == 415
+    # No row persisted, no file written.
+    rows = (await session.execute(select(Resume).where(Resume.applicant_id == applicant.id))).all()
+    assert rows == []
+    assert not any(tmp_path.rglob("*"))
+
+
+@pytest.mark.integration
+async def test_upload_resume_rejects_oversized_payload(
+    async_client: httpx.AsyncClient,
+    session: AsyncSession,
+    monkeypatch: pytest.MonkeyPatch,
+    db_url: str,
+    tmp_path: Path,
+) -> None:
+    """Use a low cap so we don't allocate real 10 MB blobs in tests."""
+    # Re-create the app with a stricter KPA_MAX_UPLOAD_BYTES.
+    monkeypatch.setenv("KPA_MAX_UPLOAD_BYTES", "16")  # 16 bytes
+    monkeypatch.setenv("KPA_ENV", "local")
+    monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
+    monkeypatch.setenv("KPA_DB_URL", db_url)
+    monkeypatch.setenv("KPA_STORAGE_ROOT", str(tmp_path))
+
+    from kpa.app_factory import create_app
+    from kpa.db.session import get_session
+
+    app = create_app()
+
+    async def _shared_session() -> AsyncIterator[AsyncSession]:  # type: ignore[return]
+        yield session
+
+    app.dependency_overrides[get_session] = _shared_session
+    applicant = await _make_applicant(session)
+
+    payload = b"x" * 32  # over 16 bytes
+
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app),  # type: ignore[arg-type]
+        base_url="http://test",
+    ) as c:
+        response = await c.post(
+            f"/v1/applicants/{applicant.id}/resumes",
+            files={"file": ("cv.pdf", payload, "application/pdf")},
+        )
+
+    assert response.status_code == 413
+    rows = (await session.execute(select(Resume).where(Resume.applicant_id == applicant.id))).all()
+    assert rows == []
+
+
+@pytest.mark.integration
+async def test_get_resume_returns_metadata(
+    async_client: httpx.AsyncClient, session: AsyncSession
+) -> None:
+    applicant = await _make_applicant(session)
+    post = await async_client.post(
+        f"/v1/applicants/{applicant.id}/resumes",
+        files={"file": ("cv.pdf", _TINY_PDF, "application/pdf")},
+    )
+    assert post.status_code == 201, post.text
+    posted = post.json()
+
+    response = await async_client.get(f"/v1/applicants/{applicant.id}/resumes/{posted['id']}")
+
+    assert response.status_code == 200
+    assert response.json() == posted
+
+
+@pytest.mark.integration
+async def test_get_resume_unknown_id_returns_404(
+    async_client: httpx.AsyncClient, session: AsyncSession
+) -> None:
+    applicant = await _make_applicant(session)
+    bogus = uuid.uuid4()
+
+    response = await async_client.get(f"/v1/applicants/{applicant.id}/resumes/{bogus}")
+
+    assert response.status_code == 404
+
+
+@pytest.mark.integration
+async def test_get_resume_from_wrong_applicant_returns_404(
+    async_client: httpx.AsyncClient, session: AsyncSession
+) -> None:
+    """A real resume id queried under a *different* applicant's path must 404.
+
+    Returning 403 would leak the existence of the resume to an unauthorized
+    caller; 404 keeps the surface flat.
+    """
+    owner = await _make_applicant(session)
+    intruder = await _make_applicant(session)
+
+    post = await async_client.post(
+        f"/v1/applicants/{owner.id}/resumes",
+        files={"file": ("cv.pdf", _TINY_PDF, "application/pdf")},
+    )
+    posted = post.json()
+
+    response = await async_client.get(f"/v1/applicants/{intruder.id}/resumes/{posted['id']}")
+
+    assert response.status_code == 404
+
+
+@pytest.mark.integration
+async def test_get_resume_404_detail_is_uniform(
+    async_client: httpx.AsyncClient, session: AsyncSession
+) -> None:
+    """All GET 404 cases must return the same `detail` to avoid leaking
+    whether the applicant id or the resume id was the missing piece.
+    """
+    real_applicant = await _make_applicant(session)
+    other_applicant = await _make_applicant(session)
+    post = await async_client.post(
+        f"/v1/applicants/{real_applicant.id}/resumes",
+        files={"file": ("cv.pdf", _TINY_PDF, "application/pdf")},
+    )
+    real_resume_id = post.json()["id"]
+
+    bogus_applicant = uuid.uuid4()
+    bogus_resume = uuid.uuid4()
+
+    cases = [
+        # Unknown applicant + random resume id.
+        f"/v1/applicants/{bogus_applicant}/resumes/{bogus_resume}",
+        # Real applicant + unknown resume id.
+        f"/v1/applicants/{real_applicant.id}/resumes/{bogus_resume}",
+        # Wrong applicant + real resume id.
+        f"/v1/applicants/{other_applicant.id}/resumes/{real_resume_id}",
+    ]
+
+    details = []
+    for url in cases:
+        response = await async_client.get(url)
+        assert response.status_code == 404, url
+        details.append(response.json().get("detail"))
+
+    assert len(set(details)) == 1, f"detail messages leak info: {details}"

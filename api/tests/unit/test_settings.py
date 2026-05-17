@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 from pydantic import ValidationError
 
@@ -195,3 +197,60 @@ def test_auth_require_email_verified_defaults_false(monkeypatch: pytest.MonkeyPa
     _set_minimum_env(monkeypatch)
     s = Settings()
     assert s.auth_require_email_verified is False
+
+
+# ---------------------------------------------------------------------------
+# Resume upload settings (from P1.0)
+# ---------------------------------------------------------------------------
+
+
+def test_settings_storage_root_defaults_to_var_uploads(monkeypatch: pytest.MonkeyPatch) -> None:
+    _set_minimum_env(monkeypatch)
+    monkeypatch.delenv("KPA_STORAGE_ROOT", raising=False)
+
+    settings = Settings()
+
+    assert settings.storage_root == Path("var/uploads")
+
+
+def test_settings_storage_root_honors_override(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _set_minimum_env(monkeypatch)
+    monkeypatch.setenv("KPA_STORAGE_ROOT", str(tmp_path))
+
+    settings = Settings()
+
+    assert settings.storage_root == tmp_path
+
+
+def test_settings_max_upload_bytes_defaults_to_10mb(monkeypatch: pytest.MonkeyPatch) -> None:
+    _set_minimum_env(monkeypatch)
+    monkeypatch.delenv("KPA_MAX_UPLOAD_BYTES", raising=False)
+
+    settings = Settings()
+
+    assert settings.max_upload_bytes == 10 * 1024 * 1024
+
+
+def test_settings_allowed_resume_content_types_defaults(monkeypatch: pytest.MonkeyPatch) -> None:
+    _set_minimum_env(monkeypatch)
+    monkeypatch.delenv("KPA_ALLOWED_RESUME_CONTENT_TYPES", raising=False)
+
+    settings = Settings()
+
+    assert settings.allowed_resume_content_types == [
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ]
+
+
+def test_settings_allowed_resume_content_types_parses_csv(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Pydantic settings parses comma-separated strings into list[str] for env-var input."""
+    _set_minimum_env(monkeypatch)
+    monkeypatch.setenv("KPA_ALLOWED_RESUME_CONTENT_TYPES", "application/pdf,text/plain")
+
+    settings = Settings()
+
+    assert settings.allowed_resume_content_types == ["application/pdf", "text/plain"]
