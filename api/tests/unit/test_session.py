@@ -20,6 +20,7 @@ def test_create_engine_uses_settings_db_url(monkeypatch: pytest.MonkeyPatch) -> 
     monkeypatch.setenv("KPA_ENV", "local")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://u:p@h:5432/d")
+    monkeypatch.setenv("KPA_REDIS_URL", "redis://localhost:6379/0")
 
     engine = session_module.create_engine_from_settings()
 
@@ -74,6 +75,7 @@ def test_get_session_can_be_used_as_fastapi_dependency(monkeypatch: pytest.Monke
     monkeypatch.setenv("KPA_ENV", "local")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://u:p@h:5432/d")
+    monkeypatch.setenv("KPA_REDIS_URL", "redis://localhost:6379/0")
 
     from kpa.app_factory import create_app
 

@@ -19,6 +19,7 @@ def client(monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
     monkeypatch.setenv("KPA_LOG_LEVEL", "INFO")
     monkeypatch.setenv("KPA_LOG_FORMAT", "text")
     monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://u:p@h:5432/d")
+    monkeypatch.setenv("KPA_REDIS_URL", "redis://localhost:6379/0")
 
     app = create_app()
     with TestClient(app) as c:

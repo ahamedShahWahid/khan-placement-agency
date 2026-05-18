@@ -16,6 +16,7 @@ def test_settings_loads_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("KPA_LOG_FORMAT", "text")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa")
+    monkeypatch.setenv("KPA_REDIS_URL", "redis://localhost:6379/0")
 
     settings = Settings()
 
@@ -55,6 +56,7 @@ def test_settings_defaults_when_optional_missing(monkeypatch: pytest.MonkeyPatch
     monkeypatch.setenv("KPA_ENV", "local")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa")
+    monkeypatch.setenv("KPA_REDIS_URL", "redis://localhost:6379/0")
 
     settings = Settings()
 
@@ -79,6 +81,7 @@ def test_settings_normalizes_log_level_case(monkeypatch: pytest.MonkeyPatch) -> 
     monkeypatch.setenv("KPA_LOG_LEVEL", "debug")  # lowercase
     monkeypatch.setenv("KPA_LOG_FORMAT", "JSON")  # uppercase
     monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa")
+    monkeypatch.setenv("KPA_REDIS_URL", "redis://localhost:6379/0")
 
     settings = Settings()
 
@@ -90,6 +93,7 @@ def test_settings_loads_db_url(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("KPA_ENV", "local")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa")
+    monkeypatch.setenv("KPA_REDIS_URL", "redis://localhost:6379/0")
 
     settings = Settings()
 
@@ -119,6 +123,7 @@ def test_settings_storage_root_defaults_to_var_uploads(monkeypatch: pytest.Monke
     monkeypatch.setenv("KPA_ENV", "local")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa")
+    monkeypatch.setenv("KPA_REDIS_URL", "redis://localhost:6379/0")
     monkeypatch.delenv("KPA_STORAGE_ROOT", raising=False)
 
     settings = Settings()
@@ -132,6 +137,7 @@ def test_settings_storage_root_honors_override(
     monkeypatch.setenv("KPA_ENV", "local")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa")
+    monkeypatch.setenv("KPA_REDIS_URL", "redis://localhost:6379/0")
     monkeypatch.setenv("KPA_STORAGE_ROOT", str(tmp_path))
 
     settings = Settings()
@@ -143,6 +149,7 @@ def test_settings_max_upload_bytes_defaults_to_10mb(monkeypatch: pytest.MonkeyPa
     monkeypatch.setenv("KPA_ENV", "local")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa")
+    monkeypatch.setenv("KPA_REDIS_URL", "redis://localhost:6379/0")
     monkeypatch.delenv("KPA_MAX_UPLOAD_BYTES", raising=False)
 
     settings = Settings()
@@ -154,6 +161,7 @@ def test_settings_allowed_resume_content_types_defaults(monkeypatch: pytest.Monk
     monkeypatch.setenv("KPA_ENV", "local")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa")
+    monkeypatch.setenv("KPA_REDIS_URL", "redis://localhost:6379/0")
     monkeypatch.delenv("KPA_ALLOWED_RESUME_CONTENT_TYPES", raising=False)
 
     settings = Settings()
@@ -170,8 +178,74 @@ def test_settings_allowed_resume_content_types_parses_csv(monkeypatch: pytest.Mo
     monkeypatch.setenv("KPA_ENV", "local")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa")
+    monkeypatch.setenv("KPA_REDIS_URL", "redis://localhost:6379/0")
     monkeypatch.setenv("KPA_ALLOWED_RESUME_CONTENT_TYPES", "application/pdf,text/plain")
 
     settings = Settings()
 
     assert settings.allowed_resume_content_types == ["application/pdf", "text/plain"]
+
+
+# ---------------------------------------------------------------------------
+# Background workers (Redis + Celery) settings
+# ---------------------------------------------------------------------------
+
+
+def test_redis_url_required(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("KPA_ENV", "local")
+    monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
+    monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://u:p@h:5432/d")
+    monkeypatch.delenv("KPA_REDIS_URL", raising=False)
+
+    with pytest.raises(ValidationError):
+        Settings()
+
+
+def test_redis_url_accepts_redis_scheme(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("KPA_ENV", "local")
+    monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
+    monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://u:p@h:5432/d")
+    monkeypatch.setenv("KPA_REDIS_URL", "redis://localhost:6379/0")
+
+    s = Settings()
+    assert s.redis_url == "redis://localhost:6379/0"
+
+
+def test_redis_url_accepts_rediss_scheme(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("KPA_ENV", "local")
+    monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
+    monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://u:p@h:5432/d")
+    monkeypatch.setenv("KPA_REDIS_URL", "rediss://user:pw@elasticache:6380/0")
+
+    s = Settings()
+    assert s.redis_url.startswith("rediss://")
+
+
+def test_redis_url_rejects_non_redis_scheme(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("KPA_ENV", "local")
+    monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
+    monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://u:p@h:5432/d")
+    monkeypatch.setenv("KPA_REDIS_URL", "http://localhost:6379")
+
+    with pytest.raises(ValidationError, match="redis://"):
+        Settings()
+
+
+def test_redis_url_rejects_missing_hostname(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("KPA_ENV", "local")
+    monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
+    monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://u:p@h:5432/d")
+    monkeypatch.setenv("KPA_REDIS_URL", "redis://")  # scheme present, no host
+
+    with pytest.raises(ValidationError, match="hostname"):
+        Settings()
+
+
+def test_celery_task_always_eager_defaults_false(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("KPA_ENV", "local")
+    monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
+    monkeypatch.setenv("KPA_DB_URL", "postgresql+asyncpg://u:p@h:5432/d")
+    monkeypatch.setenv("KPA_REDIS_URL", "redis://localhost:6379/0")
+
+    s = Settings()
+    assert s.celery_task_always_eager is False

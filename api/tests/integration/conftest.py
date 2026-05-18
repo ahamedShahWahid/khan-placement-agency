@@ -57,6 +57,7 @@ def migrated_db(db_url: str, monkeypatch_session: pytest.MonkeyPatch) -> str:
     monkeypatch_session.setenv("KPA_ENV", "local")
     monkeypatch_session.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch_session.setenv("KPA_DB_URL", db_url)
+    monkeypatch_session.setenv("KPA_REDIS_URL", "redis://localhost:6379/0")
     cfg = Config("alembic.ini")
     command.upgrade(cfg, "head")
     return db_url
@@ -104,6 +105,7 @@ def client(
     monkeypatch.setenv("KPA_ENV", "local")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", db_url)
+    monkeypatch.setenv("KPA_REDIS_URL", "redis://localhost:6379/0")
     monkeypatch.setenv("KPA_STORAGE_ROOT", str(tmp_path))
 
     from kpa.app_factory import create_app
@@ -139,6 +141,7 @@ async def async_client(
     monkeypatch.setenv("KPA_ENV", "local")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", db_url)
+    monkeypatch.setenv("KPA_REDIS_URL", "redis://localhost:6379/0")
     monkeypatch.setenv("KPA_STORAGE_ROOT", str(tmp_path))
 
     from kpa.app_factory import create_app
