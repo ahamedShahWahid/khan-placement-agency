@@ -18,6 +18,7 @@ from typing import TYPE_CHECKING
 
 from celery import Celery
 from celery.signals import worker_process_init, worker_shutting_down
+from sqlalchemy.pool import NullPool
 
 from kpa.settings import Settings
 
@@ -62,7 +63,7 @@ def _init_engine(**_kwargs: object) -> None:
     global _engine, _sessionmaker
     from kpa.db.session import create_engine_from_settings, make_sessionmaker
 
-    _engine = create_engine_from_settings(settings)
+    _engine = create_engine_from_settings(settings, poolclass=NullPool)
     _sessionmaker = make_sessionmaker(_engine)
 
 
@@ -84,6 +85,6 @@ def get_session_maker() -> async_sessionmaker[AsyncSession]:
     if _sessionmaker is None:
         from kpa.db.session import create_engine_from_settings, make_sessionmaker
 
-        _engine = create_engine_from_settings(settings)
+        _engine = create_engine_from_settings(settings, poolclass=NullPool)
         _sessionmaker = make_sessionmaker(_engine)
     return _sessionmaker
