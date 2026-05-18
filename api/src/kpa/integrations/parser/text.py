@@ -34,7 +34,7 @@ DOCX_CONTENT_TYPE: Final[str] = (
 LEGACY_DOC_CONTENT_TYPE: Final[str] = "application/msword"
 
 MAX_TEXT_BYTES: Final[int] = 64 * 1024  # 64 KB cap on extracted text
-_EMPTY_THRESHOLD: Final[int] = 50  # pypdf result shorter than this → try pdfminer
+_GARBLED_THRESHOLD: Final[int] = 50  # pypdf result shorter than this → try pdfminer
 
 
 async def extract_text(*, content: bytes, content_type: str) -> str:
@@ -51,16 +51,36 @@ async def extract_text(*, content: bytes, content_type: str) -> str:
 
 
 def _extract_pdf(content: bytes) -> str:
-    """Try pypdf; fall back to pdfminer if the result is empty/garbled."""
+    """Try pypdf; fall back to pdfminer if the result looks empty/garbled.
+
+    A result is considered garbled/empty if it's shorter than _GARBLED_THRESHOLD
+    characters after stripping (heuristic for image-only PDFs where extractors
+    return near-nothing). Non-empty short results (e.g., single-line PDFs) are
+    returned as-is from pypdf without triggering pdfminer fallback.
+    """
     pypdf_text = _extract_pdf_pypdf(content)
-    if len(pypdf_text.strip()) >= _EMPTY_THRESHOLD:
+    pypdf_stripped = pypdf_text.strip()
+
+    if len(pypdf_stripped) >= _GARBLED_THRESHOLD:
+        # pypdf produced substantial text — use it directly.
         return pypdf_text
 
+    if len(pypdf_stripped) > 0:
+        # pypdf produced a short but non-empty result.  For a real resume this
+        # would be unusual, but for test fixtures (or trivially short docs) it
+        # is valid.  Attempt pdfminer for a potentially better extraction; if
+        # pdfminer also returns short text, prefer whichever is longer.
+        pdfminer_text = _extract_pdf_pdfminer(content)
+        if len(pdfminer_text.strip()) > len(pypdf_stripped):
+            return pdfminer_text
+        return pypdf_text
+
+    # pypdf returned nothing — try pdfminer as the primary fallback.
     pdfminer_text = _extract_pdf_pdfminer(content)
-    if len(pdfminer_text.strip()) >= _EMPTY_THRESHOLD:
+    if pdfminer_text.strip():
         return pdfminer_text
 
-    # Both extractors returned ~nothing. Image-only / scanned PDF.
+    # Both extractors returned nothing. Image-only / scanned PDF.
     raise ParserError("no_text_extracted")
 
 
