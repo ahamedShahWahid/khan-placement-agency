@@ -252,6 +252,9 @@ All settings are read from environment variables prefixed `KPA_`:
 | `KPA_AUTH_REQUIRE_EMAIL_VERIFIED`   | no | `false` | Reject Google sign-ins without `email_verified=true` |
 | `KPA_REDIS_URL`    | yes      | —       | Redis connection string (`redis://` or `rediss://`). Required for Celery broker. |
 | `KPA_CELERY_TASK_ALWAYS_EAGER` | no | `false` | When true, Celery tasks run synchronously in-process. Tests only. |
+| `KPA_GEMINI_API_KEY` | yes    | —       | Gemini Developer API key for the embedding worker |
+| `KPA_EMBEDDING_MODEL` | no   | `gemini-embedding-2` | Embedding model identifier |
+| `KPA_EMBEDDING_DIM` | no     | `1536`  | Matryoshka output dim — must be in {128,256,512,768,1024,1536,3072} and match the migration's Vector(N) |
 
 The service refuses to boot if required variables are missing or invalid.
 
