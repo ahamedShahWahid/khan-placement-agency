@@ -38,7 +38,7 @@ class GeminiEmbeddingProvider(EmbeddingProvider):
         elif task is EmbeddingTask.QUERY:
             content = f"task: search result | query: {text}"
         else:
-            raise EmbeddingProviderError(f"unsupported task: {task}")
+            raise NotImplementedError(f"task type not supported by this provider: {task}")
 
         try:
             resp = await self._client.aio.models.embed_content(
@@ -66,5 +66,9 @@ class GeminiEmbeddingProvider(EmbeddingProvider):
         return EmbeddingResult(
             values=list(emb.values),
             model_name=self._model,
-            input_tokens=getattr(emb, "input_tokens", 0) or 0,
+            input_tokens=(
+                int(emb.statistics.token_count)
+                if emb.statistics and emb.statistics.token_count
+                else 0
+            ),
         )

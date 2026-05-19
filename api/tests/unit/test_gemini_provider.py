@@ -42,9 +42,20 @@ def _make_provider(output_dim: int = 3072) -> tuple[GeminiEmbeddingProvider, Asy
     return provider, embed_mock
 
 
-def _make_response(values: list[float], input_tokens: int = 10):
-    """Build a fake SDK embed_content response with the expected shape."""
-    emb = SimpleNamespace(values=values, input_tokens=input_tokens)
+_DEFAULT_STATISTICS = SimpleNamespace(token_count=10.0)
+
+
+def _make_response(
+    values: list[float],
+    statistics: SimpleNamespace | None = _DEFAULT_STATISTICS,
+):
+    """Build a fake SDK embed_content response with the expected shape.
+
+    ``statistics`` mirrors ``ContentEmbeddingStatistics``. Pass
+    ``SimpleNamespace(token_count=N)`` to exercise the token-count path;
+    pass ``None`` to simulate a response with no statistics.
+    """
+    emb = SimpleNamespace(values=values, statistics=statistics)
     return SimpleNamespace(embeddings=[emb])
 
 
@@ -60,9 +71,7 @@ async def test_document_task_formats_with_title_prefix() -> None:
 
     await provider.encode(text="foo", task=EmbeddingTask.DOCUMENT, title="Alice")
 
-    _args, kwargs = embed_mock.call_args
-    contents = kwargs.get("contents") or _args[1] if _args else kwargs["contents"]
-    assert contents == ["title: Alice | text: foo"]
+    assert embed_mock.call_args.kwargs["contents"] == ["title: Alice | text: foo"]
 
 
 @pytest.mark.asyncio
@@ -73,9 +82,7 @@ async def test_document_task_with_none_title_uses_none_literal() -> None:
 
     await provider.encode(text="foo", task=EmbeddingTask.DOCUMENT, title=None)
 
-    _args, kwargs = embed_mock.call_args
-    contents = kwargs.get("contents") or _args[1] if _args else kwargs["contents"]
-    assert contents == ["title: none | text: foo"]
+    assert embed_mock.call_args.kwargs["contents"] == ["title: none | text: foo"]
 
 
 @pytest.mark.asyncio
@@ -86,9 +93,7 @@ async def test_query_task_formats_with_search_result_prefix() -> None:
 
     await provider.encode(text="foo", task=EmbeddingTask.QUERY)
 
-    _args, kwargs = embed_mock.call_args
-    contents = kwargs.get("contents") or _args[1] if _args else kwargs["contents"]
-    assert contents == ["task: search result | query: foo"]
+    assert embed_mock.call_args.kwargs["contents"] == ["task: search result | query: foo"]
 
 
 # ---------------------------------------------------------------------------
@@ -172,3 +177,32 @@ async def test_empty_response_is_permanent_error() -> None:
 
     with pytest.raises(EmbeddingProviderError, match="empty embedding response"):
         await provider.encode(text="x", task=EmbeddingTask.DOCUMENT)
+
+
+@pytest.mark.asyncio
+async def test_input_tokens_extracted_from_statistics() -> None:
+    """The SDK exposes token count under emb.statistics.token_count, not emb.input_tokens.
+
+    This test ensures we read the correct field — otherwise cost-tracking
+    dashboards (which consume EmbeddingResult.input_tokens) will be wrong.
+    """
+    provider, embed_mock = _make_provider(output_dim=2)
+    embed_mock.return_value = _make_response(
+        [0.1, 0.2],
+        statistics=SimpleNamespace(token_count=42.0),
+    )
+
+    result = await provider.encode(text="hello", task=EmbeddingTask.DOCUMENT)
+
+    assert result.input_tokens == 42
+
+
+@pytest.mark.asyncio
+async def test_input_tokens_zero_when_statistics_is_none() -> None:
+    """When the SDK returns no statistics, input_tokens falls back to 0."""
+    provider, embed_mock = _make_provider(output_dim=2)
+    embed_mock.return_value = _make_response([0.1, 0.2], statistics=None)
+
+    result = await provider.encode(text="hello", task=EmbeddingTask.DOCUMENT)
+
+    assert result.input_tokens == 0

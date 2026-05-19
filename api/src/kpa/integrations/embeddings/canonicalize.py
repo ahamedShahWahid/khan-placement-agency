@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import hashlib
 
-from kpa.integrations.parser.base import ParsedResume
+from kpa.integrations.parser.base import EducationEntry, ExperienceEntry, ParsedResume
 
 
 def canonicalize_profile(parsed: ParsedResume, *, full_name: str) -> tuple[str, str]:
@@ -44,7 +44,7 @@ def canonicalize_profile(parsed: ParsedResume, *, full_name: str) -> tuple[str, 
     return text, hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
-def _format_experience(r) -> str:  # type: ignore[no-untyped-def]
+def _format_experience(r: ExperienceEntry) -> str:
     title = (r.title or "?").strip()
     company = (r.company or "?").strip()
     start = (r.start or "?").strip()
@@ -54,7 +54,7 @@ def _format_experience(r) -> str:  # type: ignore[no-untyped-def]
     return f"{head}: {summary}" if summary else head
 
 
-def _format_education(e) -> str:  # type: ignore[no-untyped-def]
+def _format_education(e: EducationEntry) -> str:
     degree = (e.degree or "?").strip()
     field = (e.field or "").strip()
     institution = (e.institution or "?").strip()

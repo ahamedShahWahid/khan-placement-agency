@@ -74,6 +74,29 @@ def test_missing_optional_fields_handled() -> None:
     assert len(sha) == 64  # sha256 hex digest is always 64 chars
 
 
+def test_experience_reordering_does_not_change_hash() -> None:
+    """Two experience entries in different input orders produce the same hash.
+
+    Same invariant as test_skill_reordering_does_not_change_hash, applied to
+    the experience list. Protects against a future regression where someone
+    adds an entry and breaks the sort-after-format invariant.
+    """
+    entry_a = ExperienceEntry(
+        company="Acme", title="Engineer", start="2018", end="2020", summary="Built things"
+    )
+    entry_b = ExperienceEntry(
+        company="Globex", title="Senior Engineer", start="2020", end="Present", summary="Led team"
+    )
+
+    pr1 = _make_resume(experience=[entry_a, entry_b])
+    pr2 = _make_resume(experience=[entry_b, entry_a])
+
+    _, hash1 = canonicalize_profile(pr1, full_name="Eve")
+    _, hash2 = canonicalize_profile(pr2, full_name="Eve")
+
+    assert hash1 == hash2
+
+
 def test_certification_objects_use_name_field() -> None:
     """Certs with name=None are filtered out; non-empty name ends up in canonical text."""
     pr = _make_resume(
