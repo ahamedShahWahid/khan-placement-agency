@@ -10,9 +10,10 @@ container churn, fast.
 
 from __future__ import annotations
 
+import hashlib
 import os
 from collections.abc import AsyncIterator, Iterator
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import pytest
@@ -34,6 +35,7 @@ from kpa.auth.google_verifier import (
     InvalidGoogleTokenError,
     get_google_verifier,
 )
+from kpa.integrations.embeddings import EmbeddingResult, EmbeddingTask
 
 pytestmark = pytest.mark.integration
 
@@ -64,6 +66,66 @@ def google_verifier() -> FakeGoogleIdTokenVerifier:
         google_verifier.canned["applicant_a_token"] = GoogleClaims(...)
     """
     return FakeGoogleIdTokenVerifier(canned={})
+
+
+@dataclass
+class FakeEmbeddingProvider:
+    """Deterministic 1536-dim vector derived from sha256 of input text.
+
+    Each call appends a tuple (text, task, title) to ``.calls`` so tests can
+    assert on call count and exact arguments.
+    """
+
+    calls: list[tuple[str, EmbeddingTask, str | None]] = field(default_factory=list)
+    model_name: str = "fake-test-model"
+
+    async def encode(
+        self,
+        *,
+        text: str,
+        task: EmbeddingTask,
+        title: str | None = None,
+    ) -> EmbeddingResult:
+        self.calls.append((text, task, title))
+        h = hashlib.sha256(text.encode()).digest()
+        # Tile 32 bytes into 1536 floats in [-1, 1] — deterministic, no randomness.
+        values = [((b / 255.0) * 2.0 - 1.0) for b in (h * 48)][:1536]
+        return EmbeddingResult(
+            values=values,
+            model_name=self.model_name,
+            input_tokens=max(1, len(text) // 4),
+        )
+
+
+@pytest.fixture
+def embedding_provider() -> FakeEmbeddingProvider:
+    return FakeEmbeddingProvider()
+
+
+@pytest.fixture
+def patched_embedding_provider(
+    monkeypatch: pytest.MonkeyPatch,
+    embedding_provider: FakeEmbeddingProvider,
+) -> FakeEmbeddingProvider:
+    """Patch get_embedding_provider() to return the fake so eager-mode Celery
+    embed tasks use the fake without hitting the network.
+
+    Two patches are needed because embed.py imports get_embedding_provider by
+    name at module load time (``from kpa.workers.celery_app import
+    get_embedding_provider``), creating a local reference that is not affected
+    by patching the celery_app module attribute alone.  We therefore patch both
+    the celery_app attribute and the embed-module local reference.  We also set
+    the module-level ``_embedding_provider`` cache directly so that the original
+    (unpatched) function body, if somehow reached, also returns the fake.
+    """
+    import kpa.workers.celery_app as cel
+    import kpa.workers.tasks.embed as embed_mod
+
+    monkeypatch.setattr(cel, "get_embedding_provider", lambda: embedding_provider)
+    monkeypatch.setattr(embed_mod, "get_embedding_provider", lambda: embedding_provider)
+    # Also seed the module-level cache so the original function body short-circuits.
+    monkeypatch.setattr(cel, "_embedding_provider", embedding_provider)
+    return embedding_provider
 
 
 DEFAULT_TEST_DB_URL = "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa_test"
