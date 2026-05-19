@@ -1,13 +1,9 @@
 """Integration tests for the embed_applicant worker.
 
-Tests A, B, D (pipeline tests) use a local ``eager_client`` fixture that does
-NOT override get_session.  The upload route therefore commits fully to the real
-DB so the parse + embed worker threads can see the rows via their own
+Tests A, B, C, D (pipeline tests) use a local ``eager_client`` fixture that
+does NOT override get_session.  The upload route therefore commits fully to the
+real DB so the parse + embed worker threads can see the rows via their own
 connections.  Cleanup is done via a direct engine query after each test.
-
-Test C (no-op / no-parsed-resume) uses ``async_client`` + ``session`` because
-it calls ``_embed_applicant_async`` directly without touching the HTTP layer and
-never needs the route to commit through to the real DB.
 
 The Gemini provider is replaced via ``patched_embedding_provider`` — no real
 network calls.
@@ -23,12 +19,13 @@ import httpx
 import pytest
 import pytest_asyncio
 from fpdf import FPDF
-from sqlalchemy import delete, select, text as sql_text
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy import delete, select
+from sqlalchemy import text as sql_text
+from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.pool import NullPool
 
 from kpa.auth.google_verifier import GoogleClaims, get_google_verifier
-from kpa.db.models import ApplicantEmbedding, Resume, ResumeParseStatus, User
+from kpa.db.models import Resume, ResumeParseStatus, User
 from kpa.integrations.embeddings import EmbeddingTask
 
 pytestmark = pytest.mark.integration
@@ -174,6 +171,10 @@ async def eager_client(
         yield ac
 
     app.dependency_overrides.clear()
+    # httpx.ASGITransport does not send ASGI lifespan events, so the
+    # on_event("shutdown") hook that disposes the engine never fires.
+    # Dispose explicitly to avoid pool leaks across tests.
+    await app.state.db_engine.dispose()
 
     # Reset worker's cached sessionmaker so subsequent tests don't reuse
     # this test's engine. The patched_embedding_provider fixture handles
@@ -192,9 +193,6 @@ async def test_embed_after_parse_writes_row(
     pdf_bytes = _tiny_pdf_with_text()
 
     applicant_id, access = await _signin_as_applicant(eager_client, google_verifier)
-    email_used = google_verifier.canned[
-        next(t for t, c in google_verifier.canned.items() if c.sub is not None)
-    ].email
 
     try:
         resp = await eager_client.post(
@@ -239,7 +237,8 @@ async def test_rerun_with_same_content_is_noop(
     google_verifier,
     patched_embedding_provider,
 ) -> None:
-    """Re-running embed_applicant on unchanged parsed_json hits the hash gate and skips the provider."""
+    """Re-running embed_applicant on unchanged parsed_json hits the hash gate and
+    skips the provider."""
     from kpa.workers.celery_app import get_session_maker
     from kpa.workers.tasks.embed import _embed_applicant_async
 
@@ -283,42 +282,44 @@ async def test_rerun_with_same_content_is_noop(
 
 
 async def test_embed_no_parsed_resume_is_no_op(
-    async_client: httpx.AsyncClient,
-    session: AsyncSession,
+    eager_client: httpx.AsyncClient,
+    migrated_db: str,
     google_verifier,
     patched_embedding_provider,
 ) -> None:
-    """If no parsed resume exists for the applicant, embed_applicant bails cleanly.
+    """Sign in (commits to real DB), but do NOT upload a resume.
 
-    Note: this test substitutes for the spec's "test_stale_content_aborts_in_txn3"
-    because forcing the race within a savepoint-isolated test is fiddly. The
-    "no parsed resume" branch exercises the same defensive load-latest-resume
-    check that catches stale data in Txn3.
+    Call the embed worker directly. Worker should bail at Txn 1's
+    ``latest is None`` branch (embed.no-parsed-resume), not the
+    embed.applicant-missing branch. Using eager_client ensures the applicant
+    row is visible to the worker's fresh DB connection.
 
-    Uses async_client + session because we only call _embed_applicant_async
-    directly — no route commit is needed, and savepoint isolation is fine.
+    Substitutes for the spec's "test_stale_content_aborts_in_txn3" because
+    forcing the Txn3 race within a test is fiddly. The "no parsed resume"
+    branch exercises the same defensive load-and-check pattern.
     """
     from kpa.workers.celery_app import get_session_maker
     from kpa.workers.tasks.embed import _embed_applicant_async
 
-    applicant_id_str, _access = await _signin_as_applicant(async_client, google_verifier)
+    applicant_id_str, _access = await _signin_as_applicant(eager_client, google_verifier)
     applicant_id = uuid.UUID(applicant_id_str)
+    email_used = next(iter(google_verifier.canned.values())).email
 
-    # No resume uploaded — call the worker directly. Should bail cleanly.
-    await _embed_applicant_async(
-        applicant_id,
-        sm=get_session_maker(),
-        provider=patched_embedding_provider,
-    )
-
-    # Provider not called; no row written.
-    assert patched_embedding_provider.calls == []
-    rows = (
-        await session.execute(
-            select(ApplicantEmbedding).where(ApplicantEmbedding.applicant_id == applicant_id)
+    try:
+        # No resume uploaded — call the worker directly. Should bail cleanly
+        # at the embed.no-parsed-resume branch in Txn 1.
+        await _embed_applicant_async(
+            applicant_id,
+            sm=get_session_maker(),
+            provider=patched_embedding_provider,
         )
-    ).all()
-    assert rows == []
+
+        # Provider not called; no row written.
+        assert patched_embedding_provider.calls == []
+        emb = await _get_embedding_row_direct(migrated_db, applicant_id_str)
+        assert emb is None
+    finally:
+        await _cleanup_user_by_email(migrated_db, email_used)
 
 
 async def test_dispatch_resilient_to_embed_broker_failure(
@@ -328,7 +329,8 @@ async def test_dispatch_resilient_to_embed_broker_failure(
     patched_embedding_provider,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """If embed_applicant.delay() raises, parse still commits PARSED and no embedding row is written."""
+    """If embed_applicant.delay() raises, parse still commits PARSED and no
+    embedding row is written."""
     from kpa.workers.tasks import embed as embed_mod
 
     pdf = FPDF()
