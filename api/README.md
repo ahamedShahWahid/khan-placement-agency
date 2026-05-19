@@ -126,6 +126,48 @@ curl -s http://127.0.0.1:8000/ready | python -m json.tool
 
 `/ready` returns 200 when Postgres responds to `SELECT 1`, 503 otherwise. Use it for load-balancer readiness checks; use `/health` (no DB) for liveness.
 
+## Redis (for the parse worker)
+
+The resume parse pipeline runs on Celery + Redis. Local dev uses Homebrew Redis on the default port.
+
+### First-time setup
+
+```bash
+brew install redis
+brew services start redis
+```
+
+Verify it's up:
+
+```bash
+redis-cli ping     # → PONG
+```
+
+The connection string lives in `.env`:
+
+```
+KPA_REDIS_URL=redis://localhost:6379/0
+```
+
+### Run the parse worker
+
+In a second terminal (uvicorn keeps running in the first):
+
+```bash
+cd api
+uv run --env-file=.env celery -A kpa.workers.celery_app worker \
+    --pool=solo --concurrency=1 -Q parse --loglevel=info
+```
+
+- `--pool=solo`: single-concurrency. The MVP pattern; switch to `--pool=prefork` later when load justifies parallelism.
+- `-Q parse`: only consume from the `parse` queue. Future `embed`/`score`/`notify` queues land in their own plans.
+
+Upload a resume in the first terminal; the worker logs `parse.complete` when it's done. Poll `GET /v1/applicants/{aid}/resumes/{rid}` to see `parse_status` transition.
+
+### Skipping the worker for tests
+
+Tests use Celery eager mode (set via `KPA_CELERY_TASK_ALWAYS_EAGER=true` in test fixtures) so `.delay()` runs the task body inline — no Redis required during `pytest`. Production never sets this flag.
+
 ## Resume uploads
 
 Two endpoints, both nested under an applicant id:
@@ -208,6 +250,8 @@ All settings are read from environment variables prefixed `KPA_`:
 | `KPA_ALLOWED_RESUME_CONTENT_TYPES` | no | (pdf, doc, docx) | Comma-separated content-type whitelist. |
 | `KPA_LOG_LEVEL`    | no       | `INFO`  | Stdlib log level                |
 | `KPA_LOG_FORMAT`   | no       | `text`  | `text` (key=value) or `json`    |
+| `KPA_REDIS_URL`    | yes      | —       | Redis connection string (`redis://` or `rediss://`). Required for Celery broker. |
+| `KPA_CELERY_TASK_ALWAYS_EAGER` | no | `false` | When true, Celery tasks run synchronously in-process. Tests only. |
 
 The service refuses to boot if required variables are missing or invalid.
 
@@ -225,8 +269,17 @@ api/
 │   │   └── error_handler.py  # RFC 7807 problem+json
 │   ├── observability/
 │   │   └── logging.py        # structlog config
+│   ├── workers/
+│   │   ├── celery_app.py     # Celery instance + per-worker engine lifecycle
+│   │   └── tasks/
+│   │       └── parse.py       # parse_resume — 3-txn split, retry, idempotency
 │   ├── integrations/
-│   │   └── storage/          # Storage protocol + LocalFileStorage
+│   │   ├── storage/          # Storage protocol + LocalFileStorage
+│   │   └── parser/
+│   │       ├── base.py        # ResumeParser Protocol + ParsedResume schema
+│   │       ├── text.py        # PDF (pypdf+pdfminer) + DOCX extraction
+│   │       ├── library.py     # LibraryResumeParser — regex + keyword impl
+│   │       └── skills_dict.py # Curated skill keyword list
 │   ├── db/
 │   │   ├── session.py        # async engine, sessionmaker, get_session dep
 │   │   ├── models.py         # Base, User, Applicant, Resume
