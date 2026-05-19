@@ -93,6 +93,7 @@ def migrated_db(db_url: str, monkeypatch_session: pytest.MonkeyPatch) -> str:
     monkeypatch_session.setenv("KPA_ENV", "local")
     monkeypatch_session.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch_session.setenv("KPA_DB_URL", db_url)
+    monkeypatch_session.setenv("KPA_REDIS_URL", "redis://localhost:6379/0")
     monkeypatch_session.setenv("KPA_JWT_SECRET", "x" * 32)
     monkeypatch_session.setenv(
         "KPA_GOOGLE_OAUTH_CLIENT_IDS",
@@ -146,6 +147,7 @@ def client(
     monkeypatch.setenv("KPA_ENV", "local")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", db_url)
+    monkeypatch.setenv("KPA_REDIS_URL", "redis://localhost:6379/0")
     monkeypatch.setenv("KPA_STORAGE_ROOT", str(tmp_path))
     monkeypatch.setenv("KPA_JWT_SECRET", "x" * 32)
     monkeypatch.setenv(
@@ -188,6 +190,7 @@ async def async_client(
     monkeypatch.setenv("KPA_ENV", "local")
     monkeypatch.setenv("KPA_SERVICE_NAME", "kpa-api")
     monkeypatch.setenv("KPA_DB_URL", db_url)
+    monkeypatch.setenv("KPA_REDIS_URL", "redis://localhost:6379/0")
     monkeypatch.setenv("KPA_STORAGE_ROOT", str(tmp_path))
     monkeypatch.setenv("KPA_JWT_SECRET", "x" * 32)
     monkeypatch.setenv(

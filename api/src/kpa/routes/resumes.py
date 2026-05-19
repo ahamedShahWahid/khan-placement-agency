@@ -10,6 +10,7 @@ from __future__ import annotations
 from datetime import datetime
 from uuid import UUID
 
+import structlog
 from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, status
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy import select
@@ -19,6 +20,8 @@ from kpa.db.models import Applicant, Resume, ResumeParseStatus
 from kpa.db.session import get_session
 from kpa.integrations.storage import Storage, get_storage
 from kpa.settings import Settings
+
+_log = structlog.get_logger(__name__)
 
 router = APIRouter(prefix="/v1/applicants/{applicant_id}", tags=["resumes"])
 
@@ -109,6 +112,25 @@ async def upload_resume(
 
     await storage.save(key=resume.storage_key, content=content, content_type=file.content_type)
     await session.commit()
+
+    # Dispatch async parse — broker outages MUST NOT fail the upload because
+    # the resume row + file are already durable. Admin tooling can replay
+    # pending rows after the broker recovers.
+    #
+    # Lazy import: kpa.workers.celery_app instantiates Settings() at module
+    # level (needs KPA_REDIS_URL). Deferring the import to request time avoids
+    # import-time failures in test collection where env vars aren't yet set.
+    try:
+        from kpa.workers.tasks.parse import parse_resume
+
+        parse_resume.delay(str(resume.id))
+    except Exception as exc:
+        _log.warning(
+            "dispatch.broker-unavailable",
+            resume_id=str(resume.id),
+            error=type(exc).__name__,
+        )
+
     await session.refresh(resume)
     return resume
 

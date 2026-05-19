@@ -431,7 +431,7 @@ The MVP path is deliberately small — local first, with one minimal hosted foot
 - **Local dev:**
   - Python service: `uv run uvicorn kpa.main:app --reload` (no container required).
   - Postgres 16: Homebrew (`brew install postgresql@16`, `brew services start postgresql@16`). One local cluster, two databases: `kpa` (dev) and `kpa_test` (integration tests). pgvector via `CREATE EXTENSION vector;` once we hit P1.
-  - Redis: deferred to the plan that introduces Celery (P3-era); until then the API runs synchronously where possible.
+  - Redis: introduced at P1 by the resume parse worker plan (was originally planned for P3; advanced because §6.1 needs async parse). Local Redis via Homebrew (`brew install redis && brew services start redis`). The Celery broker + result backend both point at it.
   - Object storage: local filesystem under `./var/uploads/` during dev; an S3 bucket can be slotted in via `integrations/storage_s3.py` once the parse pipeline lands.
   - Secrets: a git-ignored `.env` file loaded by `uv run --env-file=.env ...`. No AWS at this stage.
 - **CI:** GitHub Actions runs ruff + mypy + pytest (unit + integration) against a Postgres service container provided by the workflow (the *one* container in the loop, owned by CI, not the developer). The repo itself ships no Dockerfile/compose file.
@@ -475,7 +475,7 @@ Phases are sized for sequencing, not for a fixed calendar. Each phase ends with 
 - CI green (ruff + mypy + pytest unit + pytest integration against a CI-provided Postgres), OpenAPI codegen in place.
 
 **P1 — Resume parse + embed (2 weeks)**
-- Local-filesystem upload first; S3 presigned upload behind the same `storage` interface, switched on by env. Parse worker, embedding worker, status surfacing.
+- Local-filesystem upload first; S3 presigned upload behind the same `storage` interface, switched on by env. Parse worker landed (Celery + Redis, library/regex parser); embedding worker + status push remain.
 - Gold dataset + parse F1 eval in CI (gate: ≥ 0.85 before P2; ≥ 0.90 before launch).
 
 **P2 — Jobs + matching (3 weeks)**
@@ -484,7 +484,7 @@ Phases are sized for sequencing, not for a fixed calendar. Each phase ends with 
 
 **P3 — Notifications + applications (1–2 weeks)**
 - Outbox + push + email; application tracking; saved jobs.
-- First introduction of Redis (locally via Homebrew) + Celery — still no Docker required for dev.
+- Notification-side Celery queues (`notify`, `dsr`) added — Redis + Celery already in the stack from the P1 parse worker plan.
 
 **P4 — DPDP + admin (2 weeks)**
 - Consent screens; DSR export/delete pipelines; admin moderation + audit log viewer; MFA for admins.

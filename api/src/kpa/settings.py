@@ -96,6 +96,19 @@ class Settings(BaseSettings):
         ),
     )
 
+    # --- Background workers (Celery + Redis) ---
+    redis_url: str = Field(
+        ...,
+        description="Redis connection string. Used by Celery broker + result backend.",
+    )
+    celery_task_always_eager: bool = Field(
+        default=False,
+        description=(
+            "When true, Celery tasks execute synchronously in the calling process"
+            " instead of being dispatched to the broker. Used by tests; never in prod."
+        ),
+    )
+
     @field_validator("log_level", mode="before")
     @classmethod
     def _upper_log_level(cls, v: object) -> object:
@@ -111,6 +124,17 @@ class Settings(BaseSettings):
     def _enforce_async_driver(cls, v: str) -> str:
         if not v.startswith("postgresql+asyncpg://"):
             raise ValueError("db_url must use the postgresql+asyncpg:// driver")
+        return v
+
+    @field_validator("redis_url")
+    @classmethod
+    def _enforce_redis_url(cls, v: str) -> str:
+        from urllib.parse import urlparse
+
+        if not (v.startswith("redis://") or v.startswith("rediss://")):
+            raise ValueError("redis_url must start with redis:// or rediss://")
+        if not urlparse(v).hostname:
+            raise ValueError("redis_url must include a hostname (e.g. redis://localhost:6379/0)")
         return v
 
     @field_validator("allowed_resume_content_types", mode="before")

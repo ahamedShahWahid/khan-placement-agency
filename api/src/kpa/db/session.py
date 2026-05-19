@@ -7,6 +7,7 @@ plan — see IMPLEMENTATION_SPEC.md §5 for the eventual split design.
 from __future__ import annotations
 
 from collections.abc import AsyncIterator
+from typing import Any
 
 from fastapi import Request
 from sqlalchemy.ext.asyncio import (
@@ -21,19 +22,25 @@ from kpa.settings import Settings
 _SCHEMA = "kpa"
 
 
-def create_engine_from_settings(settings: Settings | None = None) -> AsyncEngine:
+def create_engine_from_settings(
+    settings: Settings | None = None,
+    *,
+    poolclass: Any = None,
+) -> AsyncEngine:
     """Construct the application's async engine.
 
     Pool tuning is intentionally minimal here — production sizing happens via
     env vars in a later plan once we have load-test data.
     """
     settings = settings or Settings()
-    return create_async_engine(
-        settings.db_url,
-        echo=False,
-        pool_pre_ping=True,
-        connect_args={"server_settings": {"search_path": _SCHEMA}},
-    )
+    kwargs: dict[str, Any] = {
+        "echo": False,
+        "pool_pre_ping": True,
+        "connect_args": {"server_settings": {"search_path": _SCHEMA}},
+    }
+    if poolclass is not None:
+        kwargs["poolclass"] = poolclass
+    return create_async_engine(settings.db_url, **kwargs)
 
 
 def make_sessionmaker(engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
