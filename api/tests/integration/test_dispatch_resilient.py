@@ -55,8 +55,6 @@ async def test_upload_returns_201_even_if_broker_dispatch_raises(
 
     assert resp.status_code == 201
     row = (
-        await session.execute(
-            select(Resume).where(Resume.applicant_id.in_([applicant_id]))
-        )
+        await session.execute(select(Resume).where(Resume.applicant_id.in_([applicant_id])))
     ).scalar_one()
     assert row.parse_status == ResumeParseStatus.PENDING

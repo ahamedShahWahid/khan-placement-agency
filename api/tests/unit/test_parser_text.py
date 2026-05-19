@@ -75,9 +75,7 @@ async def test_extract_text_from_docx() -> None:
     docx_bytes = _make_docx(["Hello world", "Second paragraph"])
     text = await extract_text(
         content=docx_bytes,
-        content_type=(
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        ),
+        content_type=("application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
     )
     assert "Hello world" in text
     assert "Second paragraph" in text

@@ -106,9 +106,7 @@ async def test_parse_happy_path_persists_parsed_json(
 ) -> None:
     resume_id = await _make_resume_row(sm)
     storage = _FakeStorage()
-    parser = _FakeParser(
-        ParsedResume(parser_name="library.v1", raw_text="hello", email="a@b.com")
-    )
+    parser = _FakeParser(ParsedResume(parser_name="library.v1", raw_text="hello", email="a@b.com"))
 
     await _parse_resume_async(resume_id, sm=sm, storage=storage, parser=parser)
 

@@ -152,9 +152,9 @@ async def test_upload_then_parse_populates_parsed_json(
         resume_id = resp.json()["id"]
 
         row = await _get_resume_row(migrated_db, resume_id)
-        assert row.parse_status == ResumeParseStatus.PARSED, (
-            f"expected parsed, got {row.parse_status}; parse_error={row.parse_error}"
-        )
+        assert (
+            row.parse_status == ResumeParseStatus.PARSED
+        ), f"expected parsed, got {row.parse_status}; parse_error={row.parse_error}"
         assert row.parsed_json is not None
         assert row.parsed_json["parser_name"] == "library.v1"
         assert row.parsed_json["schema_version"] == 1

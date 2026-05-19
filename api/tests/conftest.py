@@ -22,9 +22,7 @@ def pytest_configure(config: object) -> None:
     """
     os.environ.setdefault("KPA_ENV", "local")
     os.environ.setdefault("KPA_SERVICE_NAME", "kpa-api")
-    os.environ.setdefault(
-        "KPA_DB_URL", "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa_test"
-    )
+    os.environ.setdefault("KPA_DB_URL", "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa_test")
     os.environ.setdefault("KPA_REDIS_URL", "redis://localhost:6379/0")
 
 
