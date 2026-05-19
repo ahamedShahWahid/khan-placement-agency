@@ -71,6 +71,12 @@ async def _require_applicant(user: User, session: AsyncSession) -> Applicant:
         )
     ).scalar_one_or_none()
     if applicant is None:
+        # Should not happen — `AuthService._upsert_identity` creates the
+        # applicants row on first sign-in. If we get here, an out-of-band
+        # path created an APPLICANT user without the paired row, or the
+        # row was soft-deleted. Either way it's a data-integrity bug worth
+        # paging on.
+        _log.error("applicant.row-missing-for-applicant-role", user_id=str(user.id))
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="applicant_missing",
@@ -140,10 +146,18 @@ async def upload_resume(
 
         parse_resume.delay(str(resume.id))
     except Exception as exc:
+        # Broad catch is deliberate: the row + blob are already durable, so
+        # any dispatch-time error (broker down, import failure, eager-mode
+        # task crash) must NOT roll back what we already committed. The log
+        # event name stays generic ("dispatch.failed") so eager-mode parser
+        # bugs aren't mislabeled as broker outages; exc_info carries the
+        # traceback so an operator can tell broker-down from a real bug.
         _log.warning(
-            "dispatch.broker-unavailable",
+            "dispatch.failed",
             resume_id=str(resume.id),
-            error=type(exc).__name__,
+            error_type=type(exc).__name__,
+            error_message=str(exc),
+            exc_info=True,
         )
 
     await session.refresh(resume)
@@ -160,9 +174,11 @@ async def get_resume(
     session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> Resume:
     applicant = await _require_applicant(user, session)
-    # Single JOIN'd query so all 404 cases (unknown resume id, resume
-    # belongs to a different applicant) collapse to the same detail
-    # message — see the commit that introduced uniform 404s for why.
+    # Both 404 cases (unknown resume id, resume owned by a different
+    # applicant) are already collapsed by the `Resume.applicant_id ==
+    # applicant.id` filter — it returns None for both. The JOIN on
+    # Applicant is belt-and-braces against a race where the applicant
+    # was soft-deleted between `_require_applicant` and this query.
     row = (
         await session.execute(
             select(Resume)

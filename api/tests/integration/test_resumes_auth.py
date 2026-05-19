@@ -70,3 +70,63 @@ async def test_upload_recruiter_role_returns_403(
     )
     assert response.status_code == 403
     assert response.json()["detail"] == "not_an_applicant"
+
+
+async def test_get_resume_recruiter_role_returns_403(
+    async_client: httpx.AsyncClient,
+    session: AsyncSession,
+) -> None:
+    """GET also gates on role — catches a refactor that wraps POST and GET differently."""
+    recruiter = User(
+        email=f"recruiter-{uuid.uuid4()}@example.com",
+        role=UserRole.RECRUITER,
+    )
+    session.add(recruiter)
+    await session.flush()
+
+    access = mint_access_token(
+        user_id=recruiter.id,
+        role=recruiter.role.value,
+        secret=_JWT_SECRET,
+        ttl_seconds=600,
+    )
+
+    response = await async_client.get(
+        f"/v1/applicants/me/resumes/{uuid.uuid4()}",
+        headers={"Authorization": f"Bearer {access}"},
+    )
+    assert response.status_code == 403
+    assert response.json()["detail"] == "not_an_applicant"
+
+
+async def test_upload_applicant_role_without_applicant_row_returns_500(
+    async_client: httpx.AsyncClient,
+    session: AsyncSession,
+) -> None:
+    """The 'theoretically unreachable' applicant_missing branch.
+
+    Pins the spec-defined slug. If `AuthService._upsert_identity` ever
+    regresses and creates an APPLICANT user without an applicants row,
+    or if an admin tool soft-deletes the row, this test fails loudly.
+    """
+    orphan = User(
+        email=f"orphan-{uuid.uuid4()}@example.com",
+        role=UserRole.APPLICANT,
+    )
+    session.add(orphan)
+    await session.flush()
+
+    access = mint_access_token(
+        user_id=orphan.id,
+        role=orphan.role.value,
+        secret=_JWT_SECRET,
+        ttl_seconds=600,
+    )
+
+    response = await async_client.post(
+        "/v1/applicants/me/resumes",
+        files={"file": ("cv.pdf", _TINY_PDF, "application/pdf")},
+        headers={"Authorization": f"Bearer {access}"},
+    )
+    assert response.status_code == 500
+    assert response.json()["detail"] == "applicant_missing"

@@ -38,7 +38,8 @@ async def _signin_as_applicant(
     """Sign in via the fake Google verifier; return (applicant_id, access_token).
 
     Each call uses a unique sub/email by default so multiple applicants in
-    one test don't collide on the partial-unique email index.
+    one test don't collide on the global `uq_users_email` unique constraint
+    (or on the `provider_subject` uniqueness of `oauth_identities`).
     """
     sub = sub or f"google-sub-{uuid.uuid4()}"
     email = email or f"applicant-{uuid.uuid4()}@example.com"
