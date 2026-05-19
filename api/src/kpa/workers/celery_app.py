@@ -25,7 +25,7 @@ from kpa.settings import Settings
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
-    from kpa.integrations.embeddings import GeminiEmbeddingProvider
+    from kpa.integrations.embeddings.gemini import GeminiEmbeddingProvider
 
 # Settings is built at import time — one Settings object for the worker process.
 # Tasks read this rather than instantiating Settings repeatedly.
@@ -110,7 +110,7 @@ def get_embedding_provider() -> GeminiEmbeddingProvider:
     """
     global _embedding_provider
     if _embedding_provider is None:
-        from kpa.integrations.embeddings import GeminiEmbeddingProvider
+        from kpa.integrations.embeddings.gemini import GeminiEmbeddingProvider
 
         _embedding_provider = GeminiEmbeddingProvider(
             api_key=settings.gemini_api_key.get_secret_value(),

@@ -5,6 +5,11 @@ Public surface: ``EmbeddingProvider`` Protocol with two implementations
 vs query encoding, and the ``canonicalize_profile`` helper that produces the
 deterministic text + sha256 used as the idempotency key on
 ``applicant_embeddings.canonicalized_text_hash``.
+
+``GeminiEmbeddingProvider`` is intentionally not imported here — it is deferred
+to the point of use (in ``celery_app.get_embedding_provider()``) so that
+``google.genai`` and its dependencies are not loaded for worker processes
+that don't consume the ``embed`` queue.
 """
 from kpa.integrations.embeddings.base import (
     EmbeddingProvider,
@@ -14,7 +19,6 @@ from kpa.integrations.embeddings.base import (
     TransientEmbeddingError,
 )
 from kpa.integrations.embeddings.canonicalize import canonicalize_profile
-from kpa.integrations.embeddings.gemini import GeminiEmbeddingProvider
 
 __all__ = [
     "EmbeddingProvider",
@@ -23,5 +27,4 @@ __all__ = [
     "EmbeddingTask",
     "TransientEmbeddingError",
     "canonicalize_profile",
-    "GeminiEmbeddingProvider",
 ]

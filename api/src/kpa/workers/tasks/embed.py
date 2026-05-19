@@ -25,13 +25,13 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.sql import func
 
 from kpa.db.models import Applicant, ApplicantEmbedding, Resume, ResumeParseStatus
-from kpa.integrations.embeddings import (
+from kpa.integrations.embeddings.base import (
     EmbeddingProvider,
     EmbeddingProviderError,
     EmbeddingTask,
     TransientEmbeddingError,
-    canonicalize_profile,
 )
+from kpa.integrations.embeddings.canonicalize import canonicalize_profile
 from kpa.integrations.parser.base import ParsedResume
 from kpa.workers.celery_app import (
     celery_app,
@@ -139,7 +139,11 @@ async def _embed_applicant_async(
         )
         return  # No row state to clean up; no retry.
     except TransientEmbeddingError:
-        # Reraise unchanged so Celery autoretry fires.
+        # Explicit catch-and-reraise is load-bearing: without it, the bare
+        # ``except Exception`` below would wrap this into a NEW
+        # TransientEmbeddingError and the original message would be lost.
+        # Celery's autoretry_for tuple includes TransientEmbeddingError, so
+        # re-raising unchanged triggers the autoretry path with full context.
         raise
     except Exception as exc:
         _log.exception("embed.unexpected", applicant_id=str(applicant_id))
