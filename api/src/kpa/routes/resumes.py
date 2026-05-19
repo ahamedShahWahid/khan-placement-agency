@@ -1,8 +1,7 @@
 """Resume upload + retrieval endpoints.
 
-Routes are nested under the applicant id; no auth in this slice (the
-applicant id is supplied directly in the path). Auth lands later and
-adds a /v1/applicants/me/resumes alias.
+Both routes are nested under `/v1/applicants/me` and resolve the
+authenticated applicant from the access JWT — never from the URL.
 """
 
 from __future__ import annotations
@@ -16,14 +15,15 @@ from pydantic import BaseModel, ConfigDict
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from kpa.db.models import Applicant, Resume, ResumeParseStatus
+from kpa.auth.dependencies import current_user
+from kpa.db.models import Applicant, Resume, ResumeParseStatus, User, UserRole
 from kpa.db.session import get_session
 from kpa.integrations.storage import Storage, get_storage
 from kpa.settings import Settings
 
 _log = structlog.get_logger(__name__)
 
-router = APIRouter(prefix="/v1/applicants/{applicant_id}", tags=["resumes"])
+router = APIRouter(prefix="/v1/applicants/me", tags=["resumes"])
 
 
 # Content-Type → file extension. The original filename's extension is not
@@ -49,18 +49,33 @@ class ResumeRead(BaseModel):
     created_at: datetime
 
 
-async def _load_live_applicant(session: AsyncSession, applicant_id: UUID) -> Applicant:
-    row = (
+async def _require_applicant(user: User, session: AsyncSession) -> Applicant:
+    """Resolve the authenticated user to a live applicants row.
+
+    Raises 403 not_an_applicant if user.role is not APPLICANT.
+    Raises 500 applicant_missing if role=applicant but no row exists
+    (theoretically unreachable; defense in depth against an auth
+    auto-provisioning regression).
+    """
+    if user.role != UserRole.APPLICANT:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="not_an_applicant",
+        )
+    applicant = (
         await session.execute(
             select(Applicant).where(
-                Applicant.id == applicant_id,
+                Applicant.user_id == user.id,
                 Applicant.deleted_at.is_(None),
             )
         )
     ).scalar_one_or_none()
-    if row is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="applicant not found")
-    return row
+    if applicant is None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="applicant_missing",
+        )
+    return applicant
 
 
 @router.post(
@@ -69,9 +84,9 @@ async def _load_live_applicant(session: AsyncSession, applicant_id: UUID) -> App
     status_code=status.HTTP_201_CREATED,
 )
 async def upload_resume(
-    applicant_id: UUID,
     request: Request,
     file: UploadFile,
+    user: User = Depends(current_user),  # noqa: B008
     session: AsyncSession = Depends(get_session),  # noqa: B008
     storage: Storage = Depends(get_storage),  # noqa: B008
 ) -> Resume:
@@ -94,7 +109,7 @@ async def upload_resume(
             detail=f"file exceeds max_upload_bytes ({settings.max_upload_bytes})",
         )
 
-    applicant = await _load_live_applicant(session, applicant_id)
+    applicant = await _require_applicant(user, session)
 
     resume = Resume(
         applicant_id=applicant.id,
@@ -140,20 +155,21 @@ async def upload_resume(
     response_model=ResumeRead,
 )
 async def get_resume(
-    applicant_id: UUID,
     resume_id: UUID,
+    user: User = Depends(current_user),  # noqa: B008
     session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> Resume:
-    # Single JOIN'd query so all 404 cases (unknown applicant, unknown
-    # resume, wrong applicant) collapse to the same detail message — see
-    # the commit message for why uniform 404s matter.
+    applicant = await _require_applicant(user, session)
+    # Single JOIN'd query so all 404 cases (unknown resume id, resume
+    # belongs to a different applicant) collapse to the same detail
+    # message — see the commit that introduced uniform 404s for why.
     row = (
         await session.execute(
             select(Resume)
             .join(Applicant, Resume.applicant_id == Applicant.id)
             .where(
                 Resume.id == resume_id,
-                Resume.applicant_id == applicant_id,
+                Resume.applicant_id == applicant.id,
                 Resume.deleted_at.is_(None),
                 Applicant.deleted_at.is_(None),
             )
