@@ -108,6 +108,29 @@ uv run alembic upgrade head
 
 The integration test DB stays clean across runs (savepoint rollback per test), so you rarely need to reset it.
 
+### pgvector (required for embedding worker)
+
+The embedding worker uses a `vector(1536)` column on `applicant_embeddings`. Local Postgres needs the `pgvector` extension installed at the OS level.
+
+Homebrew currently bottles pgvector only for PG17/18. For Postgres 16 (the project's pinned version), build from source:
+
+```bash
+git clone --branch v0.8.0 https://github.com/pgvector/pgvector.git
+cd pgvector
+PG_CONFIG=/opt/homebrew/opt/postgresql@16/bin/pg_config make
+PG_CONFIG=/opt/homebrew/opt/postgresql@16/bin/pg_config make install
+```
+
+Then grant the `kpa` role permission to create the extension:
+
+```bash
+psql -d postgres -c "ALTER ROLE kpa SUPERUSER;"  # dev only — granular alternative is to pre-create as superuser
+psql -d kpa -c "CREATE EXTENSION IF NOT EXISTS vector;"
+psql -d kpa_test -c "CREATE EXTENSION IF NOT EXISTS vector;"
+```
+
+The Alembic migration `0004_applicant_embeddings.py` runs `CREATE EXTENSION IF NOT EXISTS vector` idempotently as the first step of `upgrade()`.
+
 ### Generate a new migration
 
 ```bash
@@ -156,11 +179,11 @@ In a second terminal (uvicorn keeps running in the first):
 ```bash
 cd api
 uv run --env-file=.env celery -A kpa.workers.celery_app worker \
-    --pool=solo --concurrency=1 -Q parse --loglevel=info
+    --pool=solo --concurrency=1 -Q parse,embed --loglevel=info
 ```
 
 - `--pool=solo`: single-concurrency. The MVP pattern; switch to `--pool=prefork` later when load justifies parallelism.
-- `-Q parse`: only consume from the `parse` queue. Future `embed`/`score`/`notify` queues land in their own plans.
+- `-Q parse,embed`: consume from both the `parse` queue (resume parsing) and the `embed` queue (Gemini embedding). Run a second worker pinned to `-Q embed` if you want to isolate queue consumption. Future `score`/`notify` queues land in their own plans.
 
 Upload a resume in the first terminal; the worker logs `parse.complete` when it's done. Poll `GET /v1/applicants/me/resumes/{rid}` (with the same Bearer token used for the upload) to see `parse_status` transition.
 
