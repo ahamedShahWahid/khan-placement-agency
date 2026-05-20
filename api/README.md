@@ -254,6 +254,13 @@ The canonical fixture lives at `api/data/sample_jobs.json` (10 employers,
 lower(title))` on jobs. Re-running updates mutable fields; `name` and an
 existing `verified_at` timestamp are preserved.
 
+The seeder dispatches `embed_job` for each inserted or updated job after the
+COMMIT. For embeddings to materialize, a Celery worker on the `embed` queue must
+be running (`uv run --env-file=.env celery -A kpa.workers.celery_app worker
+--pool=solo --concurrency=1 -Q parse,embed`). If the broker is down, the
+seeder logs `embed.dispatch-failed` per job and continues; re-running the seed
+CLI re-dispatches.
+
 ## Tests
 
 Unit tests (no DB required):

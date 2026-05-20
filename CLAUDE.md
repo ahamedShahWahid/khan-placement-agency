@@ -138,6 +138,8 @@ Per spec §4.2 and the comment in `db/models.py`: SQLAlchemy models are never re
 - **Updates preserve human-set state.** `employers.name` is never overwritten (the canonical name set by a real recruiter wins over the JSON spelling). `employers.verified_at` is only set when currently `NULL` — re-verification timestamps are not stomped.
 - **`_apply_in_session(session, payload, report)` is the test seam.** The CLI's `_apply()` opens its own engine; integration tests call `_apply_in_session` directly with the savepoint-bound session. Mirror this pattern if you add new seed scripts.
 - **Drift guard:** `test_loader_against_sample_jobs_json` asserts `count(employers)==10, count(jobs)==27`. If you intentionally change the fixture, update the test in the same commit.
+- **`embed_job` dispatch from the seed CLI** lives in `_dispatch_embeds(...)` and runs *after* `_apply` returns (outside the `asyncio.run` boundary so eager-mode `asyncio.run()` in the task body doesn't conflict). Same broad-except + `_log.warning("embed.dispatch-failed", ...)` pattern as the upload route → parse worker; broker down ≠ seed failure. Don't tighten.
+- **Three modules need patching to intercept `get_embedding_provider`** in tests: `celery_app`, `embed_job`, and `embed` (P1.3). All three import the function by name, so each holds a local reference. The `patched_embedding_provider` fixture patches all three plus the `_embedding_provider` cache. Mirror this pattern in any future fixture that needs to swap a function imported by name across multiple modules.
 
 ## Test patterns
 
