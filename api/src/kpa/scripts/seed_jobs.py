@@ -22,7 +22,7 @@ import json
 import re
 import sys
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Annotated
@@ -123,6 +123,8 @@ class SeedReport:
     employers_updated: int = 0
     jobs_inserted: int = 0
     jobs_updated: int = 0
+    inserted_job_ids: list[uuid.UUID] = field(default_factory=list)
+    updated_job_ids: list[uuid.UUID] = field(default_factory=list)
     dry_run: bool = False
 
     def as_log_kwargs(self) -> dict[str, int | bool]:
@@ -157,6 +159,8 @@ async def _apply(payload: SeedPayload, *, dry_run: bool) -> SeedReport:
                 await session.commit()
     finally:
         await engine.dispose()
+    if not dry_run:
+        _dispatch_embeds(report.inserted_job_ids + report.updated_job_ids)
     return report
 
 
@@ -253,6 +257,7 @@ async def _upsert_job(
         session.add(job)
         await session.flush()
         report.jobs_inserted += 1
+        report.inserted_job_ids.append(job.id)
         _log.info(
             "seed.job.inserted",
             employer_id=str(employer_id),
@@ -269,12 +274,31 @@ async def _upsert_job(
     match.status = status
     match.posted_at = posted_at
     report.jobs_updated += 1
+    report.updated_job_ids.append(match.id)
     _log.info(
         "seed.job.updated",
         employer_id=str(employer_id),
         title=match.title,
         id=str(match.id),
     )
+
+
+def _dispatch_embeds(job_ids: list[uuid.UUID]) -> None:
+    """Fire ``embed_job.delay(...)`` for each job_id, fire-and-forget.
+
+    Broker outage MUST NOT fail the seed — the rows are durable. The broad
+    except + warning log mirrors the upload-route → parse-resume dispatch
+    pattern in ``routes/resumes.py``. Don't tighten the except.
+    """
+    # Lazy import to avoid celery_app import at module load (keeps the CLI
+    # invocable without Celery configured for dry-run / unit-test paths).
+    from kpa.workers.tasks.embed_job import embed_job
+
+    for jid in job_ids:
+        try:
+            embed_job.delay(str(jid))
+        except Exception:
+            _log.warning("embed.dispatch-failed", job_id=str(jid), exc_info=True)
 
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:

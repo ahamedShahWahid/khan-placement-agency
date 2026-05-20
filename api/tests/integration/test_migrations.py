@@ -75,3 +75,45 @@ async def test_employers_name_norm_is_partial_unique(session: AsyncSession) -> N
     assert row is not None
     assert "UNIQUE INDEX" in row[0]
     assert "deleted_at IS NULL" in row[0]
+
+
+@pytest.mark.integration
+async def test_migrated_db_has_job_embeddings_table(session: AsyncSession) -> None:
+    result = await session.execute(
+        text("""
+        SELECT table_name FROM information_schema.tables
+        WHERE table_schema = 'kpa'
+    """)
+    )
+    names = {row[0] for row in result}
+    assert "job_embeddings" in names
+
+
+@pytest.mark.integration
+async def test_job_embeddings_has_hnsw_index(session: AsyncSession) -> None:
+    result = await session.execute(
+        text("""
+        SELECT indexname, indexdef FROM pg_indexes
+        WHERE schemaname = 'kpa' AND tablename = 'job_embeddings'
+    """)
+    )
+    rows = list(result)
+    names = {row[0] for row in rows}
+    assert "ix_job_embeddings_hnsw" in names
+    hnsw_def = next(row[1] for row in rows if row[0] == "ix_job_embeddings_hnsw")
+    assert "hnsw" in hnsw_def.lower()
+    assert "vector_cosine_ops" in hnsw_def
+
+
+@pytest.mark.integration
+async def test_job_embeddings_job_id_is_unique(session: AsyncSession) -> None:
+    result = await session.execute(
+        text("""
+        SELECT indexdef FROM pg_indexes
+        WHERE schemaname = 'kpa'
+          AND tablename = 'job_embeddings'
+          AND indexdef ILIKE '%UNIQUE%job_id%'
+    """)
+    )
+    rows = list(result)
+    assert len(rows) >= 1  # job_embeddings_job_id_key or similar
