@@ -19,6 +19,7 @@ from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
     CHAR,
     Boolean,
+    CheckConstraint,
     DateTime,
     ForeignKey,
     Index,
@@ -27,6 +28,7 @@ from sqlalchemy import (
     String,
     Text,
     func,
+    text,
 )
 from sqlalchemy import Enum as SAEnum
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
@@ -330,6 +332,114 @@ class RefreshToken(Base):
             "ix_refresh_tokens_user_id_active",
             "user_id",
             postgresql_where="revoked_at IS NULL",
+        ),
+        {"schema": "kpa"},
+    )
+
+
+class JobStatus(StrEnum):
+    OPEN = "open"
+    CLOSED = "closed"
+
+
+class Employer(Base):
+    """Employer organization — see spec §5 and the P2.0 design doc.
+
+    Only the minimal subset needed before recruiter HTTP CRUD lands:
+    name (canonical) + name_norm (idempotency key for seeding) + gst +
+    verified_at. GSTIN format/checksum validation is a recruiter-side
+    concern and not enforced here.
+    """
+
+    __tablename__ = "employers"
+
+    id: Mapped[UuidPK]
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    name_norm: Mapped[str] = mapped_column(String(200), nullable=False)
+    gst: Mapped[str | None] = mapped_column(String(15), nullable=True)
+    verified_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    created_at: Mapped[CreatedAt]
+    updated_at: Mapped[UpdatedAt]
+    deleted_at: Mapped[DeletedAt]
+
+    __table_args__ = (
+        Index(
+            "ix_employers_name_norm_live",
+            "name_norm",
+            unique=True,
+            postgresql_where="deleted_at IS NULL",
+        ),
+        {"schema": "kpa"},
+    )
+
+
+class Job(Base):
+    """Job posting — see spec §5 and the P2.0 design doc.
+
+    Recruiter HTTP CRUD is out of scope for the current applicant-only
+    P2/P3 cut; rows are populated by the seed CLI or future recruiter
+    endpoints. No DB-level uniqueness on (employer_id, title) — real
+    recruiters re-list roles with identical titles. Seeder idempotency
+    is enforced at script level.
+    """
+
+    __tablename__ = "jobs"
+
+    id: Mapped[UuidPK]
+    employer_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("kpa.employers.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    locations: Mapped[list[str]] = mapped_column(
+        ARRAY(String(100)), nullable=False, server_default="{}"
+    )
+    min_exp_years: Mapped[int] = mapped_column(Integer, nullable=False)
+    max_exp_years: Mapped[int] = mapped_column(Integer, nullable=False)
+    ctc_min: Mapped[float | None] = mapped_column(Numeric(12, 2), nullable=True)
+    ctc_max: Mapped[float | None] = mapped_column(Numeric(12, 2), nullable=True)
+    status: Mapped[JobStatus] = mapped_column(
+        SAEnum(
+            JobStatus,
+            name="job_status",
+            native_enum=True,
+            schema="kpa",
+            values_callable=lambda x: [e.value for e in x],
+        ),
+        nullable=False,
+        default=JobStatus.OPEN,
+        server_default=JobStatus.OPEN.value,
+    )
+    posted_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    created_at: Mapped[CreatedAt]
+    updated_at: Mapped[UpdatedAt]
+    deleted_at: Mapped[DeletedAt]
+
+    __table_args__ = (
+        Index(
+            "ix_jobs_employer_id_live",
+            "employer_id",
+            postgresql_where="deleted_at IS NULL",
+        ),
+        Index(
+            "ix_jobs_status_posted_at_live",
+            "status",
+            text("posted_at DESC"),
+            postgresql_where="deleted_at IS NULL",
+        ),
+        CheckConstraint(
+            "max_exp_years >= min_exp_years",
+            name="ck_jobs_exp_years_ordered",
+        ),
+        CheckConstraint(
+            "ctc_max IS NULL OR ctc_min IS NULL OR ctc_max >= ctc_min",
+            name="ck_jobs_ctc_ordered",
         ),
         {"schema": "kpa"},
     )
