@@ -107,9 +107,7 @@ async def test_feed_empty_returns_empty_items(
 
 
 @pytest.mark.integration
-async def test_feed_returns_surfaced_only(
-    session: AsyncSession, async_client: AsyncClient
-) -> None:
+async def test_feed_returns_surfaced_only(session: AsyncSession, async_client: AsyncClient) -> None:
     user, applicant = await _make_applicant(session, email="surf@example.com")
     j1, _ = await _make_job_and_employer(session, title="A", employer_name="Alpha")
     j2, _ = await _make_job_and_employer(session, title="B", employer_name="Beta")
@@ -129,9 +127,7 @@ async def test_feed_returns_surfaced_only(
 
 
 @pytest.mark.integration
-async def test_feed_excludes_closed_jobs(
-    session: AsyncSession, async_client: AsyncClient
-) -> None:
+async def test_feed_excludes_closed_jobs(session: AsyncSession, async_client: AsyncClient) -> None:
     user, applicant = await _make_applicant(session, email="closed@example.com")
     j, _ = await _make_job_and_employer(session, status_value=JobStatus.CLOSED)
     await _make_match(session, applicant_id=applicant.id, job_id=j.id, total_score=0.9)
@@ -158,18 +154,12 @@ async def test_feed_excludes_soft_deleted_jobs(
 
 
 @pytest.mark.integration
-async def test_feed_pagination(
-    session: AsyncSession, async_client: AsyncClient
-) -> None:
+async def test_feed_pagination(session: AsyncSession, async_client: AsyncClient) -> None:
     user, applicant = await _make_applicant(session, email="page@example.com")
     scores = [0.9, 0.8, 0.7, 0.6, 0.5]
     for i, sc in enumerate(scores):
-        j, _ = await _make_job_and_employer(
-            session, title=f"J{i}", employer_name=f"E{i}"
-        )
-        await _make_match(
-            session, applicant_id=applicant.id, job_id=j.id, total_score=sc
-        )
+        j, _ = await _make_job_and_employer(session, title=f"J{i}", employer_name=f"E{i}")
+        await _make_match(session, applicant_id=applicant.id, job_id=j.id, total_score=sc)
     await session.commit()
 
     # Page 1
@@ -209,9 +199,7 @@ async def test_feed_invalid_cursor_returns_400(
 ) -> None:
     user, _ = await _make_applicant(session, email="invcur@example.com")
     await session.commit()
-    resp = await async_client.get(
-        "/v1/feed?cursor=not_base64!!!", headers=_token_headers(user)
-    )
+    resp = await async_client.get("/v1/feed?cursor=not_base64!!!", headers=_token_headers(user))
     assert resp.status_code == 400
     assert resp.json()["detail"] == "invalid_cursor"
 

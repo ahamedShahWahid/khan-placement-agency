@@ -75,9 +75,7 @@ def _token_headers(user: User) -> dict[str, str]:
 
 
 @pytest.mark.integration
-async def test_job_detail_happy_path(
-    session: AsyncSession, async_client: AsyncClient
-) -> None:
+async def test_job_detail_happy_path(session: AsyncSession, async_client: AsyncClient) -> None:
     user, applicant = await _make_applicant(session, email="jd-happy@example.com")
     j, _ = await _make_job_and_employer(session, employer_name="HappyCo")
     session.add(
@@ -184,9 +182,7 @@ async def test_job_detail_returns_match_even_when_below_threshold(
 
 
 @pytest.mark.integration
-async def test_job_detail_invalid_uuid(
-    session: AsyncSession, async_client: AsyncClient
-) -> None:
+async def test_job_detail_invalid_uuid(session: AsyncSession, async_client: AsyncClient) -> None:
     user, _ = await _make_applicant(session, email="jd-baduuid@example.com")
     await session.commit()
     resp = await async_client.get("/v1/jobs/not-a-uuid", headers=_token_headers(user))
