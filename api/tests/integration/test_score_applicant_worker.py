@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from uuid import UUID
 
 import pytest
 from sqlalchemy import func, select
@@ -96,8 +95,10 @@ async def test_score_applicant_writes_rows_for_all_open_jobs(session: AsyncSessi
     await _score_applicant_async(applicant.id, sm=_make_sm(session))
 
     rows = (
-        await session.execute(select(Match).where(Match.applicant_id == applicant.id))
-    ).scalars().all()
+        (await session.execute(select(Match).where(Match.applicant_id == applicant.id)))
+        .scalars()
+        .all()
+    )
     job_ids = {r.job_id for r in rows}
     assert job_ids == {j1.id, j2.id, j3.id}
 
@@ -112,8 +113,10 @@ async def test_score_applicant_skips_jobs_without_embeddings(session: AsyncSessi
     await _score_applicant_async(applicant.id, sm=_make_sm(session))
 
     rows = (
-        await session.execute(select(Match).where(Match.applicant_id == applicant.id))
-    ).scalars().all()
+        (await session.execute(select(Match).where(Match.applicant_id == applicant.id)))
+        .scalars()
+        .all()
+    )
     job_ids = {r.job_id for r in rows}
     assert job_ids == {j_with.id}
     assert j_without.id not in job_ids
@@ -128,9 +131,7 @@ async def test_score_applicant_surfaces_above_threshold(session: AsyncSession) -
 
     await _score_applicant_async(applicant.id, sm=_make_sm(session))
 
-    row = (
-        await session.execute(select(Match).where(Match.job_id == j.id))
-    ).scalar_one()
+    row = (await session.execute(select(Match).where(Match.job_id == j.id))).scalar_one()
     assert row.surfaced_at is not None
     assert float(row.total_score) >= 0.55
 
@@ -159,16 +160,12 @@ async def test_score_applicant_does_not_surface_below_threshold(
     )
     job_emb = [0.0] * 1536
     job_emb[1] = 1.0  # orthogonal
-    j = await _seed_job(
-        session, title="Far", locations=["Bangalore"], embedding=job_emb
-    )
+    j = await _seed_job(session, title="Far", locations=["Bangalore"], embedding=job_emb)
     await session.commit()
 
     await _score_applicant_async(applicant.id, sm=_make_sm(session))
 
-    row = (
-        await session.execute(select(Match).where(Match.job_id == j.id))
-    ).scalar_one()
+    row = (await session.execute(select(Match).where(Match.job_id == j.id))).scalar_one()
     assert row.surfaced_at is None
     assert float(row.total_score) < 0.55
 
@@ -183,8 +180,10 @@ async def test_score_applicant_idempotent_upsert(session: AsyncSession) -> None:
     await _score_applicant_async(applicant.id, sm=_make_sm(session))
 
     rows = (
-        await session.execute(select(Match).where(Match.applicant_id == applicant.id))
-    ).scalars().all()
+        (await session.execute(select(Match).where(Match.applicant_id == applicant.id)))
+        .scalars()
+        .all()
+    )
     assert len(rows) == 1
     assert rows[0].job_id == j.id
 
@@ -201,9 +200,7 @@ async def test_score_applicant_preserves_surfaced_at_on_rescore(
     await _score_applicant_async(applicant.id, sm=_make_sm(session))
     row = (
         await session.execute(
-            select(Match)
-            .where(Match.job_id == j.id)
-            .execution_options(populate_existing=True)
+            select(Match).where(Match.job_id == j.id).execution_options(populate_existing=True)
         )
     ).scalar_one()
     first_surfaced = row.surfaced_at
@@ -216,15 +213,13 @@ async def test_score_applicant_preserves_surfaced_at_on_rescore(
         await session.execute(select(JobEmbedding).where(JobEmbedding.job_id == j.id))
     ).scalar_one()
     job_emb_row.embedding = [0.0] * 1536
-    job_emb_row.embedding[1] = 1.0          # orthogonal to applicant
+    job_emb_row.embedding[1] = 1.0  # orthogonal to applicant
     await session.commit()
 
     await _score_applicant_async(applicant.id, sm=_make_sm(session))
     row2 = (
         await session.execute(
-            select(Match)
-            .where(Match.job_id == j.id)
-            .execution_options(populate_existing=True)
+            select(Match).where(Match.job_id == j.id).execution_options(populate_existing=True)
         )
     ).scalar_one()
     assert row2.surfaced_at == first_surfaced  # preserved
@@ -239,9 +234,7 @@ async def test_score_applicant_skips_deleted_applicant(session: AsyncSession) ->
 
     await _score_applicant_async(applicant.id, sm=_make_sm(session))
 
-    rows = (
-        await session.execute(select(func.count()).select_from(Match))
-    ).scalar_one()
+    rows = (await session.execute(select(func.count()).select_from(Match))).scalar_one()
     assert rows == 0
 
 
@@ -260,7 +253,5 @@ async def test_score_applicant_skips_when_no_applicant_embedding(
 
     await _score_applicant_async(applicant.id, sm=_make_sm(session))
 
-    rows = (
-        await session.execute(select(func.count()).select_from(Match))
-    ).scalar_one()
+    rows = (await session.execute(select(func.count()).select_from(Match))).scalar_one()
     assert rows == 0

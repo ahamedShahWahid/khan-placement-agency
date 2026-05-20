@@ -85,7 +85,7 @@ def upgrade() -> None:
         schema="kpa",
         postgresql_where=sa.text("deleted_at IS NULL"),
     )
-    # Feed query path: WHERE applicant_id = $1 AND surfaced AND live ORDER BY total_score DESC LIMIT N
+    # Feed query path: WHERE applicant_id = $1 AND surfaced AND live, ORDER BY total_score DESC.
     # Raw SQL because op.create_index can't portably express DESC ordering.
     op.execute(
         "CREATE INDEX ix_matches_applicant_surfaced "

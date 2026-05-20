@@ -39,15 +39,15 @@ def test_location_fit(app_locs: list[str], job_locs: list[str], expected: float)
 @pytest.mark.parametrize(
     ("years", "job_min", "job_max", "expected"),
     [
-        (Decimal("5"), 3, 6, 1.0),       # in band
-        (Decimal("3"), 3, 6, 1.0),       # min boundary
-        (Decimal("6"), 3, 6, 1.0),       # max boundary
-        (Decimal("9"), 3, 6, 0.5),       # over: 1 - (9-6)/6 = 0.5
-        (Decimal("12"), 3, 6, 0.0),      # 2x over
-        (Decimal("1.5"), 3, 6, 0.5),     # under: 1.5/3 = 0.5
-        (Decimal("0"), 3, 6, 0.0),       # zero under
-        (Decimal("4"), 0, 2, 0.0),       # past 2x over (job_max=2)
-        (None, 3, 6, 0.5),               # unknown applicant years
+        (Decimal("5"), 3, 6, 1.0),  # in band
+        (Decimal("3"), 3, 6, 1.0),  # min boundary
+        (Decimal("6"), 3, 6, 1.0),  # max boundary
+        (Decimal("9"), 3, 6, 0.5),  # over: 1 - (9-6)/6 = 0.5
+        (Decimal("12"), 3, 6, 0.0),  # 2x over
+        (Decimal("1.5"), 3, 6, 0.5),  # under: 1.5/3 = 0.5
+        (Decimal("0"), 3, 6, 0.0),  # zero under
+        (Decimal("4"), 0, 2, 0.0),  # past 2x over (job_max=2)
+        (None, 3, 6, 0.5),  # unknown applicant years
     ],
 )
 def test_exp_fit(years: Decimal | None, job_min: int, job_max: int, expected: float) -> None:

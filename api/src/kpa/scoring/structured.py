@@ -24,9 +24,7 @@ def location_fit(applicant_locations: list[str], job_locations: list[str]) -> fl
     return 1.0 if a & j else 0.0
 
 
-def exp_fit(
-    applicant_years: Decimal | None, job_min: int, job_max: int
-) -> float:
+def exp_fit(applicant_years: Decimal | None, job_min: int, job_max: int) -> float:
     """Fit of applicant's years against the job's [min, max] band.
 
     - In band → 1.0.

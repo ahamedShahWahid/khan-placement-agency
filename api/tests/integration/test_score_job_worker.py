@@ -27,9 +27,7 @@ def _make_sm(session: AsyncSession) -> async_sessionmaker[AsyncSession]:
     return async_sessionmaker(bind=session.bind, expire_on_commit=False)
 
 
-async def _seed_applicant_with_emb(
-    session: AsyncSession, *, email: str
-) -> Applicant:
+async def _seed_applicant_with_emb(session: AsyncSession, *, email: str) -> Applicant:
     user = User(email=email, role=UserRole.APPLICANT)
     session.add(user)
     await session.flush()
@@ -49,9 +47,7 @@ async def _seed_applicant_with_emb(
     return applicant
 
 
-async def _seed_job_with_emb(
-    session: AsyncSession, *, employer_name: str = "JobCo"
-) -> Job:
+async def _seed_job_with_emb(session: AsyncSession, *, employer_name: str = "JobCo") -> Job:
     employer = Employer(name=employer_name, name_norm=employer_name.lower())
     session.add(employer)
     await session.flush()
@@ -89,9 +85,7 @@ async def test_score_job_writes_rows_for_all_applicants_with_embeddings(
 
     await _score_job_async(job.id, sm=_make_sm(session))
 
-    rows = (
-        await session.execute(select(Match).where(Match.job_id == job.id))
-    ).scalars().all()
+    rows = (await session.execute(select(Match).where(Match.job_id == job.id))).scalars().all()
     applicant_ids = {r.applicant_id for r in rows}
     assert applicant_ids == {a1.id, a2.id}
 
@@ -111,9 +105,7 @@ async def test_score_job_skips_applicants_without_embeddings(session: AsyncSessi
 
     await _score_job_async(job.id, sm=_make_sm(session))
 
-    rows = (
-        await session.execute(select(Match).where(Match.job_id == job.id))
-    ).scalars().all()
+    rows = (await session.execute(select(Match).where(Match.job_id == job.id))).scalars().all()
     applicant_ids = {r.applicant_id for r in rows}
     assert applicant_ids == {a_with.id}
 
@@ -127,9 +119,7 @@ async def test_score_job_idempotent_upsert(session: AsyncSession) -> None:
     await _score_job_async(job.id, sm=_make_sm(session))
     await _score_job_async(job.id, sm=_make_sm(session))
 
-    rows = (
-        await session.execute(select(func.count()).select_from(Match))
-    ).scalar_one()
+    rows = (await session.execute(select(func.count()).select_from(Match))).scalar_one()
     assert rows == 1
 
 
@@ -142,9 +132,7 @@ async def test_score_job_skips_deleted_job(session: AsyncSession) -> None:
 
     await _score_job_async(job.id, sm=_make_sm(session))
 
-    rows = (
-        await session.execute(select(func.count()).select_from(Match))
-    ).scalar_one()
+    rows = (await session.execute(select(func.count()).select_from(Match))).scalar_one()
     assert rows == 0
 
 
@@ -166,7 +154,5 @@ async def test_score_job_skips_when_no_job_embedding(session: AsyncSession) -> N
 
     await _score_job_async(job_without.id, sm=_make_sm(session))
 
-    rows = (
-        await session.execute(select(func.count()).select_from(Match))
-    ).scalar_one()
+    rows = (await session.execute(select(func.count()).select_from(Match))).scalar_one()
     assert rows == 0

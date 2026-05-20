@@ -381,9 +381,7 @@ async def test_embed_applicant_dispatches_score_applicant(
     def _spy(applicant_id_str: str) -> None:
         calls.append(applicant_id_str)
 
-    monkeypatch.setattr(
-        "kpa.workers.tasks.score_applicant.score_applicant.delay", _spy
-    )
+    monkeypatch.setattr("kpa.workers.tasks.score_applicant.score_applicant.delay", _spy)
 
     user = User(email="dispatch@example.com", role=UserRole.APPLICANT)
     session.add(user)

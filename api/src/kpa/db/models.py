@@ -505,9 +505,7 @@ class Match(Base):
     total_score: Mapped[float] = mapped_column(Numeric(5, 4), nullable=False)
     score_components: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     model_versions: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
-    surfaced_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    surfaced_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[CreatedAt]
     updated_at: Mapped[UpdatedAt]
     deleted_at: Mapped[DeletedAt]
