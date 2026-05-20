@@ -102,6 +102,13 @@ async def test_score_applicant_writes_rows_for_all_open_jobs(session: AsyncSessi
     job_ids = {r.job_id for r in rows}
     assert job_ids == {j1.id, j2.id, j3.id}
 
+    # Each row has a templated explanation populated.
+    for row in rows:
+        assert row.explanation is not None
+        assert "fit" in row.explanation
+        assert row.explanation["generator"] == "templated"
+        assert row.explanation["generator_version"] == "1"
+
 
 @pytest.mark.integration
 async def test_score_applicant_skips_jobs_without_embeddings(session: AsyncSession) -> None:
