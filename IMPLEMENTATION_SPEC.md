@@ -482,6 +482,7 @@ Phases are sized for sequencing, not for a fixed calendar. Each phase ends with 
 - Gold dataset + parse F1 eval in CI (gate: ≥ 0.85 before P2; ≥ 0.90 before launch).
 
 **P2 — Jobs + matching (3 weeks)**
+<!-- P2.0 (jobs + seeding) shipped 2026-05-20 via docs/superpowers/plans/2026-05-20-p2.0-jobs-and-seeding.md. Recruiter HTTP CRUD remains deferred; jobs land via the seed CLI for the applicant-only P2/P3 cut. -->
 - Recruiter direct posting, job embedding, hybrid scoring, feed endpoint, "why this fits" explanation (LLM behind interface, with templated fallback).
 - Flutter feed + job detail + apply.
 

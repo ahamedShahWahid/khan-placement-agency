@@ -233,6 +233,27 @@ KPA_LOG_FORMAT=json uv run --env-file=.env uvicorn kpa.main:app --port 8000
 (Inline env vars override anything in `.env`, so this works even with the
 default `KPA_LOG_FORMAT=text` in the file.)
 
+## Seeding demo data
+
+The `kpa-seed-jobs` script populates `employers` + `jobs` from a versioned JSON
+fixture so a backend-only demo of the future feed is possible.
+
+```bash
+# Apply (idempotent — safe to re-run)
+uv run --env-file=.env kpa-seed-jobs
+
+# Validate the JSON only; nothing written
+uv run --env-file=.env kpa-seed-jobs --dry-run
+
+# Use a different fixture
+uv run --env-file=.env kpa-seed-jobs --from path/to/jobs.json
+```
+
+The canonical fixture lives at `api/data/sample_jobs.json` (10 employers,
+27 jobs). Idempotency is by `name_norm` on employers and `(employer_id,
+lower(title))` on jobs. Re-running updates mutable fields; `name` and an
+existing `verified_at` timestamp are preserved.
+
 ## Tests
 
 Unit tests (no DB required):

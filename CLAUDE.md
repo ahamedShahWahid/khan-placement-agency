@@ -131,6 +131,14 @@ Per spec §4.2 and the comment in `db/models.py`: SQLAlchemy models are never re
 - **Test C coverage gap.** Integration tests cover the happy path, idempotency, "no parsed resume" branch, and dispatch resilience. The Txn 3 `content_hash_now != content_hash` race (parsed_json mutated mid-flight) is NOT tested because forcing the race within savepoint isolation is fiddly. Filed for follow-up.
 - **Local worker becomes** `celery ... -Q parse,embed` (single worker, two queues) or run a second worker pinned to `-Q embed`.
 
+### Seeding and demo data
+
+- **`employers`/`jobs` are populated via a CLI**, not migrations. `uv run kpa-seed-jobs` reads `api/data/sample_jobs.json` and upserts. Idempotency keys: `employers.name_norm` (DB-enforced via partial UNIQUE) and `(jobs.employer_id, lower(jobs.title))` (script-only — real recruiters re-list roles).
+- **The JSON encodes `posted_days_ago: int`, not `posted_at`.** Loader converts to `now() - timedelta(days=...)` at run time so the checked-in fixture doesn't visibly age. Re-seeding "ages forward" past dates.
+- **Updates preserve human-set state.** `employers.name` is never overwritten (the canonical name set by a real recruiter wins over the JSON spelling). `employers.verified_at` is only set when currently `NULL` — re-verification timestamps are not stomped.
+- **`_apply_in_session(session, payload, report)` is the test seam.** The CLI's `_apply()` opens its own engine; integration tests call `_apply_in_session` directly with the savepoint-bound session. Mirror this pattern if you add new seed scripts.
+- **Drift guard:** `test_loader_against_sample_jobs_json` asserts `count(employers)==10, count(jobs)==27`. If you intentionally change the fixture, update the test in the same commit.
+
 ## Test patterns
 
 ### Two-conftest design
