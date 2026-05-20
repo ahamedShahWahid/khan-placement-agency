@@ -40,18 +40,13 @@ def templated_explanation(
     ctc = components.get("ctc", 0.5)
 
     overlap_loc = _location_for_message(job_locations, applicant_locations)
-    remote = "remote" in {
-        x.strip().lower() for x in (job_locations + applicant_locations)
-    }
+    remote = "remote" in {x.strip().lower() for x in (job_locations + applicant_locations)}
 
     # --- fit string (priority order) ---
     if total < threshold:
         fit = "Lower-confidence match - surfaced for breadth."
     elif loc >= 0.9 and exp >= 0.9 and ctc >= 0.9:
-        fit = (
-            f"Strong match: {job_title} in {overlap_loc} "
-            f"aligns with your experience level."
-        )
+        fit = f"Strong match: {job_title} in {overlap_loc} " f"aligns with your experience level."
     elif loc >= 0.9 and exp >= 0.9:
         fit = f"Good location and seniority fit for {job_title} in {overlap_loc}."
     elif remote:
@@ -85,9 +80,7 @@ def templated_explanation(
     }
 
 
-def _location_for_message(
-    job_locs: list[str], applicant_locs: list[str]
-) -> str:
+def _location_for_message(job_locs: list[str], applicant_locs: list[str]) -> str:
     """Return the first overlapping location for display, or the first job
     location. Case-insensitive match, but preserves casing from the job side."""
     if not job_locs:
