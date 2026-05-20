@@ -9,7 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from kpa.db.models import Applicant, User, UserRole
+from kpa.db.models import Applicant, Employer, Job, JobStatus, User, UserRole
 
 
 @pytest.mark.integration
@@ -65,3 +65,88 @@ async def test_unique_email_constraint(session: AsyncSession) -> None:
     with pytest.raises(IntegrityError):
         await session.commit()
     await session.rollback()
+
+
+@pytest.mark.integration
+async def test_create_employer_and_job(session: AsyncSession) -> None:
+    employer = Employer(name="Acme Corp", name_norm="acme corp")
+    session.add(employer)
+    await session.flush()
+    job = Job(
+        employer_id=employer.id,
+        title="Backend Engineer",
+        description="Build APIs.",
+        locations=["Bangalore", "Remote"],
+        min_exp_years=3,
+        max_exp_years=6,
+    )
+    session.add(job)
+    await session.commit()
+
+    loaded = (await session.execute(select(Job).where(Job.employer_id == employer.id))).scalar_one()
+    assert loaded.title == "Backend Engineer"
+    assert loaded.status == JobStatus.OPEN
+    assert loaded.locations == ["Bangalore", "Remote"]
+
+
+@pytest.mark.integration
+async def test_exp_years_check_constraint(session: AsyncSession) -> None:
+    employer = Employer(name="X", name_norm="x")
+    session.add(employer)
+    await session.flush()
+    session.add(
+        Job(
+            employer_id=employer.id,
+            title="Bad",
+            description="...",
+            min_exp_years=8,
+            max_exp_years=3,  # < min
+        )
+    )
+    with pytest.raises(IntegrityError):
+        await session.commit()
+    await session.rollback()
+
+
+@pytest.mark.integration
+async def test_ctc_check_constraint(session: AsyncSession) -> None:
+    employer = Employer(name="Y", name_norm="y")
+    session.add(employer)
+    await session.flush()
+    session.add(
+        Job(
+            employer_id=employer.id,
+            title="Bad CTC",
+            description="...",
+            min_exp_years=1,
+            max_exp_years=2,
+            ctc_min=2000000,
+            ctc_max=1000000,  # < min
+        )
+    )
+    with pytest.raises(IntegrityError):
+        await session.commit()
+    await session.rollback()
+
+
+@pytest.mark.integration
+async def test_employer_name_norm_partial_unique(session: AsyncSession) -> None:
+    session.add(Employer(name="Dup", name_norm="dup"))
+    await session.commit()
+    session.add(Employer(name="Dup Two", name_norm="dup"))
+    with pytest.raises(IntegrityError):
+        await session.commit()
+    await session.rollback()
+
+
+@pytest.mark.integration
+async def test_employer_name_norm_unique_ignores_soft_deleted(session: AsyncSession) -> None:
+    e1 = Employer(name="Original", name_norm="original")
+    session.add(e1)
+    await session.commit()
+    e1.deleted_at = datetime.now(UTC)
+    await session.commit()
+
+    # New row with the same name_norm should now succeed.
+    session.add(Employer(name="Replacement", name_norm="original"))
+    await session.commit()
