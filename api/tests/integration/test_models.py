@@ -9,7 +9,19 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from kpa.db.models import Applicant, Employer, Job, JobEmbedding, JobStatus, Match, User, UserRole
+from kpa.db.models import (
+    Applicant,
+    Application,
+    ApplicationStatus,
+    Employer,
+    Job,
+    JobEmbedding,
+    JobStatus,
+    Match,
+    SavedJob,
+    User,
+    UserRole,
+)
 
 
 @pytest.mark.integration
@@ -380,6 +392,139 @@ async def test_match_applicant_job_partial_unique(session: AsyncSession) -> None
             model_versions={},
         )
     )
+    with pytest.raises(IntegrityError):
+        await session.commit()
+    await session.rollback()
+
+
+# ---------------------------------------------------------------------------
+# Application model tests
+# ---------------------------------------------------------------------------
+
+
+async def _make_applicant(session: AsyncSession, email: str) -> Applicant:
+    """Helper: create a User + Applicant and return the Applicant."""
+    user = User(email=email, role=UserRole.APPLICANT)
+    session.add(user)
+    await session.flush()
+    applicant = Applicant(user_id=user.id, full_name="Test User")
+    session.add(applicant)
+    await session.flush()
+    return applicant
+
+
+async def _make_job(session: AsyncSession, name_norm: str) -> Job:
+    """Helper: create an Employer + Job and return the Job."""
+    employer = Employer(name=name_norm.title(), name_norm=name_norm)
+    session.add(employer)
+    await session.flush()
+    job = Job(
+        employer_id=employer.id,
+        title="Engineer",
+        description="Build things.",
+        min_exp_years=1,
+        max_exp_years=5,
+    )
+    session.add(job)
+    await session.flush()
+    return job
+
+
+@pytest.mark.integration
+async def test_create_application_and_round_trip(session: AsyncSession) -> None:
+    applicant = await _make_applicant(session, "app1@example.com")
+    job = await _make_job(session, "co-app1")
+
+    app = Application(applicant_id=applicant.id, job_id=job.id, source="feed")
+    session.add(app)
+    await session.commit()
+
+    loaded = (
+        await session.execute(select(Application).where(Application.applicant_id == applicant.id))
+    ).scalar_one()
+    assert loaded.status == ApplicationStatus.APPLIED
+    assert loaded.source == "feed"
+    assert loaded.deleted_at is None
+
+
+@pytest.mark.integration
+async def test_application_partial_unique_on_live_rows(session: AsyncSession) -> None:
+    applicant = await _make_applicant(session, "app2@example.com")
+    job = await _make_job(session, "co-app2")
+
+    session.add(Application(applicant_id=applicant.id, job_id=job.id))
+    await session.commit()
+    # Second live row with the same (applicant_id, job_id) must fail.
+    session.add(Application(applicant_id=applicant.id, job_id=job.id))
+    with pytest.raises(IntegrityError):
+        await session.commit()
+    await session.rollback()
+
+
+@pytest.mark.integration
+async def test_application_unique_ignores_soft_deleted(session: AsyncSession) -> None:
+    from datetime import UTC, datetime
+
+    applicant = await _make_applicant(session, "app3@example.com")
+    job = await _make_job(session, "co-app3")
+
+    first = Application(applicant_id=applicant.id, job_id=job.id)
+    session.add(first)
+    await session.commit()
+
+    # Soft-delete the first row — the partial-UNIQUE no longer covers it.
+    first.deleted_at = datetime.now(UTC)
+    await session.commit()
+
+    # A fresh live row with the same pair should now succeed.
+    session.add(Application(applicant_id=applicant.id, job_id=job.id))
+    await session.commit()
+
+    live_rows = (
+        (
+            await session.execute(
+                select(Application).where(
+                    Application.applicant_id == applicant.id,
+                    Application.deleted_at.is_(None),
+                )
+            )
+        )
+        .scalars()
+        .all()
+    )
+    assert len(live_rows) == 1
+
+
+# ---------------------------------------------------------------------------
+# SavedJob model tests
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.integration
+async def test_create_saved_job_and_round_trip(session: AsyncSession) -> None:
+    applicant = await _make_applicant(session, "sj1@example.com")
+    job = await _make_job(session, "co-sj1")
+
+    sj = SavedJob(applicant_id=applicant.id, job_id=job.id)
+    session.add(sj)
+    await session.commit()
+
+    loaded = (
+        await session.execute(select(SavedJob).where(SavedJob.applicant_id == applicant.id))
+    ).scalar_one()
+    assert loaded.job_id == job.id
+    assert loaded.deleted_at is None
+
+
+@pytest.mark.integration
+async def test_saved_job_partial_unique_on_live_rows(session: AsyncSession) -> None:
+    applicant = await _make_applicant(session, "sj2@example.com")
+    job = await _make_job(session, "co-sj2")
+
+    session.add(SavedJob(applicant_id=applicant.id, job_id=job.id))
+    await session.commit()
+    # Second live save of the same job must fail.
+    session.add(SavedJob(applicant_id=applicant.id, job_id=job.id))
     with pytest.raises(IntegrityError):
         await session.commit()
     await session.rollback()

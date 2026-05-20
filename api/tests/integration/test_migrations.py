@@ -171,3 +171,55 @@ async def test_matches_has_explanation_column(session: AsyncSession) -> None:
     assert row is not None
     assert row[1] == "jsonb"
     assert row[2] == "YES"
+
+
+@pytest.mark.integration
+async def test_migrated_db_has_applications_and_saved_jobs_tables(
+    session: AsyncSession,
+) -> None:
+    result = await session.execute(
+        text("""
+        SELECT table_name FROM information_schema.tables
+        WHERE table_schema = 'kpa'
+        ORDER BY table_name
+    """)
+    )
+    names = {row[0] for row in result}
+    assert "applications" in names
+    assert "saved_jobs" in names
+
+
+@pytest.mark.integration
+async def test_applications_has_partial_unique_on_applicant_job(
+    session: AsyncSession,
+) -> None:
+    result = await session.execute(
+        text("""
+        SELECT indexdef FROM pg_indexes
+        WHERE schemaname = 'kpa'
+          AND tablename = 'applications'
+          AND indexname = 'ix_applications_applicant_job_live'
+    """)
+    )
+    row = result.first()
+    assert row is not None
+    assert "UNIQUE INDEX" in row[0]
+    assert "deleted_at IS NULL" in row[0]
+
+
+@pytest.mark.integration
+async def test_saved_jobs_has_partial_unique_on_applicant_job(
+    session: AsyncSession,
+) -> None:
+    result = await session.execute(
+        text("""
+        SELECT indexdef FROM pg_indexes
+        WHERE schemaname = 'kpa'
+          AND tablename = 'saved_jobs'
+          AND indexname = 'ix_saved_jobs_applicant_job_live'
+    """)
+    )
+    row = result.first()
+    assert row is not None
+    assert "UNIQUE INDEX" in row[0]
+    assert "deleted_at IS NULL" in row[0]
