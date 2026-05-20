@@ -157,3 +157,17 @@ async def test_matches_check_constraints_exist(session: AsyncSession) -> None:
     assert "ck_matches_vector_score_range" in names
     assert "ck_matches_structured_score_range" in names
     assert "ck_matches_total_score_range" in names
+
+
+@pytest.mark.integration
+async def test_matches_has_explanation_column(session: AsyncSession) -> None:
+    result = await session.execute(
+        text("""
+        SELECT column_name, data_type, is_nullable FROM information_schema.columns
+        WHERE table_schema = 'kpa' AND table_name = 'matches' AND column_name = 'explanation'
+    """)
+    )
+    row = result.first()
+    assert row is not None
+    assert row[1] == "jsonb"
+    assert row[2] == "YES"
