@@ -176,3 +176,70 @@ async def test_loader_against_sample_jobs_json(session: AsyncSession) -> None:
     await _apply_in_session(session, payload, report)
     assert report.employers_inserted == 10
     assert report.jobs_inserted == 27
+
+
+@pytest.mark.integration
+async def test_seed_dispatches_embed_per_upserted_job(
+    session: AsyncSession, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The seed CLI fires embed_job.delay() for every inserted/updated job."""
+    calls: list[str] = []
+
+    def _spy(job_id_str: str) -> None:
+        calls.append(job_id_str)
+
+    monkeypatch.setattr(
+        "kpa.workers.tasks.embed_job.embed_job.delay", _spy
+    )
+
+    payload = _payload(
+        [_employer_dict()],
+        [_job_dict(), _job_dict(title="Other")],
+    )
+    report = SeedReport()
+    await _apply_in_session(session, payload, report)
+    from kpa.scripts.seed_jobs import _dispatch_embeds
+
+    _dispatch_embeds(report.inserted_job_ids + report.updated_job_ids)
+    assert len(calls) == 2
+    assert set(calls) == {str(jid) for jid in report.inserted_job_ids}
+
+
+@pytest.mark.integration
+async def test_seed_swallows_broker_outage(
+    session: AsyncSession, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """If embed_job.delay raises, the seed CLI logs and continues without raising."""
+
+    def _broken(job_id_str: str) -> None:
+        raise RuntimeError("broker down")
+
+    monkeypatch.setattr(
+        "kpa.workers.tasks.embed_job.embed_job.delay", _broken
+    )
+
+    # Capture structlog warning calls via the _log bound in seed_jobs.
+    warning_events: list[str] = []
+    import kpa.scripts.seed_jobs as seed_jobs_mod
+
+    original_log = seed_jobs_mod._log
+
+    class _CapturingLog:
+        def warning(self, event: str, **kw: object) -> None:
+            warning_events.append(event)
+
+        def __getattr__(self, name: str) -> object:
+            return getattr(original_log, name)
+
+    monkeypatch.setattr(seed_jobs_mod, "_log", _CapturingLog())
+
+    payload = _payload([_employer_dict()], [_job_dict()])
+    report = SeedReport()
+    await _apply_in_session(session, payload, report)
+    from kpa.scripts.seed_jobs import _dispatch_embeds
+
+    # Should not raise.
+    _dispatch_embeds(report.inserted_job_ids + report.updated_job_ids)
+
+    # Should have logged a warning per failed dispatch.
+    assert "embed.dispatch-failed" in warning_events
