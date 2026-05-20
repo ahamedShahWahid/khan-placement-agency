@@ -77,6 +77,12 @@ async def _make_match(
         score_components={"location": 1.0, "exp": 1.0, "ctc": 1.0},
         model_versions={"applicant_model": "test", "job_model": "test"},
         surfaced_at=datetime.now(UTC) if surfaced else None,
+        explanation={
+            "fit": "test",
+            "caveat": "",
+            "generator": "templated",
+            "generator_version": "1",
+        },
     )
     session.add(m)
     await session.flush()
@@ -124,6 +130,11 @@ async def test_feed_returns_surfaced_only(session: AsyncSession, async_client: A
     items = resp.json()["items"]
     assert len(items) == 2
     assert [item["job"]["title"] for item in items] == ["A", "B"]
+
+    # Each item carries an explanation.
+    for item in items:
+        assert item["match"]["explanation"] is not None
+        assert "fit" in item["match"]["explanation"]
 
 
 @pytest.mark.integration

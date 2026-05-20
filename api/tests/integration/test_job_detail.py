@@ -88,6 +88,12 @@ async def test_job_detail_happy_path(session: AsyncSession, async_client: AsyncC
             score_components={"location": 1.0, "exp": 1.0, "ctc": 0.4},
             model_versions={},
             surfaced_at=datetime.now(UTC),
+            explanation={
+                "fit": "test",
+                "caveat": "",
+                "generator": "templated",
+                "generator_version": "1",
+            },
         )
     )
     await session.commit()
@@ -100,6 +106,8 @@ async def test_job_detail_happy_path(session: AsyncSession, async_client: AsyncC
     assert body["employer"]["verified"] is True
     assert body["match"] is not None
     assert body["match"]["total_score"] == pytest.approx(0.8)
+    assert body["match"]["explanation"] is not None
+    assert "fit" in body["match"]["explanation"]
 
 
 @pytest.mark.integration

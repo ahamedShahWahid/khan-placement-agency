@@ -30,6 +30,7 @@ class MatchRead(BaseModel):
     # DB column is score_components; wire shape is components (per spec §P2.3).
     components: dict[str, float] = Field(validation_alias="score_components")
     surfaced_at: datetime | None
+    explanation: dict[str, str] | None
 
 
 class EmployerRead(BaseModel):
