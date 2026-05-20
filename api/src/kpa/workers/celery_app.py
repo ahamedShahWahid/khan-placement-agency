@@ -35,7 +35,7 @@ celery_app = Celery(
     "kpa",
     broker=settings.redis_url,
     backend=settings.redis_url,
-    include=["kpa.workers.tasks.parse", "kpa.workers.tasks.embed"],
+    include=["kpa.workers.tasks.parse", "kpa.workers.tasks.embed", "kpa.workers.tasks.embed_job"],
 )
 
 celery_app.conf.update(
@@ -49,6 +49,7 @@ celery_app.conf.update(
     task_routes={
         "kpa.parse_resume": {"queue": "parse"},
         "kpa.embed_applicant": {"queue": "embed"},
+        "kpa.embed_job": {"queue": "embed"},
     },
 )
 
