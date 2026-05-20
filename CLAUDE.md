@@ -170,6 +170,14 @@ Per spec §4.2 and the comment in `db/models.py`: SQLAlchemy models are never re
 - **The score worker's Txn 1 now loads `Employer.name`** alongside `Job` + `JobEmbedding`. The applicant-side adds an `Employer` JOIN; the job-side already had implicit employer access.
 - **No new worker, no new queue, no new env vars.** When LLM provider lands, a `MatchExplainer` Protocol with `templated` and `llm` impls will route via an env var; the score worker call site doesn't change.
 
+### Applications + saved jobs routes
+
+- **Re-apply after withdraw UPDATEs the same row back to `status='applied'`** (approach b from the design doc). The partial-UNIQUE index is on `(applicant_id, job_id) WHERE deleted_at IS NULL`. Withdrawal does NOT soft-delete the row — it changes status. A second INSERT against the same live unique pair would fail; instead the route UPDATEs the existing row and refreshes `created_at`. This preserves row id stability (cursor format `{created_at, application_id}` stays valid across re-applies).
+- **PATCH only accepts `applied → withdrawn`.** Body must be `{"status": "withdrawn"}`. Any other target value returns `400 invalid_transition`. Re-withdrawing an already-withdrawn application is a **200 no-op** (not 409, not 400). Uniform 404 across unknown and other-user application ids — distinguishing them leaks ownership.
+- **Save is `POST = create (idempotent), DELETE = soft-delete (idempotent)`.** Re-saving after an unsave creates a fresh row (not the same row restored). DELETE returns 204 regardless of prior state. Re-saving a currently-live saved_job returns the existing row (200, not 201).
+- **Saved-list keeps closed-job entries.** `GET /v1/saved` does NOT filter on `jobs.status = 'open'`. A job can close after saving; the saved entry remains visible so the applicant knows the role closed. Apply and save at *creation* time do enforce `status='open'` — they return 404 for closed/soft-deleted jobs.
+- **`source` is free-form `VARCHAR(32)`**, default `'feed'`. No server-side enum enforcement yet. Promote to a DB enum when the set of valid values stabilizes (tracked as follow-up). Arbitrary strings have no XSS risk (JSON output only) but will show up raw in dashboards.
+
 ## Test patterns
 
 ### Two-conftest design

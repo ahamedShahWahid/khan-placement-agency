@@ -491,6 +491,7 @@ Phases are sized for sequencing, not for a fixed calendar. Each phase ends with 
 - Flutter feed + job detail + apply.
 
 **P3 — Notifications + applications (1–2 weeks)**
+<!-- P3.0 (applications + saved jobs) shipped 2026-05-20 via the P3.0 design + commits in feat/p3.0-applications-and-saved-jobs. applications + saved_jobs tables, apply/withdraw/save/unsave/list endpoints. Recruiter-side hiring stages deferred. -->
 - Outbox + push + email; application tracking; saved jobs.
 - Notification-side Celery queues (`notify`, `dsr`) added — Redis + Celery already in the stack from the P1 parse worker plan.
 
