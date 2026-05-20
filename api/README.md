@@ -377,6 +377,41 @@ Returns a single open job plus the current applicant's match against it (if any)
 Uniform 404 across unknown / closed / soft-deleted ids (same rationale as
 `/v1/applicants/me/resumes/{id}`).
 
+### `POST /v1/jobs/{id}/apply`
+
+Apply to an open job. Idempotent — re-applying while already applied returns 200 with the
+existing row. Re-applying after withdrawing updates the same row back to `applied` (preserves
+cursor identity). Body: `{"source": "feed"}` (optional). Returns 201 on first apply, 200 on
+re-apply. 404 for unknown / closed / soft-deleted jobs.
+
+### `PATCH /v1/applications/{id}`
+
+Withdraw an application. Only `applied → withdrawn` is accepted; other transitions return
+`400 invalid_transition`. Re-withdrawing an already-withdrawn application is a 200 no-op.
+Uniform 404 across unknown and other-user application ids.
+
+### `GET /v1/applications`
+
+List the current applicant's applications (includes withdrawn — history is preserved).
+Cursor-paginated over `(created_at DESC, id DESC)`. ETag-cached. Each item carries the
+full application row, job summary, and employer summary.
+
+### `POST /v1/jobs/{id}/save`
+
+Save a job for later. Idempotent — re-saving returns the existing row (200). Returns 201 on
+first save. 404 for unknown / closed / soft-deleted jobs.
+
+### `DELETE /v1/jobs/{id}/save`
+
+Unsave a job. Soft-deletes the live saved-job row. 204 No Content regardless of whether the
+job was previously saved (idempotent).
+
+### `GET /v1/saved`
+
+List the current applicant's saved jobs (includes entries for closed jobs — no status filter
+applied to the job at list time). Cursor-paginated, ETag-cached. Same rich shape as
+`/v1/applications`.
+
 ## Project layout
 
 ```
