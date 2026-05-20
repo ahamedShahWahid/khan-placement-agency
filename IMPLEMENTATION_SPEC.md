@@ -486,6 +486,7 @@ Phases are sized for sequencing, not for a fixed calendar. Each phase ends with 
 <!-- P2.1 (job embedding worker) shipped 2026-05-20 via docs/superpowers/plans/2026-05-20-p2.1-job-embedding-worker.md. job_embeddings table + embed_job Celery task + dispatch from the seed CLI. -->
 <!-- P2.2 (matches + scoring) shipped 2026-05-20 via docs/superpowers/plans/2026-05-20-p2.2-matches-and-scoring.md. matches table + score_applicant + score_job + structured (location/exp/CTC) + vector cosine. Threshold + vector weight env-driven; per-rule weights deferred until labeled data. -->
 <!-- P2.3 (feed + job detail endpoints) shipped 2026-05-20 via docs/superpowers/plans/2026-05-20-p2.3-feed-and-job-detail.md. /v1/feed paginated by cursor, /v1/jobs/{id} with uniform 404. ETag + If-None-Match throughout. -->
+<!-- P2.4 (match explanations, templated fallback) shipped 2026-05-20 via docs/superpowers/plans/2026-05-20-p2.4-match-explanations.md. matches.explanation JSONB; templated_explanation pure function; LLM provider swap pending BRD §14 #1. -->
 - Recruiter direct posting, job embedding, hybrid scoring, feed endpoint, "why this fits" explanation (LLM behind interface, with templated fallback).
 - Flutter feed + job detail + apply.
 

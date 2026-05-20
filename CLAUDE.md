@@ -162,6 +162,14 @@ Per spec §4.2 and the comment in `db/models.py`: SQLAlchemy models are never re
 - **Uniform 404 across unknown / closed / soft-deleted.** Same rationale as the resumes route — distinguishing leaks existence.
 - **`_require_applicant`** is duplicated inline in `routes/feed.py` and `routes/jobs.py` rather than extracted to a shared module. The `routes/resumes.py` version has different downstream error semantics (`500 applicant_missing` is load-bearing there); copying keeps each route module standalone.
 
+### Match explanations (templated)
+
+- **`matches.explanation` is JSONB** with shape `{fit, caveat, generator, generator_version}`. Nullable for backward compat with pre-P2.4 rows. Generated inline in both score workers' compute step (no separate worker).
+- **`kpa.scoring.explain.templated_explanation(...)`** is pure-function. Priority-order rules over `score_components` and surrounding context. Deterministic — same inputs always produce the same strings.
+- **`GENERATOR_VERSION` bumps when the templates change semantically.** Reviewers should flag template edits as version-bump candidates. The LLM-provider swap (BRD §14 #1) will introduce a new `generator` value alongside `templated`.
+- **The score worker's Txn 1 now loads `Employer.name`** alongside `Job` + `JobEmbedding`. The applicant-side adds an `Employer` JOIN; the job-side already had implicit employer access.
+- **No new worker, no new queue, no new env vars.** When LLM provider lands, a `MatchExplainer` Protocol with `templated` and `llm` impls will route via an env var; the score worker call site doesn't change.
+
 ## Test patterns
 
 ### Two-conftest design

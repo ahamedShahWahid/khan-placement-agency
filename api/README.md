@@ -369,6 +369,7 @@ Authorization: Bearer <access_token>
 Response: `{ items: FeedItemRead[], next_cursor: string | null }`. Each item carries
 the match score breakdown, the full job record, and the employer summary.
 ETag-cached (weak). Cursor pagination over `(total_score DESC, id DESC)`.
+Each match also carries an `explanation` field with `{fit, caveat, generator, generator_version}` strings — templated for now; LLM-generated when the provider lands.
 
 ### `GET /v1/jobs/{id}`
 
