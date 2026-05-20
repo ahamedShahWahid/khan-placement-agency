@@ -120,9 +120,11 @@ def patched_embedding_provider(
     """
     import kpa.workers.celery_app as cel
     import kpa.workers.tasks.embed as embed_mod
+    import kpa.workers.tasks.embed_job as embed_job_mod
 
     monkeypatch.setattr(cel, "get_embedding_provider", lambda: embedding_provider)
     monkeypatch.setattr(embed_mod, "get_embedding_provider", lambda: embedding_provider)
+    monkeypatch.setattr(embed_job_mod, "get_embedding_provider", lambda: embedding_provider)
     # Also seed the module-level cache so the original function body short-circuits.
     monkeypatch.setattr(cel, "_embedding_provider", embedding_provider)
     return embedding_provider
@@ -325,9 +327,9 @@ async def concurrent_async_client(
     async with cleanup_engine.connect() as conn:
         await conn.execute(
             text(
-                "TRUNCATE kpa.jobs, kpa.employers, kpa.resumes, kpa.refresh_tokens,"
-                " kpa.oauth_identities, kpa.applicant_embeddings, kpa.applicants,"
-                " kpa.users RESTART IDENTITY CASCADE"
+                "TRUNCATE kpa.job_embeddings, kpa.jobs, kpa.employers, kpa.resumes,"
+                " kpa.refresh_tokens, kpa.oauth_identities, kpa.applicant_embeddings,"
+                " kpa.applicants, kpa.users RESTART IDENTITY CASCADE"
             )
         )
         await conn.commit()
