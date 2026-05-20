@@ -136,6 +136,9 @@ def upgrade() -> None:
         schema="kpa",
         postgresql_where=sa.text("deleted_at IS NULL"),
     )
+    # Plain SQL because op.create_index has no portable way to express
+    # `posted_at DESC` ordering on the second column. The (status, posted_at DESC)
+    # shape is the feed-query path called out in spec §5 and consumed by P2.3.
     op.execute(
         "CREATE INDEX ix_jobs_status_posted_at_live "
         "ON kpa.jobs (status, posted_at DESC) "
