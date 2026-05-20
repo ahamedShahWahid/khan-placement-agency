@@ -188,9 +188,7 @@ async def test_seed_dispatches_embed_per_upserted_job(
     def _spy(job_id_str: str) -> None:
         calls.append(job_id_str)
 
-    monkeypatch.setattr(
-        "kpa.workers.tasks.embed_job.embed_job.delay", _spy
-    )
+    monkeypatch.setattr("kpa.workers.tasks.embed_job.embed_job.delay", _spy)
 
     payload = _payload(
         [_employer_dict()],
@@ -214,9 +212,7 @@ async def test_seed_swallows_broker_outage(
     def _broken(job_id_str: str) -> None:
         raise RuntimeError("broker down")
 
-    monkeypatch.setattr(
-        "kpa.workers.tasks.embed_job.embed_job.delay", _broken
-    )
+    monkeypatch.setattr("kpa.workers.tasks.embed_job.embed_job.delay", _broken)
 
     # Capture structlog warning calls via the _log bound in seed_jobs.
     warning_events: list[str] = []

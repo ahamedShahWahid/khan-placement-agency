@@ -212,7 +212,7 @@ async def test_job_embedding_job_id_is_unique(session: AsyncSession) -> None:
     await session.commit()
     session.add(
         JobEmbedding(
-            job_id=job.id,                          # same job_id
+            job_id=job.id,  # same job_id
             embedding=[0.2] * 1536,
             model_name="test-model",
             canonicalized_text_hash="b" * 64,

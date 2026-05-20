@@ -10,6 +10,7 @@ from kpa.integrations.embeddings.canonicalize_job import canonicalize_job
 @dataclass
 class _JobLike:
     """Stand-in for a Job ORM instance — canonicalize_job only reads attrs."""
+
     title: str
     description: str
     locations: list[str]

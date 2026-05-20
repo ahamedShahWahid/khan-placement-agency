@@ -107,9 +107,7 @@ async def _embed_job_async(
         job, employer_name = loaded
         text, content_hash = canonicalize_job(job, employer_name=employer_name)
         existing = (
-            await session.execute(
-                select(JobEmbedding).where(JobEmbedding.job_id == job_id)
-            )
+            await session.execute(select(JobEmbedding).where(JobEmbedding.job_id == job_id))
         ).scalar_one_or_none()
         if existing is not None and existing.canonicalized_text_hash == content_hash:
             _log.info("embed.job-idempotent-skip", job_id=str(job_id))
@@ -185,9 +183,7 @@ async def _embed_job_async(
     )
 
 
-async def _load_job_with_employer(
-    session: AsyncSession, job_id: UUID
-) -> tuple[Job, str] | None:
+async def _load_job_with_employer(session: AsyncSession, job_id: UUID) -> tuple[Job, str] | None:
     """Return ``(job, employer_name)`` or None.
 
     Returns None when either the job or its employer is soft-deleted, or when
