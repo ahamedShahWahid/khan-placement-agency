@@ -474,6 +474,109 @@ class JobEmbedding(Base):
     deleted_at: Mapped[DeletedAt]
 
 
+class ApplicationStatus(StrEnum):
+    APPLIED = "applied"
+    WITHDRAWN = "withdrawn"
+
+
+class Application(Base):
+    """Applicant x job application — see spec §5 and the P3.0 design doc.
+
+    One live row per (applicant_id, job_id) pair enforced by partial-UNIQUE.
+    Re-applying after withdraw updates the existing withdrawn row back to
+    ``applied`` (approach b — row-id stable, cursor-safe).
+    """
+
+    __tablename__ = "applications"
+
+    id: Mapped[UuidPK]
+    applicant_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("kpa.applicants.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    job_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("kpa.jobs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    status: Mapped[ApplicationStatus] = mapped_column(
+        SAEnum(
+            ApplicationStatus,
+            name="application_status",
+            schema="kpa",
+            native_enum=True,
+            values_callable=lambda x: [e.value for e in x],
+        ),
+        nullable=False,
+        default=ApplicationStatus.APPLIED,
+        server_default=ApplicationStatus.APPLIED.value,
+    )
+    source: Mapped[str] = mapped_column(String(32), nullable=False, server_default="feed")
+    created_at: Mapped[CreatedAt]
+    updated_at: Mapped[UpdatedAt]
+    deleted_at: Mapped[DeletedAt]
+
+    __table_args__ = (
+        Index(
+            "ix_applications_applicant_job_live",
+            "applicant_id",
+            "job_id",
+            unique=True,
+            postgresql_where="deleted_at IS NULL",
+        ),
+        Index(
+            "ix_applications_applicant_created_at",
+            "applicant_id",
+            text("created_at DESC"),
+            postgresql_where="deleted_at IS NULL",
+        ),
+        {"schema": "kpa"},
+    )
+
+
+class SavedJob(Base):
+    """Applicant x job save — see spec §5 and the P3.0 design doc.
+
+    POST = save (idempotent), DELETE = unsave (soft-delete). Re-saving after
+    unsave creates a fresh row. Each save has its own soft-delete column.
+    """
+
+    __tablename__ = "saved_jobs"
+
+    id: Mapped[UuidPK]
+    applicant_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("kpa.applicants.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    job_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("kpa.jobs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    created_at: Mapped[CreatedAt]
+    updated_at: Mapped[UpdatedAt]
+    deleted_at: Mapped[DeletedAt]
+
+    __table_args__ = (
+        Index(
+            "ix_saved_jobs_applicant_job_live",
+            "applicant_id",
+            "job_id",
+            unique=True,
+            postgresql_where="deleted_at IS NULL",
+        ),
+        Index(
+            "ix_saved_jobs_applicant_created_at",
+            "applicant_id",
+            text("created_at DESC"),
+            postgresql_where="deleted_at IS NULL",
+        ),
+        {"schema": "kpa"},
+    )
+
+
 class Match(Base):
     """Hybrid applicant x job match score -- see spec §6.3 and the P2.2 design doc.
 
