@@ -9,7 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from kpa.db.models import Applicant, Employer, Job, JobStatus, User, UserRole
+from kpa.db.models import Applicant, Employer, Job, JobEmbedding, JobStatus, User, UserRole
 
 
 @pytest.mark.integration
@@ -150,3 +150,109 @@ async def test_employer_name_norm_unique_ignores_soft_deleted(session: AsyncSess
     # New row with the same name_norm should now succeed.
     session.add(Employer(name="Replacement", name_norm="original"))
     await session.commit()
+
+
+@pytest.mark.integration
+async def test_create_job_embedding(session: AsyncSession) -> None:
+    employer = Employer(name="Test Co", name_norm="test co")
+    session.add(employer)
+    await session.flush()
+    job = Job(
+        employer_id=employer.id,
+        title="Engineer",
+        description="x",
+        min_exp_years=1,
+        max_exp_years=3,
+    )
+    session.add(job)
+    await session.flush()
+
+    je = JobEmbedding(
+        job_id=job.id,
+        embedding=[0.1] * 1536,
+        model_name="test-model",
+        canonicalized_text_hash="a" * 64,
+        input_tokens=42,
+    )
+    session.add(je)
+    await session.commit()
+
+    loaded = (
+        await session.execute(select(JobEmbedding).where(JobEmbedding.job_id == job.id))
+    ).scalar_one()
+    assert len(loaded.embedding) == 1536
+    assert loaded.model_name == "test-model"
+    assert loaded.canonicalized_text_hash == "a" * 64
+
+
+@pytest.mark.integration
+async def test_job_embedding_job_id_is_unique(session: AsyncSession) -> None:
+    employer = Employer(name="Test Co2", name_norm="test co2")
+    session.add(employer)
+    await session.flush()
+    job = Job(
+        employer_id=employer.id,
+        title="Engineer",
+        description="x",
+        min_exp_years=1,
+        max_exp_years=3,
+    )
+    session.add(job)
+    await session.flush()
+
+    session.add(
+        JobEmbedding(
+            job_id=job.id,
+            embedding=[0.1] * 1536,
+            model_name="test-model",
+            canonicalized_text_hash="a" * 64,
+            input_tokens=1,
+        )
+    )
+    await session.commit()
+    session.add(
+        JobEmbedding(
+            job_id=job.id,                          # same job_id
+            embedding=[0.2] * 1536,
+            model_name="test-model",
+            canonicalized_text_hash="b" * 64,
+            input_tokens=2,
+        )
+    )
+    with pytest.raises(IntegrityError):
+        await session.commit()
+    await session.rollback()
+
+
+@pytest.mark.integration
+async def test_job_embedding_cascades_on_job_hard_delete(session: AsyncSession) -> None:
+    employer = Employer(name="Test Co3", name_norm="test co3")
+    session.add(employer)
+    await session.flush()
+    job = Job(
+        employer_id=employer.id,
+        title="Engineer",
+        description="x",
+        min_exp_years=1,
+        max_exp_years=3,
+    )
+    session.add(job)
+    await session.flush()
+    session.add(
+        JobEmbedding(
+            job_id=job.id,
+            embedding=[0.1] * 1536,
+            model_name="test-model",
+            canonicalized_text_hash="a" * 64,
+            input_tokens=1,
+        )
+    )
+    await session.commit()
+
+    await session.delete(job)
+    await session.commit()
+
+    remaining = (
+        await session.execute(select(JobEmbedding).where(JobEmbedding.job_id == job.id))
+    ).all()
+    assert remaining == []
