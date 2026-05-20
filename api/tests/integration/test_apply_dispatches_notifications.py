@@ -107,12 +107,16 @@ async def test_apply_201_inserts_email_and_in_app_rows(
 
     # Exactly 2 notification rows — one per channel.
     rows = (
-        await session.execute(
-            select(Notification)
-            .where(Notification.user_id == user.id)
-            .order_by(Notification.channel)
+        (
+            await session.execute(
+                select(Notification)
+                .where(Notification.user_id == user.id)
+                .order_by(Notification.channel)
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     assert len(rows) == 2
 
     channels = {n.channel for n in rows}

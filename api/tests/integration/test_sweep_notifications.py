@@ -179,9 +179,9 @@ async def test_sweep_retries_on_failed_channel(
 
         await _sweep_notifications_async(sm=sm, email_channel=failing, batch_size=10)
         await session.refresh(n)
-        assert n.status == NotificationStatus.PENDING, (
-            f"Expected PENDING after attempt {expected_attempts}, got {n.status}"
-        )
+        assert (
+            n.status == NotificationStatus.PENDING
+        ), f"Expected PENDING after attempt {expected_attempts}, got {n.status}"
         assert n.attempts == expected_attempts
         assert n.last_error == "simulated"
         assert n.send_after > datetime.now(UTC)
@@ -210,11 +210,7 @@ async def test_sweep_batch_size_respected(session: AsyncSession) -> None:
 
     # Reload all rows.
     rows = (
-        (
-            await session.execute(
-                select(Notification).where(Notification.user_id == user.id)
-            )
-        )
+        (await session.execute(select(Notification).where(Notification.user_id == user.id)))
         .scalars()
         .all()
     )

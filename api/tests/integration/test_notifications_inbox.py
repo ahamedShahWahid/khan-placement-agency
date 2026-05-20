@@ -102,9 +102,7 @@ async def test_inbox_returns_users_notifications(
 
 
 @pytest.mark.integration
-async def test_inbox_excludes_other_users(
-    session: AsyncSession, async_client: AsyncClient
-) -> None:
+async def test_inbox_excludes_other_users(session: AsyncSession, async_client: AsyncClient) -> None:
     """Notifications belonging to another user are not returned."""
     user_a, _ = await _make_applicant(session, email="inbox-a@example.com")
     user_b, _ = await _make_applicant(session, email="inbox-b@example.com")
@@ -119,9 +117,7 @@ async def test_inbox_excludes_other_users(
 
 
 @pytest.mark.integration
-async def test_inbox_excludes_failed(
-    session: AsyncSession, async_client: AsyncClient
-) -> None:
+async def test_inbox_excludes_failed(session: AsyncSession, async_client: AsyncClient) -> None:
     """FAILED notifications are excluded from the inbox (admin-only)."""
     user, _ = await _make_applicant(session, email="inbox-failed@example.com")
     await _make_notification(session, user_id=user.id, status=NotificationStatus.SENT)
@@ -137,9 +133,7 @@ async def test_inbox_excludes_failed(
 
 
 @pytest.mark.integration
-async def test_inbox_pagination(
-    session: AsyncSession, async_client: AsyncClient
-) -> None:
+async def test_inbox_pagination(session: AsyncSession, async_client: AsyncClient) -> None:
     """Cursor pagination returns items in correct order and produces a next_cursor."""
     user, _ = await _make_applicant(session, email="inbox-page@example.com")
     # Insert 3 notifications.
@@ -153,9 +147,7 @@ async def test_inbox_pagination(
     await session.commit()
 
     # First page — limit=2.
-    r1 = await async_client.get(
-        "/v1/notifications?limit=2", headers=_token_headers(user)
-    )
+    r1 = await async_client.get("/v1/notifications?limit=2", headers=_token_headers(user))
     assert r1.status_code == 200
     b1 = r1.json()
     assert len(b1["items"]) == 2
@@ -178,9 +170,7 @@ async def test_inbox_pagination(
 
 
 @pytest.mark.integration
-async def test_inbox_etag_round_trip(
-    session: AsyncSession, async_client: AsyncClient
-) -> None:
+async def test_inbox_etag_round_trip(session: AsyncSession, async_client: AsyncClient) -> None:
     """Second request with If-None-Match matching the ETag returns 304."""
     user, _ = await _make_applicant(session, email="inbox-etag@example.com")
     await _make_notification(session, user_id=user.id, status=NotificationStatus.SENT)
@@ -204,14 +194,10 @@ async def test_inbox_etag_round_trip(
 
 
 @pytest.mark.integration
-async def test_mark_read_sets_read_at(
-    session: AsyncSession, async_client: AsyncClient
-) -> None:
+async def test_mark_read_sets_read_at(session: AsyncSession, async_client: AsyncClient) -> None:
     """Mark-read sets read_at and returns the updated notification."""
     user, _ = await _make_applicant(session, email="mark-read@example.com")
-    notif = await _make_notification(
-        session, user_id=user.id, status=NotificationStatus.SENT
-    )
+    notif = await _make_notification(session, user_id=user.id, status=NotificationStatus.SENT)
     await session.commit()
 
     assert notif.read_at is None
@@ -231,9 +217,7 @@ async def test_mark_read_sets_read_at(
 
 
 @pytest.mark.integration
-async def test_mark_read_idempotent(
-    session: AsyncSession, async_client: AsyncClient
-) -> None:
+async def test_mark_read_idempotent(session: AsyncSession, async_client: AsyncClient) -> None:
     """Calling mark-read twice on an already-read notification returns 200 both times."""
     user, _ = await _make_applicant(session, email="mark-read-idem@example.com")
     notif = await _make_notification(

@@ -93,9 +93,7 @@ def decode_cursor_notifications(cursor: str) -> tuple[datetime, uuid.UUID]:
     try:
         raw = base64.urlsafe_b64decode(cursor.encode("ascii"))
         payload = json.loads(raw)
-        return datetime.fromisoformat(payload["created_at"]), uuid.UUID(
-            payload["notification_id"]
-        )
+        return datetime.fromisoformat(payload["created_at"]), uuid.UUID(payload["notification_id"])
     except (ValueError, KeyError, TypeError, json.JSONDecodeError, binascii.Error) as exc:
         raise ValueError(f"invalid_cursor: {exc}") from exc
 
@@ -183,10 +181,7 @@ async def list_notifications(
     if cursor_created_at is not None and cursor_notif_id is not None:
         stmt = stmt.where(
             (Notification.created_at < cursor_created_at)
-            | (
-                (Notification.created_at == cursor_created_at)
-                & (Notification.id < cursor_notif_id)
-            )
+            | ((Notification.created_at == cursor_created_at) & (Notification.id < cursor_notif_id))
         )
 
     rows = (await session.execute(stmt)).scalars().all()
