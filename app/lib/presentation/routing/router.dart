@@ -10,23 +10,13 @@ import 'package:kpa_app/presentation/auth/auth_providers.dart';
 import 'package:kpa_app/presentation/auth/sign_in_screen.dart';
 import 'package:kpa_app/presentation/feed/feed_screen.dart';
 import 'package:kpa_app/presentation/job_detail/job_detail_screen.dart';
+import 'package:kpa_app/presentation/profile/profile_screen.dart';
 import 'package:kpa_app/presentation/routing/routes.dart';
 import 'package:kpa_app/presentation/saved/saved_screen.dart';
 import 'package:kpa_app/presentation/splash/splash_screen.dart';
 import 'package:kpa_app/presentation/widgets/kpa_shell_scaffold.dart';
 
 part 'router.g.dart';
-
-/// Placeholder widget used until Phase 9 swaps in real screens.
-class _Placeholder extends StatelessWidget {
-  const _Placeholder(this.name);
-  final String name;
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: Text(name)),
-        body: Center(child: Text('Placeholder: $name')),
-      );
-}
 
 /// Bridges Riverpod's AuthState changes into GoRouter's `refreshListenable`.
 class _AuthChangeNotifier extends ChangeNotifier {
@@ -122,7 +112,7 @@ GoRouter router(Ref ref) {
             routes: [
               GoRoute(
                 path: Routes.profile,
-                builder: (_, __) => const _Placeholder('Profile'),
+                builder: (_, __) => const ProfileScreen(),
               ),
             ],
           ),
