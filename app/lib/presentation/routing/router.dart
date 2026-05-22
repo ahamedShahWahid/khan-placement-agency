@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:kpa_app/domain/auth/auth_state.dart';
+import 'package:kpa_app/presentation/applications/applications_screen.dart';
 import 'package:kpa_app/presentation/auth/auth_providers.dart';
 import 'package:kpa_app/presentation/auth/sign_in_screen.dart';
 import 'package:kpa_app/presentation/feed/feed_screen.dart';
@@ -105,7 +106,7 @@ GoRouter router(Ref ref) {
             routes: [
               GoRoute(
                 path: Routes.applications,
-                builder: (_, __) => const _Placeholder('Applications'),
+                builder: (_, __) => const ApplicationsScreen(),
                 routes: [
                   GoRoute(
                     path: 'jobs/:id',
