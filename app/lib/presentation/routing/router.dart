@@ -7,6 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:kpa_app/domain/auth/auth_state.dart';
 import 'package:kpa_app/presentation/auth/auth_providers.dart';
 import 'package:kpa_app/presentation/routing/routes.dart';
+import 'package:kpa_app/presentation/splash/splash_screen.dart';
 import 'package:kpa_app/presentation/widgets/kpa_shell_scaffold.dart';
 
 part 'router.g.dart';
@@ -58,7 +59,7 @@ GoRouter router(Ref ref) {
     routes: [
       GoRoute(
         path: Routes.splash,
-        builder: (_, __) => const _Placeholder('Splash'),
+        builder: (_, __) => const SplashScreen(),
       ),
       GoRoute(
         path: Routes.signIn,
