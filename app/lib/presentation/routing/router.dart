@@ -6,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:kpa_app/domain/auth/auth_state.dart';
 import 'package:kpa_app/presentation/auth/auth_providers.dart';
+import 'package:kpa_app/presentation/auth/sign_in_screen.dart';
 import 'package:kpa_app/presentation/routing/routes.dart';
 import 'package:kpa_app/presentation/splash/splash_screen.dart';
 import 'package:kpa_app/presentation/widgets/kpa_shell_scaffold.dart';
@@ -63,7 +64,7 @@ GoRouter router(Ref ref) {
       ),
       GoRoute(
         path: Routes.signIn,
-        builder: (_, __) => const _Placeholder('Sign-in'),
+        builder: (_, __) => const SignInScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => KpaShellScaffold(shell: shell),
