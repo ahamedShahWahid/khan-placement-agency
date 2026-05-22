@@ -14,5 +14,8 @@ class AccessTokenHolder {
     _token = token;
   }
 
+  /// Non-nullable convenience alias used by interceptors.
+  void set(String token) => setToken(token);
+
   void clear() => setToken(null);
 }
