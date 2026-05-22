@@ -8,6 +8,7 @@ import 'package:kpa_app/domain/auth/auth_state.dart';
 import 'package:kpa_app/presentation/auth/auth_providers.dart';
 import 'package:kpa_app/presentation/auth/sign_in_screen.dart';
 import 'package:kpa_app/presentation/feed/feed_screen.dart';
+import 'package:kpa_app/presentation/job_detail/job_detail_screen.dart';
 import 'package:kpa_app/presentation/routing/routes.dart';
 import 'package:kpa_app/presentation/splash/splash_screen.dart';
 import 'package:kpa_app/presentation/widgets/kpa_shell_scaffold.dart';
@@ -79,7 +80,7 @@ GoRouter router(Ref ref) {
                   GoRoute(
                     path: 'jobs/:id',
                     builder: (_, s) =>
-                        _Placeholder('JobDetail ${s.pathParameters['id']}'),
+                        JobDetailScreen(jobId: s.pathParameters['id']!),
                   ),
                 ],
               ),
@@ -94,7 +95,7 @@ GoRouter router(Ref ref) {
                   GoRoute(
                     path: 'jobs/:id',
                     builder: (_, s) =>
-                        _Placeholder('JobDetail ${s.pathParameters['id']}'),
+                        JobDetailScreen(jobId: s.pathParameters['id']!),
                   ),
                 ],
               ),
@@ -109,7 +110,7 @@ GoRouter router(Ref ref) {
                   GoRoute(
                     path: 'jobs/:id',
                     builder: (_, s) =>
-                        _Placeholder('JobDetail ${s.pathParameters['id']}'),
+                        JobDetailScreen(jobId: s.pathParameters['id']!),
                   ),
                 ],
               ),
