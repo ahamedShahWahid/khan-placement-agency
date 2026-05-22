@@ -7,18 +7,28 @@
 /// Call [validateOrThrow] from `main()` before `runApp` — a missing
 /// required var should fail fast with a printable message.
 abstract final class Env {
-  static const apiBaseUrl = String.fromEnvironment('KPA_API_BASE_URL');
-  static const googleWebClientId = String.fromEnvironment('KPA_GOOGLE_WEB_CLIENT_ID');
-  static const buildEnv = String.fromEnvironment('KPA_BUILD_ENV', defaultValue: 'local');
+  static const apiBaseUrl =
+      String.fromEnvironment('KPA_API_BASE_URL');
+  static const googleWebClientId =
+      String.fromEnvironment('KPA_GOOGLE_WEB_CLIENT_ID');
+  static const buildEnv = String.fromEnvironment(
+    'KPA_BUILD_ENV',
+    defaultValue: 'local',
+  );
 
   static bool get isDev => buildEnv != 'prod';
 
-  /// Validate the compiled-in values. Throws [StateError] if anything required is missing.
+  /// Validate the compiled-in values.
+  /// Throws [StateError] if anything required is missing.
   static void validateOrThrow() {
-    validateGiven(apiBaseUrl: apiBaseUrl, googleWebClientId: googleWebClientId);
+    validateGiven(
+      apiBaseUrl: apiBaseUrl,
+      googleWebClientId: googleWebClientId,
+    );
   }
 
-  /// Internal helper, exposed for testing. Mirrors [validateOrThrow] but takes args.
+  /// Internal helper, exposed for testing.
+  /// Mirrors [validateOrThrow] but takes args.
   static void validateGiven({
     required String apiBaseUrl,
     required String googleWebClientId,
