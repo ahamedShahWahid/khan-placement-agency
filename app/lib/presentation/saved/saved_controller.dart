@@ -49,8 +49,8 @@ class SavedController extends _$SavedController {
         ),
       );
     } catch (e, st) {
-      state = AsyncValue.data(current.copyWith(isLoadingMore: false));
-      state = AsyncValue.error(e, st);
+      state = AsyncValue<SavedState>.error(e, st)
+          .copyWithPrevious(AsyncValue.data(current.copyWith(isLoadingMore: false)));
     }
   }
 }

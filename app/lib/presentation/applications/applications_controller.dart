@@ -51,8 +51,8 @@ class ApplicationsController extends _$ApplicationsController {
         ),
       );
     } catch (e, st) {
-      state = AsyncValue.data(current.copyWith(isLoadingMore: false));
-      state = AsyncValue.error(e, st);
+      state = AsyncValue<ApplicationsState>.error(e, st)
+          .copyWithPrevious(AsyncValue.data(current.copyWith(isLoadingMore: false)));
     }
   }
 }
