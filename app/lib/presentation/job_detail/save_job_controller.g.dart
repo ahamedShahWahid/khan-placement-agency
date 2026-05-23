@@ -50,7 +50,7 @@ final class SaveJobControllerProvider
   }
 }
 
-String _$saveJobControllerHash() => r'048eb67f77d89010231195575a1e9dd47cef1e20';
+String _$saveJobControllerHash() => r'c42916768460093aa572fb337eefdc4f359287fb';
 
 final class SaveJobControllerFamily extends $Family
     with
