@@ -34,7 +34,7 @@ final class ApplicationsControllerProvider
 }
 
 String _$applicationsControllerHash() =>
-    r'093f677e54f3a9453f25e9e7183dd4ae718ab506';
+    r'572558e81048b7722754c4730269a53af8ee7bd9';
 
 abstract class _$ApplicationsController
     extends $AsyncNotifier<ApplicationsState> {

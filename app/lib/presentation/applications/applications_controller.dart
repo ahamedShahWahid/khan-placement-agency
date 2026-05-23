@@ -51,8 +51,10 @@ class ApplicationsController extends _$ApplicationsController {
         ),
       );
     } catch (e, st) {
-      state = AsyncValue<ApplicationsState>.error(e, st)
-          .copyWithPrevious(AsyncValue.data(current.copyWith(isLoadingMore: false)));
+      // ignore: invalid_use_of_internal_member
+      state = AsyncValue<ApplicationsState>.error(e, st).copyWithPrevious(
+        AsyncValue.data(current.copyWith(isLoadingMore: false)),
+      );
     }
   }
 }

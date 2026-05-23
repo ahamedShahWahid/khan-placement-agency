@@ -49,8 +49,10 @@ class FeedController extends _$FeedController {
         ),
       );
     } catch (e, st) {
-      state = AsyncValue<FeedState>.error(e, st)
-          .copyWithPrevious(AsyncValue.data(current.copyWith(isLoadingMore: false)));
+      // ignore: invalid_use_of_internal_member
+      state = AsyncValue<FeedState>.error(e, st).copyWithPrevious(
+        AsyncValue.data(current.copyWith(isLoadingMore: false)),
+      );
     }
   }
 }
