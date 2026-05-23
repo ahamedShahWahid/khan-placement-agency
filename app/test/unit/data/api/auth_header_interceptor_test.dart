@@ -20,7 +20,7 @@ void main() {
   });
 
   test('attaches Bearer token when present', () {
-    holder.setToken('tok-123');
+    holder.set('tok-123');
     final interceptor = AuthHeaderInterceptor(holder);
     final options = RequestOptions(path: '/foo');
     final handler = _TestHandler();
@@ -42,7 +42,7 @@ void main() {
   });
 
   test('omits Authorization when kSkipAuth=true even with token', () {
-    holder.setToken('tok-xyz');
+    holder.set('tok-xyz');
     final interceptor = AuthHeaderInterceptor(holder);
     final options = RequestOptions(
       path: '/foo',
