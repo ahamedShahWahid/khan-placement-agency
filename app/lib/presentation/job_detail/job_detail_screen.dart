@@ -60,8 +60,8 @@ class JobDetailScreen extends ConsumerWidget {
               headline: 'This job is no longer available',
               body: 'It may have been closed or removed.',
               primaryAction: FilledButton(
-                onPressed: () => context.go('/feed'),
-                child: const Text('Back to feed'),
+                onPressed: () => context.pop(),
+                child: const Text('Back'),
               ),
             );
           }
