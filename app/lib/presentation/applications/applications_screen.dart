@@ -10,6 +10,8 @@ import 'package:kpa_app/presentation/widgets/async_value_widget.dart';
 import 'package:kpa_app/presentation/widgets/kpa_empty_state.dart';
 import 'package:kpa_app/presentation/widgets/kpa_loading_view.dart';
 
+final _dateFormat = DateFormat.yMMMMd();
+
 class ApplicationsScreen extends ConsumerStatefulWidget {
   const ApplicationsScreen({super.key});
   @override
@@ -108,16 +110,15 @@ class _ApplicationsScreenState
                         const SizedBox(height: KpaSpacing.xs),
                         Text(
                           () {
-                            final withdrawn = item.application.status ==
+                            final isWithdrawn = item.application.status ==
                                 'withdrawn';
-                            final date = withdrawn
-                                ? DateFormat.yMMMMd()
-                                    .format(item.application.withdrawnAt!)
-                                : DateFormat.yMMMMd()
-                                    .format(item.application.createdAt);
-                            return withdrawn
-                                ? 'Withdrawn $date'
-                                : 'Applied $date';
+                            final whenDate = isWithdrawn
+                                ? item.application.withdrawnAt!
+                                : item.application.createdAt;
+                            final whenLabel = isWithdrawn
+                                ? 'Withdrawn ${_dateFormat.format(whenDate)}'
+                                : 'Applied ${_dateFormat.format(whenDate)}';
+                            return whenLabel;
                           }(),
                           style: Theme.of(context)
                               .textTheme

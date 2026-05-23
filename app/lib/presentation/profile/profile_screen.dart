@@ -2,9 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:kpa_app/presentation/profile/me_controller.dart';
+import 'package:kpa_app/presentation/profile/package_info_provider.dart';
 import 'package:kpa_app/presentation/profile/sign_out_controller.dart';
 import 'package:kpa_app/presentation/theme/kpa_spacing.dart';
 import 'package:kpa_app/presentation/widgets/async_value_widget.dart';
@@ -60,18 +60,17 @@ class ProfileScreen extends ConsumerWidget {
               child: Text(signOut.isLoading ? 'Signing out…' : 'Sign out'),
             ),
             const SizedBox(height: KpaSpacing.xxl),
-            FutureBuilder<PackageInfo>(
-              future: PackageInfo.fromPlatform(),
-              builder: (_, snap) => Center(
+            ref.watch(packageInfoProvider).when(
+              data: (info) => Center(
                 child: Text(
-                  snap.hasData
-                      ? 'v${snap.data!.version} (${snap.data!.buildNumber})'
-                      : '',
+                  'v${info.version} (${info.buildNumber})',
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
               ),
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
             ),
           ],
         ),
