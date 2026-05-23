@@ -54,3 +54,6 @@ app.*.map.json
 # Xcode configs containing real client IDs
 /ios/Runner/Debug.xcconfig
 /ios/Runner/Release.xcconfig
+
+# Xcode SwiftPM resolved state — per-machine artifact
+**/xcshareddata/swiftpm/
