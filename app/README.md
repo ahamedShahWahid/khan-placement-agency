@@ -70,6 +70,6 @@ CI (`.github/workflows/app.yml`) enforces both on every PR touching `app/**`.
 
 ## Architecture
 
-Pragmatic Clean Architecture — `lib/data/` + `lib/domain/` + `lib/presentation/` + `lib/core/`. Repository interfaces live in `domain/`; impls in `data/`; Riverpod providers + screens in `presentation/`. Cross-layer infrastructure (env validation, typed exceptions, logger) in `core/`.
+`lib/data/` + `lib/presentation/` + `lib/core/` (no separate `domain/` layer). Abstract repository interfaces live next to their concrete impls in `data/<feature>/<repo>_repository.dart` + `<repo>_repository_impl.dart`. Riverpod providers + screens in `presentation/`. Cross-layer infrastructure (env validation, typed exceptions, logger) in `core/`.
 
 See `docs/superpowers/specs/2026-05-21-flutter-app-shell-design.md` for the design doc.

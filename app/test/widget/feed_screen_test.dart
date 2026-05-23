@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kpa_app/data/feed/feed_dto.dart';
 import 'package:kpa_app/data/feed/feed_repository_impl.dart';
-import 'package:kpa_app/domain/feed/feed_repository.dart';
+import 'package:kpa_app/data/feed/feed_repository.dart';
 import 'package:kpa_app/presentation/feed/feed_screen.dart';
 
 class _FakeFeedRepo implements FeedRepository {

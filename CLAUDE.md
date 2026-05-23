@@ -227,7 +227,7 @@ The per-test engine in the integration conftest uses `poolclass=NullPool` to for
 
 ## Flutter app (`app/`)
 
-The applicant-facing iOS + Android + Web client lives in `app/` as a sibling of `api/`. Architecture follows Pragmatic Clean Architecture — `lib/data/` + `lib/domain/` + `lib/presentation/` + `lib/core/`. State management is Riverpod 4.x with code-gen; HTTP is dio 5.7; routing is go_router 14.6 with `StatefulShellRoute.indexedStack` for the four-tab bottom nav.
+The applicant-facing iOS + Android + Web client lives in `app/` as a sibling of `api/`. Architecture: `lib/data/` + `lib/presentation/` + `lib/core/` (no separate `domain/` layer). Abstract repository interfaces live next to their concrete impls in `data/<feature>/<repo>_repository.dart` + `<repo>_repository_impl.dart`. State management is Riverpod 4.x with code-gen; HTTP is dio 5.7; routing is go_router 14.6 with `StatefulShellRoute.indexedStack` for the four-tab bottom nav.
 
 ### Day-to-day commands
 
@@ -250,8 +250,6 @@ dart format lib test
 - **`dio_provider` depends on a presentation-layer notifier** (`authStateProvider`) to push `SignedOut` on refresh failure. Documented inline as the one allowed exception to data/→presentation/ purity.
 
 - **Riverpod 4.x codegen** drops the `Notifier` suffix from generated providers — the `AuthStateNotifier` class produces `authStateProvider` (not `authStateNotifierProvider`).
-
-- **Pragmatic CA cheat:** `data/<feature>/*_dto.dart` files are referenced from `lib/domain/<feature>/` via `export` directives. Domain consumers import the `*Dto` types using a `domain/` path; the underlying definition lives in `data/`.
 
 - **No mutation of the feed on apply/save/withdraw/unsave.** Each mutation invalidates the corresponding list controller + the `jobDetailControllerProvider(id)`, never the feed.
 

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kpa_app/data/me/me_dto.dart';
 import 'package:kpa_app/data/me/me_repository_impl.dart';
-import 'package:kpa_app/domain/me/me_repository.dart';
+import 'package:kpa_app/data/me/me_repository.dart';
 import 'package:kpa_app/presentation/profile/profile_screen.dart';
 
 class _FakeRepo implements MeRepository {

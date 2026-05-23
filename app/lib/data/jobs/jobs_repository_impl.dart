@@ -6,7 +6,7 @@ import 'package:kpa_app/data/api/error_mapping.dart';
 import 'package:kpa_app/data/api/dio_provider.dart';
 import 'package:kpa_app/data/jobs/jobs_api.dart';
 import 'package:kpa_app/data/jobs/jobs_dto.dart';
-import 'package:kpa_app/domain/jobs/jobs_repository.dart';
+import 'package:kpa_app/data/jobs/jobs_repository.dart';
 
 part 'jobs_repository_impl.g.dart';
 

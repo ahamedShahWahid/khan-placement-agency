@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:kpa_app/domain/auth/auth_state.dart';
+import 'package:kpa_app/data/auth/auth_state.dart';
 import 'package:kpa_app/presentation/applications/applications_screen.dart';
 import 'package:kpa_app/presentation/auth/auth_providers.dart';
 import 'package:kpa_app/presentation/auth/sign_in_screen.dart';

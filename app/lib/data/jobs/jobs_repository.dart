@@ -1,4 +1,4 @@
-import 'job_detail.dart';
+import 'package:kpa_app/data/jobs/jobs_dto.dart';
 
 abstract interface class JobsRepository {
   Future<JobDetailDto> fetchById(String jobId);

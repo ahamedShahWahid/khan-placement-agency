@@ -4,7 +4,7 @@ import 'package:kpa_app/data/api/access_token_holder.dart';
 import 'package:kpa_app/data/auth/auth_repository_impl.dart';
 import 'package:kpa_app/data/auth/google_sign_in_data_source.dart';
 import 'package:kpa_app/data/auth/token_storage.dart';
-import 'package:kpa_app/domain/auth/auth_state.dart';
+import 'package:kpa_app/data/auth/auth_state.dart';
 
 import '../../../helpers/mock_interceptor.dart';
 

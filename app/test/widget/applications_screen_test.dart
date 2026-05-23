@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:kpa_app/data/feed/feed_dto.dart';
 import 'package:kpa_app/data/jobs/applications_repository_impl.dart';
 import 'package:kpa_app/data/jobs/jobs_dto.dart';
-import 'package:kpa_app/domain/jobs/applications_repository.dart';
+import 'package:kpa_app/data/jobs/applications_repository.dart';
 import 'package:kpa_app/presentation/applications/applications_screen.dart';
 
 class _FakeRepo implements ApplicationsRepository {

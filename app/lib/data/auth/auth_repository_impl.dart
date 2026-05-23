@@ -11,8 +11,8 @@ import 'package:kpa_app/data/api/dio_provider.dart';
 import 'package:kpa_app/data/auth/auth_dto.dart';
 import 'package:kpa_app/data/auth/google_sign_in_data_source.dart';
 import 'package:kpa_app/data/auth/token_storage.dart';
-import 'package:kpa_app/domain/auth/auth_repository.dart';
-import 'package:kpa_app/domain/auth/auth_state.dart';
+import 'package:kpa_app/data/auth/auth_repository.dart';
+import 'package:kpa_app/data/auth/auth_state.dart';
 import 'package:kpa_app/presentation/auth/auth_providers.dart';
 
 part 'auth_repository_impl.g.dart';

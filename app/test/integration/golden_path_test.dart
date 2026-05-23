@@ -9,7 +9,7 @@ import 'package:kpa_app/data/jobs/jobs_dto.dart';
 import 'package:kpa_app/data/jobs/jobs_repository_impl.dart';
 import 'package:kpa_app/data/jobs/saved_jobs_repository_impl.dart';
 import 'package:kpa_app/data/me/me_repository_impl.dart';
-import 'package:kpa_app/domain/auth/auth_state.dart';
+import 'package:kpa_app/data/auth/auth_state.dart';
 import 'package:kpa_app/presentation/auth/auth_providers.dart';
 import 'package:kpa_app/presentation/splash/bootstrap_controller.dart';
 

@@ -1,13 +1,13 @@
 import 'package:kpa_app/data/feed/feed_dto.dart';
 import 'package:kpa_app/data/jobs/jobs_dto.dart';
 import 'package:kpa_app/data/me/me_dto.dart';
-import 'package:kpa_app/domain/auth/auth_repository.dart';
-import 'package:kpa_app/domain/auth/auth_state.dart';
-import 'package:kpa_app/domain/feed/feed_repository.dart';
-import 'package:kpa_app/domain/jobs/applications_repository.dart';
-import 'package:kpa_app/domain/jobs/jobs_repository.dart';
-import 'package:kpa_app/domain/jobs/saved_jobs_repository.dart';
-import 'package:kpa_app/domain/me/me_repository.dart';
+import 'package:kpa_app/data/auth/auth_repository.dart';
+import 'package:kpa_app/data/auth/auth_state.dart';
+import 'package:kpa_app/data/feed/feed_repository.dart';
+import 'package:kpa_app/data/jobs/applications_repository.dart';
+import 'package:kpa_app/data/jobs/jobs_repository.dart';
+import 'package:kpa_app/data/jobs/saved_jobs_repository.dart';
+import 'package:kpa_app/data/me/me_repository.dart';
 
 class FakeAuthRepository implements AuthRepository {
   FakeAuthRepository({AuthState initial = const SignedOut()})
