@@ -25,7 +25,6 @@ Dio dio(Ref ref) {
       baseUrl: Env.apiBaseUrl,
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 30),
-      validateStatus: (s) => s != null && s < 500,
     ),
   );
   dio.interceptors.add(RequestIdInterceptor());
