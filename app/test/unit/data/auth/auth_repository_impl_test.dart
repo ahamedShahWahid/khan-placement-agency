@@ -6,6 +6,8 @@ import 'package:kpa_app/data/auth/google_sign_in_data_source.dart';
 import 'package:kpa_app/data/auth/token_storage.dart';
 import 'package:kpa_app/domain/auth/auth_state.dart';
 
+import '../../../helpers/mock_interceptor.dart';
+
 // ---------------------------------------------------------------------------
 // Test doubles
 // ---------------------------------------------------------------------------
@@ -38,60 +40,6 @@ class _FakeGoogle implements GoogleSignInDataSource {
   Future<void> signOut() async {}
 }
 
-/// Intercepts requests inside Dio and returns scripted responses, keyed by
-/// "$METHOD:$path". Successful (< 400) responses call handler.resolve;
-/// error responses call handler.reject with a proper DioException so the
-/// repo's catch blocks fire correctly.
-class _MockInterceptor extends Interceptor {
-  final Map<String, _ScriptedResponse> _routes = {};
-
-  void on(String method, String path, int status, Map<String, dynamic>? body) {
-    _routes['$method:$path'] = _ScriptedResponse(status, body);
-  }
-
-  @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final key = '${options.method}:${options.path}';
-    final r = _routes[key];
-    if (r == null) {
-      handler.reject(
-        DioException(
-          requestOptions: options,
-          error: 'no mock for $key — register with on()',
-        ),
-      );
-      return;
-    }
-    if (r.status >= 400) {
-      handler.reject(
-        DioException(
-          requestOptions: options,
-          response: Response(
-            requestOptions: options,
-            statusCode: r.status,
-            data: r.body,
-          ),
-          type: DioExceptionType.badResponse,
-        ),
-      );
-    } else {
-      handler.resolve(
-        Response(
-          requestOptions: options,
-          statusCode: r.status,
-          data: r.body,
-        ),
-      );
-    }
-  }
-}
-
-class _ScriptedResponse {
-  _ScriptedResponse(this.status, this.body);
-  final int status;
-  final Map<String, dynamic>? body;
-}
-
 // ---------------------------------------------------------------------------
 // Harness builder
 // ---------------------------------------------------------------------------
@@ -100,7 +48,7 @@ class _ScriptedResponse {
   AuthRepositoryImpl repo,
   AccessTokenHolder holder,
   _InMemoryStorage storage,
-  _MockInterceptor mock,
+  MockInterceptor mock,
   List<AuthState> emitted,
 }) _buildHarness({
   String? storedRefreshToken,
@@ -108,7 +56,7 @@ class _ScriptedResponse {
 }) {
   final holder = AccessTokenHolder();
   final storage = _InMemoryStorage(storedRefreshToken);
-  final mock = _MockInterceptor();
+  final mock = MockInterceptor();
   final emitted = <AuthState>[];
 
   final dio = Dio(

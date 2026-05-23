@@ -4,60 +4,7 @@ import 'package:kpa_app/core/error/exceptions.dart';
 import 'package:kpa_app/data/jobs/jobs_api.dart';
 import 'package:kpa_app/data/jobs/jobs_repository_impl.dart';
 
-class _MockInterceptor extends Interceptor {
-  final Map<String, _ScriptedResponse> _routes = {};
-
-  void on(
-    String method,
-    String path,
-    int status,
-    Map<String, dynamic>? body,
-  ) {
-    _routes['$method:$path'] = _ScriptedResponse(status, body);
-  }
-
-  @override
-  void onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) {
-    final key = '${options.method}:${options.path}';
-    final r = _routes[key];
-    if (r == null) {
-      handler.reject(
-        DioException(requestOptions: options, error: 'no mock for $key'),
-      );
-      return;
-    }
-    if (r.status >= 400) {
-      handler.reject(
-        DioException(
-          requestOptions: options,
-          response: Response(
-            requestOptions: options,
-            statusCode: r.status,
-            data: r.body,
-          ),
-          type: DioExceptionType.badResponse,
-        ),
-      );
-    } else {
-      handler.resolve(
-        Response(
-          requestOptions: options,
-          statusCode: r.status,
-          data: r.body,
-        ),
-      );
-    }
-  }
-}
-
-class _ScriptedResponse {
-  _ScriptedResponse(this.status, this.body);
-  final int status;
-  final Map<String, dynamic>? body;
-}
+import '../../../helpers/mock_interceptor.dart';
 
 Map<String, dynamic> _jobDetail() => {
       'job': {
@@ -75,12 +22,12 @@ Map<String, dynamic> _jobDetail() => {
 
 void main() {
   late Dio dio;
-  late _MockInterceptor mock;
+  late MockInterceptor mock;
   late JobsRepositoryImpl repo;
 
   setUp(() {
     dio = Dio(BaseOptions(baseUrl: 'http://test.local'));
-    mock = _MockInterceptor();
+    mock = MockInterceptor();
     dio.interceptors.add(mock);
     repo = JobsRepositoryImpl(JobsApi(dio));
   });
