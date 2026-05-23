@@ -1,4 +1,6 @@
 import 'package:kpa_app/data/feed/feed_dto.dart';
+import 'package:kpa_app/data/jobs/application_source.dart';
+import 'package:kpa_app/data/jobs/application_status.dart';
 import 'package:kpa_app/data/jobs/jobs_dto.dart';
 import 'package:kpa_app/data/me/me_dto.dart';
 import 'package:kpa_app/data/auth/auth_repository.dart';
@@ -55,13 +57,13 @@ class FakeJobsRepository implements JobsRepository {
   @override
   Future<ApplicationDto> applyTo(
     String jobId, {
-    String source = 'feed',
+    ApplicationSource source = ApplicationSource.feed,
   }) async {
     final app = ApplicationDto(
       id: 'a1',
       applicantId: 'p',
       jobId: jobId,
-      status: 'applied',
+      status: ApplicationStatus.applied,
       source: source,
       createdAt: DateTime.now(),
     );
@@ -100,8 +102,8 @@ class FakeApplicationsRepository implements ApplicationsRepository {
         id: id,
         applicantId: 'p',
         jobId: 'j1',
-        status: 'withdrawn',
-        source: 'feed',
+        status: ApplicationStatus.withdrawn,
+        source: ApplicationSource.feed,
         createdAt: DateTime.now(),
         withdrawnAt: DateTime.now(),
       );

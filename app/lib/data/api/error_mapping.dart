@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:kpa_app/core/error/auth_slugs.dart';
 import 'package:kpa_app/core/error/exceptions.dart';
 
 /// Map a [DioException] into a typed [KpaException].
@@ -47,7 +48,7 @@ KpaException _mapResponse(
   final detail = body is Map ? body['detail'] as String? : null;
   final status = response.statusCode ?? 0;
 
-  if (status == 401 && slug == 'invalid_access_token') {
+  if (status == 401 && slug == AuthSlugs.invalidAccessToken) {
     return AuthException(
       slug: slug!,
       detail: detail,
@@ -59,7 +60,7 @@ KpaException _mapResponse(
     // Other 401 slugs (missing_bearer_token, user_not_found) are also
     // auth-y.
     return AuthException(
-      slug: slug ?? 'unauthorized',
+      slug: slug ?? AuthSlugs.unauthorized,
       detail: detail,
       requestId: requestId,
       cause: cause,

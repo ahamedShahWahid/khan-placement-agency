@@ -1,3 +1,4 @@
+import 'package:kpa_app/data/jobs/application_source.dart';
 import 'package:kpa_app/data/jobs/jobs_dto.dart';
 import 'package:kpa_app/data/jobs/jobs_repository_impl.dart';
 import 'package:kpa_app/presentation/applications/applications_controller.dart';
@@ -11,7 +12,9 @@ class ApplyToJobController extends _$ApplyToJobController {
   @override
   FutureOr<ApplicationDto?> build(String jobId) => null;
 
-  Future<void> submit({String source = 'feed'}) async {
+  Future<void> submit({
+    ApplicationSource source = ApplicationSource.feed,
+  }) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final app = await ref

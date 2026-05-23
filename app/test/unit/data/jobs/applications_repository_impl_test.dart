@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kpa_app/core/error/exceptions.dart';
+import 'package:kpa_app/data/jobs/application_status.dart';
 import 'package:kpa_app/data/jobs/applications_api.dart';
 import 'package:kpa_app/data/jobs/applications_repository_impl.dart';
 
@@ -60,7 +61,7 @@ void main() {
       'withdrawn_at': '2026-05-22T09:00:00Z',
     });
     final a = await repo.withdraw('a1');
-    expect(a.status, 'withdrawn');
+    expect(a.status, ApplicationStatus.withdrawn);
     expect(a.withdrawnAt, isNotNull);
   });
 

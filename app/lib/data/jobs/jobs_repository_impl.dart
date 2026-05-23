@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:kpa_app/data/api/error_mapping.dart';
 import 'package:kpa_app/data/api/dio_provider.dart';
+import 'package:kpa_app/data/jobs/application_source.dart';
 import 'package:kpa_app/data/jobs/jobs_api.dart';
 import 'package:kpa_app/data/jobs/jobs_dto.dart';
 import 'package:kpa_app/data/jobs/jobs_repository.dart';
@@ -26,14 +27,20 @@ class JobsRepositoryImpl implements JobsRepository {
   @override
   Future<ApplicationDto> applyTo(
     String jobId, {
-    String source = 'feed',
+    ApplicationSource source = ApplicationSource.feed,
   }) async {
     try {
-      return await _api.apply(jobId, source: source);
+      return await _api.apply(jobId, source: _sourceToWire(source));
     } on DioException catch (e) {
       throw mapDioException(e);
     }
   }
+
+  static String _sourceToWire(ApplicationSource s) => switch (s) {
+        ApplicationSource.feed => 'feed',
+        ApplicationSource.detail => 'detail',
+        ApplicationSource.unknown => 'unknown',
+      };
 
   @override
   Future<SavedJobDto> save(String jobId) async {

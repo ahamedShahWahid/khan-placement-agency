@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:kpa_app/data/jobs/job_status.dart';
 import 'package:kpa_app/presentation/feed/feed_item_card.dart';
 import 'package:kpa_app/presentation/routing/routes.dart';
 import 'package:kpa_app/presentation/saved/saved_controller.dart';
@@ -76,7 +77,7 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                 employer: item.employer,
                 match: item.match,
                 explanation: item.match?.explanation,
-                showScore: item.job.status == 'open',
+                showScore: item.job.status == JobStatus.open,
                 onTap: () =>
                     context.go('${Routes.saved}/jobs/${item.job.id}'),
               );

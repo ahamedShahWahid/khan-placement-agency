@@ -562,8 +562,10 @@ mixin _$ApplicationDto {
   String get id;
   String get applicantId;
   String get jobId;
-  String get status;
-  String get source;
+  @JsonKey(unknownEnumValue: ApplicationStatus.unknown)
+  ApplicationStatus get status;
+  @JsonKey(unknownEnumValue: ApplicationSource.unknown)
+  ApplicationSource get source;
   DateTime get createdAt;
   DateTime? get withdrawnAt;
 
@@ -616,8 +618,10 @@ abstract mixin class $ApplicationDtoCopyWith<$Res> {
       {String id,
       String applicantId,
       String jobId,
-      String status,
-      String source,
+      @JsonKey(unknownEnumValue: ApplicationStatus.unknown)
+      ApplicationStatus status,
+      @JsonKey(unknownEnumValue: ApplicationSource.unknown)
+      ApplicationSource source,
       DateTime createdAt,
       DateTime? withdrawnAt});
 }
@@ -659,11 +663,11 @@ class _$ApplicationDtoCopyWithImpl<$Res>
       status: null == status
           ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
-              as String,
+              as ApplicationStatus,
       source: null == source
           ? _self.source
           : source // ignore: cast_nullable_to_non_nullable
-              as String,
+              as ApplicationSource,
       createdAt: null == createdAt
           ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -769,8 +773,16 @@ extension ApplicationDtoPatterns on ApplicationDto {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String id, String applicantId, String jobId, String status,
-            String source, DateTime createdAt, DateTime? withdrawnAt)?
+    TResult Function(
+            String id,
+            String applicantId,
+            String jobId,
+            @JsonKey(unknownEnumValue: ApplicationStatus.unknown)
+            ApplicationStatus status,
+            @JsonKey(unknownEnumValue: ApplicationSource.unknown)
+            ApplicationSource source,
+            DateTime createdAt,
+            DateTime? withdrawnAt)?
         $default, {
     required TResult orElse(),
   }) {
@@ -799,8 +811,16 @@ extension ApplicationDtoPatterns on ApplicationDto {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String id, String applicantId, String jobId, String status,
-            String source, DateTime createdAt, DateTime? withdrawnAt)
+    TResult Function(
+            String id,
+            String applicantId,
+            String jobId,
+            @JsonKey(unknownEnumValue: ApplicationStatus.unknown)
+            ApplicationStatus status,
+            @JsonKey(unknownEnumValue: ApplicationSource.unknown)
+            ApplicationSource source,
+            DateTime createdAt,
+            DateTime? withdrawnAt)
         $default,
   ) {
     final _that = this;
@@ -831,8 +851,10 @@ extension ApplicationDtoPatterns on ApplicationDto {
             String id,
             String applicantId,
             String jobId,
-            String status,
-            String source,
+            @JsonKey(unknownEnumValue: ApplicationStatus.unknown)
+            ApplicationStatus status,
+            @JsonKey(unknownEnumValue: ApplicationSource.unknown)
+            ApplicationSource source,
             DateTime createdAt,
             DateTime? withdrawnAt)?
         $default,
@@ -855,7 +877,9 @@ class _ApplicationDto implements ApplicationDto {
       {required this.id,
       required this.applicantId,
       required this.jobId,
+      @JsonKey(unknownEnumValue: ApplicationStatus.unknown)
       required this.status,
+      @JsonKey(unknownEnumValue: ApplicationSource.unknown)
       required this.source,
       required this.createdAt,
       this.withdrawnAt});
@@ -869,9 +893,11 @@ class _ApplicationDto implements ApplicationDto {
   @override
   final String jobId;
   @override
-  final String status;
+  @JsonKey(unknownEnumValue: ApplicationStatus.unknown)
+  final ApplicationStatus status;
   @override
-  final String source;
+  @JsonKey(unknownEnumValue: ApplicationSource.unknown)
+  final ApplicationSource source;
   @override
   final DateTime createdAt;
   @override
@@ -932,8 +958,10 @@ abstract mixin class _$ApplicationDtoCopyWith<$Res>
       {String id,
       String applicantId,
       String jobId,
-      String status,
-      String source,
+      @JsonKey(unknownEnumValue: ApplicationStatus.unknown)
+      ApplicationStatus status,
+      @JsonKey(unknownEnumValue: ApplicationSource.unknown)
+      ApplicationSource source,
       DateTime createdAt,
       DateTime? withdrawnAt});
 }
@@ -975,11 +1003,11 @@ class __$ApplicationDtoCopyWithImpl<$Res>
       status: null == status
           ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
-              as String,
+              as ApplicationStatus,
       source: null == source
           ? _self.source
           : source // ignore: cast_nullable_to_non_nullable
-              as String,
+              as ApplicationSource,
       createdAt: null == createdAt
           ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable

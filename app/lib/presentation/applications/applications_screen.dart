@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import 'package:kpa_app/data/jobs/application_status.dart';
 import 'package:kpa_app/presentation/applications/applications_controller.dart';
 import 'package:kpa_app/presentation/routing/routes.dart';
 import 'package:kpa_app/presentation/theme/kpa_spacing.dart';
@@ -111,7 +112,7 @@ class _ApplicationsScreenState
                         Text(
                           () {
                             final isWithdrawn = item.application.status ==
-                                'withdrawn';
+                                ApplicationStatus.withdrawn;
                             final whenDate = isWithdrawn
                                 ? item.application.withdrawnAt!
                                 : item.application.createdAt;
@@ -144,11 +145,11 @@ class _ApplicationsScreenState
 
 class _StatusPill extends StatelessWidget {
   const _StatusPill({required this.status});
-  final String status;
+  final ApplicationStatus status;
   @override
   Widget build(BuildContext context) {
     final c = Theme.of(context);
-    final (label, bg, fg) = status == 'applied'
+    final (label, bg, fg) = status == ApplicationStatus.applied
         ? (
             'Applied',
             c.colorScheme.primaryContainer,

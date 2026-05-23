@@ -59,7 +59,8 @@ Map<String, dynamic> _$MatchSummaryDtoToJson(_MatchSummaryDto instance) =>
 _ExplanationDto _$ExplanationDtoFromJson(Map<String, dynamic> json) =>
     _ExplanationDto(
       fit: json['fit'] as String,
-      generator: json['generator'] as String,
+      generator: $enumDecode(_$MatchGeneratorEnumMap, json['generator'],
+          unknownValue: MatchGenerator.unknown),
       generatorVersion: json['generator_version'] as String,
       caveat: json['caveat'] as String?,
     );
@@ -67,17 +68,24 @@ _ExplanationDto _$ExplanationDtoFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$ExplanationDtoToJson(_ExplanationDto instance) =>
     <String, dynamic>{
       'fit': instance.fit,
-      'generator': instance.generator,
+      'generator': _$MatchGeneratorEnumMap[instance.generator]!,
       'generator_version': instance.generatorVersion,
       'caveat': instance.caveat,
     };
+
+const _$MatchGeneratorEnumMap = {
+  MatchGenerator.templated: 'templated',
+  MatchGenerator.llm: 'llm',
+  MatchGenerator.unknown: 'unknown',
+};
 
 _JobSummaryDto _$JobSummaryDtoFromJson(Map<String, dynamic> json) =>
     _JobSummaryDto(
       id: json['id'] as String,
       title: json['title'] as String,
       location: json['location'] as String,
-      status: json['status'] as String,
+      status: $enumDecode(_$JobStatusEnumMap, json['status'],
+          unknownValue: JobStatus.unknown),
       postedAt: DateTime.parse(json['posted_at'] as String),
       description: json['description'] as String?,
     );
@@ -87,10 +95,16 @@ Map<String, dynamic> _$JobSummaryDtoToJson(_JobSummaryDto instance) =>
       'id': instance.id,
       'title': instance.title,
       'location': instance.location,
-      'status': instance.status,
+      'status': _$JobStatusEnumMap[instance.status]!,
       'posted_at': instance.postedAt.toIso8601String(),
       'description': instance.description,
     };
+
+const _$JobStatusEnumMap = {
+  JobStatus.open: 'open',
+  JobStatus.closed: 'closed',
+  JobStatus.unknown: 'unknown',
+};
 
 _EmployerSummaryDto _$EmployerSummaryDtoFromJson(Map<String, dynamic> json) =>
     _EmployerSummaryDto(

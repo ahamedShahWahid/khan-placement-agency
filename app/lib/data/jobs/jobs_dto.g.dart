@@ -37,8 +37,10 @@ _ApplicationDto _$ApplicationDtoFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       applicantId: json['applicant_id'] as String,
       jobId: json['job_id'] as String,
-      status: json['status'] as String,
-      source: json['source'] as String,
+      status: $enumDecode(_$ApplicationStatusEnumMap, json['status'],
+          unknownValue: ApplicationStatus.unknown),
+      source: $enumDecode(_$ApplicationSourceEnumMap, json['source'],
+          unknownValue: ApplicationSource.unknown),
       createdAt: DateTime.parse(json['created_at'] as String),
       withdrawnAt: json['withdrawn_at'] == null
           ? null
@@ -50,11 +52,23 @@ Map<String, dynamic> _$ApplicationDtoToJson(_ApplicationDto instance) =>
       'id': instance.id,
       'applicant_id': instance.applicantId,
       'job_id': instance.jobId,
-      'status': instance.status,
-      'source': instance.source,
+      'status': _$ApplicationStatusEnumMap[instance.status]!,
+      'source': _$ApplicationSourceEnumMap[instance.source]!,
       'created_at': instance.createdAt.toIso8601String(),
       'withdrawn_at': instance.withdrawnAt?.toIso8601String(),
     };
+
+const _$ApplicationStatusEnumMap = {
+  ApplicationStatus.applied: 'applied',
+  ApplicationStatus.withdrawn: 'withdrawn',
+  ApplicationStatus.unknown: 'unknown',
+};
+
+const _$ApplicationSourceEnumMap = {
+  ApplicationSource.feed: 'feed',
+  ApplicationSource.detail: 'detail',
+  ApplicationSource.unknown: 'unknown',
+};
 
 _SavedJobDto _$SavedJobDtoFromJson(Map<String, dynamic> json) => _SavedJobDto(
       id: json['id'] as String,

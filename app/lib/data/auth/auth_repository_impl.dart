@@ -2,6 +2,7 @@
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'package:kpa_app/core/error/auth_slugs.dart';
 import 'package:kpa_app/data/api/error_mapping.dart';
 import 'package:kpa_app/core/error/exceptions.dart';
 import 'package:kpa_app/core/log/logger.dart';
@@ -81,7 +82,7 @@ class AuthRepositoryImpl implements AuthRepository {
     final stored = await _tokenStorage.readRefreshToken();
     if (stored == null) {
       throw const AuthException(
-        slug: 'no_refresh_token',
+        slug: AuthSlugs.noRefreshToken,
         detail: 'Nothing to refresh.',
       );
     }
@@ -116,7 +117,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<String> refreshAccessTokenForInterceptor() async {
     final stored = await _tokenStorage.readRefreshToken();
     if (stored == null) {
-      throw const AuthException(slug: 'no_refresh_token');
+      throw const AuthException(slug: AuthSlugs.noRefreshToken);
     }
     final res = await _dio.post<Map<String, dynamic>>(
       '/v1/auth/refresh',

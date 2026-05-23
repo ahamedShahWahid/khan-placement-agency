@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kpa_app/data/feed/feed_dto.dart';
+import 'package:kpa_app/data/jobs/job_status.dart';
 import 'package:kpa_app/data/jobs/jobs_dto.dart';
 import 'package:kpa_app/data/jobs/saved_jobs_repository_impl.dart';
 import 'package:kpa_app/data/jobs/saved_jobs_repository.dart';
@@ -54,7 +55,7 @@ void main() {
           id: 'j1',
           title: 'Open Eng',
           location: 'BLR',
-          status: 'open',
+          status: JobStatus.open,
           postedAt: DateTime(2026, 5, 1),
         ),
         employer: const EmployerSummaryDto(id: 'e1', name: 'Acme'),
@@ -75,7 +76,7 @@ void main() {
           id: 'j2',
           title: 'Closed Eng',
           location: 'BLR',
-          status: 'closed',
+          status: JobStatus.closed,
           postedAt: DateTime(2026, 5, 1),
         ),
         employer: const EmployerSummaryDto(id: 'e2', name: 'Beta'),

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kpa_app/core/error/exceptions.dart';
+import 'package:kpa_app/data/jobs/application_status.dart';
 import 'package:kpa_app/data/jobs/jobs_api.dart';
 import 'package:kpa_app/data/jobs/jobs_repository_impl.dart';
 
@@ -61,7 +62,7 @@ void main() {
     });
     final a = await repo.applyTo('j1');
     expect(a.id, 'a1');
-    expect(a.status, 'applied');
+    expect(a.status, ApplicationStatus.applied);
   });
 
   test('save: 201 → SavedJobDto', () async {

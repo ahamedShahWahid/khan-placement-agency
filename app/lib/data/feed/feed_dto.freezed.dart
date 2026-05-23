@@ -1206,7 +1206,8 @@ class __$MatchSummaryDtoCopyWithImpl<$Res>
 /// @nodoc
 mixin _$ExplanationDto {
   String get fit;
-  String get generator;
+  @JsonKey(unknownEnumValue: MatchGenerator.unknown)
+  MatchGenerator get generator;
   String get generatorVersion;
   String? get caveat;
 
@@ -1252,7 +1253,11 @@ abstract mixin class $ExplanationDtoCopyWith<$Res> {
       _$ExplanationDtoCopyWithImpl;
   @useResult
   $Res call(
-      {String fit, String generator, String generatorVersion, String? caveat});
+      {String fit,
+      @JsonKey(unknownEnumValue: MatchGenerator.unknown)
+      MatchGenerator generator,
+      String generatorVersion,
+      String? caveat});
 }
 
 /// @nodoc
@@ -1281,7 +1286,7 @@ class _$ExplanationDtoCopyWithImpl<$Res>
       generator: null == generator
           ? _self.generator
           : generator // ignore: cast_nullable_to_non_nullable
-              as String,
+              as MatchGenerator,
       generatorVersion: null == generatorVersion
           ? _self.generatorVersion
           : generatorVersion // ignore: cast_nullable_to_non_nullable
@@ -1387,7 +1392,11 @@ extension ExplanationDtoPatterns on ExplanationDto {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String fit, String generator, String generatorVersion,
+    TResult Function(
+            String fit,
+            @JsonKey(unknownEnumValue: MatchGenerator.unknown)
+            MatchGenerator generator,
+            String generatorVersion,
             String? caveat)?
         $default, {
     required TResult orElse(),
@@ -1417,7 +1426,11 @@ extension ExplanationDtoPatterns on ExplanationDto {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String fit, String generator, String generatorVersion,
+    TResult Function(
+            String fit,
+            @JsonKey(unknownEnumValue: MatchGenerator.unknown)
+            MatchGenerator generator,
+            String generatorVersion,
             String? caveat)
         $default,
   ) {
@@ -1445,7 +1458,11 @@ extension ExplanationDtoPatterns on ExplanationDto {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String fit, String generator, String generatorVersion,
+    TResult? Function(
+            String fit,
+            @JsonKey(unknownEnumValue: MatchGenerator.unknown)
+            MatchGenerator generator,
+            String generatorVersion,
             String? caveat)?
         $default,
   ) {
@@ -1465,6 +1482,7 @@ extension ExplanationDtoPatterns on ExplanationDto {
 class _ExplanationDto implements ExplanationDto {
   const _ExplanationDto(
       {required this.fit,
+      @JsonKey(unknownEnumValue: MatchGenerator.unknown)
       required this.generator,
       required this.generatorVersion,
       this.caveat});
@@ -1474,7 +1492,8 @@ class _ExplanationDto implements ExplanationDto {
   @override
   final String fit;
   @override
-  final String generator;
+  @JsonKey(unknownEnumValue: MatchGenerator.unknown)
+  final MatchGenerator generator;
   @override
   final String generatorVersion;
   @override
@@ -1528,7 +1547,11 @@ abstract mixin class _$ExplanationDtoCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String fit, String generator, String generatorVersion, String? caveat});
+      {String fit,
+      @JsonKey(unknownEnumValue: MatchGenerator.unknown)
+      MatchGenerator generator,
+      String generatorVersion,
+      String? caveat});
 }
 
 /// @nodoc
@@ -1557,7 +1580,7 @@ class __$ExplanationDtoCopyWithImpl<$Res>
       generator: null == generator
           ? _self.generator
           : generator // ignore: cast_nullable_to_non_nullable
-              as String,
+              as MatchGenerator,
       generatorVersion: null == generatorVersion
           ? _self.generatorVersion
           : generatorVersion // ignore: cast_nullable_to_non_nullable
@@ -1575,7 +1598,8 @@ mixin _$JobSummaryDto {
   String get id;
   String get title;
   String get location;
-  String get status;
+  @JsonKey(unknownEnumValue: JobStatus.unknown)
+  JobStatus get status;
   DateTime get postedAt;
   String? get description;
 
@@ -1627,7 +1651,7 @@ abstract mixin class $JobSummaryDtoCopyWith<$Res> {
       {String id,
       String title,
       String location,
-      String status,
+      @JsonKey(unknownEnumValue: JobStatus.unknown) JobStatus status,
       DateTime postedAt,
       String? description});
 }
@@ -1668,7 +1692,7 @@ class _$JobSummaryDtoCopyWithImpl<$Res>
       status: null == status
           ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
-              as String,
+              as JobStatus,
       postedAt: null == postedAt
           ? _self.postedAt
           : postedAt // ignore: cast_nullable_to_non_nullable
@@ -1774,8 +1798,13 @@ extension JobSummaryDtoPatterns on JobSummaryDto {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String id, String title, String location, String status,
-            DateTime postedAt, String? description)?
+    TResult Function(
+            String id,
+            String title,
+            String location,
+            @JsonKey(unknownEnumValue: JobStatus.unknown) JobStatus status,
+            DateTime postedAt,
+            String? description)?
         $default, {
     required TResult orElse(),
   }) {
@@ -1804,8 +1833,13 @@ extension JobSummaryDtoPatterns on JobSummaryDto {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String id, String title, String location, String status,
-            DateTime postedAt, String? description)
+    TResult Function(
+            String id,
+            String title,
+            String location,
+            @JsonKey(unknownEnumValue: JobStatus.unknown) JobStatus status,
+            DateTime postedAt,
+            String? description)
         $default,
   ) {
     final _that = this;
@@ -1832,8 +1866,13 @@ extension JobSummaryDtoPatterns on JobSummaryDto {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String id, String title, String location, String status,
-            DateTime postedAt, String? description)?
+    TResult? Function(
+            String id,
+            String title,
+            String location,
+            @JsonKey(unknownEnumValue: JobStatus.unknown) JobStatus status,
+            DateTime postedAt,
+            String? description)?
         $default,
   ) {
     final _that = this;
@@ -1854,7 +1893,7 @@ class _JobSummaryDto implements JobSummaryDto {
       {required this.id,
       required this.title,
       required this.location,
-      required this.status,
+      @JsonKey(unknownEnumValue: JobStatus.unknown) required this.status,
       required this.postedAt,
       this.description});
   factory _JobSummaryDto.fromJson(Map<String, dynamic> json) =>
@@ -1867,7 +1906,8 @@ class _JobSummaryDto implements JobSummaryDto {
   @override
   final String location;
   @override
-  final String status;
+  @JsonKey(unknownEnumValue: JobStatus.unknown)
+  final JobStatus status;
   @override
   final DateTime postedAt;
   @override
@@ -1927,7 +1967,7 @@ abstract mixin class _$JobSummaryDtoCopyWith<$Res>
       {String id,
       String title,
       String location,
-      String status,
+      @JsonKey(unknownEnumValue: JobStatus.unknown) JobStatus status,
       DateTime postedAt,
       String? description});
 }
@@ -1968,7 +2008,7 @@ class __$JobSummaryDtoCopyWithImpl<$Res>
       status: null == status
           ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
-              as String,
+              as JobStatus,
       postedAt: null == postedAt
           ? _self.postedAt
           : postedAt // ignore: cast_nullable_to_non_nullable

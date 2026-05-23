@@ -1,6 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'package:kpa_app/data/feed/feed_dto.dart';
+import 'package:kpa_app/data/jobs/application_source.dart';
+import 'package:kpa_app/data/jobs/application_status.dart';
 
 part 'jobs_dto.freezed.dart';
 part 'jobs_dto.g.dart';
@@ -25,8 +27,12 @@ abstract class ApplicationDto with _$ApplicationDto {
     required String id,
     required String applicantId,
     required String jobId,
-    required String status,
-    required String source,
+    // ignore: invalid_annotation_target
+    @JsonKey(unknownEnumValue: ApplicationStatus.unknown)
+    required ApplicationStatus status,
+    // ignore: invalid_annotation_target
+    @JsonKey(unknownEnumValue: ApplicationSource.unknown)
+    required ApplicationSource source,
     required DateTime createdAt,
     DateTime? withdrawnAt,
   }) = _ApplicationDto;

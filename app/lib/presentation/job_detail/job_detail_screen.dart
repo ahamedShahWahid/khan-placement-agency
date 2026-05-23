@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kpa_app/core/error/exceptions.dart';
 import 'package:kpa_app/data/feed/feed_dto.dart';
+import 'package:kpa_app/data/feed/match_generator.dart';
 import 'package:kpa_app/data/jobs/jobs_dto.dart';
 import 'package:kpa_app/presentation/job_detail/action_bar.dart';
 import 'package:kpa_app/presentation/job_detail/apply_to_job_controller.dart';
@@ -147,7 +148,7 @@ class _MatchCard extends StatelessWidget {
                 ),
               ],
               const SizedBox(height: KpaSpacing.sm),
-              Text(exp.generator, style: theme.textTheme.labelSmall),
+              Text(exp.generator.label, style: theme.textTheme.labelSmall),
             ],
           ],
         ),

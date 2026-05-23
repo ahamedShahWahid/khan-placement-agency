@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kpa_app/data/jobs/application_status.dart';
 import 'package:kpa_app/data/jobs/jobs_dto.dart';
 import 'package:kpa_app/presentation/job_detail/apply_to_job_controller.dart';
 import 'package:kpa_app/presentation/job_detail/save_job_controller.dart';
@@ -53,7 +54,7 @@ class ActionBar extends ConsumerWidget {
     String jobId,
     bool isBusy,
   ) {
-    if (app == null || app.status == 'withdrawn') {
+    if (app == null || app.status == ApplicationStatus.withdrawn) {
       return FilledButton(
         onPressed: isBusy
             ? null

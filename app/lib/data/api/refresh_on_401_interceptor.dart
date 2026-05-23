@@ -2,10 +2,9 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 
+import 'package:kpa_app/core/error/auth_slugs.dart';
 import 'package:kpa_app/data/api/access_token_holder.dart';
 import 'package:kpa_app/data/api/auth_header_interceptor.dart';
-
-const String _kAccessTokenInvalidSlug = 'invalid_access_token';
 const String _kReplayedFlag = 'kpa.refreshReplayed';
 
 typedef RefreshCallback = Future<String> Function();
@@ -41,7 +40,7 @@ class RefreshOn401Interceptor extends Interceptor {
 
     final body = response.data;
     final slug = body is Map ? body['slug'] : null;
-    if (slug != _kAccessTokenInvalidSlug) {
+    if (slug != AuthSlugs.invalidAccessToken) {
       return handler.next(err);
     }
 

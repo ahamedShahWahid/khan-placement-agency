@@ -1,5 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'package:kpa_app/data/feed/match_generator.dart';
+import 'package:kpa_app/data/jobs/job_status.dart';
+
 part 'feed_dto.freezed.dart';
 part 'feed_dto.g.dart';
 
@@ -44,7 +47,9 @@ abstract class MatchSummaryDto with _$MatchSummaryDto {
 abstract class ExplanationDto with _$ExplanationDto {
   const factory ExplanationDto({
     required String fit,
-    required String generator,
+    // ignore: invalid_annotation_target
+    @JsonKey(unknownEnumValue: MatchGenerator.unknown)
+    required MatchGenerator generator,
     required String generatorVersion,
     String? caveat,
   }) = _ExplanationDto;
@@ -59,7 +64,8 @@ abstract class JobSummaryDto with _$JobSummaryDto {
     required String id,
     required String title,
     required String location,
-    required String status,
+    // ignore: invalid_annotation_target
+    @JsonKey(unknownEnumValue: JobStatus.unknown) required JobStatus status,
     required DateTime postedAt,
     String? description,
   }) = _JobSummaryDto;

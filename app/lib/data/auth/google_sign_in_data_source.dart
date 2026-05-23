@@ -1,6 +1,7 @@
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:kpa_app/core/config/env.dart';
+import 'package:kpa_app/core/error/auth_slugs.dart';
 import 'package:kpa_app/core/error/exceptions.dart';
 
 abstract interface class GoogleSignInDataSource {
@@ -29,7 +30,7 @@ class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
       final account = await _sdk.signIn();
       if (account == null) {
         throw const AuthException(
-          slug: 'google_sign_in_cancelled',
+          slug: GoogleSignInSlugs.cancelled,
           detail: 'Sign-in was cancelled.',
         );
       }
@@ -37,7 +38,7 @@ class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
       final idToken = auth.idToken;
       if (idToken == null) {
         throw const AuthException(
-          slug: 'google_id_token_missing',
+          slug: GoogleSignInSlugs.idTokenMissing,
           detail: 'Google returned no ID token.',
         );
       }
@@ -46,7 +47,7 @@ class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
       rethrow;
     } catch (e) {
       throw AuthException(
-        slug: 'google_sign_in_failed',
+        slug: GoogleSignInSlugs.failed,
         detail: e.toString(),
         cause: e,
       );
