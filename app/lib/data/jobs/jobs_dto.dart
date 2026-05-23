@@ -21,82 +21,120 @@ abstract class JobDetailDto with _$JobDetailDto {
       _$JobDetailDtoFromJson(json);
 }
 
-@freezed
-abstract class ApplicationDto with _$ApplicationDto {
-  const factory ApplicationDto({
-    required String id,
-    required String applicantId,
-    required String jobId,
-    // ignore: invalid_annotation_target
-    @JsonKey(unknownEnumValue: ApplicationStatus.unknown)
-    required ApplicationStatus status,
-    // ignore: invalid_annotation_target
-    @JsonKey(unknownEnumValue: ApplicationSource.unknown)
-    required ApplicationSource source,
-    required DateTime createdAt,
-    DateTime? withdrawnAt,
-  }) = _ApplicationDto;
+@JsonSerializable()
+class ApplicationDto {
+  const ApplicationDto({
+    required this.id,
+    required this.applicantId,
+    required this.jobId,
+    required this.status,
+    required this.source,
+    required this.createdAt,
+    this.withdrawnAt,
+  });
 
   factory ApplicationDto.fromJson(Map<String, dynamic> json) =>
       _$ApplicationDtoFromJson(json);
+
+  final String id;
+  final String applicantId;
+  final String jobId;
+  @JsonKey(unknownEnumValue: ApplicationStatus.unknown)
+  final ApplicationStatus status;
+  @JsonKey(unknownEnumValue: ApplicationSource.unknown)
+  final ApplicationSource source;
+  final DateTime createdAt;
+  final DateTime? withdrawnAt;
+
+  Map<String, dynamic> toJson() => _$ApplicationDtoToJson(this);
 }
 
-@freezed
-abstract class SavedJobDto with _$SavedJobDto {
-  const factory SavedJobDto({
-    required String id,
-    required String applicantId,
-    required String jobId,
-    required DateTime createdAt,
-  }) = _SavedJobDto;
+@JsonSerializable()
+class SavedJobDto {
+  const SavedJobDto({
+    required this.id,
+    required this.applicantId,
+    required this.jobId,
+    required this.createdAt,
+  });
 
   factory SavedJobDto.fromJson(Map<String, dynamic> json) =>
       _$SavedJobDtoFromJson(json);
+
+  final String id;
+  final String applicantId;
+  final String jobId;
+  final DateTime createdAt;
+
+  Map<String, dynamic> toJson() => _$SavedJobDtoToJson(this);
 }
 
-@freezed
-abstract class ApplicationsPageDto with _$ApplicationsPageDto {
-  const factory ApplicationsPageDto({
-    required List<ApplicationListItemDto> items,
-    String? nextCursor,
-  }) = _ApplicationsPageDto;
+@JsonSerializable()
+class ApplicationsPageDto {
+  const ApplicationsPageDto({
+    required this.items,
+    this.nextCursor,
+  });
 
   factory ApplicationsPageDto.fromJson(Map<String, dynamic> json) =>
       _$ApplicationsPageDtoFromJson(json);
+
+  final List<ApplicationListItemDto> items;
+  final String? nextCursor;
+
+  Map<String, dynamic> toJson() => _$ApplicationsPageDtoToJson(this);
 }
 
-@freezed
-abstract class ApplicationListItemDto with _$ApplicationListItemDto {
-  const factory ApplicationListItemDto({
-    required ApplicationDto application,
-    required JobSummaryDto job,
-    required EmployerSummaryDto employer,
-  }) = _ApplicationListItemDto;
+@JsonSerializable()
+class ApplicationListItemDto {
+  const ApplicationListItemDto({
+    required this.application,
+    required this.job,
+    required this.employer,
+  });
 
   factory ApplicationListItemDto.fromJson(Map<String, dynamic> json) =>
       _$ApplicationListItemDtoFromJson(json);
+
+  final ApplicationDto application;
+  final JobSummaryDto job;
+  final EmployerSummaryDto employer;
+
+  Map<String, dynamic> toJson() => _$ApplicationListItemDtoToJson(this);
 }
 
-@freezed
-abstract class SavedJobsPageDto with _$SavedJobsPageDto {
-  const factory SavedJobsPageDto({
-    required List<SavedJobListItemDto> items,
-    String? nextCursor,
-  }) = _SavedJobsPageDto;
+@JsonSerializable()
+class SavedJobsPageDto {
+  const SavedJobsPageDto({
+    required this.items,
+    this.nextCursor,
+  });
 
   factory SavedJobsPageDto.fromJson(Map<String, dynamic> json) =>
       _$SavedJobsPageDtoFromJson(json);
+
+  final List<SavedJobListItemDto> items;
+  final String? nextCursor;
+
+  Map<String, dynamic> toJson() => _$SavedJobsPageDtoToJson(this);
 }
 
-@freezed
-abstract class SavedJobListItemDto with _$SavedJobListItemDto {
-  const factory SavedJobListItemDto({
-    required SavedJobDto saved,
-    required JobSummaryDto job,
-    required EmployerSummaryDto employer,
-    MatchSummaryDto? match,
-  }) = _SavedJobListItemDto;
+@JsonSerializable()
+class SavedJobListItemDto {
+  const SavedJobListItemDto({
+    required this.saved,
+    required this.job,
+    required this.employer,
+    this.match,
+  });
 
   factory SavedJobListItemDto.fromJson(Map<String, dynamic> json) =>
       _$SavedJobListItemDtoFromJson(json);
+
+  final SavedJobDto saved;
+  final JobSummaryDto job;
+  final EmployerSummaryDto employer;
+  final MatchSummaryDto? match;
+
+  Map<String, dynamic> toJson() => _$SavedJobListItemDtoToJson(this);
 }
