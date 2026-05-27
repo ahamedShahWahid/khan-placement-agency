@@ -73,11 +73,11 @@ class ProfileScreen extends ConsumerWidget {
             const SizedBox(height: KpaSpacing.xl),
             Text('Account', style: theme.textTheme.titleMedium),
             const SizedBox(height: KpaSpacing.sm),
-            const ListTile(
-              leading: Icon(Icons.description_outlined),
-              title: Text('Resume'),
-              subtitle: Text('Coming soon'),
-              enabled: false,
+            ListTile(
+              leading: const Icon(Icons.description_outlined),
+              title: const Text('Résumé'),
+              subtitle: const Text('Manage your résumé'),
+              onTap: () => context.go(Routes.resume),
             ),
             const ListTile(
               leading: Icon(Icons.notifications_outlined),

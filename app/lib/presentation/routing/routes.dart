@@ -8,4 +8,5 @@ abstract final class Routes {
   static const applications = '/applications';
   static const profile = '/profile';
   static const profileEdit = '/profile/edit';
+  static const resume = '/profile/resume';
 }
