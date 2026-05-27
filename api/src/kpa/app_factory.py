@@ -16,6 +16,7 @@ from kpa.middleware.error_handler import register_error_handlers
 from kpa.middleware.request_id import RequestIdMiddleware
 from kpa.observability.logging import configure_logging
 from kpa.routes import (
+    applicants,
     applications,
     auth,
     feed,
@@ -67,6 +68,7 @@ def create_app() -> FastAPI:
     app.include_router(health.router)
     app.include_router(ready.router)
     app.include_router(resumes.router)
+    app.include_router(applicants.router)
     app.include_router(auth.router)
     app.include_router(me.router)
     app.include_router(feed.router)
