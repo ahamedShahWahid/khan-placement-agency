@@ -9,4 +9,13 @@ void main() {
     expect(formatCtc(null), '—');
     expect(formatCtc('abc'), '—');
   });
+
+  test('formatYears drops trailing .0 but keeps real decimals', () {
+    expect(formatYears('5.0'), '5 yrs');
+    expect(formatYears('4.5'), '4.5 yrs');
+  });
+  test('formatYears null/unparseable → null', () {
+    expect(formatYears(null), isNull);
+    expect(formatYears('abc'), isNull);
+  });
 }

@@ -55,7 +55,9 @@ void main() {
     expect(find.text('Pune'), findsOneWidget); // seeded chip
 
     await tester.enterText(
-        find.widgetWithText(TextField, 'Add location'), 'Mumbai');
+      find.widgetWithText(TextField, 'Add location'),
+      'Mumbai',
+    );
     await tester.tap(find.byIcon(Icons.add));
     await tester.pump();
     expect(find.text('Mumbai'), findsOneWidget);
@@ -66,5 +68,37 @@ void main() {
     expect(repo.captured, isNotNull);
     expect(repo.captured!.fullName, 'Alice');
     expect(repo.captured!.locations, ['Pune', 'Mumbai']);
+  });
+
+  testWidgets('out-of-range experience blocks save', (tester) async {
+    final repo = _CapturingRepo();
+    final container = ProviderContainer(
+      overrides: [meRepositoryProvider.overrideWithValue(repo)],
+    );
+    addTearDown(container.dispose);
+    await container.read(meControllerProvider.future);
+
+    final router = GoRouter(
+      routes: [
+        GoRoute(path: '/', builder: (_, __) => const EditProfileScreen()),
+      ],
+    );
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Years of experience'),
+      '99', // exceeds max 60
+    );
+    await tester.tap(find.widgetWithText(TextButton, 'Save'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Must be between 0 and 60'), findsOneWidget);
+    expect(repo.captured, isNull); // save was blocked by validation
   });
 }

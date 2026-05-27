@@ -54,11 +54,8 @@ class ProfileScreen extends ConsumerWidget {
                 label: 'Locations',
                 value: a.locations.isEmpty ? '—' : a.locations.join(', '),
               ),
-              if (a.yearsExperience != null)
-                _DetailRow(
-                  label: 'Experience',
-                  value: '${a.yearsExperience} yrs',
-                ),
+              if (formatYears(a.yearsExperience) case final years?)
+                _DetailRow(label: 'Experience', value: years),
               if (a.noticePeriodDays != null)
                 _DetailRow(
                   label: 'Notice period',

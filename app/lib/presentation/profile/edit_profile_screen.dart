@@ -50,6 +50,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   void _addLocation() {
     final v = _locationInput.text.trim();
     if (v.isEmpty || _locations.contains(v)) return;
+    final messenger = ScaffoldMessenger.of(context);
+    if (v.length > 100) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Location too long (max 100 chars).')),
+      );
+      return;
+    }
+    if (_locations.length >= 10) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Up to 10 locations.')),
+      );
+      return;
+    }
     setState(() {
       _locations.add(v);
       _locationInput.clear();
@@ -99,8 +112,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             TextFormField(
               controller: _fullName,
               decoration: const InputDecoration(labelText: 'Full name'),
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Required' : null,
+              validator: (v) {
+                final t = v?.trim() ?? '';
+                if (t.isEmpty) return 'Required';
+                if (t.length > 200) return 'Too long (max 200)';
+                return null;
+              },
             ),
             const SizedBox(height: KpaSpacing.lg),
             Text('Locations', style: Theme.of(context).textTheme.labelLarge),
@@ -125,7 +142,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   ),
                 ),
                 IconButton(
-                    onPressed: _addLocation, icon: const Icon(Icons.add)),
+                  onPressed: _addLocation,
+                  icon: const Icon(Icons.add),
+                ),
               ],
             ),
             const SizedBox(height: KpaSpacing.lg),
@@ -135,28 +154,68 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   const TextInputType.numberWithOptions(decimal: true),
               decoration:
                   const InputDecoration(labelText: 'Years of experience'),
+              validator: (v) =>
+                  _validateOptionalNumber(v, min: 0, max: 60, maxDecimals: 1),
             ),
             TextFormField(
               controller: _notice,
               keyboardType: TextInputType.number,
               decoration:
                   const InputDecoration(labelText: 'Notice period (days)'),
+              validator: (v) =>
+                  _validateOptionalNumber(v, min: 0, max: 365, maxDecimals: 0),
             ),
             TextFormField(
               controller: _currentCtc,
               keyboardType: TextInputType.number,
               decoration:
                   const InputDecoration(labelText: 'Current CTC (₹/yr)'),
+              validator: (v) => _validateOptionalNumber(
+                v,
+                min: 0,
+                max: 9999999999.99,
+                maxDecimals: 2,
+              ),
             ),
             TextFormField(
               controller: _expectedCtc,
               keyboardType: TextInputType.number,
               decoration:
                   const InputDecoration(labelText: 'Expected CTC (₹/yr)'),
+              validator: (v) => _validateOptionalNumber(
+                v,
+                min: 0,
+                max: 9999999999.99,
+                maxDecimals: 2,
+              ),
             ),
           ],
         ),
       ),
     );
   }
+}
+
+/// Validate an optional numeric form field against the backend's bounds.
+/// Empty is allowed (the field clears). Returns an error message, or null when
+/// valid. `maxDecimals` mirrors the column scale (e.g. Numeric(4,1) → 1) so the
+/// user is told instead of the DB silently rounding.
+String? _validateOptionalNumber(
+  String? raw, {
+  required num min,
+  required num max,
+  required int maxDecimals,
+}) {
+  final t = raw?.trim() ?? '';
+  if (t.isEmpty) return null;
+  final n = num.tryParse(t);
+  if (n == null) return 'Enter a number';
+  if (n < min || n > max) return 'Must be between $min and $max';
+  final dot = t.indexOf('.');
+  if (dot >= 0 && t.length - dot - 1 > maxDecimals) {
+    return maxDecimals == 0
+        ? 'Whole number only'
+        : 'At most $maxDecimals decimal place${maxDecimals == 1 ? '' : 's'}';
+  }
+  return null;
 }
