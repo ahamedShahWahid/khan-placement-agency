@@ -140,3 +140,44 @@ async def test_patch_recruiter_returns_403(
     )
     assert resp.status_code == 403
     assert resp.json()["detail"] == "not_an_applicant"
+
+
+async def test_patch_matching_field_dispatches_rescore(
+    async_client: httpx.AsyncClient, google_verifier, monkeypatch
+) -> None:
+    import kpa.workers.tasks.score_applicant as score_mod
+
+    calls: list[str] = []
+    monkeypatch.setattr(
+        score_mod.score_applicant, "delay", lambda aid: calls.append(aid)
+    )
+
+    signin = await _signin(async_client, google_verifier)
+    headers = {"Authorization": f"Bearer {signin['access_token']}"}
+
+    resp = await async_client.patch(
+        "/v1/applicants/me", headers=headers, json={"locations": ["Pune"]}
+    )
+    assert resp.status_code == 200
+    assert calls == [signin["user"]["applicant_id"]]
+
+
+async def test_patch_non_matching_field_no_rescore(
+    async_client: httpx.AsyncClient, google_verifier, monkeypatch
+) -> None:
+    import kpa.workers.tasks.score_applicant as score_mod
+
+    calls: list[str] = []
+    monkeypatch.setattr(
+        score_mod.score_applicant, "delay", lambda aid: calls.append(aid)
+    )
+
+    signin = await _signin(async_client, google_verifier)
+    headers = {"Authorization": f"Bearer {signin['access_token']}"}
+
+    # notice_period_days is informational — no matching impact.
+    resp = await async_client.patch(
+        "/v1/applicants/me", headers=headers, json={"notice_period_days": 30}
+    )
+    assert resp.status_code == 200
+    assert calls == []
