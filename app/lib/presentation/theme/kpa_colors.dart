@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 /// Bands map to ColorScheme slots in buildTheme.
 abstract final class KpaColors {
   // Brand
-  static const indigo50  = Color(0xFFEEF0FF);
+  static const indigo50 = Color(0xFFEEF0FF);
   static const indigo100 = Color(0xFFDDE2FF);
   static const indigo200 = Color(0xFFBAC4FF);
   static const indigo300 = Color(0xFF96A6FF);
@@ -18,8 +18,8 @@ abstract final class KpaColors {
   static const indigo900 = Color(0xFF111A55);
 
   // Neutrals
-  static const neutral0   = Color(0xFFFFFFFF);
-  static const neutral50  = Color(0xFFF7F8FA);
+  static const neutral0 = Color(0xFFFFFFFF);
+  static const neutral50 = Color(0xFFF7F8FA);
   static const neutral100 = Color(0xFFEEEFF3);
   static const neutral200 = Color(0xFFD9DCE3);
   static const neutral300 = Color(0xFFB7BCC8);
@@ -32,13 +32,15 @@ abstract final class KpaColors {
 
   // Score bands — product semantics, not chrome.
   /// `total_score < 0.65`
-  static const scoreLow  = Color(0xFFCF8A1D);
+  static const scoreLow = Color(0xFFCF8A1D);
+
   /// `0.65 <= total_score < 0.80`
-  static const scoreMid  = Color(0xFF3D52C6);
+  static const scoreMid = Color(0xFF3D52C6);
+
   /// `total_score >= 0.80`
   static const scoreHigh = Color(0xFF1E8A4F);
 
   // Semantic
-  static const error    = Color(0xFFB3261E);
-  static const onError  = Color(0xFFFFFFFF);
+  static const error = Color(0xFFB3261E);
+  static const onError = Color(0xFFFFFFFF);
 }

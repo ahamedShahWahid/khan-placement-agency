@@ -17,9 +17,8 @@ class ApplyToJobController extends _$ApplyToJobController {
   }) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final app = await ref
-          .read(jobsRepositoryProvider)
-          .applyTo(jobId, source: source);
+      final app =
+          await ref.read(jobsRepositoryProvider).applyTo(jobId, source: source);
       ref
         ..invalidate(applicationsControllerProvider)
         ..invalidate(jobDetailControllerProvider(jobId));

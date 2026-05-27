@@ -74,7 +74,7 @@ class FeedItemCard extends StatelessWidget {
               Text(job.title, style: theme.textTheme.titleMedium),
               const SizedBox(height: KpaSpacing.xs),
               Text(
-                '${job.location} · ${_ago(job.postedAt)}',
+                '${job.locations.isEmpty ? '' : '${job.locations.join(', ')} · '}${_ago(job.postedAt)}',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),

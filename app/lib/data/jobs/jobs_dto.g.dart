@@ -9,27 +9,23 @@ part of 'jobs_dto.dart';
 ApplicationDto _$ApplicationDtoFromJson(Map<String, dynamic> json) =>
     ApplicationDto(
       id: json['id'] as String,
-      applicantId: json['applicant_id'] as String,
       jobId: json['job_id'] as String,
       status: $enumDecode(_$ApplicationStatusEnumMap, json['status'],
           unknownValue: ApplicationStatus.unknown),
       source: $enumDecode(_$ApplicationSourceEnumMap, json['source'],
           unknownValue: ApplicationSource.unknown),
       createdAt: DateTime.parse(json['created_at'] as String),
-      withdrawnAt: json['withdrawn_at'] == null
-          ? null
-          : DateTime.parse(json['withdrawn_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$ApplicationDtoToJson(ApplicationDto instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'applicant_id': instance.applicantId,
       'job_id': instance.jobId,
       'status': _$ApplicationStatusEnumMap[instance.status]!,
       'source': _$ApplicationSourceEnumMap[instance.source]!,
       'created_at': instance.createdAt.toIso8601String(),
-      'withdrawn_at': instance.withdrawnAt?.toIso8601String(),
+      'updated_at': instance.updatedAt.toIso8601String(),
     };
 
 const _$ApplicationStatusEnumMap = {
@@ -46,7 +42,6 @@ const _$ApplicationSourceEnumMap = {
 
 SavedJobDto _$SavedJobDtoFromJson(Map<String, dynamic> json) => SavedJobDto(
       id: json['id'] as String,
-      applicantId: json['applicant_id'] as String,
       jobId: json['job_id'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
     );
@@ -54,7 +49,6 @@ SavedJobDto _$SavedJobDtoFromJson(Map<String, dynamic> json) => SavedJobDto(
 Map<String, dynamic> _$SavedJobDtoToJson(SavedJobDto instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'applicant_id': instance.applicantId,
       'job_id': instance.jobId,
       'created_at': instance.createdAt.toIso8601String(),
     };
@@ -109,7 +103,7 @@ Map<String, dynamic> _$SavedJobsPageDtoToJson(SavedJobsPageDto instance) =>
 
 SavedJobListItemDto _$SavedJobListItemDtoFromJson(Map<String, dynamic> json) =>
     SavedJobListItemDto(
-      saved: SavedJobDto.fromJson(json['saved'] as Map<String, dynamic>),
+      saved: SavedJobDto.fromJson(json['saved_job'] as Map<String, dynamic>),
       job: JobSummaryDto.fromJson(json['job'] as Map<String, dynamic>),
       employer:
           EmployerSummaryDto.fromJson(json['employer'] as Map<String, dynamic>),
@@ -121,7 +115,7 @@ SavedJobListItemDto _$SavedJobListItemDtoFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$SavedJobListItemDtoToJson(
         SavedJobListItemDto instance) =>
     <String, dynamic>{
-      'saved': instance.saved.toJson(),
+      'saved_job': instance.saved.toJson(),
       'job': instance.job.toJson(),
       'employer': instance.employer.toJson(),
       'match': instance.match?.toJson(),

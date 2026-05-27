@@ -24,8 +24,7 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
   void initState() {
     super.initState();
     _scroll.addListener(() {
-      if (_scroll.position.pixels >=
-          _scroll.position.maxScrollExtent - 200) {
+      if (_scroll.position.pixels >= _scroll.position.maxScrollExtent - 200) {
         ref.read(savedControllerProvider.notifier).loadMore();
       }
     });
@@ -44,8 +43,7 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
       appBar: AppBar(title: const Text('Saved')),
       body: AsyncValueWidget<SavedState>(
         value: value,
-        onRetry: () =>
-            ref.read(savedControllerProvider.notifier).refresh(),
+        onRetry: () => ref.read(savedControllerProvider.notifier).refresh(),
         isEmpty: (s) => s.items.isEmpty,
         empty: () => const KpaEmptyState(
           headline: 'Nothing saved yet',
@@ -53,14 +51,12 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
           icon: Icons.bookmark_outline,
         ),
         data: (s) => RefreshIndicator(
-          onRefresh: () =>
-              ref.read(savedControllerProvider.notifier).refresh(),
+          onRefresh: () => ref.read(savedControllerProvider.notifier).refresh(),
           child: ListView.separated(
             controller: _scroll,
             padding: const EdgeInsets.all(KpaSpacing.lg),
             itemCount: s.items.length + 1,
-            separatorBuilder: (_, __) =>
-                const SizedBox(height: KpaSpacing.md),
+            separatorBuilder: (_, __) => const SizedBox(height: KpaSpacing.md),
             itemBuilder: (context, i) {
               if (i == s.items.length) {
                 if (s.isLoadingMore) {
@@ -78,8 +74,7 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                 match: item.match,
                 explanation: item.match?.explanation,
                 showScore: item.job.status == JobStatus.open,
-                onTap: () =>
-                    context.go('${Routes.saved}/jobs/${item.job.id}'),
+                onTap: () => context.go('${Routes.saved}/jobs/${item.job.id}'),
               );
             },
           ),

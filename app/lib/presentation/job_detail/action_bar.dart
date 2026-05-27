@@ -58,9 +58,8 @@ class ActionBar extends ConsumerWidget {
       return FilledButton(
         onPressed: isBusy
             ? null
-            : () => ref
-                .read(applyToJobControllerProvider(jobId).notifier)
-                .submit(),
+            : () =>
+                ref.read(applyToJobControllerProvider(jobId).notifier).submit(),
         child: const Text('Apply'),
       );
     }
@@ -83,13 +82,9 @@ class ActionBar extends ConsumerWidget {
           ? null
           : () {
               if (filled) {
-                ref
-                    .read(unsaveJobControllerProvider(jobId).notifier)
-                    .submit();
+                ref.read(unsaveJobControllerProvider(jobId).notifier).submit();
               } else {
-                ref
-                    .read(saveJobControllerProvider(jobId).notifier)
-                    .submit();
+                ref.read(saveJobControllerProvider(jobId).notifier).submit();
               }
             },
       icon: Icon(filled ? Icons.bookmark : Icons.bookmark_outline),

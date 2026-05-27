@@ -35,7 +35,7 @@ void main() {
       final job = JobSummaryDto(
         id: 'j1',
         title: 'Senior Engineer',
-        location: 'BLR',
+        locations: const ['BLR'],
         status: JobStatus.open,
         postedAt: DateTime(2026, 5, 18),
       );

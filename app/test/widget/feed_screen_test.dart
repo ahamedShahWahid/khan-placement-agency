@@ -11,8 +11,7 @@ class _FakeFeedRepo implements FeedRepository {
   _FakeFeedRepo(this.page);
   final FeedPageDto page;
   @override
-  Future<FeedPageDto> fetchPage({String? cursor, int limit = 20}) async =>
-      page;
+  Future<FeedPageDto> fetchPage({String? cursor, int limit = 20}) async => page;
 }
 
 Widget _wrap(Widget child, {required FeedRepository repo}) {
@@ -49,7 +48,7 @@ void main() {
       job: JobSummaryDto(
         id: 'j1',
         title: 'Engineer',
-        location: 'BLR',
+        locations: const ['BLR'],
         status: JobStatus.open,
         postedAt: DateTime.parse('2026-05-18T00:00:00Z'),
       ),

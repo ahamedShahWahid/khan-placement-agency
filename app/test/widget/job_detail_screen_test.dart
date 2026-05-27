@@ -23,16 +23,15 @@ class _FakeJobsRepo implements JobsRepository {
   }) async =>
       ApplicationDto(
         id: 'a1',
-        applicantId: 'ap1',
         jobId: id,
         status: ApplicationStatus.applied,
         source: source,
         createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
       );
   @override
   Future<SavedJobDto> save(String id) async => SavedJobDto(
         id: 's1',
-        applicantId: 'ap1',
         jobId: id,
         createdAt: DateTime.now(),
       );
@@ -40,12 +39,11 @@ class _FakeJobsRepo implements JobsRepository {
   Future<void> unsave(String id) async {}
 }
 
-JobDetailDto _detail({ApplicationDto? app, SavedJobDto? saved}) =>
-    JobDetailDto(
+JobDetailDto _detail({ApplicationDto? app, SavedJobDto? saved}) => JobDetailDto(
       job: JobSummaryDto(
         id: 'j1',
         title: 'Senior Engineer',
-        location: 'BLR',
+        locations: const ['BLR'],
         status: JobStatus.open,
         postedAt: DateTime.parse('2026-05-18T00:00:00Z'),
       ),
@@ -90,11 +88,11 @@ void main() {
   testWidgets('shows Withdraw when applied', (tester) async {
     final app = ApplicationDto(
       id: 'a1',
-      applicantId: 'ap1',
       jobId: 'j1',
       status: ApplicationStatus.applied,
       source: ApplicationSource.feed,
       createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
     await tester.pumpWidget(
       _wrap(
@@ -109,7 +107,6 @@ void main() {
   testWidgets('shows filled heart when saved', (tester) async {
     final s = SavedJobDto(
       id: 's1',
-      applicantId: 'ap1',
       jobId: 'j1',
       createdAt: DateTime.now(),
     );

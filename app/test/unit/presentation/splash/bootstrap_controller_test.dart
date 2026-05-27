@@ -30,6 +30,7 @@ class _FakeAuthRepo implements AuthRepository {
     if (refreshThrows != null) throw refreshThrows!;
     return const SignedIn(userId: 'u1', email: 'e@e.com');
   }
+
   @override
   Future<void> signOut() async {}
 }

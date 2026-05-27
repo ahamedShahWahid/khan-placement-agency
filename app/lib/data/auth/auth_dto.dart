@@ -14,7 +14,11 @@ class SignInResponseDto {
   factory SignInResponseDto.fromJson(Map<String, dynamic> json) =>
       _$SignInResponseDtoFromJson(json);
 
+  // The backend uses OAuth-conventional wire keys (api/src/kpa/routes/auth.py:
+  // SignInResponse); the Dart field names are shorter. Map explicitly.
+  @JsonKey(name: 'access_token')
   final String access;
+  @JsonKey(name: 'refresh_token')
   final String refresh;
   final AuthUserDto user;
   final AuthApplicantDto? applicant;
@@ -32,7 +36,9 @@ class RefreshResponseDto {
   factory RefreshResponseDto.fromJson(Map<String, dynamic> json) =>
       _$RefreshResponseDtoFromJson(json);
 
+  @JsonKey(name: 'access_token')
   final String access;
+  @JsonKey(name: 'refresh_token')
   final String refresh;
 
   Map<String, dynamic> toJson() => _$RefreshResponseDtoToJson(this);

@@ -52,9 +52,7 @@ class ProfileScreen extends ConsumerWidget {
               const SizedBox(height: KpaSpacing.xl),
               _DetailRow(
                 label: 'Locations',
-                value: a.locations.isEmpty
-                    ? '—'
-                    : a.locations.join(', '),
+                value: a.locations.isEmpty ? '—' : a.locations.join(', '),
               ),
               if (a.yearsExperience != null)
                 _DetailRow(

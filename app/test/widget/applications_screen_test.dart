@@ -52,16 +52,16 @@ void main() {
       ApplicationListItemDto(
         application: ApplicationDto(
           id: 'a1',
-          applicantId: 'p',
           jobId: 'j1',
           status: ApplicationStatus.applied,
           source: ApplicationSource.feed,
           createdAt: DateTime(2026, 5, 1),
+          updatedAt: DateTime(2026, 5, 1),
         ),
         job: JobSummaryDto(
           id: 'j1',
           title: 'Eng',
-          location: 'BLR',
+          locations: const ['BLR'],
           status: JobStatus.open,
           postedAt: DateTime(2026, 4, 1),
         ),
@@ -70,17 +70,16 @@ void main() {
       ApplicationListItemDto(
         application: ApplicationDto(
           id: 'a2',
-          applicantId: 'p',
           jobId: 'j2',
           status: ApplicationStatus.withdrawn,
           source: ApplicationSource.feed,
           createdAt: DateTime(2026, 4, 20),
-          withdrawnAt: DateTime(2026, 5, 5),
+          updatedAt: DateTime(2026, 5, 5),
         ),
         job: JobSummaryDto(
           id: 'j2',
           title: 'Designer',
-          location: 'BLR',
+          locations: const ['BLR'],
           status: JobStatus.open,
           postedAt: DateTime(2026, 4, 1),
         ),

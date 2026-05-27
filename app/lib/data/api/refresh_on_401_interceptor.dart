@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:kpa_app/core/error/auth_slugs.dart';
 import 'package:kpa_app/data/api/access_token_holder.dart';
 import 'package:kpa_app/data/api/auth_header_interceptor.dart';
+
 const String _kReplayedFlag = 'kpa.refreshReplayed';
 
 typedef RefreshCallback = Future<String> Function();

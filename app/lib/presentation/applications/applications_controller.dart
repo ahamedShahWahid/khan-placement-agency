@@ -12,8 +12,7 @@ typedef ApplicationsState = PagedState<ApplicationListItemDto>;
 class ApplicationsController extends _$ApplicationsController {
   @override
   Future<ApplicationsState> build() async {
-    final page =
-        await ref.read(applicationsRepositoryProvider).fetchPage();
+    final page = await ref.read(applicationsRepositoryProvider).fetchPage();
     return PagedState(
       items: page.items,
       cursor: page.nextCursor,

@@ -8,8 +8,8 @@ part of 'auth_dto.dart';
 
 SignInResponseDto _$SignInResponseDtoFromJson(Map<String, dynamic> json) =>
     SignInResponseDto(
-      access: json['access'] as String,
-      refresh: json['refresh'] as String,
+      access: json['access_token'] as String,
+      refresh: json['refresh_token'] as String,
       user: AuthUserDto.fromJson(json['user'] as Map<String, dynamic>),
       applicant: json['applicant'] == null
           ? null
@@ -19,22 +19,22 @@ SignInResponseDto _$SignInResponseDtoFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$SignInResponseDtoToJson(SignInResponseDto instance) =>
     <String, dynamic>{
-      'access': instance.access,
-      'refresh': instance.refresh,
+      'access_token': instance.access,
+      'refresh_token': instance.refresh,
       'user': instance.user.toJson(),
       'applicant': instance.applicant?.toJson(),
     };
 
 RefreshResponseDto _$RefreshResponseDtoFromJson(Map<String, dynamic> json) =>
     RefreshResponseDto(
-      access: json['access'] as String,
-      refresh: json['refresh'] as String,
+      access: json['access_token'] as String,
+      refresh: json['refresh_token'] as String,
     );
 
 Map<String, dynamic> _$RefreshResponseDtoToJson(RefreshResponseDto instance) =>
     <String, dynamic>{
-      'access': instance.access,
-      'refresh': instance.refresh,
+      'access_token': instance.access,
+      'refresh_token': instance.refresh,
     };
 
 AuthUserDto _$AuthUserDtoFromJson(Map<String, dynamic> json) => AuthUserDto(

@@ -28,9 +28,8 @@ class FeedController extends _$FeedController {
   Future<void> loadMore() => loadNextPage<FeedItemDto>(
         currentState: state,
         fetch: ({String? cursor}) async {
-          final page = await ref
-              .read(feedRepositoryProvider)
-              .fetchPage(cursor: cursor);
+          final page =
+              await ref.read(feedRepositoryProvider).fetchPage(cursor: cursor);
           return PagedState(
             items: page.items,
             cursor: page.nextCursor,

@@ -11,11 +11,11 @@ Map<String, dynamic> _jobDetail() => {
       'job': {
         'id': 'j1',
         'title': 'Eng',
-        'location': 'Bangalore',
+        'locations': ['Bangalore'],
         'status': 'open',
         'posted_at': '2026-05-18T00:00:00Z',
       },
-      'employer': {'id': 'e1', 'name': 'Acme'},
+      'employer': {'id': 'e1', 'name': 'Acme', 'verified': false},
       'match': null,
       'application': null,
       'saved_job': null,
@@ -53,12 +53,11 @@ void main() {
   test('applyTo: 201 → ApplicationDto', () async {
     mock.on('POST', '/v1/jobs/j1/apply', 201, {
       'id': 'a1',
-      'applicant_id': 'ap1',
       'job_id': 'j1',
       'status': 'applied',
       'source': 'feed',
       'created_at': '2026-05-21T12:00:00Z',
-      'withdrawn_at': null,
+      'updated_at': '2026-05-21T12:00:00Z',
     });
     final a = await repo.applyTo('j1');
     expect(a.id, 'a1');
@@ -68,7 +67,6 @@ void main() {
   test('save: 201 → SavedJobDto', () async {
     mock.on('POST', '/v1/jobs/j1/save', 201, {
       'id': 's1',
-      'applicant_id': 'ap1',
       'job_id': 'j1',
       'created_at': '2026-05-21T12:00:00Z',
     });

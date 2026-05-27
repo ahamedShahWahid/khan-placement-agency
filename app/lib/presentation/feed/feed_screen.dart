@@ -23,8 +23,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
   void initState() {
     super.initState();
     _scroll.addListener(() {
-      if (_scroll.position.pixels >=
-          _scroll.position.maxScrollExtent - 200) {
+      if (_scroll.position.pixels >= _scroll.position.maxScrollExtent - 200) {
         ref.read(feedControllerProvider.notifier).loadMore();
       }
     });
@@ -52,8 +51,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
       ),
       body: AsyncValueWidget<FeedState>(
         value: value,
-        onRetry: () =>
-            ref.read(feedControllerProvider.notifier).refresh(),
+        onRetry: () => ref.read(feedControllerProvider.notifier).refresh(),
         isEmpty: (s) => s.items.isEmpty,
         empty: () => const KpaEmptyState(
           headline: "We're still looking for matches",
@@ -61,14 +59,12 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
           icon: Icons.search_off,
         ),
         data: (s) => RefreshIndicator(
-          onRefresh: () =>
-              ref.read(feedControllerProvider.notifier).refresh(),
+          onRefresh: () => ref.read(feedControllerProvider.notifier).refresh(),
           child: ListView.separated(
             controller: _scroll,
             padding: const EdgeInsets.all(KpaSpacing.lg),
             itemCount: s.items.length + 1,
-            separatorBuilder: (_, __) =>
-                const SizedBox(height: KpaSpacing.md),
+            separatorBuilder: (_, __) => const SizedBox(height: KpaSpacing.md),
             itemBuilder: (context, i) {
               if (i == s.items.length) {
                 if (s.isLoadingMore) {
@@ -83,12 +79,11 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                     child: Center(
                       child: Text(
                         "You're all caught up",
-                        style:
-                            Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
                       ),
                     ),
                   );
@@ -99,8 +94,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
               return FeedItemCard(
                 job: item.job,
                 employer: item.employer,
-                onTap: () =>
-                    context.go('${Routes.feed}/jobs/${item.job.id}'),
+                onTap: () => context.go('${Routes.feed}/jobs/${item.job.id}'),
                 match: item.match,
                 explanation: item.match.explanation,
               );

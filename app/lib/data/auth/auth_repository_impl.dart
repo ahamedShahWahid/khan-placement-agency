@@ -13,6 +13,7 @@ import 'package:kpa_app/data/auth/auth_dto.dart';
 import 'package:kpa_app/data/auth/google_sign_in_data_source.dart';
 import 'package:kpa_app/data/auth/token_storage.dart';
 import 'package:kpa_app/data/auth/auth_repository.dart';
+import 'package:kpa_app/data/me/me_dto.dart';
 import 'package:kpa_app/data/auth/auth_state.dart';
 import 'package:kpa_app/presentation/auth/auth_providers.dart';
 
@@ -108,18 +109,18 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final res = await _dio.post<Map<String, dynamic>>(
         '/v1/auth/refresh',
-        data: {'refresh': stored},
+        data: {'refresh_token': stored},
         options: Options(extra: {kSkipAuth: true}),
       );
       final dto = RefreshResponseDto.fromJson(res.data!);
       _accessHolder.set(dto.access);
       await _tokenStorage.writeRefreshToken(dto.refresh);
       final me = await _dio.get<Map<String, dynamic>>('/v1/me');
-      final user = me.data!['user'] as Map<String, dynamic>;
+      final meDto = MeDto.fromJson(me.data!);
       final signedIn = SignedIn(
-        userId: user['id'] as String,
-        email: user['email'] as String,
-        displayName: user['display_name'] as String?,
+        userId: meDto.id,
+        email: meDto.email,
+        displayName: meDto.displayName,
       );
       _push(signedIn);
       return signedIn;
@@ -140,7 +141,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
     final res = await _dio.post<Map<String, dynamic>>(
       '/v1/auth/refresh',
-      data: {'refresh': stored},
+      data: {'refresh_token': stored},
       options: Options(extra: {kSkipAuth: true}),
     );
     final dto = RefreshResponseDto.fromJson(res.data!);
@@ -151,7 +152,15 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> signOut() async {
     try {
-      await _dio.post<dynamic>('/v1/auth/logout');
+      // Backend LogoutRequest requires refresh_token to revoke the family
+      // server-side; without it the token family is never invalidated.
+      final stored = await _tokenStorage.readRefreshToken();
+      if (stored != null) {
+        await _dio.post<dynamic>(
+          '/v1/auth/logout',
+          data: {'refresh_token': stored},
+        );
+      }
     } catch (e, s) {
       _log.warn('logout request failed (continuing)', error: e, stack: s);
     }

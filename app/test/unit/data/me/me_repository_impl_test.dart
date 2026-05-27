@@ -52,7 +52,8 @@ void main() {
       ),
     );
     expect(me.applicant?.fullName, 'Alice Khan');
-    final sent = mock.lastDataFor('PATCH', '/v1/applicants/me') as Map<String, dynamic>;
+    final sent =
+        mock.lastDataFor('PATCH', '/v1/applicants/me') as Map<String, dynamic>;
     expect(sent['full_name'], 'Alice Khan');
     expect(sent['locations'], ['Pune']);
     expect(sent.containsKey('expected_ctc'), isTrue);

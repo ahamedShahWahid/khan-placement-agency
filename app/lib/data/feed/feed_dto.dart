@@ -54,6 +54,9 @@ class MatchSummaryDto {
 
   final String id;
   final double totalScore;
+  // Backend serializes this field as `components` (its Pydantic
+  // validation_alias does NOT change the output key).
+  @JsonKey(name: 'components')
   final Map<String, dynamic> scoreComponents;
   final ExplanationDto? explanation;
   final DateTime? surfacedAt;
@@ -87,7 +90,7 @@ class JobSummaryDto {
   const JobSummaryDto({
     required this.id,
     required this.title,
-    required this.location,
+    this.locations = const [],
     required this.status,
     required this.postedAt,
     this.description,
@@ -98,7 +101,8 @@ class JobSummaryDto {
 
   final String id;
   final String title;
-  final String location;
+  // Backend JobRead sends `locations` (a list), not a singular `location`.
+  final List<String> locations;
   @JsonKey(unknownEnumValue: JobStatus.unknown)
   final JobStatus status;
   final DateTime postedAt;
@@ -112,7 +116,7 @@ class EmployerSummaryDto {
   const EmployerSummaryDto({
     required this.id,
     required this.name,
-    this.verifiedAt,
+    this.verified = false,
   });
 
   factory EmployerSummaryDto.fromJson(Map<String, dynamic> json) =>
@@ -120,7 +124,8 @@ class EmployerSummaryDto {
 
   final String id;
   final String name;
-  final DateTime? verifiedAt;
+  // Backend EmployerRead sends a boolean `verified`, not a `verified_at`.
+  final bool verified;
 
   Map<String, dynamic> toJson() => _$EmployerSummaryDtoToJson(this);
 }

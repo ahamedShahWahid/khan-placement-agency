@@ -9,7 +9,8 @@ import 'package:kpa_app/presentation/profile/profile_edit_controller.dart';
 
 class _OkRepo implements MeRepository {
   @override
-  Future<MeDto> fetch() async => const MeDto(id: 'u1', email: 'e', role: 'applicant');
+  Future<MeDto> fetch() async =>
+      const MeDto(id: 'u1', email: 'e', role: 'applicant');
   @override
   Future<MeDto> updateProfile(ProfileUpdateDto u) async =>
       const MeDto(id: 'u1', email: 'e', role: 'applicant');
@@ -17,7 +18,8 @@ class _OkRepo implements MeRepository {
 
 class _ErrRepo implements MeRepository {
   @override
-  Future<MeDto> fetch() async => const MeDto(id: 'u1', email: 'e', role: 'applicant');
+  Future<MeDto> fetch() async =>
+      const MeDto(id: 'u1', email: 'e', role: 'applicant');
   @override
   Future<MeDto> updateProfile(ProfileUpdateDto u) async =>
       throw const ApiException(statusCode: 422, slug: 'bad');
@@ -31,7 +33,8 @@ void main() {
       overrides: [meRepositoryProvider.overrideWithValue(_OkRepo())],
     );
     addTearDown(c.dispose);
-    final ok = await c.read(profileEditControllerProvider.notifier).submit(_update);
+    final ok =
+        await c.read(profileEditControllerProvider.notifier).submit(_update);
     expect(ok, isTrue);
   });
 
@@ -40,7 +43,8 @@ void main() {
       overrides: [meRepositoryProvider.overrideWithValue(_ErrRepo())],
     );
     addTearDown(c.dispose);
-    final ok = await c.read(profileEditControllerProvider.notifier).submit(_update);
+    final ok =
+        await c.read(profileEditControllerProvider.notifier).submit(_update);
     expect(ok, isFalse);
     expect(c.read(profileEditControllerProvider).hasError, isTrue);
   });

@@ -7,7 +7,10 @@ part of 'me_dto.dart';
 // **************************************************************************
 
 MeDto _$MeDtoFromJson(Map<String, dynamic> json) => MeDto(
-      user: MeUserDto.fromJson(json['user'] as Map<String, dynamic>),
+      id: json['id'] as String,
+      email: json['email'] as String,
+      role: json['role'] as String,
+      displayName: json['display_name'] as String?,
       applicant: json['applicant'] == null
           ? null
           : ApplicantSummaryDto.fromJson(
@@ -15,35 +18,35 @@ MeDto _$MeDtoFromJson(Map<String, dynamic> json) => MeDto(
     );
 
 Map<String, dynamic> _$MeDtoToJson(MeDto instance) => <String, dynamic>{
-      'user': instance.user.toJson(),
-      'applicant': instance.applicant?.toJson(),
-    };
-
-MeUserDto _$MeUserDtoFromJson(Map<String, dynamic> json) => MeUserDto(
-      id: json['id'] as String,
-      email: json['email'] as String,
-      role: json['role'] as String,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      displayName: json['display_name'] as String?,
-    );
-
-Map<String, dynamic> _$MeUserDtoToJson(MeUserDto instance) => <String, dynamic>{
       'id': instance.id,
       'email': instance.email,
       'role': instance.role,
-      'created_at': instance.createdAt.toIso8601String(),
       'display_name': instance.displayName,
+      'applicant': instance.applicant?.toJson(),
     };
 
 ApplicantSummaryDto _$ApplicantSummaryDtoFromJson(Map<String, dynamic> json) =>
     ApplicantSummaryDto(
       id: json['id'] as String,
-      userId: json['user_id'] as String,
+      fullName: json['full_name'] as String,
+      locations: (json['locations'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      noticePeriodDays: (json['notice_period_days'] as num?)?.toInt(),
+      currentCtc: json['current_ctc'] as String?,
+      expectedCtc: json['expected_ctc'] as String?,
+      yearsExperience: json['years_experience'] as String?,
     );
 
 Map<String, dynamic> _$ApplicantSummaryDtoToJson(
         ApplicantSummaryDto instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'user_id': instance.userId,
+      'full_name': instance.fullName,
+      'locations': instance.locations,
+      'notice_period_days': instance.noticePeriodDays,
+      'current_ctc': instance.currentCtc,
+      'expected_ctc': instance.expectedCtc,
+      'years_experience': instance.yearsExperience,
     };

@@ -16,8 +16,7 @@ abstract interface class GoogleSignInDataSource {
 }
 
 class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
-  GoogleSignInDataSourceImpl([GoogleSignIn? sdk])
-      : _sdk = sdk ?? _defaultSdk();
+  GoogleSignInDataSourceImpl([GoogleSignIn? sdk]) : _sdk = sdk ?? _defaultSdk();
 
   // The web plugin asserts `serverClientId == null` and requires `clientId`;
   // mobile is the mirror image (wants serverClientId, ignores clientId). The

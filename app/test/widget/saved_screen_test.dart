@@ -47,14 +47,13 @@ void main() {
       SavedJobListItemDto(
         saved: SavedJobDto(
           id: 's1',
-          applicantId: 'p',
           jobId: 'j1',
           createdAt: DateTime(2026, 5, 1),
         ),
         job: JobSummaryDto(
           id: 'j1',
           title: 'Open Eng',
-          location: 'BLR',
+          locations: const ['BLR'],
           status: JobStatus.open,
           postedAt: DateTime(2026, 5, 1),
         ),
@@ -68,14 +67,13 @@ void main() {
       SavedJobListItemDto(
         saved: SavedJobDto(
           id: 's2',
-          applicantId: 'p',
           jobId: 'j2',
           createdAt: DateTime(2026, 5, 2),
         ),
         job: JobSummaryDto(
           id: 'j2',
           title: 'Closed Eng',
-          location: 'BLR',
+          locations: const ['BLR'],
           status: JobStatus.closed,
           postedAt: DateTime(2026, 5, 1),
         ),

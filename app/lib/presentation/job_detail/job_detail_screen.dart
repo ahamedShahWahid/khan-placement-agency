@@ -52,9 +52,8 @@ class JobDetailScreen extends ConsumerWidget {
       appBar: AppBar(leading: BackButton(onPressed: () => context.pop())),
       body: AsyncValueWidget<JobDetailDto>(
         value: value,
-        onRetry: () => ref
-            .read(jobDetailControllerProvider(jobId).notifier)
-            .refresh(),
+        onRetry: () =>
+            ref.read(jobDetailControllerProvider(jobId).notifier).refresh(),
         error: (e, s) {
           if (e is ApiException && e.statusCode == 404) {
             return KpaEmptyState(
@@ -87,7 +86,7 @@ class JobDetailScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: KpaSpacing.xs),
                     Text(
-                      d.job.location,
+                      d.job.locations.join(', '),
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     if (d.match != null) ...[

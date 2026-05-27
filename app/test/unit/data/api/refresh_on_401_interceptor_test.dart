@@ -136,11 +136,13 @@ void main() {
       h.adapter.enqueue(_MockResponse(401, _invalidAccess()));
       // Replay after refresh → 200. Capture headers for verification.
       final replayHeaders = <String, String>{};
-      h.adapter.enqueue(_MockResponse(
-        200,
-        {'items': <dynamic>[]},
-        captureHeaders: replayHeaders,
-      ),);
+      h.adapter.enqueue(
+        _MockResponse(
+          200,
+          {'items': <dynamic>[]},
+          captureHeaders: replayHeaders,
+        ),
+      );
 
       final res = await h.dio.get<dynamic>('/v1/feed');
       expect(res.statusCode, 200);
@@ -220,11 +222,13 @@ void main() {
       );
       h.holder.set('TOK');
 
-      h.adapter.enqueue(_MockResponse(401, {
-        'status': 401,
-        'slug': 'missing_bearer_token',
-        'detail': 'no bearer',
-      }),);
+      h.adapter.enqueue(
+        _MockResponse(401, {
+          'status': 401,
+          'slug': 'missing_bearer_token',
+          'detail': 'no bearer',
+        }),
+      );
 
       await expectLater(
         h.dio.get<dynamic>('/v1/x'),

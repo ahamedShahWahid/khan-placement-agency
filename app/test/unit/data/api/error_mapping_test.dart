@@ -17,7 +17,9 @@ DioException _dioErrWithResponse({
       data: body,
       headers: requestId == null
           ? Headers()
-          : Headers.fromMap({'x-request-id': [requestId]}),
+          : Headers.fromMap({
+              'x-request-id': [requestId]
+            }),
     ),
     type: DioExceptionType.badResponse,
   );

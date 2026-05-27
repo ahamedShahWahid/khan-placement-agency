@@ -25,7 +25,7 @@ FeedItemDto _item(String jobId) => FeedItemDto(
       job: JobSummaryDto(
         id: jobId,
         title: 'T-$jobId',
-        location: 'BLR',
+        locations: const ['BLR'],
         status: JobStatus.open,
         postedAt: DateTime.parse('2026-05-18T00:00:00Z'),
       ),

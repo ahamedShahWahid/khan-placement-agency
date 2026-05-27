@@ -19,8 +19,7 @@ class SignInScreen extends ConsumerWidget {
             AuthException(:final slug)
                 when slug == 'google_sign_in_cancelled' =>
               null,
-            NetworkException _ =>
-              "Couldn't reach KPA. Check your connection.",
+            NetworkException _ => "Couldn't reach KPA. Check your connection.",
             AuthException(:final detail) =>
               detail ?? 'Sign-in failed. Try again.',
             _ => 'Sign-in failed. Try again.',
@@ -63,12 +62,11 @@ class SignInScreen extends ConsumerWidget {
                       ? const SizedBox(
                           width: 16,
                           height: 16,
-                          child:
-                              CircularProgressIndicator(strokeWidth: 2),
+                          child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.login),
-                  label: Text(
-                      isLoading ? 'Signing in…' : 'Continue with Google'),
+                  label:
+                      Text(isLoading ? 'Signing in…' : 'Continue with Google'),
                   onPressed: isLoading
                       ? null
                       : () => ref

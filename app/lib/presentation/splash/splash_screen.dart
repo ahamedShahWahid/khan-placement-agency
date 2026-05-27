@@ -15,9 +15,8 @@ class SplashScreen extends ConsumerWidget {
       bootstrapControllerProvider,
       (prev, next) {
         next.whenData((outcome) {
-          final target = outcome == BootstrapOutcome.feed
-              ? Routes.feed
-              : Routes.signIn;
+          final target =
+              outcome == BootstrapOutcome.feed ? Routes.feed : Routes.signIn;
           context.go(target);
         });
       },
@@ -28,9 +27,7 @@ class SplashScreen extends ConsumerWidget {
       body: AsyncValueWidget<BootstrapOutcome>(
         value: value,
         data: (_) => const SizedBox.shrink(),
-        onRetry: () => ref
-            .read(bootstrapControllerProvider.notifier)
-            .retry(),
+        onRetry: () => ref.read(bootstrapControllerProvider.notifier).retry(),
       ),
     );
   }

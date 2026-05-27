@@ -25,26 +25,26 @@ abstract class JobDetailDto with _$JobDetailDto {
 class ApplicationDto {
   const ApplicationDto({
     required this.id,
-    required this.applicantId,
     required this.jobId,
     required this.status,
     required this.source,
     required this.createdAt,
-    this.withdrawnAt,
+    required this.updatedAt,
   });
 
   factory ApplicationDto.fromJson(Map<String, dynamic> json) =>
       _$ApplicationDtoFromJson(json);
 
   final String id;
-  final String applicantId;
   final String jobId;
   @JsonKey(unknownEnumValue: ApplicationStatus.unknown)
   final ApplicationStatus status;
   @JsonKey(unknownEnumValue: ApplicationSource.unknown)
   final ApplicationSource source;
   final DateTime createdAt;
-  final DateTime? withdrawnAt;
+  // Backend ApplicationRead sends `updated_at` (not `applicant_id` or a
+  // dedicated `withdrawn_at`); for a withdrawn row this is the withdrawal time.
+  final DateTime updatedAt;
 
   Map<String, dynamic> toJson() => _$ApplicationDtoToJson(this);
 }
@@ -53,7 +53,6 @@ class ApplicationDto {
 class SavedJobDto {
   const SavedJobDto({
     required this.id,
-    required this.applicantId,
     required this.jobId,
     required this.createdAt,
   });
@@ -62,7 +61,6 @@ class SavedJobDto {
       _$SavedJobDtoFromJson(json);
 
   final String id;
-  final String applicantId;
   final String jobId;
   final DateTime createdAt;
 
@@ -131,9 +129,12 @@ class SavedJobListItemDto {
   factory SavedJobListItemDto.fromJson(Map<String, dynamic> json) =>
       _$SavedJobListItemDtoFromJson(json);
 
+  // Backend SavedJobListItem wraps the saved row under `saved_job`.
+  @JsonKey(name: 'saved_job')
   final SavedJobDto saved;
   final JobSummaryDto job;
   final EmployerSummaryDto employer;
+  // Backend does not include a match on the saved-list shape; always null.
   final MatchSummaryDto? match;
 
   Map<String, dynamic> toJson() => _$SavedJobListItemDtoToJson(this);

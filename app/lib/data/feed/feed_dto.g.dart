@@ -37,7 +37,7 @@ MatchSummaryDto _$MatchSummaryDtoFromJson(Map<String, dynamic> json) =>
     MatchSummaryDto(
       id: json['id'] as String,
       totalScore: (json['total_score'] as num).toDouble(),
-      scoreComponents: json['score_components'] as Map<String, dynamic>,
+      scoreComponents: json['components'] as Map<String, dynamic>,
       explanation: json['explanation'] == null
           ? null
           : ExplanationDto.fromJson(
@@ -51,7 +51,7 @@ Map<String, dynamic> _$MatchSummaryDtoToJson(MatchSummaryDto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'total_score': instance.totalScore,
-      'score_components': instance.scoreComponents,
+      'components': instance.scoreComponents,
       'explanation': instance.explanation?.toJson(),
       'surfaced_at': instance.surfacedAt?.toIso8601String(),
     };
@@ -83,7 +83,10 @@ JobSummaryDto _$JobSummaryDtoFromJson(Map<String, dynamic> json) =>
     JobSummaryDto(
       id: json['id'] as String,
       title: json['title'] as String,
-      location: json['location'] as String,
+      locations: (json['locations'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
       status: $enumDecode(_$JobStatusEnumMap, json['status'],
           unknownValue: JobStatus.unknown),
       postedAt: DateTime.parse(json['posted_at'] as String),
@@ -94,7 +97,7 @@ Map<String, dynamic> _$JobSummaryDtoToJson(JobSummaryDto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
-      'location': instance.location,
+      'locations': instance.locations,
       'status': _$JobStatusEnumMap[instance.status]!,
       'posted_at': instance.postedAt.toIso8601String(),
       'description': instance.description,
@@ -110,14 +113,12 @@ EmployerSummaryDto _$EmployerSummaryDtoFromJson(Map<String, dynamic> json) =>
     EmployerSummaryDto(
       id: json['id'] as String,
       name: json['name'] as String,
-      verifiedAt: json['verified_at'] == null
-          ? null
-          : DateTime.parse(json['verified_at'] as String),
+      verified: json['verified'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$EmployerSummaryDtoToJson(EmployerSummaryDto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
-      'verified_at': instance.verifiedAt?.toIso8601String(),
+      'verified': instance.verified,
     };
