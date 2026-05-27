@@ -67,6 +67,8 @@ The engine is disposed on the FastAPI `shutdown` event. Don't create your own en
 
 The request id is a uuid4. A client-supplied `X-Request-Id` is honored only if it parses as a valid uuid4; otherwise it's replaced. Every response (including problem+json errors) carries this header — it's the only correlation handle in the logs.
 
+Starlette's `CORSMiddleware` is mounted **after** `RequestIdMiddleware` (so it's outermost — it answers the browser preflight and stamps `Access-Control-*` on every response, errors included). It's pure-ASGI, so it doesn't trip the asyncpg loop issue above. Origins come from `KPA_CORS_ALLOW_ORIGINS` (CSV, default `http://localhost:8080` — the Flutter web dev server). Bearer-token auth (no cookies) → `allow_credentials` stays off. Only the web client needs this; mobile sends no `Origin`.
+
 ### Error handling — RFC 7807 problem+json
 
 `middleware/error_handler.py` replaces FastAPI's default error shape. Both `HTTPException` and unhandled `Exception` flow through `_problem()` and produce `application/problem+json` with a `request_id` field. The unhandled-exception path explicitly re-attaches the `X-Request-Id` header because Starlette's `ServerErrorMiddleware` sits outside `RequestIdMiddleware` in the stack.
@@ -227,7 +229,7 @@ The per-test engine in the integration conftest uses `poolclass=NullPool` to for
 
 ## Flutter app (`app/`)
 
-The applicant-facing iOS + Android + Web client lives in `app/` as a sibling of `api/`. Architecture follows Pragmatic Clean Architecture — `lib/data/` + `lib/domain/` + `lib/presentation/` + `lib/core/`. State management is Riverpod 4.x with code-gen; HTTP is dio 5.7; routing is go_router 14.6 with `StatefulShellRoute.indexedStack` for the four-tab bottom nav.
+The applicant-facing iOS + Android + Web client lives in `app/` as a sibling of `api/`. Architecture: `lib/data/` + `lib/presentation/` + `lib/core/` (no separate `domain/` layer). Abstract repository interfaces live next to their concrete impls in `data/<feature>/<repo>_repository.dart` + `<repo>_repository_impl.dart`. State management is Riverpod 4.x with code-gen; HTTP is dio 5.7; routing is go_router 14.6 with `StatefulShellRoute.indexedStack` for the four-tab bottom nav.
 
 ### Day-to-day commands
 
@@ -245,22 +247,44 @@ dart format lib test
 
 - **Refresh-on-401 interceptor** (`lib/data/api/refresh_on_401_interceptor.dart`) is the single most important piece of code; single-flight via `Completer<String>?` so concurrent 401s never stampede the refresh endpoint. Tests in `test/unit/data/api/refresh_on_401_interceptor_test.dart` are the canonical specification — keep them passing.
 
-- **`AccessTokenHolder`** (`lib/data/api/access_token_holder.dart`) is a mutable singleton bridging dio (below Riverpod's reach) and the rest of the app. Exposes both `setToken(String?)` (nullable, primary) and `set(String)` (non-null alias). The Riverpod `accessTokenNotifierProvider` mirrors it for UI consumers; never let them diverge.
+- **`AccessTokenHolder`** (`lib/data/api/access_token_holder.dart`) is a mutable singleton bridging dio (below Riverpod's reach) and the rest of the app. Single public setter: `set(String? token)`; `clear()` is `set(null)`. No mirror Riverpod notifier — it was removed when the code reviewer flagged it as dead.
 
-- **`dio_provider` depends on a presentation-layer notifier** (`authStateProvider`) to push `SignedOut` on refresh failure. Documented inline as the one allowed exception to data/→presentation/ purity.
+- **`dio_provider` depends on a presentation-layer notifier** (`authStateProvider`) to push `SignedOut` on refresh failure. This is the one documented exception to data→presentation purity. The `auth_repository_impl` previously had a second leak; that one was removed by deleting its dead `emit`/`readState` callbacks.
+
+- **Don't override `validateStatus` on the Dio instance.** An earlier version set `validateStatus: (s) => s < 500` which silently masked 401s and made `RefreshOn401Interceptor` non-functional in production (tests passed because the mock interceptor maps 401→reject explicitly). Default Dio behavior — 4xx/5xx throws DioException — is what the refresh interceptor needs to fire.
+
+- **Refresh interceptor cleanup order:** `_inFlight = null` is set **before** the Completer is `complete()`d, not after. Otherwise a continuation that synchronously re-enters `onError` could attach to a stale completer.
 
 - **Riverpod 4.x codegen** drops the `Notifier` suffix from generated providers — the `AuthStateNotifier` class produces `authStateProvider` (not `authStateNotifierProvider`).
 
-- **Pragmatic CA cheat:** `data/<feature>/*_dto.dart` files are referenced from `lib/domain/<feature>/` via `export` directives. Domain consumers import the `*Dto` types using a `domain/` path; the underlying definition lives in `data/`.
-
 - **No mutation of the feed on apply/save/withdraw/unsave.** Each mutation invalidates the corresponding list controller + the `jobDetailControllerProvider(id)`, never the feed.
 
-- **Per-tab navigation stacks** via `StatefulShellRoute.indexedStack`. `/jobs/:id` is defined as a child route under each of the four tab branches.
+- **List screens share `PagedState<T>` + `loadNextPage` helpers** (`lib/presentation/paging/`). Feed/Saved/Applications controllers each have a `typedef XxxState = PagedState<Y>` and delegate `loadMore()` to the shared helper. Don't reinvent the pagination state machine per screen.
 
-- **google_fonts and tests:** widget tests must use `ThemeData.light(useMaterial3: true)` rather than `buildTheme()` because the production `buildTheme` triggers a network fetch for Inter that fails in CI/offline test environments. The integration test passes because it doesn't render `_MatchCard` glyphs that depend on the font.
+- **`loadMore` error path preserves loaded items** via `AsyncValue.error(...).copyWithPrevious(AsyncValue.data(...))` — early implementation wiped the list on page-N failure. `copyWithPrevious` is `@internal` in Riverpod 3+; the `// ignore: invalid_use_of_internal_member` comment in `paging.dart` is load-bearing.
+
+- **Magic strings live in enums or constants.** `JobStatus`, `ApplicationStatus`, `ApplicationSource`, `MatchGenerator` are enums with `@JsonKey(unknownEnumValue: X.unknown)` so a future backend value parses to a sentinel instead of throwing. Error slugs live in `lib/core/error/auth_slugs.dart` (`AuthSlugs.invalidAccessToken` etc.). The HTTP API layer (`*_api.dart`) still uses raw strings for source (the wire format); enums are a repo-and-above concept.
+
+- **DTOs are `@JsonSerializable` plain classes by default; `@freezed` only when `copyWith` is needed.** Only `JobDetailDto` (FakeJobsRepository uses `copyWith`) and `PagedState<T>` (paging helper uses `copyWith`) keep freezed. If you add a new DTO, default to plain `@JsonSerializable`.
+
+- **Per-tab navigation stacks** via `StatefulShellRoute.indexedStack`. `/jobs/:id` is defined as a child route under each of the four tab branches. The 404 path in JobDetail uses `context.pop()` so users return to the tab they came from, not a hardcoded `/feed`.
+
+- **google_fonts and tests:** widget tests must use `ThemeData.light(useMaterial3: true)` rather than `buildTheme()` because the production `buildTheme` triggers a network fetch for Inter that fails in CI/offline test environments. The integration test passes because it doesn't render glyphs that depend on the font.
+
+- **`PackageInfo.fromPlatform()` lives in a `keepAlive: true` provider** (`presentation/profile/package_info_provider.dart`), not in a `FutureBuilder.future:` arg — the latter re-runs the platform-channel call on every screen rebuild. Same lesson applies if you ever wrap another platform-channel async in a widget.
+
+- **`DateFormat` instances are module-static**, not per-cell. `DateFormat.yMMMMd()` parses an ICU pattern on construction; allocating one per ListView cell adds real CPU on long lists.
+
+- **Shared test infra in `test/helpers/`:** `MockInterceptor` (replaces the 6 hand-rolled copies), `fake_repositories.dart` (the six Fake*Repository implementations used by the integration test). Reuse before hand-rolling new test fakes.
 
 - **`--dart-define`, no flavors.** `KPA_API_BASE_URL` and `KPA_GOOGLE_WEB_CLIENT_ID` are required at compile time; `Env.validateOrThrow()` runs in `main()` before `runApp`.
 
 - **Light theme only in v0; dark plumbed but disabled.** `MaterialApp.router(themeMode: ThemeMode.light)`. Flip to `ThemeMode.system` + populate the dark branch of `buildTheme` when dark mode ships.
 
 - **No `dio_smart_retry`, no toast plugin, no analytics, no Sentry.** All deferred to follow-up plans per spec §Non-goals.
+
+- **Google sign-in is two flows: imperative on mobile, rendered-button on web.** Mobile uses `GoogleSignInDataSource.getIdToken()` (`_sdk.signIn()`). Web *cannot* — GIS's `signIn()` returns no `idToken` on web — so it uses `lib/data/auth/google_web_sign_in.dart` (interface + `googleWebSignInProvider`, a `keepAlive` `FutureProvider` that awaits `initialize()` so `renderButton()` has run `init`). The impl is selected by conditional import: `google_web_sign_in_web.dart` (uses `google_sign_in_web/web_only.dart`'s `renderButton()` + `onCurrentUserChanged → idToken`) on web, `google_web_sign_in_stub.dart` everywhere else (so `web_only.dart`'s `dart:js_interop` never reaches mobile/`flutter test`). `SignInScreen` branches on `kIsWeb`: rendered button on web, the existing `FilledButton` on mobile (the widget tests run non-web, so they still find "Continue with Google").
+- **`AuthRepositoryImpl.completeWebSignIn(idToken)`** is the web entry to the shared backend exchange (`_exchangeGoogleIdToken`). It lives on the impl, NOT the `AuthRepository` interface, reached via downcast in `sign_in_controller.dart` — same pattern as `refreshAccessTokenForInterceptor` (keeps the interface + its test fakes untouched). `signInWithGoogle()` (mobile) and `completeWebSignIn()` (web) both push `Authenticating` then delegate to `_exchangeGoogleIdToken`.
+- **`GoogleSignInDataSourceImpl` constructs `GoogleSignIn` platform-conditionally** (`_defaultSdk()`): `clientId:` on web, `serverClientId:` on mobile. Web construction matters even though web never calls `getIdToken()` — `signOut()` lazily inits the plugin, which would hit the `serverClientId is not supported on Web` assert otherwise.
+- **`web/index.template.html`'s `google-signin-client_id` meta tag is now redundant.** The web helper passes `clientId` directly to `GoogleSignIn`, which the plugin prefers over the meta tag — so the README's `sed`-substitute-then-`flutter run -d chrome` step isn't required for auth to work. Running via `flutter run -d web-server --web-port=8080 --dart-define-from-file=.env` is enough.
+- **Local web sign-in needs Google Cloud + the API configured for the browser:** (1) `http://localhost:8080` (the pinned web-server port) must be an **Authorized JavaScript origin** on the web OAuth client — propagation can take minutes-to-hours; probe with `curl … /gsi/button` (403→200). (2) The API needs CORS for the browser origin — `KPA_CORS_ALLOW_ORIGINS` (default `http://localhost:8080`) drives the Starlette `CORSMiddleware` mounted in `app_factory.py` after `RequestIdMiddleware`.

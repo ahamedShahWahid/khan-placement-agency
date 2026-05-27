@@ -4,12 +4,14 @@ import 'package:kpa_app/app.dart';
 import 'package:kpa_app/data/auth/auth_repository_impl.dart';
 import 'package:kpa_app/data/feed/feed_dto.dart';
 import 'package:kpa_app/data/feed/feed_repository_impl.dart';
+import 'package:kpa_app/data/feed/match_generator.dart';
 import 'package:kpa_app/data/jobs/applications_repository_impl.dart';
+import 'package:kpa_app/data/jobs/job_status.dart';
 import 'package:kpa_app/data/jobs/jobs_dto.dart';
 import 'package:kpa_app/data/jobs/jobs_repository_impl.dart';
 import 'package:kpa_app/data/jobs/saved_jobs_repository_impl.dart';
 import 'package:kpa_app/data/me/me_repository_impl.dart';
-import 'package:kpa_app/domain/auth/auth_state.dart';
+import 'package:kpa_app/data/auth/auth_state.dart';
 import 'package:kpa_app/presentation/auth/auth_providers.dart';
 import 'package:kpa_app/presentation/splash/bootstrap_controller.dart';
 
@@ -33,8 +35,8 @@ void main() {
       final job = JobSummaryDto(
         id: 'j1',
         title: 'Senior Engineer',
-        location: 'BLR',
-        status: 'open',
+        locations: const ['BLR'],
+        status: JobStatus.open,
         postedAt: DateTime(2026, 5, 18),
       );
       const employer = EmployerSummaryDto(id: 'e1', name: 'Acme Co');
@@ -44,7 +46,7 @@ void main() {
         scoreComponents: {},
         explanation: ExplanationDto(
           fit: 'great fit',
-          generator: 'templated',
+          generator: MatchGenerator.templated,
           generatorVersion: '1',
         ),
       );

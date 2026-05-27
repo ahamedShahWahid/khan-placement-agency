@@ -1,81 +1,131 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-part 'feed_dto.freezed.dart';
+import 'package:kpa_app/data/feed/match_generator.dart';
+import 'package:kpa_app/data/jobs/job_status.dart';
+
 part 'feed_dto.g.dart';
 
-@freezed
-abstract class FeedPageDto with _$FeedPageDto {
-  const factory FeedPageDto({
-    required List<FeedItemDto> items,
-    String? nextCursor,
-  }) = _FeedPageDto;
+@JsonSerializable()
+class FeedPageDto {
+  const FeedPageDto({
+    required this.items,
+    this.nextCursor,
+  });
 
   factory FeedPageDto.fromJson(Map<String, dynamic> json) =>
       _$FeedPageDtoFromJson(json);
+
+  final List<FeedItemDto> items;
+  final String? nextCursor;
+
+  Map<String, dynamic> toJson() => _$FeedPageDtoToJson(this);
 }
 
-@freezed
-abstract class FeedItemDto with _$FeedItemDto {
-  const factory FeedItemDto({
-    required MatchSummaryDto match,
-    required JobSummaryDto job,
-    required EmployerSummaryDto employer,
-  }) = _FeedItemDto;
+@JsonSerializable()
+class FeedItemDto {
+  const FeedItemDto({
+    required this.match,
+    required this.job,
+    required this.employer,
+  });
 
   factory FeedItemDto.fromJson(Map<String, dynamic> json) =>
       _$FeedItemDtoFromJson(json);
+
+  final MatchSummaryDto match;
+  final JobSummaryDto job;
+  final EmployerSummaryDto employer;
+
+  Map<String, dynamic> toJson() => _$FeedItemDtoToJson(this);
 }
 
-@freezed
-abstract class MatchSummaryDto with _$MatchSummaryDto {
-  const factory MatchSummaryDto({
-    required String id,
-    required double totalScore,
-    required Map<String, dynamic> scoreComponents,
-    ExplanationDto? explanation,
-    DateTime? surfacedAt,
-  }) = _MatchSummaryDto;
+@JsonSerializable()
+class MatchSummaryDto {
+  const MatchSummaryDto({
+    required this.id,
+    required this.totalScore,
+    required this.scoreComponents,
+    this.explanation,
+    this.surfacedAt,
+  });
 
   factory MatchSummaryDto.fromJson(Map<String, dynamic> json) =>
       _$MatchSummaryDtoFromJson(json);
+
+  final String id;
+  final double totalScore;
+  // Backend serializes this field as `components` (its Pydantic
+  // validation_alias does NOT change the output key).
+  @JsonKey(name: 'components')
+  final Map<String, dynamic> scoreComponents;
+  final ExplanationDto? explanation;
+  final DateTime? surfacedAt;
+
+  Map<String, dynamic> toJson() => _$MatchSummaryDtoToJson(this);
 }
 
-@freezed
-abstract class ExplanationDto with _$ExplanationDto {
-  const factory ExplanationDto({
-    required String fit,
-    required String generator,
-    required String generatorVersion,
-    String? caveat,
-  }) = _ExplanationDto;
+@JsonSerializable()
+class ExplanationDto {
+  const ExplanationDto({
+    required this.fit,
+    required this.generator,
+    required this.generatorVersion,
+    this.caveat,
+  });
 
   factory ExplanationDto.fromJson(Map<String, dynamic> json) =>
       _$ExplanationDtoFromJson(json);
+
+  final String fit;
+  @JsonKey(unknownEnumValue: MatchGenerator.unknown)
+  final MatchGenerator generator;
+  final String generatorVersion;
+  final String? caveat;
+
+  Map<String, dynamic> toJson() => _$ExplanationDtoToJson(this);
 }
 
-@freezed
-abstract class JobSummaryDto with _$JobSummaryDto {
-  const factory JobSummaryDto({
-    required String id,
-    required String title,
-    required String location,
-    required String status,
-    required DateTime postedAt,
-    String? description,
-  }) = _JobSummaryDto;
+@JsonSerializable()
+class JobSummaryDto {
+  const JobSummaryDto({
+    required this.id,
+    required this.title,
+    this.locations = const [],
+    required this.status,
+    required this.postedAt,
+    this.description,
+  });
 
   factory JobSummaryDto.fromJson(Map<String, dynamic> json) =>
       _$JobSummaryDtoFromJson(json);
+
+  final String id;
+  final String title;
+  // Backend JobRead sends `locations` (a list), not a singular `location`.
+  final List<String> locations;
+  @JsonKey(unknownEnumValue: JobStatus.unknown)
+  final JobStatus status;
+  final DateTime postedAt;
+  final String? description;
+
+  Map<String, dynamic> toJson() => _$JobSummaryDtoToJson(this);
 }
 
-@freezed
-abstract class EmployerSummaryDto with _$EmployerSummaryDto {
-  const factory EmployerSummaryDto({
-    required String id,
-    required String name,
-    DateTime? verifiedAt,
-  }) = _EmployerSummaryDto;
+@JsonSerializable()
+class EmployerSummaryDto {
+  const EmployerSummaryDto({
+    required this.id,
+    required this.name,
+    this.verified = false,
+  });
 
   factory EmployerSummaryDto.fromJson(Map<String, dynamic> json) =>
       _$EmployerSummaryDtoFromJson(json);
+
+  final String id;
+  final String name;
+  // Backend EmployerRead sends a boolean `verified`, not a `verified_at`.
+  final bool verified;
+
+  Map<String, dynamic> toJson() => _$EmployerSummaryDtoToJson(this);
 }

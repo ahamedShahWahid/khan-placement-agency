@@ -12,7 +12,7 @@ Map<String, dynamic> _samplePage({String? next}) => {
           'match': {
             'id': 'm1',
             'total_score': 0.81,
-            'score_components': {'vec': 0.9, 'rules': 0.7},
+            'components': {'vec': 0.9, 'rules': 0.7},
             'explanation': {
               'fit': 'great',
               'caveat': null,
@@ -24,14 +24,14 @@ Map<String, dynamic> _samplePage({String? next}) => {
           'job': {
             'id': 'j1',
             'title': 'Eng',
-            'location': 'Bangalore',
+            'locations': ['Bangalore'],
             'status': 'open',
             'posted_at': '2026-05-18T00:00:00Z',
           },
           'employer': {
             'id': 'e1',
             'name': 'Acme',
-            'verified_at': '2026-01-01T00:00:00Z',
+            'verified': true,
           },
         }
       ],

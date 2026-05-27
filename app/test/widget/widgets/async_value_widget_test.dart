@@ -55,8 +55,7 @@ void main() {
     expect(find.textContaining("Couldn't reach KPA"), findsOneWidget);
   });
 
-  testWidgets('renders empty when isEmpty predicate matches',
-      (tester) async {
+  testWidgets('renders empty when isEmpty predicate matches', (tester) async {
     await tester.pumpWidget(
       _wrap(
         AsyncValueWidget<List<int>>(
@@ -70,8 +69,7 @@ void main() {
     expect(find.text('NOTHING'), findsOneWidget);
   });
 
-  testWidgets('renders data when isEmpty predicate is false',
-      (tester) async {
+  testWidgets('renders data when isEmpty predicate is false', (tester) async {
     await tester.pumpWidget(
       _wrap(
         AsyncValueWidget<List<int>>(

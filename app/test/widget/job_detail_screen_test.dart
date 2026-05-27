@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kpa_app/data/feed/feed_dto.dart';
+import 'package:kpa_app/data/feed/match_generator.dart';
+import 'package:kpa_app/data/jobs/application_source.dart';
+import 'package:kpa_app/data/jobs/application_status.dart';
+import 'package:kpa_app/data/jobs/job_status.dart';
 import 'package:kpa_app/data/jobs/jobs_dto.dart';
 import 'package:kpa_app/data/jobs/jobs_repository_impl.dart';
-import 'package:kpa_app/domain/jobs/jobs_repository.dart';
+import 'package:kpa_app/data/jobs/jobs_repository.dart';
 import 'package:kpa_app/presentation/job_detail/job_detail_screen.dart';
 
 class _FakeJobsRepo implements JobsRepository {
@@ -13,19 +17,21 @@ class _FakeJobsRepo implements JobsRepository {
   @override
   Future<JobDetailDto> fetchById(String id) async => detail;
   @override
-  Future<ApplicationDto> applyTo(String id, {String source = 'feed'}) async =>
+  Future<ApplicationDto> applyTo(
+    String id, {
+    ApplicationSource source = ApplicationSource.feed,
+  }) async =>
       ApplicationDto(
         id: 'a1',
-        applicantId: 'ap1',
         jobId: id,
-        status: 'applied',
+        status: ApplicationStatus.applied,
         source: source,
         createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
       );
   @override
   Future<SavedJobDto> save(String id) async => SavedJobDto(
         id: 's1',
-        applicantId: 'ap1',
         jobId: id,
         createdAt: DateTime.now(),
       );
@@ -33,13 +39,12 @@ class _FakeJobsRepo implements JobsRepository {
   Future<void> unsave(String id) async {}
 }
 
-JobDetailDto _detail({ApplicationDto? app, SavedJobDto? saved}) =>
-    JobDetailDto(
+JobDetailDto _detail({ApplicationDto? app, SavedJobDto? saved}) => JobDetailDto(
       job: JobSummaryDto(
         id: 'j1',
         title: 'Senior Engineer',
-        location: 'BLR',
-        status: 'open',
+        locations: const ['BLR'],
+        status: JobStatus.open,
         postedAt: DateTime.parse('2026-05-18T00:00:00Z'),
       ),
       employer: const EmployerSummaryDto(id: 'e1', name: 'Acme Co'),
@@ -49,7 +54,7 @@ JobDetailDto _detail({ApplicationDto? app, SavedJobDto? saved}) =>
         scoreComponents: const {},
         explanation: const ExplanationDto(
           fit: 'great fit',
-          generator: 'templated',
+          generator: MatchGenerator.templated,
           generatorVersion: '1',
         ),
       ),
@@ -83,11 +88,11 @@ void main() {
   testWidgets('shows Withdraw when applied', (tester) async {
     final app = ApplicationDto(
       id: 'a1',
-      applicantId: 'ap1',
       jobId: 'j1',
-      status: 'applied',
-      source: 'feed',
+      status: ApplicationStatus.applied,
+      source: ApplicationSource.feed,
       createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
     await tester.pumpWidget(
       _wrap(
@@ -102,7 +107,6 @@ void main() {
   testWidgets('shows filled heart when saved', (tester) async {
     final s = SavedJobDto(
       id: 's1',
-      applicantId: 'ap1',
       jobId: 'j1',
       createdAt: DateTime.now(),
     );

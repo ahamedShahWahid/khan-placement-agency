@@ -103,6 +103,7 @@ async def test_job_detail_happy_path(session: AsyncSession, async_client: AsyncC
     body = resp.json()
     assert body["job"]["id"] == str(j.id)
     assert body["job"]["title"] == "Engineer"
+    assert body["job"]["status"] == "open"
     assert body["employer"]["verified"] is True
     assert body["match"] is not None
     assert body["match"]["total_score"] == pytest.approx(0.8)

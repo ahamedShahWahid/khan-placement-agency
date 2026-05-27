@@ -4,7 +4,7 @@ import 'package:kpa_app/data/api/access_token_holder.dart';
 import 'package:kpa_app/data/auth/auth_repository_impl.dart';
 import 'package:kpa_app/data/auth/google_sign_in_data_source.dart';
 import 'package:kpa_app/data/auth/token_storage.dart';
-import 'package:kpa_app/domain/auth/auth_state.dart';
+import 'package:kpa_app/data/auth/auth_state.dart';
 
 import '../../../helpers/mock_interceptor.dart';
 
@@ -97,8 +97,8 @@ Map<String, dynamic> _signInBody({
   String? displayName = 'Test User',
 }) =>
     {
-      'access': access,
-      'refresh': refresh,
+      'access_token': access,
+      'refresh_token': refresh,
       'user': {
         'id': userId,
         'email': email,
@@ -112,8 +112,8 @@ Map<String, dynamic> _refreshBody({
   String refresh = 'NEW_REFRESH',
 }) =>
     {
-      'access': access,
-      'refresh': refresh,
+      'access_token': access,
+      'refresh_token': refresh,
     };
 
 Map<String, dynamic> _meBody({
@@ -122,11 +122,10 @@ Map<String, dynamic> _meBody({
   String? displayName = 'Test User',
 }) =>
     {
-      'user': {
-        'id': userId,
-        'email': email,
-        'display_name': displayName,
-      },
+      'id': userId,
+      'email': email,
+      'role': 'applicant',
+      'display_name': displayName,
     };
 
 Map<String, dynamic> _401Body() => {
@@ -225,6 +224,11 @@ void main() {
       // Storage updated with new refresh token.
       expect(await h.storage.readRefreshToken(), 'NEW_REFRESH');
 
+      // Request body must use the backend's `refresh_token` key (not `refresh`).
+      final reqData = h.mock.lastDataFor('POST', '/v1/auth/refresh')
+          as Map<String, dynamic>;
+      expect(reqData['refresh_token'], 'OLD_REFRESH');
+
       // Emitted SignedIn.
       expect(h.emitted.length, 1);
       expect(h.emitted[0], isA<SignedIn>());
@@ -253,7 +257,8 @@ void main() {
     });
 
     // 6. signOut: clears everything even if /v1/auth/logout returns 500.
-    test('signOut: clears holder + storage + emits SignedOut even if logout fails',
+    test(
+        'signOut: clears holder + storage + emits SignedOut even if logout fails',
         () async {
       final h = _buildHarness(storedRefreshToken: 'REFRESH');
       h.holder.set('ACCESS');
@@ -273,4 +278,3 @@ void main() {
     });
   });
 }
-

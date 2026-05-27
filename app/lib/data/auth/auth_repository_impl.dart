@@ -2,6 +2,7 @@
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'package:kpa_app/core/error/auth_slugs.dart';
 import 'package:kpa_app/data/api/error_mapping.dart';
 import 'package:kpa_app/core/error/exceptions.dart';
 import 'package:kpa_app/core/log/logger.dart';
@@ -11,8 +12,9 @@ import 'package:kpa_app/data/api/dio_provider.dart';
 import 'package:kpa_app/data/auth/auth_dto.dart';
 import 'package:kpa_app/data/auth/google_sign_in_data_source.dart';
 import 'package:kpa_app/data/auth/token_storage.dart';
-import 'package:kpa_app/domain/auth/auth_repository.dart';
-import 'package:kpa_app/domain/auth/auth_state.dart';
+import 'package:kpa_app/data/auth/auth_repository.dart';
+import 'package:kpa_app/data/me/me_dto.dart';
+import 'package:kpa_app/data/auth/auth_state.dart';
 import 'package:kpa_app/presentation/auth/auth_providers.dart';
 
 part 'auth_repository_impl.g.dart';
@@ -50,8 +52,30 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<SignedIn> signInWithGoogle() async {
     _push(const Authenticating());
+    final String idToken;
     try {
-      final idToken = await _google.getIdToken();
+      idToken = await _google.getIdToken();
+    } on AuthException {
+      _push(const SignedOut());
+      rethrow;
+    }
+    return _exchangeGoogleIdToken(idToken);
+  }
+
+  /// Web-only completion: the rendered Google button (see [GoogleWebSignIn])
+  /// delivers the ID token asynchronously, so there's no imperative
+  /// `getIdToken()` step — we go straight to the backend exchange. Kept on the
+  /// impl (not [AuthRepository]) and reached via downcast, mirroring
+  /// [refreshAccessTokenForInterceptor].
+  Future<SignedIn> completeWebSignIn(String idToken) async {
+    _push(const Authenticating());
+    return _exchangeGoogleIdToken(idToken);
+  }
+
+  /// Trade a Google ID token for a KPA session. Shared by the mobile imperative
+  /// path and the web rendered-button path.
+  Future<SignedIn> _exchangeGoogleIdToken(String idToken) async {
+    try {
       final res = await _dio.post<Map<String, dynamic>>(
         '/v1/auth/oauth/google',
         data: {'id_token': idToken},
@@ -70,9 +94,6 @@ class AuthRepositoryImpl implements AuthRepository {
     } on DioException catch (e) {
       _push(const SignedOut());
       throw mapDioException(e);
-    } on AuthException {
-      _push(const SignedOut());
-      rethrow;
     }
   }
 
@@ -81,25 +102,25 @@ class AuthRepositoryImpl implements AuthRepository {
     final stored = await _tokenStorage.readRefreshToken();
     if (stored == null) {
       throw const AuthException(
-        slug: 'no_refresh_token',
+        slug: AuthSlugs.noRefreshToken,
         detail: 'Nothing to refresh.',
       );
     }
     try {
       final res = await _dio.post<Map<String, dynamic>>(
         '/v1/auth/refresh',
-        data: {'refresh': stored},
+        data: {'refresh_token': stored},
         options: Options(extra: {kSkipAuth: true}),
       );
       final dto = RefreshResponseDto.fromJson(res.data!);
       _accessHolder.set(dto.access);
       await _tokenStorage.writeRefreshToken(dto.refresh);
       final me = await _dio.get<Map<String, dynamic>>('/v1/me');
-      final user = me.data!['user'] as Map<String, dynamic>;
+      final meDto = MeDto.fromJson(me.data!);
       final signedIn = SignedIn(
-        userId: user['id'] as String,
-        email: user['email'] as String,
-        displayName: user['display_name'] as String?,
+        userId: meDto.id,
+        email: meDto.email,
+        displayName: meDto.displayName,
       );
       _push(signedIn);
       return signedIn;
@@ -116,11 +137,11 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<String> refreshAccessTokenForInterceptor() async {
     final stored = await _tokenStorage.readRefreshToken();
     if (stored == null) {
-      throw const AuthException(slug: 'no_refresh_token');
+      throw const AuthException(slug: AuthSlugs.noRefreshToken);
     }
     final res = await _dio.post<Map<String, dynamic>>(
       '/v1/auth/refresh',
-      data: {'refresh': stored},
+      data: {'refresh_token': stored},
       options: Options(extra: {kSkipAuth: true}),
     );
     final dto = RefreshResponseDto.fromJson(res.data!);
@@ -131,7 +152,15 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> signOut() async {
     try {
-      await _dio.post<dynamic>('/v1/auth/logout');
+      // Backend LogoutRequest requires refresh_token to revoke the family
+      // server-side; without it the token family is never invalidated.
+      final stored = await _tokenStorage.readRefreshToken();
+      if (stored != null) {
+        await _dio.post<dynamic>(
+          '/v1/auth/logout',
+          data: {'refresh_token': stored},
+        );
+      }
     } catch (e, s) {
       _log.warn('logout request failed (continuing)', error: e, stack: s);
     }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import 'package:kpa_app/data/jobs/application_status.dart';
 import 'package:kpa_app/presentation/applications/applications_controller.dart';
 import 'package:kpa_app/presentation/routing/routes.dart';
 import 'package:kpa_app/presentation/theme/kpa_spacing.dart';
@@ -15,20 +16,17 @@ final _dateFormat = DateFormat.yMMMMd();
 class ApplicationsScreen extends ConsumerStatefulWidget {
   const ApplicationsScreen({super.key});
   @override
-  ConsumerState<ApplicationsScreen> createState() =>
-      _ApplicationsScreenState();
+  ConsumerState<ApplicationsScreen> createState() => _ApplicationsScreenState();
 }
 
-class _ApplicationsScreenState
-    extends ConsumerState<ApplicationsScreen> {
+class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> {
   final _scroll = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _scroll.addListener(() {
-      if (_scroll.position.pixels >=
-          _scroll.position.maxScrollExtent - 200) {
+      if (_scroll.position.pixels >= _scroll.position.maxScrollExtent - 200) {
         ref.read(applicationsControllerProvider.notifier).loadMore();
       }
     });
@@ -60,15 +58,13 @@ class _ApplicationsScreenState
           ),
         ),
         data: (s) => RefreshIndicator(
-          onRefresh: () => ref
-              .read(applicationsControllerProvider.notifier)
-              .refresh(),
+          onRefresh: () =>
+              ref.read(applicationsControllerProvider.notifier).refresh(),
           child: ListView.separated(
             controller: _scroll,
             padding: const EdgeInsets.all(KpaSpacing.lg),
             itemCount: s.items.length + 1,
-            separatorBuilder: (_, __) =>
-                const SizedBox(height: KpaSpacing.md),
+            separatorBuilder: (_, __) => const SizedBox(height: KpaSpacing.md),
             itemBuilder: (context, i) {
               if (i == s.items.length) {
                 if (s.isLoadingMore) {
@@ -95,8 +91,7 @@ class _ApplicationsScreenState
                             Expanded(
                               child: Text(
                                 item.employer.name,
-                                style:
-                                    Theme.of(context).textTheme.labelLarge,
+                                style: Theme.of(context).textTheme.labelLarge,
                               ),
                             ),
                             _StatusPill(status: item.application.status),
@@ -111,23 +106,21 @@ class _ApplicationsScreenState
                         Text(
                           () {
                             final isWithdrawn = item.application.status ==
-                                'withdrawn';
+                                ApplicationStatus.withdrawn;
                             final whenDate = isWithdrawn
-                                ? item.application.withdrawnAt!
+                                ? item.application.updatedAt
                                 : item.application.createdAt;
                             final whenLabel = isWithdrawn
                                 ? 'Withdrawn ${_dateFormat.format(whenDate)}'
                                 : 'Applied ${_dateFormat.format(whenDate)}';
                             return whenLabel;
                           }(),
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
                         ),
                       ],
                     ),
@@ -144,11 +137,11 @@ class _ApplicationsScreenState
 
 class _StatusPill extends StatelessWidget {
   const _StatusPill({required this.status});
-  final String status;
+  final ApplicationStatus status;
   @override
   Widget build(BuildContext context) {
     final c = Theme.of(context);
-    final (label, bg, fg) = status == 'applied'
+    final (label, bg, fg) = status == ApplicationStatus.applied
         ? (
             'Applied',
             c.colorScheme.primaryContainer,

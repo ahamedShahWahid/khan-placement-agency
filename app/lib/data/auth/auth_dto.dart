@@ -1,52 +1,81 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-part 'auth_dto.freezed.dart';
 part 'auth_dto.g.dart';
 
-@freezed
-abstract class SignInResponseDto with _$SignInResponseDto {
-  const factory SignInResponseDto({
-    required String access,
-    required String refresh,
-    required AuthUserDto user,
-    AuthApplicantDto? applicant,
-  }) = _SignInResponseDto;
+@JsonSerializable()
+class SignInResponseDto {
+  const SignInResponseDto({
+    required this.access,
+    required this.refresh,
+    required this.user,
+    this.applicant,
+  });
 
   factory SignInResponseDto.fromJson(Map<String, dynamic> json) =>
       _$SignInResponseDtoFromJson(json);
+
+  // The backend uses OAuth-conventional wire keys (api/src/kpa/routes/auth.py:
+  // SignInResponse); the Dart field names are shorter. Map explicitly.
+  @JsonKey(name: 'access_token')
+  final String access;
+  @JsonKey(name: 'refresh_token')
+  final String refresh;
+  final AuthUserDto user;
+  final AuthApplicantDto? applicant;
+
+  Map<String, dynamic> toJson() => _$SignInResponseDtoToJson(this);
 }
 
-@freezed
-abstract class RefreshResponseDto with _$RefreshResponseDto {
-  const factory RefreshResponseDto({
-    required String access,
-    required String refresh,
-  }) = _RefreshResponseDto;
+@JsonSerializable()
+class RefreshResponseDto {
+  const RefreshResponseDto({
+    required this.access,
+    required this.refresh,
+  });
 
   factory RefreshResponseDto.fromJson(Map<String, dynamic> json) =>
       _$RefreshResponseDtoFromJson(json);
+
+  @JsonKey(name: 'access_token')
+  final String access;
+  @JsonKey(name: 'refresh_token')
+  final String refresh;
+
+  Map<String, dynamic> toJson() => _$RefreshResponseDtoToJson(this);
 }
 
-@freezed
-abstract class AuthUserDto with _$AuthUserDto {
-  const factory AuthUserDto({
-    required String id,
-    required String email,
-    required String role,
-    String? displayName,
-  }) = _AuthUserDto;
+@JsonSerializable()
+class AuthUserDto {
+  const AuthUserDto({
+    required this.id,
+    required this.email,
+    required this.role,
+    this.displayName,
+  });
 
   factory AuthUserDto.fromJson(Map<String, dynamic> json) =>
       _$AuthUserDtoFromJson(json);
+
+  final String id;
+  final String email;
+  final String role;
+  final String? displayName;
+
+  Map<String, dynamic> toJson() => _$AuthUserDtoToJson(this);
 }
 
-@freezed
-abstract class AuthApplicantDto with _$AuthApplicantDto {
-  const factory AuthApplicantDto({
-    required String id,
-    required String userId,
-  }) = _AuthApplicantDto;
+@JsonSerializable()
+class AuthApplicantDto {
+  const AuthApplicantDto({
+    required this.id,
+    required this.userId,
+  });
 
   factory AuthApplicantDto.fromJson(Map<String, dynamic> json) =>
       _$AuthApplicantDtoFromJson(json);
+
+  final String id;
+  final String userId;
+
+  Map<String, dynamic> toJson() => _$AuthApplicantDtoToJson(this);
 }

@@ -51,7 +51,7 @@ final class ApplyToJobControllerProvider
 }
 
 String _$applyToJobControllerHash() =>
-    r'421c40110a2cfef0fc5cb90fa218ef63c0f93477';
+    r'd8d528e97e66a2c4e24309b78bd5b619f3480b83';
 
 final class ApplyToJobControllerFamily extends $Family
     with

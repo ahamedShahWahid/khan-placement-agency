@@ -1,13 +1,16 @@
 import 'package:kpa_app/data/feed/feed_dto.dart';
+import 'package:kpa_app/data/jobs/application_source.dart';
+import 'package:kpa_app/data/jobs/application_status.dart';
 import 'package:kpa_app/data/jobs/jobs_dto.dart';
 import 'package:kpa_app/data/me/me_dto.dart';
-import 'package:kpa_app/domain/auth/auth_repository.dart';
-import 'package:kpa_app/domain/auth/auth_state.dart';
-import 'package:kpa_app/domain/feed/feed_repository.dart';
-import 'package:kpa_app/domain/jobs/applications_repository.dart';
-import 'package:kpa_app/domain/jobs/jobs_repository.dart';
-import 'package:kpa_app/domain/jobs/saved_jobs_repository.dart';
-import 'package:kpa_app/domain/me/me_repository.dart';
+import 'package:kpa_app/data/auth/auth_repository.dart';
+import 'package:kpa_app/data/auth/auth_state.dart';
+import 'package:kpa_app/data/feed/feed_repository.dart';
+import 'package:kpa_app/data/jobs/applications_repository.dart';
+import 'package:kpa_app/data/jobs/jobs_repository.dart';
+import 'package:kpa_app/data/jobs/saved_jobs_repository.dart';
+import 'package:kpa_app/data/me/me_repository.dart';
+import 'package:kpa_app/data/me/profile_update_dto.dart';
 
 class FakeAuthRepository implements AuthRepository {
   FakeAuthRepository({AuthState initial = const SignedOut()})
@@ -55,15 +58,15 @@ class FakeJobsRepository implements JobsRepository {
   @override
   Future<ApplicationDto> applyTo(
     String jobId, {
-    String source = 'feed',
+    ApplicationSource source = ApplicationSource.feed,
   }) async {
     final app = ApplicationDto(
       id: 'a1',
-      applicantId: 'p',
       jobId: jobId,
-      status: 'applied',
+      status: ApplicationStatus.applied,
       source: source,
       createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
     _detail = _detail.copyWith(application: app);
     return app;
@@ -73,7 +76,6 @@ class FakeJobsRepository implements JobsRepository {
   Future<SavedJobDto> save(String jobId) async {
     final s = SavedJobDto(
       id: 's1',
-      applicantId: 'p',
       jobId: jobId,
       createdAt: DateTime.now(),
     );
@@ -98,12 +100,11 @@ class FakeApplicationsRepository implements ApplicationsRepository {
   @override
   Future<ApplicationDto> withdraw(String id) async => ApplicationDto(
         id: id,
-        applicantId: 'p',
         jobId: 'j1',
-        status: 'withdrawn',
-        source: 'feed',
+        status: ApplicationStatus.withdrawn,
+        source: ApplicationSource.feed,
         createdAt: DateTime.now(),
-        withdrawnAt: DateTime.now(),
+        updatedAt: DateTime.now(),
       );
 }
 
@@ -118,14 +119,20 @@ class FakeSavedJobsRepository implements SavedJobsRepository {
 
 class FakeMeRepository implements MeRepository {
   @override
-  Future<MeDto> fetch() async => MeDto(
-        user: MeUserDto(
-          id: 'u1',
-          email: 'u@e.com',
-          displayName: 'U',
-          role: 'applicant',
-          createdAt: DateTime(2026),
-        ),
-        applicant: const ApplicantSummaryDto(id: 'a1', userId: 'u1'),
+  Future<MeDto> fetch() async => const MeDto(
+        id: 'u1',
+        email: 'u@e.com',
+        displayName: 'U',
+        role: 'applicant',
+        applicant: ApplicantSummaryDto(id: 'a1', fullName: 'U'),
+      );
+
+  @override
+  Future<MeDto> updateProfile(ProfileUpdateDto update) async => const MeDto(
+        id: 'u1',
+        email: 'u@e.com',
+        displayName: 'U',
+        role: 'applicant',
+        applicant: ApplicantSummaryDto(id: 'a1', fullName: 'U'),
       );
 }

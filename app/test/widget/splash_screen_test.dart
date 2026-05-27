@@ -51,7 +51,8 @@ void main() {
         const SplashScreen(),
         overrides: [
           bootstrapControllerProvider.overrideWith(
-            () => _StubError(const NetworkException(message: 'Connection failed')),
+            () => _StubError(
+                const NetworkException(message: 'Connection failed')),
           ),
         ],
       ),

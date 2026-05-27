@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kpa_app/data/feed/feed_dto.dart';
+import 'package:kpa_app/data/jobs/application_source.dart';
+import 'package:kpa_app/data/jobs/application_status.dart';
 import 'package:kpa_app/data/jobs/applications_repository_impl.dart';
+import 'package:kpa_app/data/jobs/job_status.dart';
 import 'package:kpa_app/data/jobs/jobs_dto.dart';
-import 'package:kpa_app/domain/jobs/applications_repository.dart';
+import 'package:kpa_app/data/jobs/applications_repository.dart';
 import 'package:kpa_app/presentation/applications/applications_screen.dart';
 
 class _FakeRepo implements ApplicationsRepository {
@@ -49,17 +52,17 @@ void main() {
       ApplicationListItemDto(
         application: ApplicationDto(
           id: 'a1',
-          applicantId: 'p',
           jobId: 'j1',
-          status: 'applied',
-          source: 'feed',
+          status: ApplicationStatus.applied,
+          source: ApplicationSource.feed,
           createdAt: DateTime(2026, 5, 1),
+          updatedAt: DateTime(2026, 5, 1),
         ),
         job: JobSummaryDto(
           id: 'j1',
           title: 'Eng',
-          location: 'BLR',
-          status: 'open',
+          locations: const ['BLR'],
+          status: JobStatus.open,
           postedAt: DateTime(2026, 4, 1),
         ),
         employer: const EmployerSummaryDto(id: 'e1', name: 'Acme'),
@@ -67,18 +70,17 @@ void main() {
       ApplicationListItemDto(
         application: ApplicationDto(
           id: 'a2',
-          applicantId: 'p',
           jobId: 'j2',
-          status: 'withdrawn',
-          source: 'feed',
+          status: ApplicationStatus.withdrawn,
+          source: ApplicationSource.feed,
           createdAt: DateTime(2026, 4, 20),
-          withdrawnAt: DateTime(2026, 5, 5),
+          updatedAt: DateTime(2026, 5, 5),
         ),
         job: JobSummaryDto(
           id: 'j2',
           title: 'Designer',
-          location: 'BLR',
-          status: 'open',
+          locations: const ['BLR'],
+          status: JobStatus.open,
           postedAt: DateTime(2026, 4, 1),
         ),
         employer: const EmployerSummaryDto(id: 'e2', name: 'Beta'),

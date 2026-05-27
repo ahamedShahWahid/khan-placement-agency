@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kpa_app/data/jobs/application_status.dart';
 import 'package:kpa_app/data/jobs/jobs_dto.dart';
 import 'package:kpa_app/presentation/job_detail/apply_to_job_controller.dart';
 import 'package:kpa_app/presentation/job_detail/save_job_controller.dart';
@@ -53,13 +54,12 @@ class ActionBar extends ConsumerWidget {
     String jobId,
     bool isBusy,
   ) {
-    if (app == null || app.status == 'withdrawn') {
+    if (app == null || app.status == ApplicationStatus.withdrawn) {
       return FilledButton(
         onPressed: isBusy
             ? null
-            : () => ref
-                .read(applyToJobControllerProvider(jobId).notifier)
-                .submit(),
+            : () =>
+                ref.read(applyToJobControllerProvider(jobId).notifier).submit(),
         child: const Text('Apply'),
       );
     }
@@ -82,13 +82,9 @@ class ActionBar extends ConsumerWidget {
           ? null
           : () {
               if (filled) {
-                ref
-                    .read(unsaveJobControllerProvider(jobId).notifier)
-                    .submit();
+                ref.read(unsaveJobControllerProvider(jobId).notifier).submit();
               } else {
-                ref
-                    .read(saveJobControllerProvider(jobId).notifier)
-                    .submit();
+                ref.read(saveJobControllerProvider(jobId).notifier).submit();
               }
             },
       icon: Icon(filled ? Icons.bookmark : Icons.bookmark_outline),

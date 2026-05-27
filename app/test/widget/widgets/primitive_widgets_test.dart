@@ -47,8 +47,7 @@ void main() {
     expect(taps, 1);
   });
 
-  testWidgets('KpaEmptyState renders headline + body + action',
-      (tester) async {
+  testWidgets('KpaEmptyState renders headline + body + action', (tester) async {
     await tester.pumpWidget(
       _wrap(
         KpaEmptyState(

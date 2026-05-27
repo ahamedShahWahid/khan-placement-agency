@@ -7,8 +7,7 @@
 /// Call [validateOrThrow] from `main()` before `runApp` — a missing
 /// required var should fail fast with a printable message.
 abstract final class Env {
-  static const apiBaseUrl =
-      String.fromEnvironment('KPA_API_BASE_URL');
+  static const apiBaseUrl = String.fromEnvironment('KPA_API_BASE_URL');
   static const googleWebClientId =
       String.fromEnvironment('KPA_GOOGLE_WEB_CLIENT_ID');
   static const buildEnv = String.fromEnvironment(

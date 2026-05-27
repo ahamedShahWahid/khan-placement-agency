@@ -6,6 +6,18 @@ import 'package:dio/dio.dart';
 class MockInterceptor extends Interceptor {
   final Map<String, _ScriptedResponse> _routes = {};
 
+  /// Every request seen, in order — lets tests assert the request body/keys
+  /// (the response mock alone can't catch a wrong request-body contract).
+  final List<RequestOptions> requests = [];
+
+  /// The most recent request data for a given `(method, path)`, or null.
+  Object? lastDataFor(String method, String path) {
+    for (final r in requests.reversed) {
+      if (r.method == method && r.path == path) return r.data;
+    }
+    return null;
+  }
+
   void on(
     String method,
     String path,
@@ -20,6 +32,7 @@ class MockInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) {
+    requests.add(options);
     final key = '${options.method}:${options.path}';
     final r = _routes[key];
     if (r == null) {

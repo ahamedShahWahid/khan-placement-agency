@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kpa_app/data/me/me_dto.dart';
+import 'package:kpa_app/data/me/me_repository.dart';
 import 'package:kpa_app/data/me/me_repository_impl.dart';
-import 'package:kpa_app/domain/me/me_repository.dart';
+import 'package:kpa_app/data/me/profile_update_dto.dart';
 import 'package:kpa_app/presentation/profile/profile_screen.dart';
 
 class _FakeRepo implements MeRepository {
@@ -11,21 +12,25 @@ class _FakeRepo implements MeRepository {
   final MeDto me;
   @override
   Future<MeDto> fetch() async => me;
+  @override
+  Future<MeDto> updateProfile(ProfileUpdateDto update) async => me;
 }
 
 void main() {
   testWidgets(
     'renders user name + email + Coming soon rows + Sign out',
     (tester) async {
-      final me = MeDto(
-        user: MeUserDto(
-          id: 'u1',
-          email: 'eng@example.com',
-          displayName: 'Eng U',
-          role: 'applicant',
-          createdAt: DateTime(2026, 1, 1),
+      const me = MeDto(
+        id: 'u1',
+        email: 'eng@example.com',
+        displayName: 'Eng U',
+        role: 'applicant',
+        applicant: ApplicantSummaryDto(
+          id: 'a1',
+          fullName: 'Eng U',
+          locations: ['Pune'],
+          expectedCtc: '1800000.00',
         ),
-        applicant: const ApplicantSummaryDto(id: 'a1', userId: 'u1'),
       );
       await tester.pumpWidget(
         ProviderScope(
@@ -44,6 +49,9 @@ void main() {
       expect(find.text('Resume'), findsOneWidget);
       expect(find.text('Notifications'), findsOneWidget);
       expect(find.text('Sign out'), findsOneWidget);
+      expect(find.text('Locations'), findsOneWidget);
+      expect(find.text('Pune'), findsOneWidget);
+      expect(find.text('Edit'), findsOneWidget);
     },
   );
 }

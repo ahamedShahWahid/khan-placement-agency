@@ -54,6 +54,9 @@ class JobRead(BaseModel):
     max_exp_years: int
     ctc_min: float | None
     ctc_max: float | None
+    # StrEnum → serializes as its string value ("open"/"closed"). The web/mobile
+    # client uses this to render closed-role state on the saved list.
+    status: str
     posted_at: datetime
 
 

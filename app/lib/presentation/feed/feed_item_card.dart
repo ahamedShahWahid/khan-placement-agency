@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:kpa_app/data/feed/feed_dto.dart';
+import 'package:kpa_app/data/jobs/job_status.dart';
 import 'package:kpa_app/presentation/theme/kpa_spacing.dart';
 import 'package:kpa_app/presentation/widgets/kpa_score_badge.dart';
 
@@ -33,7 +34,7 @@ class FeedItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isClosed = job.status != 'open';
+    final isClosed = job.status != JobStatus.open;
     return Card(
       child: InkWell(
         onTap: onTap,
@@ -73,7 +74,7 @@ class FeedItemCard extends StatelessWidget {
               Text(job.title, style: theme.textTheme.titleMedium),
               const SizedBox(height: KpaSpacing.xs),
               Text(
-                '${job.location} · ${_ago(job.postedAt)}',
+                '${job.locations.isEmpty ? '' : '${job.locations.join(', ')} · '}${_ago(job.postedAt)}',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),

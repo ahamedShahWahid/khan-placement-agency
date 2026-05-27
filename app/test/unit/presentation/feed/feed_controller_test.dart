@@ -2,7 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kpa_app/data/feed/feed_dto.dart';
 import 'package:kpa_app/data/feed/feed_repository_impl.dart';
-import 'package:kpa_app/domain/feed/feed_repository.dart';
+import 'package:kpa_app/data/feed/feed_repository.dart';
+import 'package:kpa_app/data/jobs/job_status.dart';
 import 'package:kpa_app/presentation/feed/feed_controller.dart';
 
 class _FakeFeedRepo implements FeedRepository {
@@ -24,8 +25,8 @@ FeedItemDto _item(String jobId) => FeedItemDto(
       job: JobSummaryDto(
         id: jobId,
         title: 'T-$jobId',
-        location: 'BLR',
-        status: 'open',
+        locations: const ['BLR'],
+        status: JobStatus.open,
         postedAt: DateTime.parse('2026-05-18T00:00:00Z'),
       ),
       employer: const EmployerSummaryDto(id: 'e1', name: 'Acme'),

@@ -3,15 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kpa_app/data/feed/feed_dto.dart';
 import 'package:kpa_app/data/feed/feed_repository_impl.dart';
-import 'package:kpa_app/domain/feed/feed_repository.dart';
+import 'package:kpa_app/data/feed/feed_repository.dart';
+import 'package:kpa_app/data/jobs/job_status.dart';
 import 'package:kpa_app/presentation/feed/feed_screen.dart';
 
 class _FakeFeedRepo implements FeedRepository {
   _FakeFeedRepo(this.page);
   final FeedPageDto page;
   @override
-  Future<FeedPageDto> fetchPage({String? cursor, int limit = 20}) async =>
-      page;
+  Future<FeedPageDto> fetchPage({String? cursor, int limit = 20}) async => page;
 }
 
 Widget _wrap(Widget child, {required FeedRepository repo}) {
@@ -48,8 +48,8 @@ void main() {
       job: JobSummaryDto(
         id: 'j1',
         title: 'Engineer',
-        location: 'BLR',
-        status: 'open',
+        locations: const ['BLR'],
+        status: JobStatus.open,
         postedAt: DateTime.parse('2026-05-18T00:00:00Z'),
       ),
       employer: const EmployerSummaryDto(id: 'e1', name: 'Acme Co'),

@@ -25,8 +25,7 @@ class SecureTokenStorage implements TokenStorage {
   static const _kRefreshKey = 'kpa.refresh_token';
 
   @override
-  Future<String?> readRefreshToken() =>
-      _storage.read(key: _kRefreshKey);
+  Future<String?> readRefreshToken() => _storage.read(key: _kRefreshKey);
 
   @override
   Future<void> writeRefreshToken(String token) =>

@@ -7,8 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'withdraw_application_controller.g.dart';
 
 @riverpod
-class WithdrawApplicationController
-    extends _$WithdrawApplicationController {
+class WithdrawApplicationController extends _$WithdrawApplicationController {
   @override
   FutureOr<ApplicationDto?> build(String applicationId) => null;
 

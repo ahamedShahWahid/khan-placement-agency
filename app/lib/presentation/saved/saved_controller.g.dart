@@ -33,7 +33,7 @@ final class SavedControllerProvider
   SavedController create() => SavedController();
 }
 
-String _$savedControllerHash() => r'1b1a58a23f28bbfd34efa59b406f701eab670829';
+String _$savedControllerHash() => r'8ae696227f8ad3ace5b7aa61635218cde15d0123';
 
 abstract class _$SavedController extends $AsyncNotifier<SavedState> {
   FutureOr<SavedState> build();

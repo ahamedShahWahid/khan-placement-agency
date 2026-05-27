@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
 from kpa import __version__
 from kpa.auth.google_verifier import JwksGoogleIdTokenVerifier
@@ -15,6 +16,7 @@ from kpa.middleware.error_handler import register_error_handlers
 from kpa.middleware.request_id import RequestIdMiddleware
 from kpa.observability.logging import configure_logging
 from kpa.routes import (
+    applicants,
     applications,
     auth,
     feed,
@@ -48,12 +50,25 @@ def create_app() -> FastAPI:
         cache_ttl_seconds=settings.google_jwks_cache_ttl_seconds,
     )
     app.add_middleware(RequestIdMiddleware)
+    # Added after RequestIdMiddleware so it wraps it (outermost): CORS handles the
+    # browser preflight (OPTIONS) and stamps Access-Control-* on every response,
+    # including errors. Starlette's CORSMiddleware is pure-ASGI, so it's safe
+    # alongside RequestIdMiddleware (see the BaseHTTPMiddleware note in CLAUDE.md).
+    # Bearer-token auth (no cookies) → allow_credentials stays False.
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=list(settings.cors_allow_origins),
+        allow_methods=["*"],
+        allow_headers=["*"],
+        expose_headers=["X-Request-Id"],
+    )
     register_error_handlers(app)
     # /health is intentionally not under /v1 — ALB and Kubernetes probes target
     # it directly. Versioned API routes will be mounted with prefix="/v1" later.
     app.include_router(health.router)
     app.include_router(ready.router)
     app.include_router(resumes.router)
+    app.include_router(applicants.router)
     app.include_router(auth.router)
     app.include_router(me.router)
     app.include_router(feed.router)

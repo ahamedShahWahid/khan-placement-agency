@@ -13,20 +13,19 @@ void main() {
     mock.on('GET', '/v1/saved', 200, {
       'items': [
         {
-          'saved': {
+          'saved_job': {
             'id': 's1',
-            'applicant_id': 'ap1',
             'job_id': 'j1',
             'created_at': '2026-05-21T12:00:00Z',
           },
           'job': {
             'id': 'j1',
             'title': 'Eng',
-            'location': 'BLR',
+            'locations': ['BLR'],
             'status': 'open',
             'posted_at': '2026-05-18T00:00:00Z',
           },
-          'employer': {'id': 'e1', 'name': 'Acme'},
+          'employer': {'id': 'e1', 'name': 'Acme', 'verified': false},
           'match': null,
         }
       ],
