@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:kpa_app/data/me/me_dto.dart';
 import 'package:kpa_app/data/me/me_repository_impl.dart';
 import 'package:kpa_app/data/me/me_repository.dart';
+import 'package:kpa_app/data/me/profile_update_dto.dart';
 import 'package:kpa_app/presentation/profile/profile_screen.dart';
 
 class _FakeRepo implements MeRepository {
@@ -11,21 +12,20 @@ class _FakeRepo implements MeRepository {
   final MeDto me;
   @override
   Future<MeDto> fetch() async => me;
+  @override
+  Future<MeDto> updateProfile(ProfileUpdateDto update) async => me;
 }
 
 void main() {
   testWidgets(
     'renders user name + email + Coming soon rows + Sign out',
     (tester) async {
-      final me = MeDto(
-        user: MeUserDto(
-          id: 'u1',
-          email: 'eng@example.com',
-          displayName: 'Eng U',
-          role: 'applicant',
-          createdAt: DateTime(2026, 1, 1),
-        ),
-        applicant: const ApplicantSummaryDto(id: 'a1', userId: 'u1'),
+      const me = MeDto(
+        id: 'u1',
+        email: 'eng@example.com',
+        displayName: 'Eng U',
+        role: 'applicant',
+        applicant: ApplicantSummaryDto(id: 'a1', fullName: 'Eng U'),
       );
       await tester.pumpWidget(
         ProviderScope(

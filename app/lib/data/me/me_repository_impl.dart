@@ -4,6 +4,7 @@ import 'package:kpa_app/data/api/error_mapping.dart';
 import 'package:kpa_app/data/me/me_api.dart';
 import 'package:kpa_app/data/me/me_dto.dart';
 import 'package:kpa_app/data/me/me_repository.dart';
+import 'package:kpa_app/data/me/profile_update_dto.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'me_repository_impl.g.dart';
@@ -16,6 +17,15 @@ class MeRepositoryImpl implements MeRepository {
   Future<MeDto> fetch() async {
     try {
       return await _api.getMe();
+    } on DioException catch (e) {
+      throw mapDioException(e);
+    }
+  }
+
+  @override
+  Future<MeDto> updateProfile(ProfileUpdateDto update) async {
+    try {
+      return await _api.updateProfile(update);
     } on DioException catch (e) {
       throw mapDioException(e);
     }
