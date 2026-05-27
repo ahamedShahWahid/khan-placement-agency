@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kpa_app/data/me/me_dto.dart';
-import 'package:kpa_app/data/me/me_repository_impl.dart';
 import 'package:kpa_app/data/me/me_repository.dart';
+import 'package:kpa_app/data/me/me_repository_impl.dart';
 import 'package:kpa_app/data/me/profile_update_dto.dart';
 import 'package:kpa_app/presentation/profile/profile_screen.dart';
 
@@ -25,7 +25,12 @@ void main() {
         email: 'eng@example.com',
         displayName: 'Eng U',
         role: 'applicant',
-        applicant: ApplicantSummaryDto(id: 'a1', fullName: 'Eng U'),
+        applicant: ApplicantSummaryDto(
+          id: 'a1',
+          fullName: 'Eng U',
+          locations: ['Pune'],
+          expectedCtc: '1800000.00',
+        ),
       );
       await tester.pumpWidget(
         ProviderScope(
@@ -44,6 +49,9 @@ void main() {
       expect(find.text('Resume'), findsOneWidget);
       expect(find.text('Notifications'), findsOneWidget);
       expect(find.text('Sign out'), findsOneWidget);
+      expect(find.text('Locations'), findsOneWidget);
+      expect(find.text('Pune'), findsOneWidget);
+      expect(find.text('Edit'), findsOneWidget);
     },
   );
 }

@@ -2,10 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:kpa_app/presentation/profile/ctc_format.dart';
 import 'package:kpa_app/presentation/profile/me_controller.dart';
 import 'package:kpa_app/presentation/profile/package_info_provider.dart';
 import 'package:kpa_app/presentation/profile/sign_out_controller.dart';
+import 'package:kpa_app/presentation/routing/routes.dart';
 import 'package:kpa_app/presentation/theme/kpa_spacing.dart';
 import 'package:kpa_app/presentation/widgets/async_value_widget.dart';
 
@@ -19,7 +22,15 @@ class ProfileScreen extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: AppBar(
+        title: const Text('Profile'),
+        actions: [
+          TextButton(
+            onPressed: () => context.go(Routes.profileEdit),
+            child: const Text('Edit'),
+          ),
+        ],
+      ),
       body: AsyncValueWidget(
         value: me,
         onRetry: () => ref.read(meControllerProvider.notifier).refresh(),
@@ -27,16 +38,43 @@ class ProfileScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(KpaSpacing.lg),
           children: [
             Text(
-              data.user.displayName ?? data.user.email,
+              data.displayName ?? data.email,
               style: theme.textTheme.headlineSmall,
             ),
             const SizedBox(height: KpaSpacing.xs),
             Text(
-              data.user.email,
+              data.email,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
+            if (data.applicant case final a?) ...[
+              const SizedBox(height: KpaSpacing.xl),
+              _DetailRow(
+                label: 'Locations',
+                value: a.locations.isEmpty
+                    ? '—'
+                    : a.locations.join(', '),
+              ),
+              if (a.yearsExperience != null)
+                _DetailRow(
+                  label: 'Experience',
+                  value: '${a.yearsExperience} yrs',
+                ),
+              if (a.noticePeriodDays != null)
+                _DetailRow(
+                  label: 'Notice period',
+                  value: '${a.noticePeriodDays} days',
+                ),
+              _DetailRow(
+                label: 'Current CTC',
+                value: formatCtc(a.currentCtc),
+              ),
+              _DetailRow(
+                label: 'Expected CTC',
+                value: formatCtc(a.expectedCtc),
+              ),
+            ],
             const SizedBox(height: KpaSpacing.xl),
             Text('Account', style: theme.textTheme.titleMedium),
             const SizedBox(height: KpaSpacing.sm),
@@ -61,17 +99,17 @@ class ProfileScreen extends ConsumerWidget {
             ),
             const SizedBox(height: KpaSpacing.xxl),
             ref.watch(packageInfoProvider).when(
-              data: (info) => Center(
-                child: Text(
-                  'v${info.version} (${info.buildNumber})',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                  data: (info) => Center(
+                    child: Text(
+                      'v${info.version} (${info.buildNumber})',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                   ),
+                  loading: () => const SizedBox.shrink(),
+                  error: (_, __) => const SizedBox.shrink(),
                 ),
-              ),
-              loading: () => const SizedBox.shrink(),
-              error: (_, __) => const SizedBox.shrink(),
-            ),
           ],
         ),
       ),
@@ -101,5 +139,34 @@ class ProfileScreen extends ConsumerWidget {
     if (ok ?? false) {
       await ref.read(signOutControllerProvider.notifier).submit();
     }
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  const _DetailRow({required this.label, required this.value});
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: KpaSpacing.xs),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(
+              label,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          Expanded(child: Text(value, style: theme.textTheme.bodyMedium)),
+        ],
+      ),
+    );
   }
 }
