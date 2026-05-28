@@ -114,12 +114,16 @@ class _RefreshCounter {
   return (dio: dio, adapter: adapter, holder: holder, counter: counter);
 }
 
+/// Real backend wire shape — RFC 7807 problem+json from
+/// middleware/error_handler.py. The slug is encoded in `detail`; there is
+/// NO separate `slug` field. Tests must mirror this so contract drift
+/// (slug-key vs detail-key) cannot pass.
 Map<String, dynamic> _invalidAccess() => {
       'type': 'about:blank',
       'title': 'Unauthorized',
       'status': 401,
-      'slug': 'invalid_access_token',
-      'detail': 'expired',
+      'detail': 'invalid_access_token',
+      'request_id': 'test-req-id',
     };
 
 // ---------------------------------------------------------------------------
@@ -216,17 +220,25 @@ void main() {
       expect(h.counter.calls, 0);
     });
 
-    test('401 with non-invalid_access_token slug → no refresh', () async {
+    test('401 with non-invalid_access_token detail → no refresh, sign out',
+        () async {
+      // missing_bearer_token / user_not_found / unknown future slugs all
+      // mean the session is structurally broken — refresh won't help, so
+      // clear the holder and trigger sign-out so the router redirects to
+      // /signin. (Pre-2026-05-29 behavior just fell through, which left
+      // the caller rendering a misleading "Signed out" inline view while
+      // the auth state stayed SignedIn.)
+      var signedOut = false;
       final h = _buildHarness(
         onRefresh: (_) async => fail('should not run'),
+        onSignedOut: () => signedOut = true,
       );
       h.holder.set('TOK');
 
       h.adapter.enqueue(
         _MockResponse(401, {
           'status': 401,
-          'slug': 'missing_bearer_token',
-          'detail': 'no bearer',
+          'detail': 'missing_bearer_token',
         }),
       );
 
@@ -235,7 +247,64 @@ void main() {
         throwsA(isA<DioException>()),
       );
       expect(h.counter.calls, 0);
-      expect(h.holder.current, 'TOK', reason: 'holder unchanged');
+      expect(h.holder.current, isNull, reason: 'holder cleared on sign-out');
+      expect(signedOut, isTrue);
+    });
+
+    test('401 user_not_found → no refresh, sign out', () async {
+      var signedOut = false;
+      final h = _buildHarness(
+        onRefresh: (_) async => fail('should not run'),
+        onSignedOut: () => signedOut = true,
+      );
+      h.holder.set('TOK');
+
+      h.adapter.enqueue(
+        _MockResponse(401, {
+          'status': 401,
+          'detail': 'user_not_found',
+        }),
+      );
+
+      await expectLater(
+        h.dio.get<dynamic>('/v1/feed'),
+        throwsA(isA<DioException>()),
+      );
+      expect(h.counter.calls, 0);
+      expect(h.holder.current, isNull);
+      expect(signedOut, isTrue);
+    });
+
+    test('401 on kSkipAuth refresh endpoint → no sign-out either', () async {
+      // The refresh-endpoint call itself sets kSkipAuth. A 401 from refresh
+      // is handled by the auth repo (which then triggers the dio's higher-
+      // level sign-out path via _RefreshFailed inside the OTHER 401). The
+      // interceptor must NOT also push SignedOut here — that would race
+      // with the in-flight refresh's own error handling.
+      var signedOut = false;
+      final h = _buildHarness(
+        onRefresh: (_) async => fail('should not run'),
+        onSignedOut: () => signedOut = true,
+      );
+      h.holder.set('TOK');
+
+      h.adapter.enqueue(
+        _MockResponse(401, {
+          'status': 401,
+          'detail': 'invalid_refresh_token',
+        }),
+      );
+
+      await expectLater(
+        h.dio.post<dynamic>(
+          '/v1/auth/refresh',
+          options: Options(extra: {kSkipAuth: true}),
+        ),
+        throwsA(isA<DioException>()),
+      );
+      expect(h.counter.calls, 0);
+      expect(signedOut, isFalse, reason: 'kSkipAuth path must not sign out');
+      expect(h.holder.current, 'TOK', reason: 'holder untouched on kSkipAuth');
     });
 
     test('replay still 401 → give up, clear holder, signed out', () async {
