@@ -98,6 +98,17 @@ Every domain table carries `id` (uuid4), `created_at`, `updated_at`, `deleted_at
 
 The `Base.__table_args__` is typed `Any` and uses `# noqa: RUF012` because SQLAlchemy's declarative base types this as a class-level mutable. Don't "fix" the noqa.
 
+### Audit logs
+
+- **Append-only.** `audit_logs` has no UPDATE or DELETE paths in code. The `CreatedAt` / `UpdatedAt` / `DeletedAt` `Annotated` types in `db/models.py` are deliberately NOT used on `AuditLog` — this is the documented exception to the soft-delete pattern above. Queries against `audit_logs` never filter `deleted_at IS NULL`.
+- **Caller owns the txn.** `await audit_log(session, action=..., actor=..., resource_type=..., resource_id=..., context=...)` flushes one row inside the caller's transaction. No commit, no fire-and-forget dispatch. The row is as durable as the business action it records — if the request rolls back, the audit row rolls back too. Spec §5.1 documents why fire-and-forget was rejected (broker outage → evidence loss; rolled-back business txn → false evidence).
+- **`actor_user_id` is `ON DELETE SET NULL`.** Load-bearing for future DSR-delete (sub-project D, scoped as "hard-delete PII, keep anonymized aggregates"): hard-deleting a user succeeds, but the audit row survives — re-identification of the deleted user is intentionally impossible.
+- **`actor_role` is a snapshot** at action time, plain TEXT (not the `UserRole` enum) because `'system'` is a valid value for cron / worker actions where `actor=None`. A user whose role later flips (applicant → recruiter via `POST /v1/employers`) still has audit rows showing the role they had at the time.
+- **Helper guard.** `audit_log(actor=None, actor_role=None)` raises `ValueError` before touching the session. The DB's `actor_role NOT NULL` would have caught it anyway, but the helper-boundary check is cheaper to debug.
+- **Action-slug namespace:** dotted, lowercase, verb-past. Reserved top-level prefixes: `resume.*`, `application.*`, `job.*`, `consent.*` (P4-B), `user.*` (P4-C/D for DSR), `admin.*`, `auth.*`, `employer.*`. Full table in `docs/superpowers/specs/2026-05-28-audit-logs-substrate-design.md` §4.
+- **The structlog line stays.** Fluent Bit → Elasticsearch → Kibana is the live operational channel (PagerDuty filters, on-call queries); the DB row is the durable channel. Both fire from the same handler — they are complementary, not substitutes. The `recruiter.resume-accessed` structlog line in `routes/applications.py:recruiter_download_application_resume` is the canonical example: structlog FIRST, `audit_log()` SECOND, then the side-effecting work.
+- **No retention TTL yet.** Indefinite retention until the table grows past ~10M rows; a `purge_old_audit_logs` Celery beat task is the deferred follow-up.
+
 ### Don't reuse models as response schemas
 
 Per spec §4.2 and the comment in `db/models.py`: SQLAlchemy models are never response models. Define `*Read` / `*Create` / `*Update` Pydantic v2 models in the route module (see `ResumeRead` with `ConfigDict(from_attributes=True)` for the conversion pattern).
