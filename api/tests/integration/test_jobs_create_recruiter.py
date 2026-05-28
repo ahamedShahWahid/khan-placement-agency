@@ -78,7 +78,7 @@ async def test_create_job_not_a_recruiter_returns_403(
     _, token = applicant_user_and_token
     body = {
         "employer_id": "00000000-0000-0000-0000-000000000000",
-        "title": "X",
+        "title": "XY",
         "description": "Y" * 50,
         "locations": ["A"],
         "min_exp_years": 0,
@@ -103,7 +103,7 @@ async def test_create_job_invalid_exp_band_returns_422(
     emp_id = r1.json()["id"]
     body = {
         "employer_id": emp_id,
-        "title": "X",
+        "title": "XY",
         "description": "Y" * 50,
         "locations": ["A"],
         "min_exp_years": 5,
@@ -133,12 +133,12 @@ async def test_create_job_dispatches_embed(
         def delay(self, job_id: str) -> None:
             called_with.append(job_id)
 
-    import kpa.routes.jobs as jobs_mod
-    monkeypatch.setattr(jobs_mod, "embed_job", _Stub())
+    import kpa.workers.tasks.embed_job as _embed_job_mod
+    monkeypatch.setattr(_embed_job_mod, "embed_job", _Stub(), raising=False)
 
     body = {
         "employer_id": emp_id,
-        "title": "T",
+        "title": "Test Job",
         "description": "D" * 50,
         "locations": ["A"],
         "min_exp_years": 1,

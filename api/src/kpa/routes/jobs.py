@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import uuid
 from decimal import Decimal
-from typing import Any, Literal
+from typing import Literal
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
@@ -114,37 +114,11 @@ async def get_job_detail(
     )
 
 
-class _LazyEmbedJob:
-    """Lazy proxy for the ``embed_job`` Celery task.
-
-    The real task lives in ``kpa.workers.tasks.embed_job``, which imports
-    ``kpa.workers.celery_app`` at module level — that module calls
-    ``Settings()`` immediately and requires KPA_* env vars.  A module-level
-    import of the task would break test collection (conftest loads
-    ``app_factory`` before ``pytest_configure`` sets the env-var defaults).
-
-    Exposing this proxy as a module-level name lets tests replace it via
-    ``monkeypatch.setattr(jobs_mod, "embed_job", _Stub())`` while keeping the
-    real import deferred until the first actual dispatch call.
-    """
-
-    _task: Any = None  # populated on first use; class-level so the proxy is stateless
-
-    def delay(self, job_id: str) -> None:
-        if self._task is None:
-            from kpa.workers.tasks.embed_job import embed_job as _t
-
-            type(self)._task = _t
-        self._task.delay(job_id)
-
-
-embed_job: _LazyEmbedJob = _LazyEmbedJob()
-
 
 class JobCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
     employer_id: uuid.UUID
-    title: str = Field(min_length=1, max_length=200)
+    title: str = Field(min_length=2, max_length=200)
     description: str = Field(min_length=10, max_length=10_000)
     locations: list[str] = Field(min_length=1, max_length=20)
     min_exp_years: int = Field(ge=0, le=50)
@@ -190,7 +164,12 @@ async def create_job(
     await session.commit()
     await session.refresh(job)
 
+    # Lazy import: kpa.workers.celery_app instantiates Settings() at module
+    # level (needs KPA_REDIS_URL). Deferring the import to request time avoids
+    # import-time failures in test collection where env vars aren't yet set.
     try:
+        from kpa.workers.tasks.embed_job import embed_job
+
         embed_job.delay(str(job.id))
     except Exception:
         _log.warning("embed.dispatch-failed", job_id=str(job.id), exc_info=True)
