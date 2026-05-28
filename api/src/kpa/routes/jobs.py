@@ -395,3 +395,105 @@ async def delete_job(
     return Response(status_code=204)
 
 
+# ---------------------------------------------------------------------------
+# GET /v1/jobs/{job_id}/applicants — recruiter view of who applied
+# ---------------------------------------------------------------------------
+
+
+class ApplicantOfJobRow(BaseModel):
+    application_id: uuid.UUID
+    applicant_id: uuid.UUID
+    display_name: str | None
+    email: str | None
+    status: str
+    applied_at: datetime
+    match_score: float | None
+    match_explanation: dict[str, str] | None
+
+
+class ApplicantsOfJobPage(BaseModel):
+    items: list[ApplicantOfJobRow]
+    next_cursor: str | None
+
+
+def _encode_applicants_cursor(created_at: datetime, application_id: uuid.UUID) -> str:
+    raw = _json.dumps({"created_at": created_at.isoformat(), "id": str(application_id)})
+    return base64.urlsafe_b64encode(raw.encode()).decode()
+
+
+def _decode_applicants_cursor(cursor: str) -> tuple[datetime, uuid.UUID]:
+    try:
+        raw = base64.urlsafe_b64decode(cursor.encode()).decode()
+        obj = _json.loads(raw)
+        return datetime.fromisoformat(obj["created_at"]), uuid.UUID(obj["id"])
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="invalid_cursor") from e
+
+
+@router.get("/jobs/{job_id}/applicants", response_model=ApplicantsOfJobPage)
+async def list_applicants_for_job(
+    job_id: uuid.UUID,
+    user: User = Depends(current_user),  # noqa: B008
+    session: AsyncSession = Depends(get_session),  # noqa: B008
+    limit: Annotated[int, Query(ge=1, le=100)] = 20,
+    cursor: str | None = None,
+) -> ApplicantsOfJobPage:
+    # _load_recruiter_job validates role + employer link + job existence; uniform 404.
+    await _load_recruiter_job(job_id, user, session)
+
+    stmt = (
+        select(Application, Applicant, User, Match)
+        .join(Applicant, Applicant.id == Application.applicant_id)
+        .join(User, User.id == Applicant.user_id)
+        .outerjoin(
+            Match,
+            and_(
+                Match.applicant_id == Application.applicant_id,
+                Match.job_id == Application.job_id,
+                Match.deleted_at.is_(None),
+            ),
+        )
+        .where(
+            Application.job_id == job_id,
+            Application.deleted_at.is_(None),
+            Application.status == "applied",
+        )
+        .order_by(Application.created_at.desc(), Application.id.desc())
+    )
+
+    if cursor is not None:
+        cur_at, cur_id = _decode_applicants_cursor(cursor)
+        stmt = stmt.where(
+            or_(
+                Application.created_at < cur_at,
+                and_(Application.created_at == cur_at, Application.id < cur_id),
+            )
+        )
+
+    stmt = stmt.limit(limit + 1)
+    rows = (await session.execute(stmt)).all()
+    has_more = len(rows) > limit
+    rows = rows[:limit]
+
+    items: list[ApplicantOfJobRow] = []
+    for app_row, applicant, u, match in rows:
+        items.append(
+            ApplicantOfJobRow(
+                application_id=app_row.id,
+                applicant_id=app_row.applicant_id,
+                display_name=applicant.full_name,
+                email=u.email,
+                status=app_row.status,
+                applied_at=app_row.created_at,
+                match_score=float(match.total_score) if match is not None else None,
+                match_explanation=match.explanation if match is not None else None,
+            )
+        )
+
+    next_cursor = (
+        _encode_applicants_cursor(rows[-1][0].created_at, rows[-1][0].id)
+        if has_more and rows
+        else None
+    )
+    return ApplicantsOfJobPage(items=items, next_cursor=next_cursor)
+
