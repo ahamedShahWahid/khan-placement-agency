@@ -22,6 +22,7 @@ from kpa.auth.dependencies import (
 from kpa.db.models import (
     Applicant,
     Employer,
+    EmployerUser,
     Job,
     JobStatus,
     Match,
@@ -173,5 +174,82 @@ async def create_job(
         embed_job.delay(str(job.id))
     except Exception:
         _log.warning("embed.dispatch-failed", job_id=str(job.id), exc_info=True)
+
+    return JobRead.model_validate(job)
+
+
+_EMBED_TRIGGERING_FIELDS = frozenset(
+    {
+        "title",
+        "description",
+        "locations",
+        "min_exp_years",
+        "max_exp_years",
+        "ctc_min",
+        "ctc_max",
+    }
+)
+
+
+class JobPatch(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    title: str | None = Field(default=None, min_length=2, max_length=200)
+    description: str | None = Field(default=None, min_length=10, max_length=10_000)
+    locations: list[str] | None = Field(default=None, min_length=1, max_length=20)
+    min_exp_years: int | None = Field(default=None, ge=0, le=50)
+    max_exp_years: int | None = Field(default=None, ge=0, le=50)
+    ctc_min: Decimal | None = Field(default=None, ge=0)
+    ctc_max: Decimal | None = Field(default=None, ge=0)
+    status: Literal["open", "closed"] | None = None
+
+
+async def _load_recruiter_job(
+    job_id: uuid.UUID, user: User, session: AsyncSession
+) -> Job:
+    """Uniform 404 for unknown / wrong-employer / soft-deleted job."""
+    await _require_recruiter(user)
+    row = await session.execute(
+        select(Job)
+        .join(EmployerUser, EmployerUser.employer_id == Job.employer_id)
+        .where(
+            Job.id == job_id,
+            Job.deleted_at.is_(None),
+            EmployerUser.user_id == user.id,
+            EmployerUser.deleted_at.is_(None),
+        )
+    )
+    job = row.scalar_one_or_none()
+    if job is None:
+        raise HTTPException(status_code=404, detail="not found")
+    return job
+
+
+@router.patch("/jobs/{job_id}", response_model=JobRead)
+async def patch_job(
+    job_id: uuid.UUID,
+    payload: JobPatch,
+    user: User = Depends(current_user),  # noqa: B008
+    session: AsyncSession = Depends(get_session),  # noqa: B008
+) -> JobRead:
+    job = await _load_recruiter_job(job_id, user, session)
+
+    fields = payload.model_dump(exclude_unset=True)
+    content_changed = bool(_EMBED_TRIGGERING_FIELDS & fields.keys())
+
+    for key, value in fields.items():
+        if key == "status":
+            setattr(job, key, JobStatus(value))
+        else:
+            setattr(job, key, value)
+    await session.commit()
+    await session.refresh(job)
+
+    if content_changed:
+        try:
+            from kpa.workers.tasks.embed_job import embed_job
+
+            embed_job.delay(str(job.id))
+        except Exception:
+            _log.warning("embed.dispatch-failed", job_id=str(job.id), exc_info=True)
 
     return JobRead.model_validate(job)
