@@ -66,7 +66,7 @@ def upgrade() -> None:
 
     # Action timeline: WHERE action = $1 ORDER BY created_at DESC.
     op.execute(
-        "CREATE INDEX ix_audit_logs_action_created " "ON kpa.audit_logs (action, created_at DESC)"
+        "CREATE INDEX ix_audit_logs_action_created ON kpa.audit_logs (action, created_at DESC)"
     )
 
 
