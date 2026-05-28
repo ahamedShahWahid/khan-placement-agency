@@ -5,8 +5,9 @@
 # Local upload storage (LocalFileStorage default root).
 api/var/
 
-# Local secrets scratch file (Gemini key, Google client secret) — never commit.
+# Local secrets scratch files (Gemini key, JWT secret, DB password, etc.) — never commit.
 keys.txt
+working
 
 # Redis dump produced by a local redis-server.
 *.rdb
