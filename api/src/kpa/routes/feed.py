@@ -100,10 +100,44 @@ class FeedResponse(BaseModel):
     next_cursor: str | None
 
 
+class JobDetailApplicationRead(BaseModel):
+    """Slim Application shape for the JobDetailResponse.
+
+    Mirrors the fields of ``routes/applications.py::ApplicationRead`` but
+    lives here to avoid the import cycle (applications.py + saved_jobs.py
+    both already import from feed.py).
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+    id: uuid.UUID
+    job_id: uuid.UUID
+    status: str  # "applied" | "withdrawn"
+    source: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class JobDetailSavedJobRead(BaseModel):
+    """Slim SavedJob shape for the JobDetailResponse.
+
+    Mirrors ``routes/saved_jobs.py::SavedJobRead`` — same field set the
+    Flutter ``SavedJobDto`` reads (it ignores ``updated_at`` but the
+    canonical Read includes it, so we match for consistency).
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+    id: uuid.UUID
+    job_id: uuid.UUID
+    created_at: datetime
+    updated_at: datetime
+
+
 class JobDetailResponse(BaseModel):
     job: JobRead
     employer: EmployerRead
     match: MatchRead | None
+    application: JobDetailApplicationRead | None
+    saved_job: JobDetailSavedJobRead | None
 
 
 # --- Cursor helpers ---
