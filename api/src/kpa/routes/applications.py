@@ -22,23 +22,26 @@ import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.responses import Response
 from pydantic import BaseModel, ConfigDict
-from sqlalchemy import func, select, update
+from sqlalchemy import and_, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from kpa.auth.dependencies import current_user
+from kpa.auth.dependencies import _require_recruiter, current_user
 from kpa.db.models import (
     Applicant,
     Application,
     ApplicationStatus,
     Employer,
+    EmployerUser,
     Job,
     JobStatus,
     Notification,
     NotificationChannel,
+    Resume,
     User,
     UserRole,
 )
 from kpa.db.session import get_session
+from kpa.integrations.storage.base import Storage, get_storage
 from kpa.routes.feed import EmployerRead, JobRead, make_weak_etag
 
 _log = structlog.get_logger(__name__)
@@ -407,7 +410,7 @@ async def list_applications(
         items.append(
             ApplicationListItem(
                 application=ApplicationRead.model_validate(application),
-                job=JobRead.model_validate(job),
+                job=JobRead.from_job_and_employer(job, employer),
                 employer=EmployerRead(
                     id=employer.id,
                     name=employer.name,
@@ -429,3 +432,82 @@ async def list_applications(
     response.headers["ETag"] = etag
 
     return ApplicationListResponse(items=items, next_cursor=next_cursor)
+
+
+# ---------------------------------------------------------------------------
+# GET /v1/applications/{application_id}/resume — recruiter downloads latest resume
+# ---------------------------------------------------------------------------
+
+
+@router.get("/applications/{application_id}/resume")
+async def recruiter_download_application_resume(
+    application_id: uuid.UUID,
+    user: User = Depends(current_user),  # noqa: B008
+    session: AsyncSession = Depends(get_session),  # noqa: B008
+    storage: Storage = Depends(get_storage),  # noqa: B008
+) -> Response:
+    """Download the latest resume of the applicant who applied to one of the
+    recruiter's jobs.
+
+    Error ladder:
+    - 401 — no/invalid bearer token (current_user).
+    - 403 not_a_recruiter — caller is not a recruiter.
+    - 404 not found — application doesn't exist, belongs to another employer's
+      job, applicant has no resume, or the application is soft-deleted.
+      Deliberately uniform to avoid existence leaks.
+
+    Emits structured audit log ``recruiter.resume-accessed`` on success.
+    """
+    await _require_recruiter(user)
+
+    # Single query: join Application → Job → EmployerUser (scoped to caller) →
+    # outerjoin Resume (latest first). If the application doesn't belong to one
+    # of the caller's jobs, the EmployerUser join returns nothing.
+    row = (
+        await session.execute(
+            select(Application, Job, Resume)
+            .join(Job, Job.id == Application.job_id)
+            .join(
+                EmployerUser,
+                and_(
+                    EmployerUser.employer_id == Job.employer_id,
+                    EmployerUser.user_id == user.id,
+                    EmployerUser.deleted_at.is_(None),
+                ),
+            )
+            .outerjoin(
+                Resume,
+                and_(
+                    Resume.applicant_id == Application.applicant_id,
+                    Resume.deleted_at.is_(None),
+                ),
+            )
+            .where(
+                Application.id == application_id,
+                Application.deleted_at.is_(None),
+                Job.deleted_at.is_(None),
+            )
+            .order_by(Resume.created_at.desc())
+        )
+    ).first()
+
+    if row is None or row.Resume is None:
+        raise HTTPException(status_code=404, detail="not found")
+
+    application, job, resume = row.Application, row.Job, row.Resume
+
+    _log.info(
+        "recruiter.resume-accessed",
+        recruiter_user_id=str(user.id),
+        employer_id=str(job.employer_id),
+        application_id=str(application.id),
+        applicant_id=str(application.applicant_id),
+        resume_id=str(resume.id),
+    )
+
+    content = await storage.read(resume.storage_key)
+    return Response(
+        content=content,
+        media_type=resume.content_type,
+        headers={"Content-Disposition": f'attachment; filename="{resume.original_filename}"'},
+    )

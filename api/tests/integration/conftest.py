@@ -35,6 +35,8 @@ from kpa.auth.google_verifier import (
     InvalidGoogleTokenError,
     get_google_verifier,
 )
+from kpa.auth.tokens import mint_access_token
+from kpa.db.models import User, UserRole
 from kpa.integrations.embeddings import EmbeddingResult, EmbeddingTask
 from kpa.scoring.explainer import ExplainContext
 
@@ -329,6 +331,21 @@ async def async_client(
         yield ac
 
     app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture
+async def applicant_user_and_token(session: AsyncSession) -> tuple[User, str]:
+    """Mints an applicant user + a valid access JWT for use in integration tests."""
+    user = User(email="applicant@example.com", role=UserRole.APPLICANT)
+    session.add(user)
+    await session.flush()
+    token = mint_access_token(
+        user_id=user.id,
+        role=user.role.value,
+        secret="x" * 32,
+        ttl_seconds=600,
+    )
+    return user, token
 
 
 @pytest_asyncio.fixture

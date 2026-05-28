@@ -39,16 +39,12 @@ class ProfileUpdate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     full_name: str | None = Field(default=None, min_length=1, max_length=200)
-    locations: (
-        list[Annotated[str, Field(min_length=1, max_length=100)]] | None
-    ) = Field(default=None, max_length=10)
+    locations: list[Annotated[str, Field(min_length=1, max_length=100)]] | None = Field(
+        default=None, max_length=10
+    )
     notice_period_days: int | None = Field(default=None, ge=0, le=365)
-    current_ctc: Decimal | None = Field(
-        default=None, ge=0, le=Decimal("9999999999.99")
-    )
-    expected_ctc: Decimal | None = Field(
-        default=None, ge=0, le=Decimal("9999999999.99")
-    )
+    current_ctc: Decimal | None = Field(default=None, ge=0, le=Decimal("9999999999.99"))
+    expected_ctc: Decimal | None = Field(default=None, ge=0, le=Decimal("9999999999.99"))
     years_experience: Decimal | None = Field(default=None, ge=0, le=Decimal("60"))
 
     @model_validator(mode="after")
@@ -66,9 +62,7 @@ async def _require_applicant(user: User, session: AsyncSession) -> Applicant:
     paired row is absent (sign-in provisions it — defense in depth).
     """
     if user.role != UserRole.APPLICANT:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="not_an_applicant"
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not_an_applicant")
     applicant = (
         await session.execute(
             select(Applicant).where(
@@ -94,9 +88,7 @@ def _dispatch_score(applicant_id: UUID) -> None:
     try:
         score_applicant.delay(str(applicant_id))
     except Exception:
-        _log.warning(
-            "score.dispatch-failed", applicant_id=str(applicant_id), exc_info=True
-        )
+        _log.warning("score.dispatch-failed", applicant_id=str(applicant_id), exc_info=True)
 
 
 @router.patch("", response_model=MeResponse, status_code=status.HTTP_200_OK)
