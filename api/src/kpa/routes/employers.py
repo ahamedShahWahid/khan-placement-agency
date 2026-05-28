@@ -63,15 +63,19 @@ async def create_employer(
     try:
         await session.flush()
     except IntegrityError as e:
+        # SQLAlchemy wraps the asyncpg exception: e.orig is AsyncAdapt_asyncpg_dbapi.IntegrityError,
+        # and the raw asyncpg UniqueViolationError (which carries constraint_name) sits at
+        # e.orig.__cause__. Walk the cause chain to detect our partial-UNIQUE constraint.
         orig = getattr(e, "orig", None)
-        # asyncpg surfaces constraint violations as asyncpg.exceptions.UniqueViolationError.
-        # We detect by class name to avoid importing asyncpg directly (no py.typed marker).
+        cause = getattr(orig, "__cause__", None) or orig
         if (
-            orig is not None
-            and type(orig).__name__ == "UniqueViolationError"
-            and getattr(orig, "constraint_name", None) == "ix_employers_name_norm_live"
+            cause is not None
+            and type(cause).__name__ == "UniqueViolationError"
+            and getattr(cause, "constraint_name", None) == "ix_employers_name_norm_live"
         ):
+            await session.rollback()
             raise HTTPException(status_code=409, detail="employer_name_taken") from e
+        await session.rollback()
         raise
 
     session.add(EmployerUser(employer_id=emp.id, user_id=user.id, role="owner"))
