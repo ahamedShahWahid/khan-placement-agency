@@ -27,6 +27,7 @@ if TYPE_CHECKING:
 
     from kpa.integrations.embeddings.gemini import GeminiEmbeddingProvider
     from kpa.integrations.notifications.base import EmailChannel
+    from kpa.scoring.explainer import MatchExplainer
 
 # Settings is built at import time — one Settings object for the worker process.
 # Tasks read this rather than instantiating Settings repeatedly.
@@ -158,3 +159,40 @@ def get_email_channel() -> EmailChannel:
         else:
             raise ValueError(f"unknown email_channel: {settings.email_channel!r}")
     return _email_channel
+
+
+# --- Per-worker match explainer ---
+
+_match_explainer: MatchExplainer | None = None
+
+
+def get_match_explainer() -> MatchExplainer:
+    """Return the worker's match explainer, building it lazily.
+
+    Reads ``settings.match_explainer`` to choose the implementation:
+    - ``"templated"`` — ``TemplatedExplainer`` (default; deterministic, no network).
+    - ``"llm"``       — ``GeminiMatchExplainer`` wrapping ``genai.Client``.
+
+    Like ``get_embedding_provider``, the explainer is built on first call so
+    that eager-mode tests can monkeypatch before the factory is invoked. The
+    LLM branch defers ``from google import genai`` so the templated path never
+    pays the import cost.
+    """
+    global _match_explainer
+    if _match_explainer is None:
+        if settings.match_explainer == "templated":
+            from kpa.scoring.explainer import TemplatedExplainer
+
+            _match_explainer = TemplatedExplainer()
+        elif settings.match_explainer == "llm":
+            from google import genai
+
+            from kpa.scoring.llm_explainer import GeminiMatchExplainer
+
+            _match_explainer = GeminiMatchExplainer(
+                client=genai.Client(api_key=settings.gemini_api_key.get_secret_value()),
+                model=settings.match_explainer_model,
+            )
+        else:
+            raise ValueError(f"unknown match_explainer: {settings.match_explainer!r}")
+    return _match_explainer
