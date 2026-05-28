@@ -358,6 +358,11 @@ class Employer(Base):
     name_norm: Mapped[str] = mapped_column(String(200), nullable=False)
     gst: Mapped[str | None] = mapped_column(String(15), nullable=True)
     verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_by_user_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("kpa.users.id"),
+        nullable=True,
+    )
     created_at: Mapped[CreatedAt]
     updated_at: Mapped[UpdatedAt]
     deleted_at: Mapped[DeletedAt]
@@ -369,6 +374,45 @@ class Employer(Base):
             unique=True,
             postgresql_where="deleted_at IS NULL",
         ),
+        {"schema": "kpa"},
+    )
+
+
+class EmployerUser(Base):
+    """Recruiter ↔ employer M:N link. role: 'owner' (this slice) or 'member' (future)."""
+
+    __tablename__ = "employer_users"
+
+    id: Mapped[UuidPK]
+    employer_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("kpa.employers.id"),
+        nullable=False,
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("kpa.users.id"),
+        nullable=False,
+    )
+    role: Mapped[str] = mapped_column(String(16), nullable=False)
+    created_at: Mapped[CreatedAt]
+    updated_at: Mapped[UpdatedAt]
+    deleted_at: Mapped[DeletedAt]
+
+    __table_args__ = (
+        Index(
+            "ix_employer_users_pair_live",
+            "employer_id",
+            "user_id",
+            unique=True,
+            postgresql_where="deleted_at IS NULL",
+        ),
+        Index(
+            "ix_employer_users_user",
+            "user_id",
+            postgresql_where="deleted_at IS NULL",
+        ),
+        CheckConstraint("role IN ('owner','member')", name="ck_employer_users_role"),
         {"schema": "kpa"},
     )
 
