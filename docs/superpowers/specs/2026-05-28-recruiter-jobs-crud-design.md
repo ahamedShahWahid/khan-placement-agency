@@ -21,7 +21,7 @@ posting" line item.
 
 ## Background — verified current state
 
-- `employers` table exists with columns `id, name, name_norm, website,
+- `employers` table exists with columns `id, name, name_norm, gst,
   verified_at, created_at, updated_at, deleted_at` and a partial UNIQUE index
   on `name_norm` WHERE `deleted_at IS NULL`. Seeded via `kpa-seed-jobs` CLI.
 - `jobs` table exists with `id, employer_id, title, description, locations
@@ -148,7 +148,7 @@ async def create_employer(payload, user, session):
         emp = Employer(
             name=payload.name,
             name_norm=name_norm,
-            website=str(payload.website) if payload.website else None,
+            gst=str(payload.gst) if payload.gst else None,
             created_by_user_id=user.id,
         )
         session.add(emp)
@@ -209,7 +209,7 @@ whether an id exists for another tenant.
 ```python
 _EMBED_TRIGGERING_FIELDS = frozenset({
     "title", "description", "locations",
-    "min_exp_years", "max_exp_years", "ctc_max",
+    "min_exp_years", "max_exp_years", "ctc_min", "ctc_max",
 })
 
 async def patch_job(job_id, payload, ...):
@@ -359,13 +359,13 @@ If the applicant has multiple resumes, the **latest** is returned (ORDER BY
 class EmployerCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
     name: str = Field(min_length=2, max_length=200)
-    website: HttpUrl | None = None
+    gst: str | None = Field(default=None, min_length=15, max_length=15)
 
 class EmployerRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: UUID
     name: str
-    website: str | None
+    gst: str | None
     verified_at: datetime | None
     created_at: datetime
 
@@ -378,6 +378,7 @@ class JobCreate(BaseModel):
     locations: list[str] = Field(min_length=1, max_length=20)
     min_exp_years: int = Field(ge=0, le=50)
     max_exp_years: int = Field(ge=0, le=50)
+    ctc_min: Decimal | None = Field(default=None, ge=0)
     ctc_max: Decimal | None = Field(default=None, ge=0)
     status: Literal["open", "closed"] = "open"
 
@@ -388,6 +389,7 @@ class JobPatch(BaseModel):
     locations: list[str] | None = Field(default=None, min_length=1, max_length=20)
     min_exp_years: int | None = Field(default=None, ge=0, le=50)
     max_exp_years: int | None = Field(default=None, ge=0, le=50)
+    ctc_min: Decimal | None = Field(default=None, ge=0)
     ctc_max: Decimal | None = Field(default=None, ge=0)
     status: Literal["open", "closed"] | None = None
 
