@@ -7,13 +7,15 @@ via ``app.dependency_overrides[current_user] = lambda: fake_user``.
 
 from __future__ import annotations
 
+import uuid
 from uuid import UUID
 
 from fastapi import Depends, HTTPException, Request, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from kpa.auth.tokens import AccessTokenError, decode_access_token
-from kpa.db.models import User
+from kpa.db.models import EmployerUser, User, UserRole
 from kpa.db.session import get_session
 from kpa.settings import Settings
 
@@ -78,3 +80,29 @@ async def optional_current_user(
     if not request.headers.get("authorization"):
         return None
     return await current_user(request, session=session)
+
+
+async def _require_recruiter(user: User) -> User:
+    """403 not_a_recruiter if the caller is not a recruiter."""
+    if user.role != UserRole.RECRUITER:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="not_a_recruiter"
+        )
+    return user
+
+
+async def _require_recruiter_at_employer(
+    user: User,
+    employer_id: uuid.UUID,
+    session: AsyncSession,
+) -> None:
+    """Uniform 404 if the recruiter is not on employer_users for ``employer_id``."""
+    found = await session.scalar(
+        select(EmployerUser.id).where(
+            EmployerUser.employer_id == employer_id,
+            EmployerUser.user_id == user.id,
+            EmployerUser.deleted_at.is_(None),
+        )
+    )
+    if found is None:
+        raise HTTPException(status_code=404, detail="not found")
