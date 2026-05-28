@@ -28,9 +28,7 @@ async def test_create_job_happy_path(async_client, session, applicant_user_and_t
         "ctc_min": 2000000,
         "ctc_max": 4000000,
     }
-    r = await async_client.post(
-        "/v1/jobs", json=body, headers={"Authorization": f"Bearer {token}"}
-    )
+    r = await async_client.post("/v1/jobs", json=body, headers={"Authorization": f"Bearer {token}"})
     assert r.status_code == 201, r.text
     job_id = r.json()["id"]
 
@@ -66,15 +64,11 @@ async def test_create_job_not_at_employer_returns_404(
         "min_exp_years": 0,
         "max_exp_years": 1,
     }
-    r = await async_client.post(
-        "/v1/jobs", json=body, headers={"Authorization": f"Bearer {token}"}
-    )
+    r = await async_client.post("/v1/jobs", json=body, headers={"Authorization": f"Bearer {token}"})
     assert r.status_code == 404
 
 
-async def test_create_job_not_a_recruiter_returns_403(
-    async_client, applicant_user_and_token
-):
+async def test_create_job_not_a_recruiter_returns_403(async_client, applicant_user_and_token):
     _, token = applicant_user_and_token
     body = {
         "employer_id": "00000000-0000-0000-0000-000000000000",
@@ -84,16 +78,12 @@ async def test_create_job_not_a_recruiter_returns_403(
         "min_exp_years": 0,
         "max_exp_years": 1,
     }
-    r = await async_client.post(
-        "/v1/jobs", json=body, headers={"Authorization": f"Bearer {token}"}
-    )
+    r = await async_client.post("/v1/jobs", json=body, headers={"Authorization": f"Bearer {token}"})
     assert r.status_code == 403
     assert r.json()["detail"] == "not_a_recruiter"
 
 
-async def test_create_job_invalid_exp_band_returns_422(
-    async_client, applicant_user_and_token
-):
+async def test_create_job_invalid_exp_band_returns_422(async_client, applicant_user_and_token):
     _, token = applicant_user_and_token
     r1 = await async_client.post(
         "/v1/employers",
@@ -109,15 +99,11 @@ async def test_create_job_invalid_exp_band_returns_422(
         "min_exp_years": 5,
         "max_exp_years": 2,  # max < min
     }
-    r = await async_client.post(
-        "/v1/jobs", json=body, headers={"Authorization": f"Bearer {token}"}
-    )
+    r = await async_client.post("/v1/jobs", json=body, headers={"Authorization": f"Bearer {token}"})
     assert r.status_code == 422
 
 
-async def test_create_job_dispatches_embed(
-    async_client, applicant_user_and_token, monkeypatch
-):
+async def test_create_job_dispatches_embed(async_client, applicant_user_and_token, monkeypatch):
     """The route must fire-and-forget embed_job.delay(job_id_str) after commit."""
     _, token = applicant_user_and_token
     r1 = await async_client.post(
@@ -134,6 +120,7 @@ async def test_create_job_dispatches_embed(
             called_with.append(job_id)
 
     import kpa.workers.tasks.embed_job as _embed_job_mod
+
     monkeypatch.setattr(_embed_job_mod, "embed_job", _Stub(), raising=False)
 
     body = {
@@ -144,9 +131,7 @@ async def test_create_job_dispatches_embed(
         "min_exp_years": 1,
         "max_exp_years": 3,
     }
-    r = await async_client.post(
-        "/v1/jobs", json=body, headers={"Authorization": f"Bearer {token}"}
-    )
+    r = await async_client.post("/v1/jobs", json=body, headers={"Authorization": f"Bearer {token}"})
     assert r.status_code == 201
     assert called_with == [r.json()["id"]]
 
@@ -170,8 +155,6 @@ async def test_create_job_employer_verified_false_by_default(
         "min_exp_years": 1,
         "max_exp_years": 5,
     }
-    r = await async_client.post(
-        "/v1/jobs", json=body, headers={"Authorization": f"Bearer {token}"}
-    )
+    r = await async_client.post("/v1/jobs", json=body, headers={"Authorization": f"Bearer {token}"})
     assert r.status_code == 201
     assert r.json()["employer_verified"] is False

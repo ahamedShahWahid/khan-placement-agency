@@ -21,9 +21,7 @@ async def _setup_job(async_client, token):
         "min_exp_years": 1,
         "max_exp_years": 5,
     }
-    r = await async_client.post(
-        "/v1/jobs", json=body, headers={"Authorization": f"Bearer {token}"}
-    )
+    r = await async_client.post("/v1/jobs", json=body, headers={"Authorization": f"Bearer {token}"})
     assert r.status_code == 201, r.text
     return r.json()["id"]
 
@@ -56,9 +54,7 @@ async def test_delete_second_call_returns_404(async_client, applicant_user_and_t
     assert r2.status_code == 404
 
 
-async def test_delete_other_employer_returns_404(
-    async_client, session, applicant_user_and_token
-):
+async def test_delete_other_employer_returns_404(async_client, session, applicant_user_and_token):
     _, token = applicant_user_and_token
     job_id = await _setup_job(async_client, token)
 

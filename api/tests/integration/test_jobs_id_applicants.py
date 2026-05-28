@@ -24,9 +24,7 @@ async def _create_job(async_client, token, emp_id):
         "min_exp_years": 1,
         "max_exp_years": 5,
     }
-    r = await async_client.post(
-        "/v1/jobs", json=body, headers={"Authorization": f"Bearer {token}"}
-    )
+    r = await async_client.post("/v1/jobs", json=body, headers={"Authorization": f"Bearer {token}"})
     assert r.status_code == 201, r.text
     return r.json()["id"]
 
@@ -45,9 +43,7 @@ async def _seed_applications(session, job_id, n: int):
     await session.flush()
 
 
-async def test_applicants_happy_path(
-    async_client, session, applicant_user_and_token
-):
+async def test_applicants_happy_path(async_client, session, applicant_user_and_token):
     _, token = applicant_user_and_token
     emp_id = await _setup_employer(async_client, token)
     job_id = await _create_job(async_client, token, emp_id)
@@ -98,9 +94,7 @@ async def test_applicants_other_employer_returns_404(
     assert r.status_code == 404
 
 
-async def test_applicants_applicant_role_returns_403(
-    async_client, applicant_user_and_token
-):
+async def test_applicants_applicant_role_returns_403(async_client, applicant_user_and_token):
     _, token = applicant_user_and_token
     r = await async_client.get(
         "/v1/jobs/00000000-0000-0000-0000-000000000000/applicants",

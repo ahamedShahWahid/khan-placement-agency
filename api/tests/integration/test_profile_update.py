@@ -54,9 +54,7 @@ async def test_patch_partial_update(
     assert body["applicant"]["full_name"] == "Alice"
 
     row = (
-        await session.execute(
-            select(Applicant).where(Applicant.user_id == signin["user"]["id"])
-        )
+        await session.execute(select(Applicant).where(Applicant.user_id == signin["user"]["id"]))
     ).scalar_one()
     assert row.locations == ["Pune", "Bengaluru"]
 
@@ -81,9 +79,7 @@ async def test_patch_omitted_key_unchanged(
 ) -> None:
     signin = await _signin(async_client, google_verifier)
     headers = {"Authorization": f"Bearer {signin['access_token']}"}
-    await async_client.patch(
-        "/v1/applicants/me", headers=headers, json={"notice_period_days": 45}
-    )
+    await async_client.patch("/v1/applicants/me", headers=headers, json={"notice_period_days": 45})
     resp = await async_client.patch(
         "/v1/applicants/me", headers=headers, json={"locations": ["Pune"]}
     )
@@ -107,9 +103,7 @@ async def test_patch_omitted_key_unchanged(
         {"unknown_field": "x"},
     ],
 )
-async def test_patch_validation_422(
-    async_client: httpx.AsyncClient, google_verifier, body
-) -> None:
+async def test_patch_validation_422(async_client: httpx.AsyncClient, google_verifier, body) -> None:
     signin = await _signin(async_client, google_verifier)
     headers = {"Authorization": f"Bearer {signin['access_token']}"}
     resp = await async_client.patch("/v1/applicants/me", headers=headers, json=body)
@@ -148,9 +142,7 @@ async def test_patch_matching_field_dispatches_rescore(
     import kpa.workers.tasks.score_applicant as score_mod
 
     calls: list[str] = []
-    monkeypatch.setattr(
-        score_mod.score_applicant, "delay", lambda aid: calls.append(aid)
-    )
+    monkeypatch.setattr(score_mod.score_applicant, "delay", lambda aid: calls.append(aid))
 
     signin = await _signin(async_client, google_verifier)
     headers = {"Authorization": f"Bearer {signin['access_token']}"}
@@ -168,9 +160,7 @@ async def test_patch_non_matching_field_no_rescore(
     import kpa.workers.tasks.score_applicant as score_mod
 
     calls: list[str] = []
-    monkeypatch.setattr(
-        score_mod.score_applicant, "delay", lambda aid: calls.append(aid)
-    )
+    monkeypatch.setattr(score_mod.score_applicant, "delay", lambda aid: calls.append(aid))
 
     signin = await _signin(async_client, google_verifier)
     headers = {"Authorization": f"Bearer {signin['access_token']}"}

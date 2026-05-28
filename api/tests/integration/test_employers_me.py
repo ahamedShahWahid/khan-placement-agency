@@ -10,9 +10,7 @@ from kpa.db.models import EmployerUser
 pytestmark = pytest.mark.integration
 
 
-async def test_me_returns_recruiters_employers(
-    async_client, applicant_user_and_token
-):
+async def test_me_returns_recruiters_employers(async_client, applicant_user_and_token):
     """A recruiter (post role-flip) sees every employer they're on."""
     _, token = applicant_user_and_token
     r1 = await async_client.post(
@@ -48,9 +46,7 @@ async def test_me_returns_403_for_applicant(async_client, applicant_user_and_tok
     assert r.json()["detail"] == "not_a_recruiter"
 
 
-async def test_me_excludes_soft_deleted_link(
-    async_client, session, applicant_user_and_token
-):
+async def test_me_excludes_soft_deleted_link(async_client, session, applicant_user_and_token):
     """If the employer_users link is soft-deleted, the employer is hidden from /me."""
     user, token = applicant_user_and_token
     r1 = await async_client.post(

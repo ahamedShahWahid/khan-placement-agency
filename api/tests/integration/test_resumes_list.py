@@ -78,9 +78,7 @@ async def test_list_newest_first_and_scoped(
     assert created_ats == sorted(created_ats, reverse=True)
 
 
-async def test_list_recruiter_403(
-    async_client: httpx.AsyncClient, session: AsyncSession
-) -> None:
+async def test_list_recruiter_403(async_client: httpx.AsyncClient, session: AsyncSession) -> None:
     user = User(
         email=f"rec-resume-{uuid.uuid4()}@example.com",
         role=UserRole.RECRUITER,
@@ -106,14 +104,16 @@ async def test_list_excludes_other_applicant_resumes(
 ) -> None:
     # Sign in as Alice and upload.
     alice_signin = await _signin(
-        async_client, google_verifier,
+        async_client,
+        google_verifier,
         _claims(sub="g-alice-iso", email="alice-iso@example.com"),
     )
     alice_resume = await _upload(async_client, alice_signin["access_token"], "alice.pdf")
 
     # Sign in as Bob and upload.
     bob_signin = await _signin(
-        async_client, google_verifier,
+        async_client,
+        google_verifier,
         _claims(sub="g-bob-iso", email="bob-iso@example.com"),
     )
     await _upload(async_client, bob_signin["access_token"], "bob.pdf")

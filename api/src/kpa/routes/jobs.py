@@ -174,9 +174,7 @@ async def list_my_jobs(
         )
 
     next_cursor = (
-        _encode_jobs_me_cursor(rows[-1][0].posted_at, rows[-1][0].id)
-        if has_more and rows
-        else None
+        _encode_jobs_me_cursor(rows[-1][0].posted_at, rows[-1][0].id) if has_more and rows else None
     )
     return RecruiterJobsPage(items=items, next_cursor=next_cursor)
 
@@ -237,7 +235,6 @@ async def get_job_detail(
     )
 
 
-
 class JobCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
     employer_id: uuid.UUID
@@ -254,11 +251,7 @@ class JobCreate(BaseModel):
     def _ordered_bands(self) -> JobCreate:
         if self.max_exp_years < self.min_exp_years:
             raise ValueError("max_exp_years must be >= min_exp_years")
-        if (
-            self.ctc_min is not None
-            and self.ctc_max is not None
-            and self.ctc_max < self.ctc_min
-        ):
+        if self.ctc_min is not None and self.ctc_max is not None and self.ctc_max < self.ctc_min:
             raise ValueError("ctc_max must be >= ctc_min")
         return self
 
@@ -328,9 +321,7 @@ class JobPatch(BaseModel):
     status: Literal["open", "closed"] | None = None
 
 
-async def _load_recruiter_job(
-    job_id: uuid.UUID, user: User, session: AsyncSession
-) -> Job:
+async def _load_recruiter_job(job_id: uuid.UUID, user: User, session: AsyncSession) -> Job:
     """Uniform 404 for unknown / wrong-employer / soft-deleted job."""
     await _require_recruiter(user)
     row = await session.execute(
@@ -496,4 +487,3 @@ async def list_applicants_for_job(
         else None
     )
     return ApplicantsOfJobPage(items=items, next_cursor=next_cursor)
-

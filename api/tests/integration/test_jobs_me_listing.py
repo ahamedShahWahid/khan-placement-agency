@@ -22,9 +22,7 @@ async def _create_job(async_client, token, emp_id, title):
         "min_exp_years": 1,
         "max_exp_years": 5,
     }
-    r = await async_client.post(
-        "/v1/jobs", json=body, headers={"Authorization": f"Bearer {token}"}
-    )
+    r = await async_client.post("/v1/jobs", json=body, headers={"Authorization": f"Bearer {token}"})
     assert r.status_code == 201, r.text
     return r.json()["id"]
 
@@ -46,9 +44,7 @@ async def test_me_lists_my_jobs(async_client, applicant_user_and_token):
         assert row["employer_verified"] is False
 
 
-async def test_me_hides_closed_by_default_shows_with_filter(
-    async_client, applicant_user_and_token
-):
+async def test_me_hides_closed_by_default_shows_with_filter(async_client, applicant_user_and_token):
     _, token = applicant_user_and_token
     emp_id = await _setup_employer(async_client, token)
     open_id = await _create_job(async_client, token, emp_id, "Open Role")
@@ -59,9 +55,7 @@ async def test_me_hides_closed_by_default_shows_with_filter(
         headers={"Authorization": f"Bearer {token}"},
     )
 
-    r1 = await async_client.get(
-        "/v1/jobs/me", headers={"Authorization": f"Bearer {token}"}
-    )
+    r1 = await async_client.get("/v1/jobs/me", headers={"Authorization": f"Bearer {token}"})
     assert [j["id"] for j in r1.json()["items"]] == [open_id]
 
     r2 = await async_client.get(
@@ -76,9 +70,7 @@ async def test_me_pagination(async_client, applicant_user_and_token):
     emp_id = await _setup_employer(async_client, token)
     ids = [await _create_job(async_client, token, emp_id, f"Role {i}") for i in range(5)]
 
-    r1 = await async_client.get(
-        "/v1/jobs/me?limit=2", headers={"Authorization": f"Bearer {token}"}
-    )
+    r1 = await async_client.get("/v1/jobs/me?limit=2", headers={"Authorization": f"Bearer {token}"})
     body1 = r1.json()
     assert len(body1["items"]) == 2
     assert body1["next_cursor"] is not None

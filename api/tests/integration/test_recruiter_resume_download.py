@@ -21,9 +21,7 @@ async def _setup_employer_and_job(async_client, token):
         "min_exp_years": 1,
         "max_exp_years": 5,
     }
-    r = await async_client.post(
-        "/v1/jobs", json=body, headers={"Authorization": f"Bearer {token}"}
-    )
+    r = await async_client.post("/v1/jobs", json=body, headers={"Authorization": f"Bearer {token}"})
     assert r.status_code == 201, r.text
     return r.json()["id"]
 
@@ -52,9 +50,7 @@ async def _seed_applicant_with_resume(session, storage, job_id, content: bytes):
     return r, app
 
 
-async def test_recruiter_downloads_resume(
-    async_client, session, applicant_user_and_token
-):
+async def test_recruiter_downloads_resume(async_client, session, applicant_user_and_token):
     _, token = applicant_user_and_token
     job_id = await _setup_employer_and_job(async_client, token)
     storage = async_client._transport.app.state.storage  # type: ignore[union-attr]
@@ -84,9 +80,7 @@ async def test_recruiter_at_other_employer_gets_404(
     _, token = applicant_user_and_token
     job_id = await _setup_employer_and_job(async_client, token)
     storage = async_client._transport.app.state.storage  # type: ignore[union-attr]
-    _, application = await _seed_applicant_with_resume(
-        session, storage, job_id, b"X"
-    )
+    _, application = await _seed_applicant_with_resume(session, storage, job_id, b"X")
     await session.commit()
 
     # Other recruiter

@@ -85,9 +85,7 @@ async def optional_current_user(
 async def _require_recruiter(user: User) -> User:
     """403 not_a_recruiter if the caller is not a recruiter."""
     if user.role != UserRole.RECRUITER:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="not_a_recruiter"
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not_a_recruiter")
     return user
 
 

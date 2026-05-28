@@ -5,6 +5,7 @@ flips users.role APPLICANT→RECRUITER. 409 on duplicate name_norm.
 
 GET  /v1/employers/me — lists every employer the caller is on.
 """
+
 from __future__ import annotations
 
 import re
@@ -105,15 +106,19 @@ async def list_my_employers(
 ) -> list[EmployerRead]:
     await _require_recruiter(user)
     rows = (
-        await session.execute(
-            select(Employer)
-            .join(EmployerUser, EmployerUser.employer_id == Employer.id)
-            .where(
-                EmployerUser.user_id == user.id,
-                EmployerUser.deleted_at.is_(None),
-                Employer.deleted_at.is_(None),
+        (
+            await session.execute(
+                select(Employer)
+                .join(EmployerUser, EmployerUser.employer_id == Employer.id)
+                .where(
+                    EmployerUser.user_id == user.id,
+                    EmployerUser.deleted_at.is_(None),
+                    Employer.deleted_at.is_(None),
+                )
+                .order_by(Employer.created_at.desc())
             )
-            .order_by(Employer.created_at.desc())
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     return [EmployerRead.model_validate(r) for r in rows]

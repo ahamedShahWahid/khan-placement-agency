@@ -91,9 +91,7 @@ async def test_patch_combined_content_and_status_redispatches_once(
     assert stub.calls == [job_id]
 
 
-async def test_patch_unknown_status_returns_422(
-    async_client, applicant_user_and_token
-):
+async def test_patch_unknown_status_returns_422(async_client, applicant_user_and_token):
     """Pydantic Literal['open','closed'] rejects unknown values at the validation layer."""
     _, token = applicant_user_and_token
     _, job_id = await _make_recruiter_and_job(async_client, token)
@@ -105,9 +103,7 @@ async def test_patch_unknown_status_returns_422(
     assert r.status_code == 422
 
 
-async def test_patch_other_employer_returns_404(
-    async_client, session, applicant_user_and_token
-):
+async def test_patch_other_employer_returns_404(async_client, session, applicant_user_and_token):
     _, token = applicant_user_and_token
     _, job_id = await _make_recruiter_and_job(async_client, token)
 

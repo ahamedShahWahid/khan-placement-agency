@@ -509,7 +509,5 @@ async def recruiter_download_application_resume(
     return Response(
         content=content,
         media_type=resume.content_type,
-        headers={
-            "Content-Disposition": f'attachment; filename="{resume.original_filename}"'
-        },
+        headers={"Content-Disposition": f'attachment; filename="{resume.original_filename}"'},
     )
