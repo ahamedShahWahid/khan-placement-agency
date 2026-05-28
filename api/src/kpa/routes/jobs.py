@@ -11,7 +11,7 @@ from typing import Literal
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from pydantic import BaseModel, ConfigDict, Field, model_validator
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from kpa.auth.dependencies import (
@@ -253,3 +253,15 @@ async def patch_job(
             _log.warning("embed.dispatch-failed", job_id=str(job.id), exc_info=True)
 
     return JobRead.model_validate(job)
+
+
+@router.delete("/jobs/{job_id}", status_code=204)
+async def delete_job(
+    job_id: uuid.UUID,
+    user: User = Depends(current_user),  # noqa: B008
+    session: AsyncSession = Depends(get_session),  # noqa: B008
+) -> Response:
+    job = await _load_recruiter_job(job_id, user, session)
+    job.deleted_at = func.now()
+    await session.commit()
+    return Response(status_code=204)
