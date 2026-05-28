@@ -129,6 +129,16 @@ class Settings(BaseSettings):
         alias="KPA_MATCH_VECTOR_WEIGHT",
         description="Weight on the vector score component. Structured weight is 1 - this.",
     )
+    match_explainer: str = Field(
+        default="templated",
+        alias="KPA_MATCH_EXPLAINER",
+        description="Match-explanation generator: 'templated' (default) or 'llm' (Gemini).",
+    )
+    match_explainer_model: str = Field(
+        default="gemini-2.5-flash",
+        alias="KPA_MATCH_EXPLAINER_MODEL",
+        description="Gemini text-generation model used when match_explainer='llm'.",
+    )
 
     # --- Notifications ---
     email_channel: str = Field(
@@ -230,6 +240,13 @@ class Settings(BaseSettings):
     def _enforce_valid_email_channel(cls, v: str) -> str:
         if v not in ("logging", "ses"):
             raise ValueError(f"email_channel must be 'logging' or 'ses', got {v!r}")
+        return v
+
+    @field_validator("match_explainer")
+    @classmethod
+    def _enforce_valid_match_explainer(cls, v: str) -> str:
+        if v not in ("templated", "llm"):
+            raise ValueError(f"match_explainer must be 'templated' or 'llm', got {v!r}")
         return v
 
     @field_validator("google_oauth_client_ids", mode="before")
