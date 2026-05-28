@@ -31,13 +31,16 @@ from kpa.db.models import (
     Job,
     JobStatus,
     Match,
+    SavedJob,
     User,
     UserRole,
 )
 from kpa.db.session import get_session
 from kpa.routes.feed import (
     EmployerRead,
+    JobDetailApplicationRead,
     JobDetailResponse,
+    JobDetailSavedJobRead,
     JobRead,
     MatchRead,
     make_weak_etag,
@@ -216,9 +219,41 @@ async def get_job_detail(
         )
     ).scalar_one_or_none()
 
+    # Current applicant's live application for this job (any status — applied
+    # or withdrawn — see CLAUDE.md "Applications + saved jobs routes": withdraw
+    # does NOT soft-delete, it flips status). The Flutter ActionBar uses
+    # status to decide between Apply / Withdraw, so we must include withdrawn
+    # rows too — otherwise re-apply after withdraw won't UPDATE the existing
+    # row and the partial-UNIQUE INSERT collides.
+    application = (
+        await session.execute(
+            select(Application).where(
+                Application.applicant_id == applicant.id,
+                Application.job_id == job_id,
+                Application.deleted_at.is_(None),
+            )
+        )
+    ).scalar_one_or_none()
+
+    saved_job = (
+        await session.execute(
+            select(SavedJob).where(
+                SavedJob.applicant_id == applicant.id,
+                SavedJob.job_id == job_id,
+                SavedJob.deleted_at.is_(None),
+            )
+        )
+    ).scalar_one_or_none()
+
+    # ETag includes application + saved_job updated_at so the client sees a
+    # fresh response (not 304) after applying / withdrawing / saving.
     etag_parts: list[object] = [job.id, job.updated_at]
     if match is not None:
         etag_parts.append(match.updated_at)
+    if application is not None:
+        etag_parts.append(application.updated_at)
+    if saved_job is not None:
+        etag_parts.append(saved_job.updated_at)
     etag = make_weak_etag(*etag_parts)
     if request.headers.get("if-none-match") == etag:
         return Response(status_code=304)
@@ -232,6 +267,14 @@ async def get_job_detail(
             verified=employer.verified_at is not None,
         ),
         match=MatchRead.model_validate(match) if match is not None else None,
+        application=(
+            JobDetailApplicationRead.model_validate(application)
+            if application is not None
+            else None
+        ),
+        saved_job=(
+            JobDetailSavedJobRead.model_validate(saved_job) if saved_job is not None else None
+        ),
     )
 
 

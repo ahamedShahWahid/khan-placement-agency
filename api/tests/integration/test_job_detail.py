@@ -12,10 +12,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from kpa.auth.tokens import mint_access_token
 from kpa.db.models import (
     Applicant,
+    Application,
     Employer,
     Job,
     JobStatus,
     Match,
+    SavedJob,
     User,
     UserRole,
 )
@@ -241,3 +243,145 @@ async def test_job_detail_etag_returns_304(
     )
     assert r2.status_code == 304
     assert r2.content == b""
+
+
+@pytest.mark.integration
+async def test_job_detail_application_null_when_user_never_applied(
+    session: AsyncSession, async_client: AsyncClient
+) -> None:
+    """application/saved_job default to null when the applicant has neither."""
+    user, _ = await _make_applicant(session, email="jd-noapp@example.com")
+    j, _ = await _make_job_and_employer(session, employer_name="NoAppCo")
+    await session.commit()
+
+    resp = await async_client.get(f"/v1/jobs/{j.id}", headers=_token_headers(user))
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["application"] is None
+    assert body["saved_job"] is None
+
+
+@pytest.mark.integration
+async def test_job_detail_includes_applied_application(
+    session: AsyncSession, async_client: AsyncClient
+) -> None:
+    """When the applicant has applied, the response carries status='applied'.
+
+    Reproduces the bug where the Flutter ActionBar shows the Apply button
+    even after applying — the backend silently omitted the application.
+    """
+    user, applicant = await _make_applicant(session, email="jd-applied@example.com")
+    j, _ = await _make_job_and_employer(session, employer_name="AppliedCo")
+    app = Application(
+        applicant_id=applicant.id,
+        job_id=j.id,
+        status="applied",
+        source="feed",
+    )
+    session.add(app)
+    await session.commit()
+
+    resp = await async_client.get(f"/v1/jobs/{j.id}", headers=_token_headers(user))
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["application"] is not None
+    assert body["application"]["id"] == str(app.id)
+    assert body["application"]["job_id"] == str(j.id)
+    assert body["application"]["status"] == "applied"
+    assert body["application"]["source"] == "feed"
+    assert "created_at" in body["application"]
+    assert "updated_at" in body["application"]
+
+
+@pytest.mark.integration
+async def test_job_detail_includes_withdrawn_application(
+    session: AsyncSession, async_client: AsyncClient
+) -> None:
+    """Withdrawn applications are still returned (status flip, not soft-delete).
+
+    The ActionBar uses status to decide Apply vs Withdraw — for a withdrawn
+    row it shows Apply (re-apply path) but it still needs to see the row.
+    """
+    user, applicant = await _make_applicant(session, email="jd-withdrawn@example.com")
+    j, _ = await _make_job_and_employer(session, employer_name="WithdrawnCo")
+    app = Application(
+        applicant_id=applicant.id,
+        job_id=j.id,
+        status="withdrawn",
+        source="feed",
+    )
+    session.add(app)
+    await session.commit()
+
+    resp = await async_client.get(f"/v1/jobs/{j.id}", headers=_token_headers(user))
+    assert resp.status_code == 200
+    assert resp.json()["application"]["status"] == "withdrawn"
+
+
+@pytest.mark.integration
+async def test_job_detail_includes_saved_job(
+    session: AsyncSession, async_client: AsyncClient
+) -> None:
+    user, applicant = await _make_applicant(session, email="jd-saved@example.com")
+    j, _ = await _make_job_and_employer(session, employer_name="SavedCo")
+    sj = SavedJob(applicant_id=applicant.id, job_id=j.id)
+    session.add(sj)
+    await session.commit()
+
+    resp = await async_client.get(f"/v1/jobs/{j.id}", headers=_token_headers(user))
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["saved_job"] is not None
+    assert body["saved_job"]["id"] == str(sj.id)
+    assert body["saved_job"]["job_id"] == str(j.id)
+
+
+@pytest.mark.integration
+async def test_job_detail_application_scoped_to_caller(
+    session: AsyncSession, async_client: AsyncClient
+) -> None:
+    """Another applicant's application MUST NOT leak into this caller's response."""
+    caller, _caller_a = await _make_applicant(session, email="jd-caller@example.com")
+    other_user, other_applicant = await _make_applicant(session, email="jd-other@example.com")
+    j, _ = await _make_job_and_employer(session, employer_name="ScopedCo")
+    session.add(
+        Application(
+            applicant_id=other_applicant.id,
+            job_id=j.id,
+            status="applied",
+            source="feed",
+        )
+    )
+    await session.commit()
+
+    resp = await async_client.get(f"/v1/jobs/{j.id}", headers=_token_headers(caller))
+    assert resp.status_code == 200
+    assert resp.json()["application"] is None
+
+
+@pytest.mark.integration
+async def test_job_detail_etag_changes_when_application_changes(
+    session: AsyncSession, async_client: AsyncClient
+) -> None:
+    """ETag must depend on application.updated_at so the client refetches
+    after apply / withdraw instead of seeing a stale 304."""
+    user, applicant = await _make_applicant(session, email="jd-etag2@example.com")
+    j, _ = await _make_job_and_employer(session, employer_name="EtagAppCo")
+    await session.commit()
+
+    r1 = await async_client.get(f"/v1/jobs/{j.id}", headers=_token_headers(user))
+    etag1 = r1.headers["ETag"]
+
+    session.add(
+        Application(
+            applicant_id=applicant.id,
+            job_id=j.id,
+            status="applied",
+            source="feed",
+        )
+    )
+    await session.commit()
+
+    r2 = await async_client.get(f"/v1/jobs/{j.id}", headers=_token_headers(user))
+    etag2 = r2.headers["ETag"]
+    assert etag2 != etag1, "ETag must change once an application exists"
