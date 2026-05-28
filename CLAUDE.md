@@ -164,13 +164,18 @@ Per spec §4.2 and the comment in `db/models.py`: SQLAlchemy models are never re
 - **Uniform 404 across unknown / closed / soft-deleted.** Same rationale as the resumes route — distinguishing leaks existence.
 - **`_require_applicant`** is duplicated inline in `routes/feed.py` and `routes/jobs.py` rather than extracted to a shared module. The `routes/resumes.py` version has different downstream error semantics (`500 applicant_missing` is load-bearing there); copying keeps each route module standalone.
 
-### Match explanations (templated)
+### Match explanations (templated + llm)
 
 - **`matches.explanation` is JSONB** with shape `{fit, caveat, generator, generator_version}`. Nullable for backward compat with pre-P2.4 rows. Generated inline in both score workers' compute step (no separate worker).
-- **`kpa.scoring.explain.templated_explanation(...)`** is pure-function. Priority-order rules over `score_components` and surrounding context. Deterministic — same inputs always produce the same strings.
-- **`GENERATOR_VERSION` bumps when the templates change semantically.** Reviewers should flag template edits as version-bump candidates. The LLM-provider swap (BRD §14 #1) will introduce a new `generator` value alongside `templated`.
-- **The score worker's Txn 1 now loads `Employer.name`** alongside `Job` + `JobEmbedding`. The applicant-side adds an `Employer` JOIN; the job-side already had implicit employer access.
-- **No new worker, no new queue, no new env vars.** When LLM provider lands, a `MatchExplainer` Protocol with `templated` and `llm` impls will route via an env var; the score worker call site doesn't change.
+- **`kpa.scoring.explainer.MatchExplainer` Protocol** routes between two impls. Workers call `await get_match_explainer().explain(ctx)`; the call site does not change between templated and LLM.
+- **`TemplatedExplainer`** (`kpa/scoring/explainer.py`) — wraps the pure-function `templated_explanation(...)` from `kpa/scoring/explain.py`. Deterministic, no network. `generator="templated"`.
+- **`GeminiMatchExplainer`** (`kpa/scoring/llm_explainer.py`) — uses `google.genai` to call the configured Gemini text model. Surfaced-only LLM call: if `ctx.total < ctx.threshold`, returns the templated explanation without calling Gemini. Any failure (provider exception, empty response, malformed JSON, non-dict JSON) logs `explain.llm-failed` (warning, `exc_info=True`) and falls back to templated. `explain()` **never raises** — scoring is never failed or retried by the explainer.
+- **Selection via env.** `KPA_MATCH_EXPLAINER` is `"templated"` (default) or `"llm"`. `KPA_MATCH_EXPLAINER_MODEL` (default `"gemini-2.5-flash"`) is read only when the LLM branch is selected. `get_match_explainer()` in `celery_app.py` is the lazy-singleton factory (mirrors `get_embedding_provider` / `get_email_channel`).
+- **`kpa/scoring/explainer.py` does NOT import `google.genai`.** The LLM impl lives in a separate module so the templated path never pays the genai import cost (mirrors the embeddings package's `__init__` not re-exporting `GeminiEmbeddingProvider`). The factory's LLM branch does `from google import genai` lazily.
+- **`patched_match_explainer` fixture patches three modules + the `_match_explainer` cache.** Strictly only the `celery_app.get_match_explainer` + `_match_explainer` patches are load-bearing today, because both score workers import `get_match_explainer` inside the function body (each call re-reads from `sys.modules['kpa.workers.celery_app']`). The `score_applicant` / `score_job` module-level patches (with `raising=False`) are defensive — if a future refactor hoists the import to module top, the fixture keeps working without changes. Mirrors the `patched_embedding_provider` shape so the two stay analogous.
+- **The score worker's Txn 1 already loads `Employer.name`** alongside `Job` + `JobEmbedding` (added when the templated explainer first shipped). The LLM impl uses the same context.
+- **`GENERATOR_VERSION` bumps when the templates or LLM prompt change semantically.** Reviewers should flag template/prompt edits as version-bump candidates. `LLM_GENERATOR_VERSION = "1"` is the initial release.
+- **First text-gen call in the repo.** If the `google-genai` 1.x structured-output API changes shape, only `kpa/scoring/llm_explainer.py` needs to change; the Protocol, the factory, and the workers are insulated.
 
 ### Notifications outbox
 

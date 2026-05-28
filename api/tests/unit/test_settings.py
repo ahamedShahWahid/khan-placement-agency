@@ -434,3 +434,43 @@ def test_notify_batch_size_out_of_range_rejected(monkeypatch: pytest.MonkeyPatch
     monkeypatch.setenv("KPA_NOTIFY_BATCH_SIZE", "0")
     with pytest.raises(ValidationError):
         Settings()
+
+
+# ---------------------------------------------------------------------------
+# Match-explainer settings (from sub-project G)
+# ---------------------------------------------------------------------------
+
+
+def test_match_explainer_default_is_templated(monkeypatch: pytest.MonkeyPatch) -> None:
+    _set_minimum_env(monkeypatch)
+    monkeypatch.delenv("KPA_MATCH_EXPLAINER", raising=False)
+    s = Settings()
+    assert s.match_explainer == "templated"
+
+
+def test_match_explainer_llm_accepted(monkeypatch: pytest.MonkeyPatch) -> None:
+    _set_minimum_env(monkeypatch)
+    monkeypatch.setenv("KPA_MATCH_EXPLAINER", "llm")
+    s = Settings()
+    assert s.match_explainer == "llm"
+
+
+def test_match_explainer_invalid_value_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
+    _set_minimum_env(monkeypatch)
+    monkeypatch.setenv("KPA_MATCH_EXPLAINER", "openai")
+    with pytest.raises(ValidationError, match="match_explainer"):
+        Settings()
+
+
+def test_match_explainer_model_default(monkeypatch: pytest.MonkeyPatch) -> None:
+    _set_minimum_env(monkeypatch)
+    monkeypatch.delenv("KPA_MATCH_EXPLAINER_MODEL", raising=False)
+    s = Settings()
+    assert s.match_explainer_model == "gemini-2.5-flash"
+
+
+def test_match_explainer_model_override(monkeypatch: pytest.MonkeyPatch) -> None:
+    _set_minimum_env(monkeypatch)
+    monkeypatch.setenv("KPA_MATCH_EXPLAINER_MODEL", "gemini-2.5-pro")
+    s = Settings()
+    assert s.match_explainer_model == "gemini-2.5-pro"

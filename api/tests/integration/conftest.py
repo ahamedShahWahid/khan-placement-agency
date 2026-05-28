@@ -36,6 +36,7 @@ from kpa.auth.google_verifier import (
     get_google_verifier,
 )
 from kpa.integrations.embeddings import EmbeddingResult, EmbeddingTask
+from kpa.scoring.explainer import ExplainContext
 
 pytestmark = pytest.mark.integration
 
@@ -128,6 +129,54 @@ def patched_embedding_provider(
     # Also seed the module-level cache so the original function body short-circuits.
     monkeypatch.setattr(cel, "_embedding_provider", embedding_provider)
     return embedding_provider
+
+
+@dataclass
+class FakeMatchExplainer:
+    """Test double: records every call, returns a marker dict so the wiring test
+    can assert the worker actually routed through the configured explainer."""
+
+    calls: list[ExplainContext] = field(default_factory=list)
+    fit: str = "fake-llm fit string"
+    caveat: str = "fake-llm caveat string"
+
+    async def explain(self, ctx: ExplainContext) -> dict[str, str]:
+        self.calls.append(ctx)
+        return {
+            "fit": self.fit,
+            "caveat": self.caveat,
+            "generator": "fake-llm",
+            "generator_version": "test",
+        }
+
+
+@pytest.fixture
+def match_explainer() -> FakeMatchExplainer:
+    return FakeMatchExplainer()
+
+
+@pytest.fixture
+def patched_match_explainer(
+    monkeypatch: pytest.MonkeyPatch,
+    match_explainer: FakeMatchExplainer,
+) -> FakeMatchExplainer:
+    """Patch get_match_explainer() so eager-mode score workers use the fake.
+
+    Mirrors patched_embedding_provider: three patch sites + the cache, because
+    score_applicant.py and score_job.py do
+    ``from kpa.workers.celery_app import get_match_explainer`` locally inside
+    the async body. Each local import creates a separate reference; we patch
+    both call sites plus the source module, then seed the module-level cache.
+    """
+    import kpa.workers.celery_app as cel
+    import kpa.workers.tasks.score_applicant as sa_mod
+    import kpa.workers.tasks.score_job as sj_mod
+
+    monkeypatch.setattr(cel, "get_match_explainer", lambda: match_explainer)
+    monkeypatch.setattr(sa_mod, "get_match_explainer", lambda: match_explainer, raising=False)
+    monkeypatch.setattr(sj_mod, "get_match_explainer", lambda: match_explainer, raising=False)
+    monkeypatch.setattr(cel, "_match_explainer", match_explainer)
+    return match_explainer
 
 
 DEFAULT_TEST_DB_URL = "postgresql+asyncpg://kpa:kpa@localhost:5432/kpa_test"
