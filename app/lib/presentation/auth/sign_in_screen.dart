@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:kpa_app/core/error/exceptions.dart';
 import 'package:kpa_app/data/auth/google_web_sign_in.dart';
+import 'package:kpa_app/presentation/auth/delete_success_snackbar_provider.dart';
 import 'package:kpa_app/presentation/auth/sign_in_controller.dart';
 import 'package:kpa_app/presentation/theme/kpa_spacing.dart';
 
@@ -12,6 +13,16 @@ class SignInScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // One-time snackbar after account deletion.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (ref.read(deleteSuccessSnackbarProvider)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Your account has been deleted.')),
+        );
+        ref.read(deleteSuccessSnackbarProvider.notifier).consume();
+      }
+    });
+
     ref.listen<AsyncValue<void>>(signInControllerProvider, (_, next) {
       next.whenOrNull(
         error: (e, _) {

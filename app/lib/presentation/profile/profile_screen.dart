@@ -85,6 +85,12 @@ class ProfileScreen extends ConsumerWidget {
               subtitle: const Text('View your notifications'),
               onTap: () => context.go(Routes.notifications),
             ),
+            ListTile(
+              leading: const Icon(Icons.shield_outlined),
+              title: const Text('Privacy & data'),
+              subtitle: const Text('Preferences, export, delete'),
+              onTap: () => context.go(Routes.privacy),
+            ),
             const SizedBox(height: KpaSpacing.xxl),
             OutlinedButton(
               onPressed: signOut.isLoading
