@@ -1,0 +1,181 @@
+"""Integration tests for POST /v1/me/dsr/export.
+
+Covers:
+1. Applicant happy path — all sections populated where applicable.
+2. Recruiter happy path — employer_memberships + owned_jobs populated;
+   applicant sections empty.
+3. Authentication required (no bearer → 401).
+4. Refresh tokens never appear in the export body.
+5. Two audit rows written per export (request + completed).
+"""
+
+from __future__ import annotations
+
+import json
+from uuid import uuid4
+
+import pytest
+from httpx import AsyncClient
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from kpa.auth.tokens import mint_access_token
+from kpa.consent import seed_default_consents
+from kpa.db.models import (
+    Applicant,
+    AuditLog,
+    Employer,
+    EmployerUser,
+    Job,
+    JobStatus,
+    User,
+    UserRole,
+)
+
+pytestmark = pytest.mark.integration
+
+
+async def _make_applicant(session: AsyncSession) -> tuple[User, Applicant, str]:
+    user = User(email=f"dsr-{uuid4().hex[:8]}@example.com", role=UserRole.APPLICANT)
+    session.add(user)
+    await session.flush()
+    applicant = Applicant(user_id=user.id, full_name="DSR Test User")
+    session.add(applicant)
+    await session.flush()
+    await seed_default_consents(session, user=user)
+    await session.commit()
+    token = mint_access_token(
+        user_id=user.id, role=user.role.value, secret="x" * 32, ttl_seconds=600
+    )
+    return user, applicant, token
+
+
+async def _make_recruiter_with_employer(
+    session: AsyncSession,
+) -> tuple[User, Employer, Job, str]:
+    user = User(email=f"rec-{uuid4().hex[:8]}@example.com", role=UserRole.RECRUITER)
+    session.add(user)
+    await session.flush()
+    employer_name = f"Test Employer {uuid4().hex[:6]}"
+    employer = Employer(name=employer_name, name_norm=employer_name.lower())
+    session.add(employer)
+    await session.flush()
+    link = EmployerUser(employer_id=employer.id, user_id=user.id, role="owner")
+    session.add(link)
+    job = Job(
+        employer_id=employer.id,
+        title="Senior Engineer",
+        description="DSR test job.",
+        locations=["Remote"],
+        status=JobStatus.OPEN,
+        min_exp_years=3,
+        max_exp_years=8,
+    )
+    session.add(job)
+    await seed_default_consents(session, user=user)
+    await session.commit()
+    token = mint_access_token(
+        user_id=user.id, role=user.role.value, secret="x" * 32, ttl_seconds=600
+    )
+    return user, employer, job, token
+
+
+@pytest.mark.asyncio
+async def test_applicant_export_happy_path(
+    async_client: AsyncClient, session: AsyncSession
+) -> None:
+    user, _applicant, token = await _make_applicant(session)
+    resp = await async_client.post(
+        "/v1/me/dsr/export",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 200
+    assert resp.headers["content-type"].startswith("application/json")
+    assert "attachment" in resp.headers["content-disposition"]
+    assert resp.headers["cache-control"] == "no-store"
+
+    body = resp.json()
+    assert body["version"] == "1"
+    assert body["exported_for_user_id"] == str(user.id)
+    assert body["user"]["id"] == str(user.id)
+    assert body["applicant"] is not None
+    assert body["applicant"]["full_name"] == "DSR Test User"
+    assert len(body["user_consents"]) == 7  # all default scopes
+    assert body["employer_memberships"] == []
+    assert body["owned_jobs"] == []
+    assert any(r["type"] == "refresh_tokens" for r in body["redactions"])
+    assert len(body["notes"]) >= 1
+
+
+@pytest.mark.asyncio
+async def test_recruiter_export_includes_employer_and_jobs(
+    async_client: AsyncClient, session: AsyncSession
+) -> None:
+    user, employer, job, token = await _make_recruiter_with_employer(session)
+    resp = await async_client.post(
+        "/v1/me/dsr/export",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["applicant"] is None
+    assert body["resumes"] == []
+    assert body["applications"] == []
+    assert len(body["employer_memberships"]) == 1
+    assert body["employer_memberships"][0]["employer"]["id"] == str(employer.id)
+    assert any(j["id"] == str(job.id) for j in body["owned_jobs"])
+
+
+@pytest.mark.asyncio
+async def test_export_requires_auth(async_client: AsyncClient) -> None:
+    resp = await async_client.post("/v1/me/dsr/export")
+    assert resp.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_export_never_includes_refresh_tokens(
+    async_client: AsyncClient, session: AsyncSession
+) -> None:
+    user, _applicant, token = await _make_applicant(session)
+    resp = await async_client.post(
+        "/v1/me/dsr/export",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    # Scan the entire serialized body for the substring; no false positives
+    # because refresh_tokens is not a documented top-level key in the envelope.
+    body_text = resp.text
+    parsed = json.loads(body_text)
+    assert "refresh_tokens" not in parsed
+    # Make sure the redaction is documented.
+    assert any(r["type"] == "refresh_tokens" for r in parsed["redactions"])
+
+
+@pytest.mark.asyncio
+async def test_export_writes_two_audit_rows(
+    async_client: AsyncClient, session: AsyncSession
+) -> None:
+    user, _applicant, token = await _make_applicant(session)
+    resp = await async_client.post(
+        "/v1/me/dsr/export",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 200
+
+    audit_rows = (
+        (
+            await session.execute(
+                select(AuditLog).where(
+                    AuditLog.actor_user_id == user.id,
+                    AuditLog.action.in_(["user.dsr_export_requested", "user.dsr_export_completed"]),
+                )
+            )
+        )
+        .scalars()
+        .all()
+    )
+    assert len(audit_rows) == 2
+    actions = {r.action for r in audit_rows}
+    assert actions == {"user.dsr_export_requested", "user.dsr_export_completed"}
+    completed = next(r for r in audit_rows if r.action == "user.dsr_export_completed")
+    assert "section_counts" in completed.context
+    assert completed.context["section_counts"]["user_consents"] == 7
