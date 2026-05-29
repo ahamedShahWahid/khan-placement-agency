@@ -10,4 +10,6 @@ abstract final class Routes {
   static const profileEdit = '/profile/edit';
   static const resume = '/profile/resume';
   static const notifications = '/profile/notifications';
+  static const privacy = '/profile/privacy';
+  static const privacyDelete = '/profile/privacy/delete';
 }

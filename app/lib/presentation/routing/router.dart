@@ -12,6 +12,8 @@ import 'package:kpa_app/presentation/feed/feed_screen.dart';
 import 'package:kpa_app/presentation/job_detail/job_detail_screen.dart';
 import 'package:kpa_app/presentation/profile/edit_profile_screen.dart';
 import 'package:kpa_app/presentation/notifications/notifications_screen.dart';
+import 'package:kpa_app/presentation/privacy/delete_account_screen.dart';
+import 'package:kpa_app/presentation/privacy/privacy_screen.dart';
 import 'package:kpa_app/presentation/resume/resume_screen.dart';
 import 'package:kpa_app/presentation/profile/profile_screen.dart';
 import 'package:kpa_app/presentation/routing/routes.dart';
@@ -157,6 +159,16 @@ GoRouter router(Ref ref) {
                         path: 'jobs/:id',
                         builder: (_, s) =>
                             JobDetailScreen(jobId: s.pathParameters['id']!),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: 'privacy',
+                    builder: (_, __) => const PrivacyScreen(),
+                    routes: [
+                      GoRoute(
+                        path: 'delete',
+                        builder: (_, __) => const DeleteAccountScreen(),
                       ),
                     ],
                   ),
