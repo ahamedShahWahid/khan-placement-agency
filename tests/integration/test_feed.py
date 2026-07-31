@@ -620,3 +620,14 @@ async def test_feed_min_years_above_bound_returns_422(
     h = _token_headers(user)
     resp = await async_client.get("/v1/feed", params={"min_years": 9999999999}, headers=h)
     assert resp.status_code == 422
+
+
+@pytest.mark.integration
+async def test_feed_location_list_capped_at_20(
+    session: AsyncSession, async_client: AsyncClient
+) -> None:
+    user, _ = await _make_applicant(session, email="cap@example.com")
+    await session.commit()
+    params = [("location", f"City{i}") for i in range(21)]
+    resp = await async_client.get("/v1/feed", params=params, headers=_token_headers(user))
+    assert resp.status_code == 422

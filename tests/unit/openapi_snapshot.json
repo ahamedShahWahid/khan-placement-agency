@@ -4533,6 +4533,7 @@
                     "minLength": 1,
                     "type": "string"
                   },
+                  "maxItems": 20,
                   "type": "array"
                 },
                 {

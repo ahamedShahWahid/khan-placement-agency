@@ -128,7 +128,7 @@ async def get_feed(
     limit: int = Query(20, ge=1, le=50),
     cursor: str | None = Query(None),
     q: str | None = Query(None, max_length=100),
-    location: list[_LocationItem] | None = Query(None),  # noqa: B008
+    location: list[_LocationItem] | None = Query(None, max_length=20),  # noqa: B008
     min_years: int | None = Query(None, ge=0, le=80),
     min_ctc: Decimal | None = Query(None, ge=0),  # noqa: B008
 ) -> FeedResponse | Response:
