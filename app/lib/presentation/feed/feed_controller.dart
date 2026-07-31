@@ -31,20 +31,34 @@ class FeedController extends _$FeedController {
     await future;
   }
 
-  Future<void> loadMore() => loadNextPage<FeedItemDto>(
-        currentState: state,
-        fetch: ({String? cursor}) async {
-          final filters = ref.read(feedFiltersControllerProvider);
-          final page = await ref.read(feedRepositoryProvider).fetchPage(
-              cursor: cursor, filters: filters.isEmpty ? null : filters,);
-          return PagedState(
-            items: page.items,
-            cursor: page.nextCursor,
-            hasMore: page.nextCursor != null,
-          );
-        },
-        setState: (s) => state = s,
-      );
+  Future<void> loadMore() {
+    // Snapshot the filters this call started under. If they change mid-flight
+    // (user edits filters while a page-2 fetch is in the air), the fetch
+    // that started under the OLD filters must not land on top of the
+    // rebuild the filter change already triggered — `FeedController.build()`
+    // watches the filters provider and replaces `state` wholesale, and a
+    // stale `setState` here would silently merge old-filter pages into it.
+    final filtersAtStart = ref.read(feedFiltersControllerProvider);
+    return loadNextPage<FeedItemDto>(
+      currentState: state,
+      fetch: ({String? cursor}) async {
+        final filters = ref.read(feedFiltersControllerProvider);
+        final page = await ref.read(feedRepositoryProvider).fetchPage(
+              cursor: cursor,
+              filters: filters.isEmpty ? null : filters,
+            );
+        return PagedState(
+          items: page.items,
+          cursor: page.nextCursor,
+          hasMore: page.nextCursor != null,
+        );
+      },
+      setState: (s) {
+        if (ref.read(feedFiltersControllerProvider) != filtersAtStart) return;
+        state = s;
+      },
+    );
+  }
 
   /// Optimistic thumbs-down: remove the card immediately, roll back on error.
   Future<void> rateDown(String jobId) async {

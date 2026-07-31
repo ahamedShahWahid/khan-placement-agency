@@ -79,7 +79,9 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
   /// [_selfMutation]'s doc for why value-based gating alone can't cover
   /// the "removed the last active chip" case.
   void _syncControllerFromExternalClear(
-      FeedFilters? previous, FeedFilters next,) {
+    FeedFilters? previous,
+    FeedFilters next,
+  ) {
     if (_selfMutation) {
       _selfMutation = false;
       return;
@@ -103,9 +105,19 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
   /// Wraps an in-widget notifier mutation (chip removal, "Clear all") so
   /// the resulting provider notification is recognized as self-inflicted,
   /// not an external clear — see [_selfMutation].
+  ///
+  /// The listener normally consumes-and-resets the flag itself when the
+  /// mutation actually changes the provider's state (Riverpod only notifies
+  /// on `previous != next`, so the listener runs synchronously inside
+  /// `action()`). But if the mutation happens to produce an EQUAL state
+  /// (a no-op set), no notification fires, the listener never runs, and
+  /// `_selfMutation` would stay stuck `true` — silently swallowing the
+  /// next genuine external clear. Resetting it here unconditionally after
+  /// `action()` returns guarantees it can never outlive its own mutation.
   void _mutateSelf(void Function() action) {
     _selfMutation = true;
     action();
+    _selfMutation = false;
   }
 
   Widget _buildCtcChip({
@@ -113,8 +125,7 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
     required FeedFiltersController notifier,
   }) {
     final decimals = filters.minCtc! % 100000 == 0 ? 0 : 1;
-    final label =
-        '≥ ₹${(filters.minCtc! / 100000).toStringAsFixed(decimals)}L';
+    final label = '≥ ₹${(filters.minCtc! / 100000).toStringAsFixed(decimals)}L';
     return InputChip(
       label: Text(label),
       onDeleted: () => _mutateSelf(
@@ -141,10 +152,12 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
                 controller: _searchController,
                 onChanged: _onSearchChanged,
                 textInputAction: TextInputAction.search,
+                maxLength: 100,
                 decoration: const InputDecoration(
                   hintText: 'Search title or company',
                   prefixIcon: Icon(Icons.search),
                   isDense: true,
+                  counterText: '',
                 ),
               ),
             ),
@@ -174,14 +187,16 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
               for (final loc in filters.locations)
                 InputChip(
                   label: Text(loc),
-                  onDeleted: () => _mutateSelf(() => notifier.set(
-                        filters.copyWith(
-                          locations: [
-                            for (final l in filters.locations)
-                              if (l != loc) l,
-                          ],
-                        ),
-                      ),),
+                  onDeleted: () => _mutateSelf(
+                    () => notifier.set(
+                      filters.copyWith(
+                        locations: [
+                          for (final l in filters.locations)
+                            if (l != loc) l,
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               if (filters.minYears != null)
                 InputChip(

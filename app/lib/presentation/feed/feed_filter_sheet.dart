@@ -104,9 +104,11 @@ class _FeedFilterSheetState extends ConsumerState<FeedFilterSheet> {
           const SizedBox(height: JobifySpacing.sm),
           TextField(
             controller: _customCityController,
+            maxLength: 100,
             decoration: const InputDecoration(
               hintText: 'Add another city',
               isDense: true,
+              counterText: '',
             ),
             onSubmitted: (v) {
               final city = v.trim();
@@ -121,8 +123,10 @@ class _FeedFilterSheetState extends ConsumerState<FeedFilterSheet> {
               IconButton(
                 onPressed: _minYears == null
                     ? null
-                    : () => setState(() =>
-                        _minYears = _minYears! > 0 ? _minYears! - 1 : null,),
+                    : () => setState(
+                          () => _minYears =
+                              _minYears! > 0 ? _minYears! - 1 : null,
+                        ),
                 icon: const Icon(Icons.remove),
               ),
               Text(_minYears == null ? 'Any' : '$_minYears yrs'),

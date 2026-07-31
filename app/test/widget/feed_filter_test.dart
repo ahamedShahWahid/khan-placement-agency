@@ -95,10 +95,16 @@ void main() {
 
   testWidgets('search field debounces then sets query filter', (tester) async {
     late ProviderContainer container;
-    await tester.pumpWidget(_wrap(Consumer(builder: (context, ref, _) {
-      container = ProviderScope.containerOf(context);
-      return const FeedFilterBar();
-    },),),);
+    await tester.pumpWidget(
+      _wrap(
+        Consumer(
+          builder: (context, ref, _) {
+            container = ProviderScope.containerOf(context);
+            return const FeedFilterBar();
+          },
+        ),
+      ),
+    );
 
     await tester.enterText(find.byType(TextField), 'flutter');
     await tester.pump(const Duration(milliseconds: 200));
@@ -110,10 +116,16 @@ void main() {
   testWidgets('search field clears when the query filter is cleared externally',
       (tester) async {
     late ProviderContainer container;
-    await tester.pumpWidget(_wrap(Consumer(builder: (context, ref, _) {
-      container = ProviderScope.containerOf(context);
-      return const FeedFilterBar();
-    },),),);
+    await tester.pumpWidget(
+      _wrap(
+        Consumer(
+          builder: (context, ref, _) {
+            container = ProviderScope.containerOf(context);
+            return const FeedFilterBar();
+          },
+        ),
+      ),
+    );
 
     await tester.enterText(find.byType(TextField), 'flutter');
     await tester.pump(const Duration(milliseconds: 400));
@@ -138,10 +150,16 @@ void main() {
       'external clear cancels the pending debounce — it does not resurrect '
       'the query once the original deadline passes', (tester) async {
     late ProviderContainer container;
-    await tester.pumpWidget(_wrap(Consumer(builder: (context, ref, _) {
-      container = ProviderScope.containerOf(context);
-      return const FeedFilterBar();
-    },),),);
+    await tester.pumpWidget(
+      _wrap(
+        Consumer(
+          builder: (context, ref, _) {
+            container = ProviderScope.containerOf(context);
+            return const FeedFilterBar();
+          },
+        ),
+      ),
+    );
     // Seed an active (non-query) filter first — realistically, the Clear
     // affordance that calls `notifier.clear()` externally is only ever
     // visible/tappable when SOME filter is already active; a query that was
@@ -174,10 +192,16 @@ void main() {
       'an unrelated external mutation while typing does not wipe the '
       'pending search text', (tester) async {
     late ProviderContainer container;
-    await tester.pumpWidget(_wrap(Consumer(builder: (context, ref, _) {
-      container = ProviderScope.containerOf(context);
-      return const FeedFilterBar();
-    },),),);
+    await tester.pumpWidget(
+      _wrap(
+        Consumer(
+          builder: (context, ref, _) {
+            container = ProviderScope.containerOf(context);
+            return const FeedFilterBar();
+          },
+        ),
+      ),
+    );
 
     await tester.enterText(find.byType(TextField), 'flutter');
     // Well inside the 400ms debounce window — nothing committed yet.
@@ -205,10 +229,16 @@ void main() {
       'pending search text (structurally identical to an external clear)',
       (tester) async {
     late ProviderContainer container;
-    await tester.pumpWidget(_wrap(Consumer(builder: (context, ref, _) {
-      container = ProviderScope.containerOf(context);
-      return const FeedFilterBar();
-    },),),);
+    await tester.pumpWidget(
+      _wrap(
+        Consumer(
+          builder: (context, ref, _) {
+            container = ProviderScope.containerOf(context);
+            return const FeedFilterBar();
+          },
+        ),
+      ),
+    );
     // Exactly ONE active (non-query) filter — removing it below produces
     // previous.isEmpty=false -> next.isEmpty=true, the SAME (previous, next)
     // shape an external `notifier.clear()` would produce. Only the call
@@ -243,10 +273,16 @@ void main() {
       '"Clear all" cancels the pending debounce — it does not resurrect the '
       'query once the original deadline passes', (tester) async {
     late ProviderContainer container;
-    await tester.pumpWidget(_wrap(Consumer(builder: (context, ref, _) {
-      container = ProviderScope.containerOf(context);
-      return const FeedFilterBar();
-    },),),);
+    await tester.pumpWidget(
+      _wrap(
+        Consumer(
+          builder: (context, ref, _) {
+            container = ProviderScope.containerOf(context);
+            return const FeedFilterBar();
+          },
+        ),
+      ),
+    );
     // "Clear all" is an in-widget mutation, so the listener short-circuits on
     // `_selfMutation` and never reaches the value-based cancel branch — this
     // call site must cancel the debounce itself. Seed a filter so the chip
@@ -278,10 +314,16 @@ void main() {
   testWidgets('active filters render chips; clearing a chip removes it',
       (tester) async {
     late ProviderContainer container;
-    await tester.pumpWidget(_wrap(Consumer(builder: (context, ref, _) {
-      container = ProviderScope.containerOf(context);
-      return const FeedFilterBar();
-    },),),);
+    await tester.pumpWidget(
+      _wrap(
+        Consumer(
+          builder: (context, ref, _) {
+            container = ProviderScope.containerOf(context);
+            return const FeedFilterBar();
+          },
+        ),
+      ),
+    );
     container
         .read(feedFiltersControllerProvider.notifier)
         .set(const FeedFilters(locations: ['Pune'], minYears: 3));
