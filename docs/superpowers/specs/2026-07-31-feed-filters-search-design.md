@@ -41,9 +41,9 @@ statement in `jobify_api.routes.feed`. Untouched: the score ordering, the
 peek-one `LIMIT limit+1`, the thumbs-down exclusion outer join (ON-clause
 predicates), `require_applicant`, and the 401/403 ladder.
 
-- Location: `EXISTS (SELECT 1 FROM jsonb_array_elements_text(jobs.locations) e
-  WHERE lower(e) = lower(:loc))`, OR-ed across requested locations. Fine at
-  MVP scale; no new index, **no migration**.
+- Location: `jobs.locations` is a Postgres `ARRAY(String(100))` — predicate is
+  `EXISTS (SELECT 1 FROM unnest(jobs.locations) e WHERE lower(e) IN
+  (:wanted_lowercased))`. Fine at MVP scale; no new index, **no migration**.
 - Keyword: `job.title ILIKE :pat OR employer.name ILIKE :pat` with the pattern
   escaped server-side (SQLAlchemy `ilike(..., escape="\\")`).
 
