@@ -609,3 +609,14 @@ async def test_feed_filter_validation_422(session: AsyncSession, async_client: A
     assert r2.status_code == 422
     r3 = await async_client.get("/v1/feed", params={"q": "x" * 101}, headers=h)
     assert r3.status_code == 422
+
+
+@pytest.mark.integration
+async def test_feed_min_years_above_bound_returns_422(
+    session: AsyncSession, async_client: AsyncClient
+) -> None:
+    user, _ = await _make_applicant(session, email="v2@example.com")
+    await session.commit()
+    h = _token_headers(user)
+    resp = await async_client.get("/v1/feed", params={"min_years": 9999999999}, headers=h)
+    assert resp.status_code == 422

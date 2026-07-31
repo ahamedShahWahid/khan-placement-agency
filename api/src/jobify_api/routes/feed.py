@@ -85,11 +85,11 @@ def filters_hash(
     return hashlib.sha256(canon.encode("utf-8")).hexdigest()[:12]
 
 
-def encode_cursor(score: Decimal, match_id: uuid.UUID, filters_hash: str | None = None) -> str:
+def encode_cursor(score: Decimal, match_id: uuid.UUID, fhash: str | None = None) -> str:
     """Pack (score, match_id[, filter-set hash]) into an opaque base64 string."""
     payload: dict[str, str] = {"score": str(score), "match_id": str(match_id)}
-    if filters_hash is not None:
-        payload["f"] = filters_hash
+    if fhash is not None:
+        payload["f"] = fhash
     return _encode_cursor_payload(payload)
 
 
@@ -129,7 +129,7 @@ async def get_feed(
     cursor: str | None = Query(None),
     q: str | None = Query(None, max_length=100),
     location: list[_LocationItem] | None = Query(None),  # noqa: B008
-    min_years: int | None = Query(None, ge=0),
+    min_years: int | None = Query(None, ge=0, le=80),
     min_ctc: Decimal | None = Query(None, ge=0),  # noqa: B008
 ) -> FeedResponse | Response:
     applicant = await _require_applicant(user, session)

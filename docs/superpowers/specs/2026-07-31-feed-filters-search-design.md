@@ -61,8 +61,11 @@ sorted. On decode:
   if the current request also has no filters, else `400 invalid_cursor`.
 
 Flutter resets its cursor on every filter change, so clients never hit the 400
-in practice; on receiving it anyway the client drops the cursor and refetches
-page 1 (existing invalid-cursor handling).
+in practice; on receiving it anyway `loadNextPage` surfaces it through the
+shared paging error state (`AsyncValue.error(...).copyWithPrevious(...)`,
+preserving already-loaded items) and the feed screen's error view offers a
+manual Retry button that calls `FeedController.refresh()` — there is no
+automatic cursor-drop-and-refetch.
 
 **ETag needs no change** — it already keys off `(applicant_id, max(updated_at),
 count)`; filtered responses produce their own counts, so 304 semantics stay
@@ -88,8 +91,8 @@ correct per filter set.
 
 ## Error handling & edge cases
 
-- `400 invalid_cursor` on filter/cursor mismatch → client drops cursor,
-  refetches page 1.
+- `400 invalid_cursor` on filter/cursor mismatch → paging error view with a
+  manual Retry button (`FeedController.refresh()`); no automatic cursor drop.
 - ILIKE metacharacters (`%`, `_`, `\`) in `q` are escaped — a literal search
   for `100%` matches literally.
 - No audit/PII implications: filters are the applicant's own query over their
