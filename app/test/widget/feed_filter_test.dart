@@ -107,6 +107,33 @@ void main() {
     expect(container.read(feedFiltersControllerProvider).query, 'flutter');
   });
 
+  testWidgets('search field clears when the query filter is cleared externally',
+      (tester) async {
+    late ProviderContainer container;
+    await tester.pumpWidget(_wrap(Consumer(builder: (context, ref, _) {
+      container = ProviderScope.containerOf(context);
+      return const FeedFilterBar();
+    })));
+
+    await tester.enterText(find.byType(TextField), 'flutter');
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(container.read(feedFiltersControllerProvider).query, 'flutter');
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller!.text,
+      'flutter',
+    );
+
+    // External clear — e.g. the filtered empty state's "Clear filters"
+    // button — has no reference to FeedFilterBar's private controller.
+    container.read(feedFiltersControllerProvider.notifier).clear();
+    await tester.pump();
+
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller!.text,
+      isEmpty,
+    );
+  });
+
   testWidgets('active filters render chips; clearing a chip removes it',
       (tester) async {
     late ProviderContainer container;

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jobify_app/data/feed/feed_filters.dart';
 import 'package:jobify_app/presentation/feed/feed_filter_sheet.dart';
 import 'package:jobify_app/presentation/feed/feed_filters_provider.dart';
 import 'package:jobify_app/presentation/theme/jobify_spacing.dart';
@@ -35,8 +36,28 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
     });
   }
 
+  /// Keeps the search field in sync with any EXTERNAL clear of the query
+  /// filter (e.g. the filtered empty state's "Clear filters" button, or the
+  /// filter sheet's Reset/Apply) — those mutate the provider directly and
+  /// have no reference to this widget's private [_searchController]. Only
+  /// reacts when the provider's query goes null/empty while the field still
+  /// shows text; a live-typing debounce round-trip always sets a *non-null*
+  /// query (or the field is already empty), so this never fights the user
+  /// mid-keystroke.
+  void _syncControllerFromExternalClear(
+      FeedFilters? previous, FeedFilters next) {
+    final queryCleared = next.query == null || next.query!.isEmpty;
+    if (queryCleared && _searchController.text.isNotEmpty) {
+      _searchController.clear();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    ref.listen<FeedFilters>(
+      feedFiltersControllerProvider,
+      _syncControllerFromExternalClear,
+    );
     final filters = ref.watch(feedFiltersControllerProvider);
     final notifier = ref.read(feedFiltersControllerProvider.notifier);
     return Column(
