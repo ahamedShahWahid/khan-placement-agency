@@ -10,6 +10,8 @@ Shared response shapes (JobRead, EmployerRead, …) live in
 
 from __future__ import annotations
 
+import hashlib
+import json
 import uuid
 from datetime import datetime
 from decimal import Decimal
@@ -54,16 +56,47 @@ router = APIRouter(prefix="/v1", tags=["feed"])
 # --- Cursor helpers (typed wrappers over jobify.pagination) ---
 
 
-def encode_cursor(score: Decimal, match_id: uuid.UUID) -> str:
-    """Pack (score, match_id) into an opaque base64 string."""
-    return _encode_cursor_payload({"score": str(score), "match_id": str(match_id)})
+def filters_hash(
+    q: str | None,
+    locations: list[str] | None,
+    min_years: int | None,
+    min_ctc: Decimal | None,
+) -> str | None:
+    """Short stable hash of the canonicalized filter set; None = no filters.
+
+    Inputs must already be normalized (trimmed, empties dropped) — this
+    function only canonicalizes case + location order.
+    """
+    if q is None and not locations and min_years is None and min_ctc is None:
+        return None
+    canon = json.dumps(
+        {
+            "q": q.lower() if q is not None else None,
+            "loc": sorted(loc.lower() for loc in locations) if locations else None,
+            "years": min_years,
+            "ctc": str(min_ctc) if min_ctc is not None else None,
+        },
+        sort_keys=True,
+    )
+    return hashlib.sha256(canon.encode("utf-8")).hexdigest()[:12]
 
 
-def decode_cursor(cursor: str) -> tuple[Decimal, uuid.UUID]:
+def encode_cursor(score: Decimal, match_id: uuid.UUID, filters_hash: str | None = None) -> str:
+    """Pack (score, match_id[, filter-set hash]) into an opaque base64 string."""
+    payload: dict[str, str] = {"score": str(score), "match_id": str(match_id)}
+    if filters_hash is not None:
+        payload["f"] = filters_hash
+    return _encode_cursor_payload(payload)
+
+
+def decode_cursor(cursor: str) -> tuple[Decimal, uuid.UUID, str | None]:
     """Decode an opaque cursor. Raises ValueError on any malformed input."""
     payload = _decode_cursor_payload(cursor)
     try:
-        return Decimal(payload["score"]), uuid.UUID(payload["match_id"])
+        f = payload.get("f")
+        if f is not None and not isinstance(f, str):
+            raise TypeError("f is not a string")
+        return Decimal(payload["score"]), uuid.UUID(payload["match_id"]), f
     except (ValueError, KeyError, TypeError, ArithmeticError) as exc:
         # ArithmeticError covers decimal.InvalidOperation on a garbage score.
         raise ValueError(f"invalid_cursor: {exc}") from exc
@@ -84,7 +117,7 @@ async def get_feed(
     cursor_mid: uuid.UUID | None = None
     if cursor is not None:
         try:
-            cursor_score, cursor_mid = decode_cursor(cursor)
+            cursor_score, cursor_mid, _cursor_f = decode_cursor(cursor)
         except ValueError:
             raise HTTPException(status_code=400, detail="invalid_cursor") from None
 
