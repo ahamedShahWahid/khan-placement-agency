@@ -200,6 +200,45 @@ void main() {
     expect(container.read(feedFiltersControllerProvider).query, 'flutter');
   });
 
+  testWidgets(
+      'removing the last active chip while typing does not wipe the '
+      'pending search text (structurally identical to an external clear)',
+      (tester) async {
+    late ProviderContainer container;
+    await tester.pumpWidget(_wrap(Consumer(builder: (context, ref, _) {
+      container = ProviderScope.containerOf(context);
+      return const FeedFilterBar();
+    })));
+    // Exactly ONE active (non-query) filter — removing it below produces
+    // previous.isEmpty=false -> next.isEmpty=true, the SAME (previous, next)
+    // shape an external `notifier.clear()` would produce. Only the call
+    // site (in-widget chip vs. an external caller) can tell them apart.
+    container
+        .read(feedFiltersControllerProvider.notifier)
+        .set(const FeedFilters(locations: ['Pune']));
+    await tester.pump();
+
+    await tester.enterText(find.byType(TextField), 'flutter');
+    // Well inside the 400ms debounce window — nothing committed yet.
+    await tester.pump(const Duration(milliseconds: 100));
+
+    // The chip's own in-widget onDeleted — not an external caller.
+    tester
+        .widget<InputChip>(find.widgetWithText(InputChip, 'Pune'))
+        .onDeleted!();
+    await tester.pump();
+
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller!.text,
+      'flutter',
+    );
+    expect(container.read(feedFiltersControllerProvider).locations, isEmpty);
+
+    // Let the debounce complete — the typed text must still land.
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(container.read(feedFiltersControllerProvider).query, 'flutter');
+  });
+
   testWidgets('active filters render chips; clearing a chip removes it',
       (tester) async {
     late ProviderContainer container;

@@ -19,6 +19,17 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
   final _searchController = TextEditingController();
   Timer? _debounce;
 
+  /// Set immediately before any of THIS WIDGET'S OWN calls into the notifier
+  /// (a chip's `onDeleted`, "Clear all"), then consumed (read + reset) by
+  /// `_syncControllerFromExternalClear` on the resulting notification.
+  ///
+  /// Needed because value-based heuristics can't distinguish "the user
+  /// removed the one-and-only active chip" from "an external caller cleared
+  /// everything" — both produce the exact same (previous, next) pair
+  /// (active → fully empty). Only the CALL SITE knows which one happened,
+  /// so the call site marks it explicitly rather than the listener guessing.
+  bool _selfMutation = false;
+
   @override
   void dispose() {
     _debounce?.cancel();
@@ -61,8 +72,19 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
   /// removing one of several chips, or adding a new one) matches neither
   /// condition, so an in-flight debounce is left completely alone —
   /// preserving both the on-screen text and the eventual commit.
+  ///
+  /// Structural guard first: any notifier call THIS WIDGET made itself
+  /// (chip removal, "Clear all") is skipped unconditionally, regardless of
+  /// what the resulting (previous, next) pair looks like — see
+  /// [_selfMutation]'s doc for why value-based gating alone can't cover
+  /// the "removed the last active chip" case.
   void _syncControllerFromExternalClear(
       FeedFilters? previous, FeedFilters next) {
+    if (_selfMutation) {
+      _selfMutation = false;
+      return;
+    }
+
     final previousQuery = previous?.query;
     final queryWasCommitted = previousQuery != null && previousQuery.isNotEmpty;
     final queryNowCleared = next.query == null || next.query!.isEmpty;
@@ -76,6 +98,14 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
       _debounce?.cancel();
       _searchController.clear();
     }
+  }
+
+  /// Wraps an in-widget notifier mutation (chip removal, "Clear all") so
+  /// the resulting provider notification is recognized as self-inflicted,
+  /// not an external clear — see [_selfMutation].
+  void _mutateSelf(void Function() action) {
+    _selfMutation = true;
+    action();
   }
 
   @override
@@ -129,31 +159,36 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
               for (final loc in filters.locations)
                 InputChip(
                   label: Text(loc),
-                  onDeleted: () => notifier.set(filters.copyWith(
-                    locations: [
-                      for (final l in filters.locations)
-                        if (l != loc) l,
-                    ],
-                  )),
+                  onDeleted: () => _mutateSelf(() => notifier.set(
+                        filters.copyWith(
+                          locations: [
+                            for (final l in filters.locations)
+                              if (l != loc) l,
+                          ],
+                        ),
+                      )),
                 ),
               if (filters.minYears != null)
                 InputChip(
                   label: Text('${filters.minYears} yrs'),
-                  onDeleted: () =>
-                      notifier.set(filters.copyWith(minYears: null)),
+                  onDeleted: () => _mutateSelf(
+                    () => notifier.set(filters.copyWith(minYears: null)),
+                  ),
                 ),
               if (filters.minCtc != null)
                 InputChip(
                   label: Text(
                       '≥ ₹${(filters.minCtc! / 100000).toStringAsFixed(filters.minCtc! % 100000 == 0 ? 0 : 1)}L'),
-                  onDeleted: () => notifier.set(filters.copyWith(minCtc: null)),
+                  onDeleted: () => _mutateSelf(
+                    () => notifier.set(filters.copyWith(minCtc: null)),
+                  ),
                 ),
               ActionChip(
                 label: const Text('Clear all'),
-                onPressed: () {
+                onPressed: () => _mutateSelf(() {
                   _searchController.clear();
                   notifier.clear();
-                },
+                }),
               ),
             ],
           ),
