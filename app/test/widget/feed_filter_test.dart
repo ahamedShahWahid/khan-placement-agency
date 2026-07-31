@@ -98,7 +98,7 @@ void main() {
     await tester.pumpWidget(_wrap(Consumer(builder: (context, ref, _) {
       container = ProviderScope.containerOf(context);
       return const FeedFilterBar();
-    })));
+    },),),);
 
     await tester.enterText(find.byType(TextField), 'flutter');
     await tester.pump(const Duration(milliseconds: 200));
@@ -113,7 +113,7 @@ void main() {
     await tester.pumpWidget(_wrap(Consumer(builder: (context, ref, _) {
       container = ProviderScope.containerOf(context);
       return const FeedFilterBar();
-    })));
+    },),),);
 
     await tester.enterText(find.byType(TextField), 'flutter');
     await tester.pump(const Duration(milliseconds: 400));
@@ -141,7 +141,7 @@ void main() {
     await tester.pumpWidget(_wrap(Consumer(builder: (context, ref, _) {
       container = ProviderScope.containerOf(context);
       return const FeedFilterBar();
-    })));
+    },),),);
     // Seed an active (non-query) filter first — realistically, the Clear
     // affordance that calls `notifier.clear()` externally is only ever
     // visible/tappable when SOME filter is already active; a query that was
@@ -177,7 +177,7 @@ void main() {
     await tester.pumpWidget(_wrap(Consumer(builder: (context, ref, _) {
       container = ProviderScope.containerOf(context);
       return const FeedFilterBar();
-    })));
+    },),),);
 
     await tester.enterText(find.byType(TextField), 'flutter');
     // Well inside the 400ms debounce window — nothing committed yet.
@@ -208,7 +208,7 @@ void main() {
     await tester.pumpWidget(_wrap(Consumer(builder: (context, ref, _) {
       container = ProviderScope.containerOf(context);
       return const FeedFilterBar();
-    })));
+    },),),);
     // Exactly ONE active (non-query) filter — removing it below produces
     // previous.isEmpty=false -> next.isEmpty=true, the SAME (previous, next)
     // shape an external `notifier.clear()` would produce. Only the call
@@ -246,7 +246,7 @@ void main() {
     await tester.pumpWidget(_wrap(Consumer(builder: (context, ref, _) {
       container = ProviderScope.containerOf(context);
       return const FeedFilterBar();
-    })));
+    },),),);
     // "Clear all" is an in-widget mutation, so the listener short-circuits on
     // `_selfMutation` and never reaches the value-based cancel branch — this
     // call site must cancel the debounce itself. Seed a filter so the chip
@@ -281,7 +281,7 @@ void main() {
     await tester.pumpWidget(_wrap(Consumer(builder: (context, ref, _) {
       container = ProviderScope.containerOf(context);
       return const FeedFilterBar();
-    })));
+    },),),);
     container
         .read(feedFiltersControllerProvider.notifier)
         .set(const FeedFilters(locations: ['Pune'], minYears: 3));

@@ -122,7 +122,7 @@ class _FeedFilterSheetState extends ConsumerState<FeedFilterSheet> {
                 onPressed: _minYears == null
                     ? null
                     : () => setState(() =>
-                        _minYears = _minYears! > 0 ? _minYears! - 1 : null),
+                        _minYears = _minYears! > 0 ? _minYears! - 1 : null,),
                 icon: const Icon(Icons.remove),
               ),
               Text(_minYears == null ? 'Any' : '$_minYears yrs'),

@@ -79,7 +79,7 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
   /// [_selfMutation]'s doc for why value-based gating alone can't cover
   /// the "removed the last active chip" case.
   void _syncControllerFromExternalClear(
-      FeedFilters? previous, FeedFilters next) {
+      FeedFilters? previous, FeedFilters next,) {
     if (_selfMutation) {
       _selfMutation = false;
       return;
@@ -106,6 +106,21 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
   void _mutateSelf(void Function() action) {
     _selfMutation = true;
     action();
+  }
+
+  Widget _buildCtcChip({
+    required FeedFilters filters,
+    required FeedFiltersController notifier,
+  }) {
+    final decimals = filters.minCtc! % 100000 == 0 ? 0 : 1;
+    final label =
+        '≥ ₹${(filters.minCtc! / 100000).toStringAsFixed(decimals)}L';
+    return InputChip(
+      label: Text(label),
+      onDeleted: () => _mutateSelf(
+        () => notifier.set(filters.copyWith(minCtc: null)),
+      ),
+    );
   }
 
   @override
@@ -166,7 +181,7 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
                               if (l != loc) l,
                           ],
                         ),
-                      )),
+                      ),),
                 ),
               if (filters.minYears != null)
                 InputChip(
@@ -175,14 +190,12 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
                     () => notifier.set(filters.copyWith(minYears: null)),
                   ),
                 ),
-              if (filters.minCtc != null)
-                InputChip(
-                  label: Text(
-                      '≥ ₹${(filters.minCtc! / 100000).toStringAsFixed(filters.minCtc! % 100000 == 0 ? 0 : 1)}L'),
-                  onDeleted: () => _mutateSelf(
-                    () => notifier.set(filters.copyWith(minCtc: null)),
-                  ),
+              if (filters.minCtc != null) ...[
+                _buildCtcChip(
+                  filters: filters,
+                  notifier: notifier,
                 ),
+              ],
               ActionChip(
                 label: const Text('Clear all'),
                 onPressed: () => _mutateSelf(() {

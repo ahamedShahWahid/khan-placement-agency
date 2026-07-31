@@ -36,7 +36,7 @@ class FeedController extends _$FeedController {
         fetch: ({String? cursor}) async {
           final filters = ref.read(feedFiltersControllerProvider);
           final page = await ref.read(feedRepositoryProvider).fetchPage(
-              cursor: cursor, filters: filters.isEmpty ? null : filters);
+              cursor: cursor, filters: filters.isEmpty ? null : filters,);
           return PagedState(
             items: page.items,
             cursor: page.nextCursor,

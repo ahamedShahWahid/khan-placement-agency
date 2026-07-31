@@ -11,6 +11,7 @@ class FeedFiltersController extends _$FeedFiltersController {
   @override
   FeedFilters build() => const FeedFilters();
 
+  // ignore: use_setters_to_change_properties — Riverpod controller pattern
   void set(FeedFilters filters) => state = filters;
 
   void clear() => state = const FeedFilters();
