@@ -239,6 +239,42 @@ void main() {
     expect(container.read(feedFiltersControllerProvider).query, 'flutter');
   });
 
+  testWidgets(
+      '"Clear all" cancels the pending debounce — it does not resurrect the '
+      'query once the original deadline passes', (tester) async {
+    late ProviderContainer container;
+    await tester.pumpWidget(_wrap(Consumer(builder: (context, ref, _) {
+      container = ProviderScope.containerOf(context);
+      return const FeedFilterBar();
+    })));
+    // "Clear all" is an in-widget mutation, so the listener short-circuits on
+    // `_selfMutation` and never reaches the value-based cancel branch — this
+    // call site must cancel the debounce itself. Seed a filter so the chip
+    // row (and therefore "Clear all") renders at all.
+    container
+        .read(feedFiltersControllerProvider.notifier)
+        .set(const FeedFilters(locations: ['Pune']));
+    await tester.pump();
+
+    await tester.enterText(find.byType(TextField), 'flutter');
+    // Well inside the 400ms debounce window — nothing committed yet.
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(container.read(feedFiltersControllerProvider).query, isNull);
+
+    await tester.tap(find.widgetWithText(ActionChip, 'Clear all'));
+    await tester.pump();
+
+    // Let the ORIGINAL debounce deadline pass. If the timer wasn't
+    // cancelled, it fires here and silently reinstates `query: 'flutter'`
+    // even though the field (and every chip) reads as cleared.
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(container.read(feedFiltersControllerProvider).query, isNull);
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller!.text,
+      isEmpty,
+    );
+  });
+
   testWidgets('active filters render chips; clearing a chip removes it',
       (tester) async {
     late ProviderContainer container;

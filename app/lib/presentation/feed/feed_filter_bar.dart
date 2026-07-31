@@ -186,6 +186,16 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
               ActionChip(
                 label: const Text('Clear all'),
                 onPressed: () => _mutateSelf(() {
+                  // Cancel HERE, not in the listener: this is a self-
+                  // mutation, so `_syncControllerFromExternalClear` short-
+                  // circuits on `_selfMutation` and never reaches its
+                  // `_debounce?.cancel()`. And `_searchController.clear()`
+                  // does not fire `onChanged`, so nothing else touches the
+                  // timer — an in-flight debounce would fire at its original
+                  // deadline and silently reinstate the query the user just
+                  // cleared. (Deliberately NOT hoisted into `_mutateSelf`:
+                  // chip removals must leave a pending debounce running.)
+                  _debounce?.cancel();
                   _searchController.clear();
                   notifier.clear();
                 }),
