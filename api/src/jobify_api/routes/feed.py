@@ -1,8 +1,10 @@
 """GET /v1/feed — paginated ranked matches for the current applicant.
 
-Cursor pagination via opaque base64 of {score, match_id}. ETag is weak,
-keyed off (applicant_id, max(updated_at), count). 401/403 ladder reuses the
-current_user + require_applicant deps from jobify_api.auth.dependencies.
+Cursor pagination via opaque base64 of {score, match_id[, f]} (f = optional
+filter-set hash, binding the cursor to the filters it was minted under).
+ETag is weak, keyed off (applicant_id, max(updated_at), count). 401/403
+ladder reuses the current_user + require_applicant deps from
+jobify_api.auth.dependencies.
 
 Shared response shapes (JobRead, EmployerRead, …) live in
 ``routes/schemas.py``; cursor/ETag primitives in ``jobify.pagination``.
@@ -15,11 +17,13 @@ import json
 import uuid
 from datetime import datetime
 from decimal import Decimal
+from typing import Annotated
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import Response
-from sqlalchemy import and_, literal, or_, select, tuple_
+from pydantic import StringConstraints
+from sqlalchemy import and_, exists, func, literal, or_, select, tuple_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from jobify.db.models import (
@@ -102,6 +106,19 @@ def decode_cursor(cursor: str) -> tuple[Decimal, uuid.UUID, str | None]:
         raise ValueError(f"invalid_cursor: {exc}") from exc
 
 
+_LIKE_ESCAPE = "\\"
+
+
+def _escape_like(term: str) -> str:
+    """Escape ILIKE metacharacters so user input matches literally."""
+    return term.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
+
+_LocationItem = Annotated[
+    str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)
+]
+
+
 @router.get("/feed", response_model=FeedResponse)
 async def get_feed(
     request: Request,
@@ -110,16 +127,29 @@ async def get_feed(
     session: AsyncSession = Depends(get_session),  # noqa: B008
     limit: int = Query(20, ge=1, le=50),
     cursor: str | None = Query(None),
+    q: str | None = Query(None, max_length=100),
+    location: list[_LocationItem] | None = Query(None),  # noqa: B008
+    min_years: int | None = Query(None, ge=0),
+    min_ctc: Decimal | None = Query(None, ge=0),  # noqa: B008
 ) -> FeedResponse | Response:
     applicant = await _require_applicant(user, session)
+
+    # Normalize BEFORE hashing so the cursor hash sees canonical values.
+    q_norm = (q or "").strip() or None
+    locations = list(location or [])
+    fhash = filters_hash(q_norm, locations, min_years, min_ctc)
 
     cursor_score: Decimal | None = None
     cursor_mid: uuid.UUID | None = None
     if cursor is not None:
         try:
-            cursor_score, cursor_mid, _cursor_f = decode_cursor(cursor)
+            cursor_score, cursor_mid, cursor_f = decode_cursor(cursor)
         except ValueError:
             raise HTTPException(status_code=400, detail="invalid_cursor") from None
+        if cursor_f != fhash:
+            # A cursor minted under a different filter set can't be resumed —
+            # silently mixing pages would be worse than a clean 400.
+            raise HTTPException(status_code=400, detail="invalid_cursor")
 
     # Query: match JOIN job JOIN employer; surfaced + live + open. One outer
     # join to the live feedback row does double duty: rating='down' EXCLUDES
@@ -154,6 +184,29 @@ async def get_feed(
         .order_by(Match.total_score.desc(), Match.id.desc())
         .limit(limit + 1)  # peek-one
     )
+    if q_norm is not None:
+        pat = f"%{_escape_like(q_norm)}%"
+        stmt = stmt.where(
+            or_(
+                Job.title.ilike(pat, escape=_LIKE_ESCAPE),
+                Employer.name.ilike(pat, escape=_LIKE_ESCAPE),
+            )
+        )
+    if locations:
+        loc_el = (
+            func.unnest(Job.locations).table_valued("value", joins_implicitly=True).render_derived()
+        )
+        stmt = stmt.where(
+            exists(
+                select(literal(1))
+                .select_from(loc_el)
+                .where(func.lower(loc_el.c.value).in_([loc.lower() for loc in locations]))
+            )
+        )
+    if min_years is not None:
+        stmt = stmt.where(Job.min_exp_years <= min_years, Job.max_exp_years >= min_years)
+    if min_ctc is not None:
+        stmt = stmt.where(or_(Job.ctc_max.is_(None), Job.ctc_max >= min_ctc))
     if cursor_score is not None and cursor_mid is not None:
         # Tuple comparison maps cleanly to (total_score DESC, id DESC) ordering.
         # literal() wraps plain Python values so SQLAlchemy (and mypy) treats
@@ -192,7 +245,7 @@ async def get_feed(
     next_cursor: str | None = None
     if has_more and rows:
         last_match = rows[-1][0]
-        next_cursor = encode_cursor(last_match.total_score, last_match.id)
+        next_cursor = encode_cursor(last_match.total_score, last_match.id, fhash)
 
     etag = make_weak_etag(applicant.id, max_updated_at, len(items))
     if request.headers.get("if-none-match") == etag:
