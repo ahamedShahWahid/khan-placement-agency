@@ -6,17 +6,22 @@ import 'package:jobify_app/data/feed/feed_repository.dart';
 import 'package:jobify_app/data/feed/feed_repository_impl.dart';
 import 'package:jobify_app/data/jobs/job_status.dart';
 import 'package:jobify_app/presentation/feed/feed_controller.dart';
+import 'package:jobify_app/presentation/feed/feed_filters_provider.dart';
 
 class _FakeFeedRepo implements FeedRepository {
   _FakeFeedRepo(this.pages);
   final List<FeedPageDto> pages;
   int call = 0;
+  final List<FeedFilters?> receivedFilters = [];
+  final List<String?> receivedCursors = [];
   @override
   Future<FeedPageDto> fetchPage({
     String? cursor,
     int limit = 20,
     FeedFilters? filters,
   }) async {
+    receivedFilters.add(filters);
+    receivedCursors.add(cursor);
     return pages[call++];
   }
 }
@@ -88,5 +93,51 @@ void main() {
     await c.read(feedControllerProvider.future);
     await c.read(feedControllerProvider.notifier).loadMore();
     expect(c.read(feedControllerProvider).value!.items, hasLength(1));
+  });
+
+  test('filter change rebuilds feed from page 1 with filters applied',
+      () async {
+    final repo = _FakeFeedRepo([
+      FeedPageDto(items: [_item('j1')], nextCursor: 'c1'),
+      FeedPageDto(items: [_item('j2')]),
+    ]);
+    final c = ProviderContainer(
+      overrides: [feedRepositoryProvider.overrideWithValue(repo)],
+    );
+    addTearDown(c.dispose);
+    final sub = c.listen(feedControllerProvider, (_, __) {});
+    addTearDown(sub.close);
+
+    await c.read(feedControllerProvider.future);
+    expect(repo.receivedFilters, [null]); // empty filters sent as null
+
+    c
+        .read(feedFiltersControllerProvider.notifier)
+        .set(const FeedFilters(locations: ['Pune']));
+    final s = await c.read(feedControllerProvider.future);
+
+    expect(s.items.single.job.id, 'j2');
+    expect(repo.receivedCursors.last, isNull); // reset to page 1
+    expect(repo.receivedFilters.last, const FeedFilters(locations: ['Pune']));
+  });
+
+  test('loadMore carries the active filters', () async {
+    final repo = _FakeFeedRepo([
+      FeedPageDto(items: [_item('j1')], nextCursor: 'c1'),
+      FeedPageDto(items: [_item('j2')]),
+    ]);
+    final c = ProviderContainer(
+      overrides: [feedRepositoryProvider.overrideWithValue(repo)],
+    );
+    addTearDown(c.dispose);
+
+    c
+        .read(feedFiltersControllerProvider.notifier)
+        .set(const FeedFilters(query: 'x'));
+    await c.read(feedControllerProvider.future);
+    await c.read(feedControllerProvider.notifier).loadMore();
+
+    expect(repo.receivedCursors.last, 'c1');
+    expect(repo.receivedFilters.last, const FeedFilters(query: 'x'));
   });
 }
