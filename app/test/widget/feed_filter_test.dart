@@ -134,6 +134,72 @@ void main() {
     );
   });
 
+  testWidgets(
+      'external clear cancels the pending debounce — it does not resurrect '
+      'the query once the original deadline passes', (tester) async {
+    late ProviderContainer container;
+    await tester.pumpWidget(_wrap(Consumer(builder: (context, ref, _) {
+      container = ProviderScope.containerOf(context);
+      return const FeedFilterBar();
+    })));
+    // Seed an active (non-query) filter first — realistically, the Clear
+    // affordance that calls `notifier.clear()` externally is only ever
+    // visible/tappable when SOME filter is already active; a query that was
+    // never committed can't be what makes it visible.
+    container
+        .read(feedFiltersControllerProvider.notifier)
+        .set(const FeedFilters(locations: ['Pune']));
+    await tester.pump();
+
+    await tester.enterText(find.byType(TextField), 'flutter');
+    // Well inside the 400ms debounce window — nothing committed yet.
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(container.read(feedFiltersControllerProvider).query, isNull);
+
+    // External clear races the pending debounce.
+    container.read(feedFiltersControllerProvider.notifier).clear();
+    await tester.pump();
+
+    // Let the ORIGINAL debounce deadline pass. If the timer wasn't
+    // cancelled, it fires here and silently reinstates `query: 'flutter'`.
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(container.read(feedFiltersControllerProvider).query, isNull);
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller!.text,
+      isEmpty,
+    );
+  });
+
+  testWidgets(
+      'an unrelated external mutation while typing does not wipe the '
+      'pending search text', (tester) async {
+    late ProviderContainer container;
+    await tester.pumpWidget(_wrap(Consumer(builder: (context, ref, _) {
+      container = ProviderScope.containerOf(context);
+      return const FeedFilterBar();
+    })));
+
+    await tester.enterText(find.byType(TextField), 'flutter');
+    // Well inside the 400ms debounce window — nothing committed yet.
+    await tester.pump(const Duration(milliseconds: 100));
+
+    // Externally set a locations-only filter (query stays null) — e.g. the
+    // filter sheet's Apply, unrelated to the in-flight search text.
+    container
+        .read(feedFiltersControllerProvider.notifier)
+        .set(const FeedFilters(locations: ['Pune']));
+    await tester.pump();
+
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller!.text,
+      'flutter',
+    );
+
+    // Let the debounce complete — the typed text must still land.
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(container.read(feedFiltersControllerProvider).query, 'flutter');
+  });
+
   testWidgets('active filters render chips; clearing a chip removes it',
       (tester) async {
     late ProviderContainer container;

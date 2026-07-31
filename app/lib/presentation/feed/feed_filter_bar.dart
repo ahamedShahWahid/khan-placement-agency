@@ -36,18 +36,44 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
     });
   }
 
-  /// Keeps the search field in sync with any EXTERNAL clear of the query
-  /// filter (e.g. the filtered empty state's "Clear filters" button, or the
-  /// filter sheet's Reset/Apply) — those mutate the provider directly and
-  /// have no reference to this widget's private [_searchController]. Only
-  /// reacts when the provider's query goes null/empty while the field still
-  /// shows text; a live-typing debounce round-trip always sets a *non-null*
-  /// query (or the field is already empty), so this never fights the user
-  /// mid-keystroke.
+  /// Keeps the search field (AND its pending debounce) in sync with an
+  /// EXTERNAL clear of the filters — the filtered empty state's "Clear
+  /// filters" button, "Clear all", or the filter sheet's Reset — all of
+  /// which mutate the provider directly with no reference to this widget's
+  /// private [_searchController] or [_debounce].
+  ///
+  /// Gates on an actual TRANSITION, never merely "next.query is null" (that
+  /// would fire on any unrelated mutation — e.g. removing one of several
+  /// location chips — and wipe text the user is still typing). Two
+  /// transitions both count as "externally cleared":
+  ///  - the committed `query` itself went from non-empty to null/empty
+  ///    (editing an existing committed search term, cleared mid-edit); or
+  ///  - the filters as a whole went from active to fully empty. This
+  ///    second check is required because the realistic path to an external
+  ///    clear is usually a DIFFERENT filter being active (that's what makes
+  ///    the Clear affordance visible in the first place) while the query
+  ///    itself was never committed yet — in that case `previous.query` and
+  ///    `next.query` are both already null, so a query-only transition
+  ///    check would miss it and let the pending debounce silently reinstate
+  ///    the query the user just tried to clear.
+  ///
+  /// A mutation that leaves at least one OTHER filter still active (e.g.
+  /// removing one of several chips, or adding a new one) matches neither
+  /// condition, so an in-flight debounce is left completely alone —
+  /// preserving both the on-screen text and the eventual commit.
   void _syncControllerFromExternalClear(
       FeedFilters? previous, FeedFilters next) {
-    final queryCleared = next.query == null || next.query!.isEmpty;
-    if (queryCleared && _searchController.text.isNotEmpty) {
+    final previousQuery = previous?.query;
+    final queryWasCommitted = previousQuery != null && previousQuery.isNotEmpty;
+    final queryNowCleared = next.query == null || next.query!.isEmpty;
+    final queryTransitionCleared = queryWasCommitted && queryNowCleared;
+
+    final wasActive = previous != null && !previous.isEmpty;
+    final fullReset = wasActive && next.isEmpty;
+
+    if ((queryTransitionCleared || fullReset) &&
+        _searchController.text.isNotEmpty) {
+      _debounce?.cancel();
       _searchController.clear();
     }
   }
