@@ -6,6 +6,7 @@ import 'package:jobify_app/data/api/error_mapping.dart';
 import 'package:jobify_app/data/api/dio_provider.dart';
 import 'package:jobify_app/data/feed/feed_api.dart';
 import 'package:jobify_app/data/feed/feed_dto.dart';
+import 'package:jobify_app/data/feed/feed_filters.dart';
 import 'package:jobify_app/data/feed/feed_repository.dart';
 
 part 'feed_repository_impl.g.dart';
@@ -15,9 +16,13 @@ class FeedRepositoryImpl implements FeedRepository {
   final FeedApi _api;
 
   @override
-  Future<FeedPageDto> fetchPage({String? cursor, int limit = 20}) async {
+  Future<FeedPageDto> fetchPage({
+    String? cursor,
+    int limit = 20,
+    FeedFilters? filters,
+  }) async {
     try {
-      return await _api.getFeed(cursor: cursor, limit: limit);
+      return await _api.getFeed(cursor: cursor, limit: limit, filters: filters);
     } on DioException catch (e) {
       throw mapDioException(e);
     }

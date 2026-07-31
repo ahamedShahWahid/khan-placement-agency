@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jobify_app/data/feed/feed_dto.dart';
+import 'package:jobify_app/data/feed/feed_filters.dart';
 import 'package:jobify_app/data/feed/feed_repository.dart';
 import 'package:jobify_app/data/feed/feed_repository_impl.dart';
 import 'package:jobify_app/data/jobs/job_status.dart';
@@ -11,7 +12,11 @@ class _FakeFeedRepo implements FeedRepository {
   final List<FeedPageDto> pages;
   int call = 0;
   @override
-  Future<FeedPageDto> fetchPage({String? cursor, int limit = 20}) async {
+  Future<FeedPageDto> fetchPage({
+    String? cursor,
+    int limit = 20,
+    FeedFilters? filters,
+  }) async {
     return pages[call++];
   }
 }

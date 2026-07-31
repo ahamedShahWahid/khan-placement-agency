@@ -2,7 +2,12 @@
 // (fake implementations in test/helpers depend on them).
 // ignore_for_file: one_member_abstracts
 import 'package:jobify_app/data/feed/feed_dto.dart';
+import 'package:jobify_app/data/feed/feed_filters.dart';
 
 abstract interface class FeedRepository {
-  Future<FeedPageDto> fetchPage({String? cursor, int limit = 20});
+  Future<FeedPageDto> fetchPage({
+    String? cursor,
+    int limit = 20,
+    FeedFilters? filters,
+  });
 }

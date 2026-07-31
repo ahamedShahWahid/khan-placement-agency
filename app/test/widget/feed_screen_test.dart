@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jobify_app/data/feed/feed_dto.dart';
+import 'package:jobify_app/data/feed/feed_filters.dart';
 import 'package:jobify_app/data/feed/feed_repository.dart';
 import 'package:jobify_app/data/feed/feed_repository_impl.dart';
 import 'package:jobify_app/data/feed/feed_visit_repository.dart';
@@ -36,7 +37,12 @@ class _FakeFeedRepo implements FeedRepository {
   _FakeFeedRepo(this.page);
   final FeedPageDto page;
   @override
-  Future<FeedPageDto> fetchPage({String? cursor, int limit = 20}) async => page;
+  Future<FeedPageDto> fetchPage({
+    String? cursor,
+    int limit = 20,
+    FeedFilters? filters,
+  }) async =>
+      page;
 }
 
 class _FakeResumeRepo implements ResumeRepository {
