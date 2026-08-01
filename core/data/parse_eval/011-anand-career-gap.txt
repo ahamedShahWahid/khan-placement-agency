@@ -1,0 +1,48 @@
+Anand Krishnan
+
+anand.krishnan@example.com
++91 89390 27114
+Chennai, Tamil Nadu
+
+SUMMARY
+Backend developer with 7 years of professional experience building
+Java and Node.js services, plus a self-directed career break to care
+for a family member. Returned to full-time engineering in 2022 and
+have since shipped two production services at a Series B fintech.
+
+EXPERIENCE
+
+Backend Developer, LoanFlow Technologies
+Feb 2022 - Present
+- Built a KYC verification service in Node.js and PostgreSQL.
+- Integrated with 3 external credit-bureau APIs using REST and OAuth2.
+- Wrote the team's first load tests, cutting production incidents by 60%.
+
+Career Break (2019 - 2022)
+Paused full-time work to care for a family member. Stayed current with
+the ecosystem by completing two online certifications and contributing
+small patches to an open-source Express.js middleware project on GitHub.
+
+Software Engineer, Freshworks
+Jun 2015 - Dec 2018
+- Developed customer-support ticketing features in Java and Spring Boot.
+- Owned MySQL schema design for the notifications subsystem.
+- Built a Redis-backed caching layer that cut API latency by 30%.
+
+Associate Software Engineer, Freshworks
+Aug 2013 - May 2015
+- Maintained internal tooling in Java for the QA team.
+- Fixed 100+ bugs across the ticketing and reporting modules.
+
+EDUCATION
+B.E. Computer Science, Anna University, Chennai, 2013
+
+SKILLS
+Java, Node.js, Express, Spring Boot, PostgreSQL, MySQL, Redis, REST,
+OAuth2, Git, Docker
+
+CERTIFICATIONS
+Node.js Application Development, 2021
+AWS Certified Cloud Practitioner, 2021
+
+Expected CTC: Rs. 22,00,000 per annum

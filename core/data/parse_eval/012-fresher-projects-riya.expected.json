@@ -1,0 +1,24 @@
+{
+  "name": "Riya Desai",
+  "email": "riya.desai@example.com",
+  "phone": "+91 81234 56709",
+  "skills": [
+    "c++",
+    "express",
+    "firebase",
+    "flutter",
+    "git",
+    "github actions",
+    "mongodb",
+    "next.js",
+    "node.js",
+    "python",
+    "react",
+    "redis",
+    "render",
+    "tailwind",
+    "typescript",
+    "vercel",
+    "websocket"
+  ]
+}

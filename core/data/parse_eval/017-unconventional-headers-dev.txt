@@ -1,0 +1,38 @@
+Nikhil Rao
+
+nikhil.rao@example.com
++91 90080 34567
+Hyderabad, Telangana
+
+A FEW LINES ABOUT ME
+Backend engineer who likes building boring, reliable systems. 5 years
+of experience mostly in Python and Go, with a soft spot for anything
+involving message queues. Currently building the payments backend for
+a logistics startup.
+
+WHERE I'VE WORKED
+
+Backend Engineer, ShipSwift Logistics
+Aug 2022 - Present
+- Built the settlement service in Go, processing 200K+ transactions/day.
+- Moved the order pipeline onto RabbitMQ, cutting processing lag by 70%.
+- Own the PostgreSQL schema for the billing subsystem.
+
+Software Engineer, Zeta Suite
+Jul 2019 - Jul 2022
+- Built internal APIs in Python and FastAPI for the finance team.
+- Set up a Celery-based background job system backed by Redis.
+- Wrote the team's first Docker Compose setup for local development.
+
+THINGS I'M GOOD AT
+Python, Go, FastAPI, PostgreSQL, RabbitMQ, Redis, Docker, Celery, Git,
+Linux, gRPC
+
+WHERE I STUDIED
+B.Tech Computer Science, Osmania University, Hyderabad, 2019
+
+PAPERS & BADGES
+HashiCorp Terraform Associate, earned 2023
+Go Developer badge from a company-internal bootcamp, 2021
+
+Expected CTC: Rs 24,00,000 per annum

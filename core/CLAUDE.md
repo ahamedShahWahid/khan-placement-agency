@@ -60,6 +60,7 @@ The explainer modules live here (`jobify` integrations); they are invoked inline
 - **`uv run pytest -m eval`** → `test_library_parser_meets_quality_gate` → `jobify.eval.parse_f1.eval_gold_dataset()`. CI runs it (`lint-types-unit-eval`, no DB) before integration.
 - **Gate** (spec §13 P1): macro-F1 ≥ 0.85; floors `email ≥ 0.95`/`phone ≥ 0.85`/`name ≥ 0.70`/`skills ≥ 0.75`. **Only those 4 fields gate** (others print only). Set-skills F1 counts FPs (measures `_extract_skills` over-match drift).
 - New gold example: drop a pair with the next id, re-run `-m eval -v -s`; if it tanks a floor, fix the expectation or document the limitation.
+- **20 examples (001-020)** — 009-020 are deliberately hard (mangled two-column text, unconventional headers, non-tech vocabularies, name mid-header). `_extract_certifications` requires the literal word "certif\*" — a "PAPERS & BADGES"-style header with real credentials scores zero on that (non-gated) field; `_extract_skills`'s substring containment has predictable false positives ("gin" in "engineer", "sql"/"postgres" as substrings of "postgresql"). Full list in `core/data/parse_eval/000_README.md`'s "Documented limitations" section.
 
 ## Seeding — spec `2026-05-20-p2.0-jobs-and-seeding-design.md`
 

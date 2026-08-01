@@ -1,0 +1,44 @@
+Riya Desai
+
+riya.desai@example.com
++91 81234 56709
+Vadodara, Gujarat
+
+SUMMARY
+Final-year Computer Engineering student looking for an entry-level
+software development role. No formal work experience yet, but have
+built and shipped four side projects, two of which have real users.
+Comfortable picking up new frameworks quickly.
+
+EDUCATION
+B.E. Computer Engineering, MS University of Baroda, 2026 (expected)
+CGPA: 8.7 / 10
+
+PROJECTS
+
+CampusMart, github.com/riyadesai/campusmart
+A peer-to-peer marketplace for college students to buy and sell used
+textbooks and gadgets. Built with React, Node.js, Express, and MongoDB.
+Deployed on Render; 300+ registered users across two campuses.
+
+StudyTimer, github.com/riyadesai/studytimer
+A Pomodoro-style focus timer with shared study rooms over WebSocket.
+Built with TypeScript, React, and Redis for room state. 40+ weekly
+active users during exam season.
+
+Campus Bus Tracker, github.com/riyadesai/bus-tracker
+A Flutter app showing live campus shuttle locations using Firebase
+Realtime Database. Built as a hackathon project; won second place at
+a 200-team inter-college hackathon.
+
+Personal Portfolio, riyadesai.dev
+A statically generated portfolio site built with Next.js and Tailwind,
+deployed on Vercel with a CI pipeline in GitHub Actions.
+
+ACHIEVEMENTS
+Winner, Smart India Hackathon (college round), 2025
+Second place, TechFest Inter-College Hackathon, 2025
+
+SKILLS
+React, Node.js, Express, MongoDB, TypeScript, Redis, Flutter, Firebase,
+Next.js, Tailwind, GitHub Actions, Git, Python, C++

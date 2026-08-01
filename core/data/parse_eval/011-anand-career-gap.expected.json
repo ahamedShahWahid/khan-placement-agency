@@ -1,0 +1,19 @@
+{
+  "name": "Anand Krishnan",
+  "email": "anand.krishnan@example.com",
+  "phone": "+91 89390 27114",
+  "skills": [
+    "aws",
+    "docker",
+    "express",
+    "git",
+    "java",
+    "mysql",
+    "node.js",
+    "oauth2",
+    "postgresql",
+    "redis",
+    "rest",
+    "spring boot"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "Nikhil Rao",
+  "email": "nikhil.rao@example.com",
+  "phone": "+91 90080 34567",
+  "skills": [
+    "celery",
+    "docker",
+    "fastapi",
+    "git",
+    "go",
+    "grpc",
+    "linux",
+    "postgresql",
+    "python",
+    "rabbitmq",
+    "redis",
+    "terraform"
+  ]
+}

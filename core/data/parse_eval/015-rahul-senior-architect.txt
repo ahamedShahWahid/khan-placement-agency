@@ -1,0 +1,66 @@
+Rahul Bose
+
+rahul.bose@example.com
++91 98200 11223
+Bengaluru, Karnataka
+
+SUMMARY
+Staff-level software architect with 16 years across fintech, e-commerce,
+and enterprise SaaS. Deep experience designing distributed systems,
+leading platform re-architectures, and building engineering cultures
+from the ground up. Have worked across JVM, Python, and Node.js stacks,
+and led teams ranging from 6 to 40 engineers.
+
+EXPERIENCE
+
+Staff Architect, PhonePe
+Jan 2021 - Present
+- Own the technical roadmap for the payments settlement platform.
+- Led a re-architecture from a monolith to 20+ Kotlin microservices
+  on Kubernetes, cutting deployment time from 45 minutes to 4 minutes.
+- Introduced Kafka-based event sourcing for the reconciliation pipeline.
+- Mentor 6 tech leads across three engineering pods.
+Stack: Kotlin, Spring Boot, Kafka, PostgreSQL, Kubernetes, gRPC.
+
+Principal Engineer, Myntra
+Mar 2017 - Dec 2020
+- Led the checkout and payments platform team of 22 engineers.
+- Migrated the cart service from PHP to Node.js and TypeScript.
+- Built a GraphQL gateway that unified 12 backend services for the app.
+- Drove adoption of Terraform and Helm across the platform org.
+Stack: Node.js, TypeScript, GraphQL, MongoDB, Redis, Terraform, Helm.
+
+Engineering Manager, Freshworks
+Jul 2013 - Feb 2017
+- Managed a 14-person team building the CRM's reporting engine.
+- Rebuilt the analytics pipeline on Spark and Redshift.
+- Rolled out Jenkins-based CI/CD across four product teams.
+Stack: Java, Spring, Spark, Redshift, Jenkins, MySQL.
+
+Senior Software Engineer, Yahoo India
+Aug 2009 - Jun 2013
+- Built ad-serving infrastructure in Java handling 2B+ requests/day.
+- Optimised Cassandra data models, cutting p99 read latency by 45%.
+- Contributed to an internal C++ library for real-time bidding.
+Stack: Java, Cassandra, C++, Hadoop, Oracle.
+
+Software Engineer, Infosys
+Jun 2008 - Jul 2009
+- Built and maintained modules for a banking client's core system in
+  Java and Oracle PL/SQL as part of an onshore-offshore delivery team.
+Stack: Java, Oracle, SQL.
+
+EDUCATION
+M.Tech Computer Science, IIT Madras, 2008
+B.Tech Computer Science, NIT Trichy, 2006
+
+CERTIFICATIONS
+AWS Certified Solutions Architect - Professional, 2020
+Certified Kubernetes Administrator (CKA), 2021
+
+SKILLS
+Java, Kotlin, TypeScript, Python, Spring Boot, Spring, Node.js, GraphQL,
+Kafka, Kubernetes, Docker, Terraform, Helm, gRPC, PostgreSQL, MongoDB,
+Redis, MySQL, Spark, Redshift, Cassandra, Oracle, Jenkins, C++
+
+Expected CTC: Rs 85,00,000 per annum
