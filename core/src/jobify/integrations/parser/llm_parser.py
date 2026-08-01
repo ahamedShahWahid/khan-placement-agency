@@ -139,8 +139,18 @@ class GeminiResumeParser:
                 raw_text=text,
                 **payload,
             )
-        except (ValueError, ValidationError, TypeError) as exc:
-            _log.debug("parse.llm-raw-output", raw_text=(raw or "")[:500])
+        except ValidationError as exc:
+            _log.debug("parse.llm-raw-output", raw_model_output=(raw or "")[:500])
+            # str(exc) embeds pydantic's "input_value=..." context, which for
+            # this model IS the resume's own PII (name/email/phone/etc). Build
+            # the message from a slug + failing top-level field names only —
+            # never the offending values.
+            fields = sorted({str(e["loc"][0]) for e in exc.errors() if e["loc"]})
+            raise LlmParserError(f"llm_output_invalid: validation failed on {fields}") from exc
+        except (ValueError, TypeError) as exc:
+            # Our own safe messages ("empty response text", "expected object,
+            # got ..."); never model-echoed content.
+            _log.debug("parse.llm-raw-output", raw_model_output=(raw or "")[:500])
             raise LlmParserError(f"llm_output_invalid: {exc}") from exc
         except Exception as exc:
             raise LlmParserError(f"llm_call_failed: {type(exc).__name__}") from exc

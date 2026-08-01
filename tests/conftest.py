@@ -28,6 +28,7 @@ def pytest_configure(config: object) -> None:
     os.environ.setdefault("JOBIFY_REDIS_URL", "redis://localhost:6379/0")
     os.environ.setdefault("JOBIFY_JWT_SECRET", "x" * 32)
     os.environ.setdefault("JOBIFY_GEMINI_API_KEY", "test-gemini-key")
+    os.environ.setdefault("JOBIFY_RESUME_PARSER", "library")
     os.environ.setdefault(
         "JOBIFY_GOOGLE_OAUTH_CLIENT_IDS",
         "test.apps.googleusercontent.com",

@@ -78,6 +78,21 @@ def test_schema_invalid_payload_raises_llm_error() -> None:
         asyncio.run(parser.parse_text("text"))
 
 
+def test_schema_invalid_payload_error_message_scrubs_pii() -> None:
+    """A ValidationError's str() embeds pydantic's input_value=... context —
+    for ParsedResume that context is the model-echoed resume fields
+    themselves. The raised LlmParserError (which fallback.py logs at WARNING)
+    must name the failing field but never leak the offending value."""
+    leaked_email = "leaked-pii@example.com"
+    bad = json.dumps({"education": [{"end_year": leaked_email}]})
+    parser = GeminiResumeParser(client=_client_returning(bad), model="m")
+    with pytest.raises(LlmParserError) as exc_info:
+        asyncio.run(parser.parse_text("text"))
+    message = str(exc_info.value)
+    assert leaked_email not in message
+    assert "education" in message
+
+
 def test_provider_exception_wrapped_as_llm_error() -> None:
     client = MagicMock()
     client.aio.models.generate_content = AsyncMock(side_effect=RuntimeError("503"))
