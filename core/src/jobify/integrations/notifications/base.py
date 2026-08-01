@@ -68,6 +68,10 @@ class EmailChannel(Protocol):
         notification: The ``Notification`` ORM row being dispatched.
         recipient: The recipient email address (resolved by the sweeper from
             ``users.email``; not taken from the payload to avoid stale data).
+        language: The recipient's content language (``"en"`` or ``"hi"``),
+            resolved by the sweeper from the applicant's live preferences.
+            Defaults to ``"en"`` (e.g. for recruiter recipients, who have no
+            ``ApplicantPreferences`` row).
 
     Returns:
         A ``ChannelResult`` indicating success or failure.
@@ -78,4 +82,5 @@ class EmailChannel(Protocol):
         notification: Notification,
         *,
         recipient: str,
+        language: str = "en",
     ) -> ChannelResult: ...

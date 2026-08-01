@@ -59,7 +59,9 @@ async def test_revoked_email_consent_cancels_next_sweep(
 
     # Inline a channel that fails the test if called — gate should preempt.
     class _NeverCalled:
-        async def send(self, n: Notification, *, recipient: str) -> ChannelResult:
+        async def send(
+            self, n: Notification, *, recipient: str, language: str = "en"
+        ) -> ChannelResult:
             raise AssertionError("channel must not be called when consent revoked")
 
     await _sweep_notifications_async(
@@ -100,7 +102,9 @@ async def test_revoked_in_app_consent_cancels_next_sweep(
     sm = _make_sm(session)
 
     class _NeverCalled:
-        async def send(self, n: Notification, *, recipient: str) -> ChannelResult:
+        async def send(
+            self, n: Notification, *, recipient: str, language: str = "en"
+        ) -> ChannelResult:
             raise AssertionError("channel must not be called when consent revoked")
 
     await _sweep_notifications_async(
@@ -141,7 +145,9 @@ async def test_no_consent_row_falls_back_to_default_grant(
     class _CountingChannel:
         sent: ClassVar[list[tuple[str, str]]] = []
 
-        async def send(self, n: Notification, *, recipient: str) -> ChannelResult:
+        async def send(
+            self, n: Notification, *, recipient: str, language: str = "en"
+        ) -> ChannelResult:
             type(self).sent.append((str(n.id), recipient))
             return ChannelResult.success()
 

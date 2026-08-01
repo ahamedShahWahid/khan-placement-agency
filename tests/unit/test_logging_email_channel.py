@@ -67,4 +67,17 @@ async def test_logging_email_channel_logs_payload() -> None:
     assert log_entry["notification_id"] == str(notif.id)
     assert log_entry["kind"] == "application_received"
     assert log_entry["recipient"] == recipient
+    assert log_entry["language"] == "en"
     assert log_entry["payload"] == notif.payload
+
+
+@pytest.mark.asyncio
+async def test_logging_email_channel_logs_hindi_language() -> None:
+    """``send()`` logs the caller-supplied ``language``, not just the default."""
+    channel = LoggingEmailChannel()
+    notif = _make_notification()
+
+    with structlog.testing.capture_logs() as captured:
+        await channel.send(notif, recipient="applicant@example.com", language="hi")
+
+    assert captured[0]["language"] == "hi"

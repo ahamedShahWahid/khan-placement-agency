@@ -30,6 +30,8 @@ from sqlalchemy.sql import func
 from jobify.consent import get_consent
 from jobify.db.models import (
     DEFAULT_CONSENTS,
+    Applicant,
+    ApplicantPreferences,
     ConsentScope,
     Notification,
     NotificationChannel,
@@ -248,10 +250,30 @@ async def _dispatch_one(
         channel = n.channel
         recipient = user.email
 
+        # Resolve the recipient's content language from live applicant
+        # preferences. Recruiters have no Applicant row (outer join misses),
+        # so they fall through to the "en" default.
+        language = "en"
+        applicant_row = (
+            await session.execute(
+                select(ApplicantPreferences.language)
+                .join(Applicant, Applicant.id == ApplicantPreferences.applicant_id)
+                .where(
+                    Applicant.user_id == user.id,
+                    Applicant.deleted_at.is_(None),
+                    ApplicantPreferences.deleted_at.is_(None),
+                )
+            )
+        ).scalar_one_or_none()
+        if applicant_row is not None:
+            language = applicant_row
+
     # --- Channel dispatch (no open DB session) ---
     try:
         if channel == NotificationChannel.EMAIL:
-            result: ChannelResult = await email_channel.send(n, recipient=recipient)
+            result: ChannelResult = await email_channel.send(
+                n, recipient=recipient, language=language
+            )
         elif channel == NotificationChannel.IN_APP:
             result = ChannelResult.success()
         else:
