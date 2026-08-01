@@ -2096,6 +2096,14 @@
             ],
             "title": "Expected Ctc"
           },
+          "language": {
+            "enum": [
+              "en",
+              "hi"
+            ],
+            "title": "Language",
+            "type": "string"
+          },
           "locations": {
             "items": {
               "type": "string"
@@ -2107,14 +2115,15 @@
         "required": [
           "desired_role",
           "locations",
-          "expected_ctc"
+          "expected_ctc",
+          "language"
         ],
         "title": "PreferencesRead",
         "type": "object"
       },
       "PreferencesUpdate": {
         "additionalProperties": false,
-        "description": "Partial preferences update \u2014 same partial-update contract as\nProfileUpdate. `desired_role`/`expected_ctc` are nullable and accept an\nexplicit null to clear; `locations` is non-nullable (empty list clears\nit instead).",
+        "description": "Partial preferences update \u2014 same partial-update contract as\nProfileUpdate. `desired_role`/`expected_ctc` are nullable and accept an\nexplicit null to clear; `locations` is non-nullable (empty list clears\nit instead); `language` is non-nullable (a bare `Literal` rejects an\nexplicit null with a 422, same as `locations`).",
         "properties": {
           "desired_role": {
             "anyOf": [
@@ -2142,6 +2151,15 @@
               }
             ],
             "title": "Expected Ctc"
+          },
+          "language": {
+            "default": "en",
+            "enum": [
+              "en",
+              "hi"
+            ],
+            "title": "Language",
+            "type": "string"
           },
           "locations": {
             "anyOf": [

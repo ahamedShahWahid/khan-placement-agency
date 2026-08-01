@@ -154,6 +154,14 @@ class RoleCategory(StrEnum):
     OTHER = "other"
 
 
+class AppLanguage(StrEnum):
+    """Applicant-facing content language. Varchar in DB (no PG enum — the
+    desired_role precedent); adding a language is a Python edit + CHECK bump."""
+
+    EN = "en"
+    HI = "hi"
+
+
 class ApplicantPreferences(Base):
     """Desired role / location / expected CTC — captured after resume upload
     or via the profile edit screen. Single source for these 3 fields (they
@@ -185,6 +193,9 @@ class ApplicantPreferences(Base):
         ARRAY(String(100)), nullable=False, server_default="{}"
     )
     expected_ctc: Mapped[float | None] = mapped_column(Numeric(12, 2), nullable=True)
+    language: Mapped[str] = mapped_column(
+        String(8), nullable=False, default="en", server_default="en"
+    )
     created_at: Mapped[CreatedAt]
     updated_at: Mapped[UpdatedAt]
     deleted_at: Mapped[DeletedAt]
@@ -197,6 +208,7 @@ class ApplicantPreferences(Base):
             postgresql_where="deleted_at IS NULL",
         ),
         CheckConstraint("expected_ctc >= 0", name="ck_applicant_preferences_expected_ctc_nonneg"),
+        CheckConstraint("language IN ('en','hi')", name="ck_applicant_preferences_language"),
         {"schema": "jobify"},
     )
 

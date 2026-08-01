@@ -604,6 +604,7 @@ def test_applicant_preferences_model_shape() -> None:
         "desired_role",
         "locations",
         "expected_ctc",
+        "language",
         "created_at",
         "updated_at",
         "deleted_at",

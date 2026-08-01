@@ -9,7 +9,7 @@ applicant_preferences — see PATCH /v1/applicants/me/preferences below.
 from __future__ import annotations
 
 from decimal import Decimal
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID
 
 import structlog
@@ -36,8 +36,10 @@ router = APIRouter(prefix="/v1/applicants/me", tags=["applicants"])
 # Fields whose change must trigger a rescore (they drive the structured score).
 _MATCHING_FIELDS = {"years_experience"}
 # Rescore-trigger fields for the preferences endpoint below (same purpose as
-# _MATCHING_FIELDS; the sets are disjoint).
-_PREFERENCES_MATCHING_FIELDS = {"locations", "expected_ctc"}
+# _MATCHING_FIELDS; the sets are disjoint). `language` doesn't change the
+# structured score — it's here so a language switch regenerates the LLM match
+# explanation in the applicant's chosen language (scores identical).
+_PREFERENCES_MATCHING_FIELDS = {"locations", "expected_ctc", "language"}
 
 
 class ProfileUpdate(BaseModel):
@@ -95,13 +97,15 @@ class PreferencesRead(BaseModel):
     desired_role: RoleCategory | None
     locations: list[str]
     expected_ctc: Decimal | None
+    language: Literal["en", "hi"]
 
 
 class PreferencesUpdate(BaseModel):
     """Partial preferences update — same partial-update contract as
     ProfileUpdate. `desired_role`/`expected_ctc` are nullable and accept an
     explicit null to clear; `locations` is non-nullable (empty list clears
-    it instead)."""
+    it instead); `language` is non-nullable (a bare `Literal` rejects an
+    explicit null with a 422, same as `locations`)."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -110,6 +114,7 @@ class PreferencesUpdate(BaseModel):
         default=None, max_length=10
     )
     expected_ctc: Decimal | None = Field(default=None, ge=0, le=Decimal("9999999999.99"))
+    language: Literal["en", "hi"] = Field(default="en")
 
     @model_validator(mode="after")
     def _no_null_for_locations(self) -> PreferencesUpdate:
