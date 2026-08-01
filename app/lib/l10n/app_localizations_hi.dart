@@ -75,15 +75,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get commonUnexpectedError => 'एक अनपेक्षित त्रुटि हुई।';
 
   @override
-  String get recruiterShellTabDashboard => 'डैशबोर्ड';
-
-  @override
-  String get recruiterShellTabJobs => 'नौकरियां';
-
-  @override
-  String get recruiterShellTabEmployer => 'नियोक्ता';
-
-  @override
   String get authAccountDeletedSnackbar => 'आपका खाता हटा दिया गया है।';
 
   @override
@@ -147,7 +138,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get onboardingCreateEmployerFailed =>
-      'एम्प्लॉयर नहीं बनाया जा सका। कृपया फिर से कोशिश करें।';
+      'नियोक्ता नहीं बनाया जा सका। कृपया फिर से कोशिश करें।';
 
   @override
   String get onboardingTitle => 'अपनी कंपनी सेट करें';
@@ -169,7 +160,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get feedRatingSaveError => 'आपकी रेटिंग सेव नहीं हो सकी';
 
   @override
-  String get feedHiddenSnackbar => 'आपकी फ़ीड से छिपाया गया';
+  String get feedHiddenSnackbar => 'आपकी फ़ीड से छिपाई गई';
 
   @override
   String get feedHeaderTitle => 'आपके लिए';
@@ -216,7 +207,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String matchCaveatPrefix(String reason) {
-    return 'इसके खिलाफ जाता है: $reason';
+    return 'ध्यान देने योग्य: $reason';
   }
 
   @override
@@ -224,7 +215,13 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String feedPostedMonthsAgo(int months) {
-    return '$months महीने पहले';
+    String _temp0 = intl.Intl.pluralLogic(
+      months,
+      locale: localeName,
+      other: '$months महीने पहले',
+      one: '$months महीना पहले',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -234,7 +231,13 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String feedPostedHoursAgo(int hours) {
-    return '$hours घंटे पहले';
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours घंटे पहले',
+      one: '$hours घंटा पहले',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -332,7 +335,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get jobDetailGoneHeadline => 'यह नौकरी अब उपलब्ध नहीं है';
 
   @override
-  String get jobDetailGoneBody => 'इसे बंद या हटाया जा चुका होगा।';
+  String get jobDetailGoneBody => 'इसे बंद या हटाई जा चुकी होगी।';
 
   @override
   String get jobDetailWhyThisMatch => 'यह मैच क्यों';

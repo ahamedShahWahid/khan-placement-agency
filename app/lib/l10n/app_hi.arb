@@ -106,21 +106,6 @@
     "description": "Fallback error body for an unrecognised error type."
   },
 
-  "recruiterShellTabDashboard": "डैशबोर्ड",
-  "@recruiterShellTabDashboard": {
-    "description": "Bottom navigation tab label for the recruiter's dashboard."
-  },
-
-  "recruiterShellTabJobs": "नौकरियां",
-  "@recruiterShellTabJobs": {
-    "description": "Bottom navigation tab label for the recruiter's job postings."
-  },
-
-  "recruiterShellTabEmployer": "नियोक्ता",
-  "@recruiterShellTabEmployer": {
-    "description": "Bottom navigation tab label for the recruiter's employer/team settings."
-  },
-
   "authAccountDeletedSnackbar": "आपका खाता हटा दिया गया है।",
   "@authAccountDeletedSnackbar": {
     "description": "Snackbar shown on the sign-in screen right after a successful account deletion."
@@ -216,7 +201,7 @@
     "description": "Snackbar shown when creating an employer fails because the name is already taken."
   },
 
-  "onboardingCreateEmployerFailed": "एम्प्लॉयर नहीं बनाया जा सका। कृपया फिर से कोशिश करें।",
+  "onboardingCreateEmployerFailed": "नियोक्ता नहीं बनाया जा सका। कृपया फिर से कोशिश करें।",
   "@onboardingCreateEmployerFailed": {
     "description": "Snackbar shown when creating an employer fails for a generic reason."
   },
@@ -251,7 +236,7 @@
     "description": "Snackbar shown when a thumbs up/down match-feedback rating fails to save."
   },
 
-  "feedHiddenSnackbar": "आपकी फ़ीड से छिपाया गया",
+  "feedHiddenSnackbar": "आपकी फ़ीड से छिपाई गई",
   "@feedHiddenSnackbar": {
     "description": "Snackbar shown after thumbs-down hides a job from the feed."
   },
@@ -316,7 +301,7 @@
     "description": "Tooltip for the thumbs-down (negative match feedback) icon button."
   },
 
-  "matchCaveatPrefix": "इसके खिलाफ जाता है: {reason}",
+  "matchCaveatPrefix": "ध्यान देने योग्य: {reason}",
   "@matchCaveatPrefix": {
     "description": "Prefix shown before a match's caveat/downside text.",
     "placeholders": {
@@ -331,7 +316,7 @@
     "description": "Pill label shown on a job card when the job listing is closed."
   },
 
-  "feedPostedMonthsAgo": "{months} महीने पहले",
+  "feedPostedMonthsAgo": "{months, plural, one{{months} महीना पहले} other{{months} महीने पहले}}",
   "@feedPostedMonthsAgo": {
     "description": "Relative time since a job was posted, in months.",
     "placeholders": {
@@ -351,7 +336,7 @@
     }
   },
 
-  "feedPostedHoursAgo": "{hours} घंटे पहले",
+  "feedPostedHoursAgo": "{hours, plural, one{{hours} घंटा पहले} other{{hours} घंटे पहले}}",
   "@feedPostedHoursAgo": {
     "description": "Relative time since a job was posted, in hours.",
     "placeholders": {
@@ -521,7 +506,7 @@
     "description": "Empty-state headline shown when a job detail 404s (closed or removed)."
   },
 
-  "jobDetailGoneBody": "इसे बंद या हटाया जा चुका होगा।",
+  "jobDetailGoneBody": "इसे बंद या हटाई जा चुकी होगी।",
   "@jobDetailGoneBody": {
     "description": "Empty-state body shown when a job detail 404s (closed or removed)."
   },

@@ -106,21 +106,6 @@
     "description": "Fallback error body for an unrecognised error type."
   },
 
-  "recruiterShellTabDashboard": "Dashboard",
-  "@recruiterShellTabDashboard": {
-    "description": "Bottom navigation tab label for the recruiter's dashboard."
-  },
-
-  "recruiterShellTabJobs": "Jobs",
-  "@recruiterShellTabJobs": {
-    "description": "Bottom navigation tab label for the recruiter's job postings."
-  },
-
-  "recruiterShellTabEmployer": "Employer",
-  "@recruiterShellTabEmployer": {
-    "description": "Bottom navigation tab label for the recruiter's employer/team settings."
-  },
-
   "authAccountDeletedSnackbar": "Your account has been deleted.",
   "@authAccountDeletedSnackbar": {
     "description": "Snackbar shown on the sign-in screen right after a successful account deletion."
@@ -331,7 +316,7 @@
     "description": "Pill label shown on a job card when the job listing is closed."
   },
 
-  "feedPostedMonthsAgo": "{months}mo ago",
+  "feedPostedMonthsAgo": "{months, plural, one{{months}mo ago} other{{months}mo ago}}",
   "@feedPostedMonthsAgo": {
     "description": "Relative time since a job was posted, in months.",
     "placeholders": {
@@ -351,7 +336,7 @@
     }
   },
 
-  "feedPostedHoursAgo": "{hours}h ago",
+  "feedPostedHoursAgo": "{hours, plural, one{{hours}h ago} other{{hours}h ago}}",
   "@feedPostedHoursAgo": {
     "description": "Relative time since a job was posted, in hours.",
     "placeholders": {

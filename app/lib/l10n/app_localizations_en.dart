@@ -73,15 +73,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonUnexpectedError => 'An unexpected error occurred.';
 
   @override
-  String get recruiterShellTabDashboard => 'Dashboard';
-
-  @override
-  String get recruiterShellTabJobs => 'Jobs';
-
-  @override
-  String get recruiterShellTabEmployer => 'Employer';
-
-  @override
   String get authAccountDeletedSnackbar => 'Your account has been deleted.';
 
   @override
@@ -222,7 +213,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String feedPostedMonthsAgo(int months) {
-    return '${months}mo ago';
+    String _temp0 = intl.Intl.pluralLogic(
+      months,
+      locale: localeName,
+      other: '${months}mo ago',
+      one: '${months}mo ago',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -232,7 +229,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String feedPostedHoursAgo(int hours) {
-    return '${hours}h ago';
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '${hours}h ago',
+      one: '${hours}h ago',
+    );
+    return '$_temp0';
   }
 
   @override

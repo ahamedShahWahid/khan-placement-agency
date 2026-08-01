@@ -224,24 +224,6 @@ abstract class AppLocalizations {
   /// **'An unexpected error occurred.'**
   String get commonUnexpectedError;
 
-  /// Bottom navigation tab label for the recruiter's dashboard.
-  ///
-  /// In en, this message translates to:
-  /// **'Dashboard'**
-  String get recruiterShellTabDashboard;
-
-  /// Bottom navigation tab label for the recruiter's job postings.
-  ///
-  /// In en, this message translates to:
-  /// **'Jobs'**
-  String get recruiterShellTabJobs;
-
-  /// Bottom navigation tab label for the recruiter's employer/team settings.
-  ///
-  /// In en, this message translates to:
-  /// **'Employer'**
-  String get recruiterShellTabEmployer;
-
   /// Snackbar shown on the sign-in screen right after a successful account deletion.
   ///
   /// In en, this message translates to:
@@ -485,7 +467,7 @@ abstract class AppLocalizations {
   /// Relative time since a job was posted, in months.
   ///
   /// In en, this message translates to:
-  /// **'{months}mo ago'**
+  /// **'{months, plural, one{{months}mo ago} other{{months}mo ago}}'**
   String feedPostedMonthsAgo(int months);
 
   /// Relative time since a job was posted, in days.
@@ -497,7 +479,7 @@ abstract class AppLocalizations {
   /// Relative time since a job was posted, in hours.
   ///
   /// In en, this message translates to:
-  /// **'{hours}h ago'**
+  /// **'{hours, plural, one{{hours}h ago} other{{hours}h ago}}'**
   String feedPostedHoursAgo(int hours);
 
   /// Relative time since a job was posted, when under an hour ago.
