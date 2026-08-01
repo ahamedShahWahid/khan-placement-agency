@@ -41,10 +41,15 @@ Decisions made during brainstorming:
   extraction's; simplest correct mechanism — `GeminiResumeParser` wraps its
   own post-extraction failures in a dedicated `LlmParserError(ParserError)`
   subclass so the composite can tell the layers apart).
-- **`__init__.py` — `get_resume_parser()`** lazy-singleton factory
-  (explainer-style): `"llm"` → `FallbackResumeParser(GeminiResumeParser(...),
+- **Factory `get_resume_parser()` lives in `jobify_worker.runtime`** (the
+  explainer precedent exactly — worker owns settings and genai-client
+  construction; core modules stay config-free and constructor-injected):
+  `"llm"` → `FallbackResumeParser(GeminiResumeParser(client=..., model=...),
   LibraryResumeParser())`; `"library"` → `LibraryResumeParser()`; `"llm"`
-  without an API key → warning log + `LibraryResumeParser()`.
+  without an API key → warning log + `LibraryResumeParser()` (unlike the
+  explainer's raise — the parser has a same-quality-as-today fallback).
+  Lazy singleton `_resume_parser` with the same monkeypatch-before-first-call
+  contract as `get_match_explainer`.
 
 ## Settings (`WorkerSettings`)
 
