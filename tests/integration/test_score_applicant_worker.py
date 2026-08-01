@@ -34,7 +34,11 @@ def _make_sm(session: AsyncSession) -> async_sessionmaker[AsyncSession]:
 
 
 async def _seed_applicant(
-    session: AsyncSession, *, email: str = "s@example.com", locations: list[str] | None = None
+    session: AsyncSession,
+    *,
+    email: str = "s@example.com",
+    locations: list[str] | None = None,
+    language: str = "en",
 ) -> Applicant:
     user = User(email=email, role=UserRole.APPLICANT)
     session.add(user)
@@ -43,7 +47,9 @@ async def _seed_applicant(
     session.add(applicant)
     await session.flush()
     session.add(
-        ApplicantPreferences(applicant_id=applicant.id, locations=locations or ["Bangalore"])
+        ApplicantPreferences(
+            applicant_id=applicant.id, locations=locations or ["Bangalore"], language=language
+        )
     )
     session.add(
         ApplicantEmbedding(
@@ -117,6 +123,24 @@ async def test_score_applicant_writes_rows_for_all_open_jobs(session: AsyncSessi
         assert "fit" in row.explanation
         assert row.explanation["generator"] == "templated"
         assert row.explanation["generator_version"] == "1"
+
+
+@pytest.mark.integration
+async def test_score_applicant_hindi_preference_yields_hindi_explanation(
+    session: AsyncSession,
+) -> None:
+    """applicant_preferences.language='hi' propagates through ExplainContext into
+    the stored explanation (see explainer.py + score_applicant.py language wiring)."""
+    applicant = await _seed_applicant(session, language="hi")
+    await _seed_job(session, title="A", embedding=[1.0] * 1536)
+    await session.commit()
+
+    await _score_applicant_async(applicant.id, sm=_make_sm(session))
+
+    row = (
+        await session.execute(select(Match).where(Match.applicant_id == applicant.id))
+    ).scalar_one()
+    assert any("ऀ" <= ch <= "ॿ" for ch in row.explanation["fit"])
 
 
 @pytest.mark.integration

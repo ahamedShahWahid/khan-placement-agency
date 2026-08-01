@@ -51,6 +51,7 @@ class ScoringInput:
     job_ctc_min: Any
     job_ctc_max: Any
     employer_name: str
+    language: str = "en"
 
 
 @dataclass(frozen=True, slots=True)
@@ -96,6 +97,7 @@ def _compute(
         employer_name=inp.employer_name,
         applicant_expected_ctc=inp.applicant_expected_ctc,
         applicant_locations=inp.applicant_locations,
+        language=inp.language,
     )
     return ms, ctx
 

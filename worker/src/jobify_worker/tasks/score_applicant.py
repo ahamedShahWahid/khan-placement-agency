@@ -142,6 +142,7 @@ async def _score_applicant_async(
         applicant_locs = list(applicant_prefs.locations or []) if applicant_prefs else []
         applicant_years = applicant.years_experience
         applicant_ctc = applicant_prefs.expected_ctc if applicant_prefs else None
+        applicant_language = applicant_prefs.language if applicant_prefs else "en"
 
     if not scored_inputs:
         _log.info(
@@ -172,6 +173,7 @@ async def _score_applicant_async(
             job_ctc_min=job_ctc_min,
             job_ctc_max=job_ctc_max,
             employer_name=employer_name,
+            language=applicant_language,
         )
         for (
             job_id,

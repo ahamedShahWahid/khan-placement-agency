@@ -17,7 +17,7 @@ from jobify.scoring.explain import templated_explanation
 
 @dataclass(frozen=True, slots=True)
 class ExplainContext:
-    """Frozen bundle of the 13 fields ``templated_explanation`` accepts.
+    """Frozen bundle of the 14 fields ``templated_explanation`` accepts.
 
     Workers build this once per match between the score computation and the
     UPSERT, then hand it to whichever ``MatchExplainer`` is configured.
@@ -36,6 +36,7 @@ class ExplainContext:
     employer_name: str
     applicant_expected_ctc: Decimal | None
     applicant_locations: list[str]
+    language: str = "en"
 
 
 @runtime_checkable
@@ -61,6 +62,7 @@ def _templated_from_ctx(ctx: ExplainContext) -> dict[str, str]:
         employer_name=ctx.employer_name,
         applicant_expected_ctc=ctx.applicant_expected_ctc,
         applicant_locations=ctx.applicant_locations,
+        language=ctx.language,
     )
 
 
