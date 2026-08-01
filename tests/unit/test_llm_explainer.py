@@ -166,3 +166,48 @@ async def test_parse_failure_logs_raw_text_snippet() -> None:
     failed = [e for e in logs if e.get("event") == "explain.llm-failed"]
     assert len(failed) == 1
     assert "Here is the JSON requested" in failed[0]["raw_text"]
+
+
+@pytest.mark.asyncio
+async def test_llm_explainer_hindi_appends_language_directive() -> None:
+    """The generate_content call's system_instruction mentions Hindi when ctx.language='hi'."""
+    explainer, gc_mock = _make_explainer()
+    gc_mock.return_value = SimpleNamespace(text='{"fit": "अच्छा मेल"}')
+
+    await explainer.explain(_ctx(language="hi", total=0.9, threshold=0.5))
+
+    config = gc_mock.await_args.kwargs["config"]
+    assert "Hindi" in config.system_instruction
+
+
+@pytest.mark.asyncio
+async def test_llm_explainer_english_instruction_unchanged() -> None:
+    """English context should not have Hindi directive in system instruction."""
+    explainer, gc_mock = _make_explainer()
+    gc_mock.return_value = SimpleNamespace(text='{"fit": "good match"}')
+
+    await explainer.explain(_ctx(total=0.9, threshold=0.5))
+
+    config = gc_mock.await_args.kwargs["config"]
+    assert "Hindi" not in config.system_instruction
+
+
+@pytest.mark.asyncio
+async def test_llm_failure_falls_back_to_hindi_templated_for_hindi_ctx() -> None:
+    """On LLM failure with Hindi context, fallback should return Hindi templated."""
+    gc_mock = AsyncMock(side_effect=RuntimeError("503"))
+    client = MagicMock()
+    client.aio.models.generate_content = gc_mock
+    explainer = GeminiMatchExplainer(client=client, model="m")
+
+    result = await explainer.explain(_ctx(language="hi", total=0.9, threshold=0.5))
+
+    assert result["generator"] == "templated"
+    # Check for Devanagari script presence (Hindi text should contain Devanagari characters)
+    assert any("ऀ" <= ch <= "ॿ" for ch in result["fit"])
+
+
+@pytest.mark.asyncio
+async def test_generator_version_bumped() -> None:
+    """LLM_GENERATOR_VERSION should be '2' after the Hindi update."""
+    assert LLM_GENERATOR_VERSION == "2"
