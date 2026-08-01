@@ -9,6 +9,7 @@
     "git",
     "go",
     "grpc",
+    "kafka",
     "linux",
     "postgresql",
     "python",

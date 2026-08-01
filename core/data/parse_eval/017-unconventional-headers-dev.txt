@@ -8,7 +8,10 @@ A FEW LINES ABOUT ME
 Backend engineer who likes building boring, reliable systems. 5 years
 of experience mostly in Python and Go, with a soft spot for anything
 involving message queues. Currently building the payments backend for
-a logistics startup.
+a logistics startup. Not a fan of resume buzzwords, so this is written
+the way he'd actually explain his work to a teammate over coffee: what
+broke, what he built to stop it breaking again, and what he'd still
+like to fix given more time.
 
 WHERE I'VE WORKED
 
@@ -17,12 +20,32 @@ Aug 2022 - Present
 - Built the settlement service in Go, processing 200K+ transactions/day.
 - Moved the order pipeline onto RabbitMQ, cutting processing lag by 70%.
 - Own the PostgreSQL schema for the billing subsystem.
+- Wrote a runbook for the on-call rotation after realising every
+  incident was being debugged from scratch by whoever was paged.
+- Paired with two newer hires on their first production changes to
+  the settlement service.
 
 Software Engineer, Zeta Suite
 Jul 2019 - Jul 2022
 - Built internal APIs in Python and FastAPI for the finance team.
 - Set up a Celery-based background job system backed by Redis.
 - Wrote the team's first Docker Compose setup for local development.
+- Spent a quarter untangling a reporting job that used to take six
+  hours and occasionally failed silently overnight; got it down to
+  under twenty minutes with proper retries and alerting.
+
+Junior Developer, Zeta Suite
+Jun 2018 - Jun 2019
+- Fixed bugs and wrote small internal tools in Python for the ops team.
+- Shadowed senior engineers on deploys before being trusted to run
+  one solo.
+
+RANDOM STUFF I'VE BUILT
+A small command-line tool that tails a Kafka topic and pretty-prints
+JSON payloads, mostly because he got tired of piping things through
+jq during incidents. Also maintains a personal notes site where he
+occasionally writes up postmortems from work, with identifying
+details stripped out.
 
 THINGS I'M GOOD AT
 Python, Go, FastAPI, PostgreSQL, RabbitMQ, Redis, Docker, Celery, Git,

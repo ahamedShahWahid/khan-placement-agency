@@ -17,11 +17,19 @@ Feb 2022 - Present
 - Built a KYC verification service in Node.js and PostgreSQL.
 - Integrated with 3 external credit-bureau APIs using REST and OAuth2.
 - Wrote the team's first load tests, cutting production incidents by 60%.
+- Onboarded and mentored two engineers who joined after him, walking
+  them through the service's domain model and deployment process.
+- Wrote a design note proposing a queue-based retry strategy for the
+  bureau integrations, which the team adopted the following quarter.
 
 Career Break (2019 - 2022)
 Paused full-time work to care for a family member. Stayed current with
 the ecosystem by completing two online certifications and contributing
 small patches to an open-source Express.js middleware project on GitHub.
+Also spent part of the break tutoring undergraduate students in data
+structures and basic web development, and rebuilt a small personal
+project from scratch to get comfortable with the newer parts of the
+Node.js ecosystem before returning to full-time work.
 
 Software Engineer, Freshworks
 Jun 2015 - Dec 2018
@@ -33,6 +41,13 @@ Associate Software Engineer, Freshworks
 Aug 2013 - May 2015
 - Maintained internal tooling in Java for the QA team.
 - Fixed 100+ bugs across the ticketing and reporting modules.
+
+ACHIEVEMENTS
+Nominated for LoanFlow's quarterly "Reliability Champion" recognition
+after the load-testing initiative reduced customer-facing incidents.
+Regularly reviews design proposals from newer engineers on the team
+and has become an informal go-to person for questions about the
+bureau-integration layer he originally built.
 
 EDUCATION
 B.E. Computer Science, Anna University, Chennai, 2013

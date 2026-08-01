@@ -32,6 +32,17 @@ QA Trainee, Cognizant Technology Solutions
 Jan 2019 - Jun 2019
 - Shadowed senior testers on smoke and sanity testing for a retail client.
 - Learned Git workflows and the team's test-management tooling.
+- Documented over 50 defect reports and helped write the team's first
+  smoke-test checklist for new builds.
+
+ACHIEVEMENTS
+Recognised with a "Quality Champion" award at PayEase Technologies for
+driving down escaped defects in the payments module over two quarters.
+Presented a lightning talk on API test strategy at an internal QA guild
+meetup attended by testers from four different product teams. Also
+volunteers as a mentor for junior testers joining the automation team,
+helping them get comfortable with the existing test framework and the
+team's release checklist within their first month.
 
 EDUCATION
 B.Tech Information Technology, Jadavpur University, 2018
@@ -42,5 +53,9 @@ ISTQB Certified Tester, Foundation Level, 2020
 SKILLS
 Selenium, Java, TestNG, Postman, JIRA, REST API, Cypress, SQL, Git,
 Agile, Jenkins, Manual Testing
+
+Open to relocating within India for the right opportunity, and prefers
+teams that treat testing as a first-class part of the development
+process rather than an afterthought before release.
 
 Expected CTC: Rs. 11,00,000 per annum

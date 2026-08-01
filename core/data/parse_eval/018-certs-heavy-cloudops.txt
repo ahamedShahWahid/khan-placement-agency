@@ -26,6 +26,19 @@ Jan 2021 - Jan 2023
   and IAM issues.
 - Wrote Ansible playbooks to automate routine patching across 200+ VMs.
 - Built a Jenkins pipeline for the team's internal tooling releases.
+- Wrote internal documentation for the on-call escalation process,
+  which the team still uses as the starting point for new hires.
+- Volunteered for weekend patching windows on a rotating basis and
+  kept a clean track record with zero unplanned downtime.
+
+ACHIEVEMENTS
+Recognised by RouteMetrics leadership for the cost-optimisation work,
+which freed up budget for two additional monitoring tools the team had
+been asking for. Regularly shares certification study notes internally
+and has informally coached three colleagues through their first AWS
+certification exam. Represented the infrastructure team at an internal
+tech talk on right-sizing cloud workloads, drawing on the RouteMetrics
+cost work as the main case study.
 
 EDUCATION
 B.Tech Electronics and Communication, ABES Engineering College, 2020

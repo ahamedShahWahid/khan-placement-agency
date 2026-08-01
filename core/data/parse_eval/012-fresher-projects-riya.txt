@@ -8,23 +8,34 @@ SUMMARY
 Final-year Computer Engineering student looking for an entry-level
 software development role. No formal work experience yet, but have
 built and shipped four side projects, two of which have real users.
-Comfortable picking up new frameworks quickly.
+Comfortable picking up new frameworks quickly, and enjoys taking a
+project from a rough idea to something real people actually use,
+even if that means learning an unfamiliar part of the stack along
+the way.
 
 EDUCATION
 B.E. Computer Engineering, MS University of Baroda, 2026 (expected)
 CGPA: 8.7 / 10
+Relevant coursework: Data Structures and Algorithms, Operating
+Systems, Database Management Systems, Computer Networks, and
+Software Engineering.
 
 PROJECTS
 
 CampusMart, github.com/riyadesai/campusmart
 A peer-to-peer marketplace for college students to buy and sell used
 textbooks and gadgets. Built with React, Node.js, Express, and MongoDB.
-Deployed on Render; 300+ registered users across two campuses.
+Deployed on Render; 300+ registered users across two campuses. Started
+as a two-week hackathon prototype and later rebuilt the listing and
+chat flows after real users kept asking for in-app messaging between
+buyers and sellers.
 
 StudyTimer, github.com/riyadesai/studytimer
 A Pomodoro-style focus timer with shared study rooms over WebSocket.
 Built with TypeScript, React, and Redis for room state. 40+ weekly
-active users during exam season.
+active users during exam season. Wrote a short blog post explaining
+the room-sync design after a few classmates asked how the shared
+timers stayed in sync across devices.
 
 Campus Bus Tracker, github.com/riyadesai/bus-tracker
 A Flutter app showing live campus shuttle locations using Firebase
@@ -38,6 +49,13 @@ deployed on Vercel with a CI pipeline in GitHub Actions.
 ACHIEVEMENTS
 Winner, Smart India Hackathon (college round), 2025
 Second place, TechFest Inter-College Hackathon, 2025
+
+EXTRACURRICULAR
+Core member of the college coding club, where she runs a weekly
+beginner-friendly session helping first-year students get comfortable
+with Git and their first web project. Volunteered as a mentor during
+last year's inter-college hackathon, helping three junior teams debug
+their submissions before the final judging round.
 
 SKILLS
 React, Node.js, Express, MongoDB, TypeScript, Redis, Flutter, Firebase,

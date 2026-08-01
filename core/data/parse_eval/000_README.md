@@ -89,9 +89,11 @@ the LLM parser lane has a concrete bar to clear:
   (word-boundary matching) as `TODO(P3-llm-parser)`.
 - **Non-tech vocabularies score near-zero recall on `skills`** —
   009 (FMCG sales), 013 (ops executive), 014 (school teacher), 016 (HR
-  generalist), 019 (delivery ops) have skills entirely or mostly outside
-  the curated tech dictionary by design; this is expected, not a bug, and
-  is exactly the gap the LLM parser is meant to close.
+  generalist), 019 (delivery ops), 020 (financial analyst — 7 of 8
+  expected skills, e.g. "financial modeling"/"fp&a"/"power bi", are
+  outside the dict) have skills entirely or mostly outside the curated
+  tech dictionary by design; this is expected, not a bug, and is exactly
+  the gap the LLM parser is meant to close.
 
 ## Adding examples
 
