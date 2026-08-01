@@ -138,3 +138,39 @@ never silently lowered.
 - Vendor parsers, per-tenant model config, response caching.
 - Ratcheting the CI library gate above 0.85 (the 0.90 criterion lives on the
   LLM lane).
+
+## Batch mode (eval + bulk lanes)
+
+**Decision (user-approved 2026-08-01):** the LLM eval lane, and any future
+bulk re-parse job, go through the Gemini **Batch API**
+(`GeminiResumeParser.parse_texts_batch`) instead of paced interactive
+`generate_content` calls. Two independent wins over the original
+"20 calls, 13s-paced, one event loop" lane:
+
+- **50% of interactive `generate_content` pricing** for identical output.
+- **A separate quota pool** from interactive `generate_content` — the eval
+  lane no longer competes with (or gets capped by) whatever RPM/RPD budget
+  the free-tier key has already burned on interactive traffic. The original
+  lane's 13s pacing and same-event-loop plumbing existed solely to survive
+  the interactive free-tier RPM/RPD caps; batch mode needs neither, so both
+  are deleted along with the per-call machinery.
+
+**The LIVE path (`parse`/`parse_text`) stays interactive — never moved to
+batch.** Batch jobs are asynchronous and can take anywhere from minutes to
+hours to complete; the spec's **≤10-min first-match criterion** (§ above)
+depends on the live parse path returning within one interactive round trip
+per resume upload. `parse_texts_batch` is therefore a separate, deliberately
+sync method (batch create+poll is long-running job management, not
+request/response) used only by the eval lane today and reserved for a future
+bulk re-parse job — never called from the worker's parse task.
+
+Contract: one batch job of inlined requests (same system instruction,
+response schema, and generation config as `parse_text` — factored into
+`_generate_content_config()`), polled to a terminal state, all-or-nothing —
+a job-level failure/timeout or ANY per-item failure (missing/error response,
+schema-invalid JSON) raises `LlmParserError` naming the failing indices
+rather than returning a partial list. Response-to-request correlation relies
+on the SDK's documented order guarantee for inlined batch responses
+(`google.genai.types.BatchJobDestination.inlined_responses`: "will be in the
+same order as the input requests") rather than any per-item metadata
+round-trip.

@@ -73,67 +73,38 @@ def _llm_lane_enabled() -> bool:
     reason="LLM lane: set JOBIFY_PARSE_EVAL_PARSER=llm + JOBIFY_GEMINI_API_KEY (never runs in CI)",
 )
 def test_llm_parser_meets_quality_gate() -> None:
-    """On-demand lane — live Gemini. The committed LLM_EVAL_REPORT.md is the
-    durable record; this test is the measurement.
+    """On-demand lane — live Gemini via the Batch API. The committed
+    LLM_EVAL_REPORT.md is the durable record; this test is the measurement.
 
-    Run: JOBIFY_PARSE_EVAL_PARSER=llm uv run --env-file=.env pytest -m eval -s
+    Run: JOBIFY_PARSE_EVAL_PARSER=llm uv run --env-file=.env pytest -m eval -s -k llm
+
+    Uses `GeminiResumeParser.parse_texts_batch` (one Batch API job for all 20
+    examples) instead of 20 paced interactive `generate_content` calls: the
+    Batch API is 50% of interactive pricing and draws from a separate quota
+    pool, so this lane no longer competes with (or is capped by) the live
+    parse path's free-tier RPM/RPD limits. The LIVE `parse`/`parse_text` path
+    stays interactive — this lane's parser choice has no bearing on it.
     """
-    import asyncio
     import os
-    import time
 
     from google import genai
 
+    from jobify.eval.parse_f1 import DEFAULT_DATA_DIR, _load_examples
     from jobify.integrations.parser.base import ParsedResume
     from jobify.integrations.parser.llm_parser import GeminiResumeParser
 
-    # One event loop for the whole 20-call run, not asyncio.run() per call:
-    # google.genai.Client caches an async httpx transport bound to whichever
-    # loop is running on first use. asyncio.run() opens+closes a fresh loop
-    # per invocation, so the cached transport survives into a closed loop by
-    # the second example and every call after the first raises
-    # "RuntimeError: Event loop is closed" during connection teardown.
-    # Driving every call through one loop.run_until_complete() keeps the
-    # transport valid for the full run. Production is unaffected — it runs
-    # under uvicorn's single long-lived loop and never hits asyncio.run().
-    loop = asyncio.new_event_loop()
-    try:
-        client = genai.Client(api_key=os.environ["JOBIFY_GEMINI_API_KEY"])
-        parser = GeminiResumeParser(
-            client=client,
-            model=os.environ.get("JOBIFY_RESUME_PARSER_MODEL", "gemini-2.5-flash"),
-        )
+    client = genai.Client(api_key=os.environ["JOBIFY_GEMINI_API_KEY"])
+    parser = GeminiResumeParser(
+        client=client,
+        model=os.environ.get("JOBIFY_RESUME_PARSER_MODEL", "gemini-2.5-flash"),
+    )
 
-        # The free-tier key is capped at 5 generate_content requests/minute
-        # for gemini-2.5-flash. 20 back-to-back calls trip a hard 429
-        # RESOURCE_EXHAUSTED (not the occasional transient one this lane's
-        # docstring warns about — it's every run, deterministically). Pace
-        # calls at ~4.6/min (13s floor between call starts) to stay under
-        # the quota; call latency is already part of that gap so this adds
-        # at most ~13s of pure sleep per example.
-        #
-        # The free tier ALSO caps gemini-2.5-flash at 20 generate_content
-        # requests/DAY (GenerateRequestsPerDayPerProjectPerModel-FreeTier).
-        # A full 20-example run consumes the entire day's budget with zero
-        # margin: eval_gold_dataset has no per-example exception handling
-        # (a single failure anywhere aborts the whole run), so one 429/5xx
-        # on example 17 burns the day's quota with nothing to show for it.
-        # This pacing fix cannot work around the daily cap — only billing
-        # (or waiting for the next day's reset) does.
-        _last_call_at: list[float] = []
+    examples = _load_examples(DEFAULT_DATA_DIR)
+    texts = [text for _example_id, text, _expected in examples]
+    parsed_resumes = parser.parse_texts_batch(texts)
+    results_by_text: dict[str, ParsedResume] = dict(zip(texts, parsed_resumes, strict=True))
 
-        def _paced_parse(text: str) -> ParsedResume:
-            if _last_call_at:
-                elapsed = time.monotonic() - _last_call_at[0]
-                wait = 13.0 - elapsed
-                if wait > 0:
-                    time.sleep(wait)
-            _last_call_at[:] = [time.monotonic()]
-            return loop.run_until_complete(parser.parse_text(text))
-
-        report = eval_gold_dataset(parse_fn=_paced_parse)
-    finally:
-        loop.close()
+    report = eval_gold_dataset(parse_fn=lambda t: results_by_text[t])
 
     print()
     print(report.summary())
