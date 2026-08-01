@@ -95,8 +95,10 @@ Decisions made during brainstorming:
   string table sits beside the English one — same kinds, same payload slots,
   subjects localized too. Kinds localized: `application_received`,
   `application_stage_changed` (all stage arms incl. the neutral rejection
-  copy), `match_surfaced`, `dsr_export_ready`. **`employer_invite` always
-  renders English** (recruiter-bound).
+  copy), plus the generic unknown-kind fallback line. **`employer_invite`
+  always renders English** (recruiter-bound). (These are the kinds the
+  render table actually contains today — the `core/emails/templates/*.html`
+  files are unused design assets.)
 - The notification sweep resolves the recipient's language once per
   dispatch: user → applicant → live preferences (outer join, default
   `"en"`); recruiters/admins have no applicant row → English. Both SES and
