@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jobify_app/core/error/exceptions.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/splash/bootstrap_controller.dart';
 import 'package:jobify_app/presentation/splash/splash_screen.dart';
 import 'package:riverpod/src/framework.dart' show Override;
@@ -13,6 +14,8 @@ Widget _wrap(Widget child, {required List<Override> overrides}) {
     overrides: overrides,
     child: MaterialApp(
       theme: ThemeData.light(useMaterial3: true),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: child,
     ),
   );

@@ -49,5 +49,535 @@
   "commonSomethingWentWrong": "कुछ गलत हो गया",
   "@commonSomethingWentWrong": {
     "description": "Generic error headline shown when an action or load fails."
+  },
+
+  "commonUndo": "पूर्ववत करें",
+  "@commonUndo": {
+    "description": "Button label to undo the last action (shown in a SnackBar)."
+  },
+
+  "commonRefresh": "रीफ़्रेश करें",
+  "@commonRefresh": {
+    "description": "Tooltip for a refresh icon button."
+  },
+
+  "commonBack": "वापस",
+  "@commonBack": {
+    "description": "Button label to go back to the previous screen."
+  },
+
+  "commonNothingHereYet": "यहाँ अभी कुछ नहीं है",
+  "@commonNothingHereYet": {
+    "description": "Default empty-state headline used when no more specific copy is supplied."
+  },
+
+  "commonTryAgain": "फिर से कोशिश करें",
+  "@commonTryAgain": {
+    "description": "Button label on the generic error view to retry the failed action."
+  },
+
+  "commonCouldntReachJobify": "Jobify तक नहीं पहुंच सके",
+  "@commonCouldntReachJobify": {
+    "description": "Generic error headline shown when a network request fails."
+  },
+
+  "commonCheckConnectionRetry": "अपना कनेक्शन जांचें और फिर से कोशिश करें।",
+  "@commonCheckConnectionRetry": {
+    "description": "Generic error body shown alongside commonCouldntReachJobify."
+  },
+
+  "commonSignedOut": "साइन आउट हो गए",
+  "@commonSignedOut": {
+    "description": "Generic error headline shown when the user's session has ended."
+  },
+
+  "commonSessionEnded": "आपका सत्र समाप्त हो गया। जारी रखने के लिए साइन इन करें।",
+  "@commonSessionEnded": {
+    "description": "Generic error body shown alongside commonSignedOut."
+  },
+
+  "commonPleaseTryAgainMoment": "कृपया थोड़ी देर में फिर से कोशिश करें।",
+  "@commonPleaseTryAgainMoment": {
+    "description": "Fallback error body when the server didn't provide a detail message."
+  },
+
+  "commonUnexpectedError": "एक अनपेक्षित त्रुटि हुई।",
+  "@commonUnexpectedError": {
+    "description": "Fallback error body for an unrecognised error type."
+  },
+
+  "recruiterShellTabDashboard": "डैशबोर्ड",
+  "@recruiterShellTabDashboard": {
+    "description": "Bottom navigation tab label for the recruiter's dashboard."
+  },
+
+  "recruiterShellTabJobs": "नौकरियां",
+  "@recruiterShellTabJobs": {
+    "description": "Bottom navigation tab label for the recruiter's job postings."
+  },
+
+  "recruiterShellTabEmployer": "नियोक्ता",
+  "@recruiterShellTabEmployer": {
+    "description": "Bottom navigation tab label for the recruiter's employer/team settings."
+  },
+
+  "authAccountDeletedSnackbar": "आपका खाता हटा दिया गया है।",
+  "@authAccountDeletedSnackbar": {
+    "description": "Snackbar shown on the sign-in screen right after a successful account deletion."
+  },
+
+  "authSignInNetworkError": "Jobify तक नहीं पहुंच सके। अपना कनेक्शन जांचें।",
+  "@authSignInNetworkError": {
+    "description": "Snackbar shown when sign-in fails due to a network error."
+  },
+
+  "authSignInFailed": "साइन-इन विफल हुआ। फिर से कोशिश करें।",
+  "@authSignInFailed": {
+    "description": "Snackbar shown when sign-in fails for an unspecified or generic reason."
+  },
+
+  "authHeroTitle": "नौकरी\nआपको ढूंढ लेगी।",
+  "@authHeroTitle": {
+    "description": "Sign-in screen hero headline — the brand promise."
+  },
+
+  "authHeroSubtitle": "हम आपका रिज़्यूमे पढ़ते हैं और आपके लिए सही भूमिकाएं लाते हैं — सीधे शब्दों में कारण और कमी के साथ।",
+  "@authHeroSubtitle": {
+    "description": "Sign-in screen hero sub-headline explaining the product."
+  },
+
+  "authWordmark": "Jobify",
+  "@authWordmark": {
+    "description": "The Jobify product wordmark on the sign-in screen. Product name — stays Latin in every locale."
+  },
+
+  "authHeroRoleBackendEngineer": "Backend Engineer",
+  "@authHeroRoleBackendEngineer": {
+    "description": "Illustrative job-title chip in the sign-in hero animation. Job title — stays Latin in every locale."
+  },
+
+  "authHeroRoleProductDesigner": "Product Designer",
+  "@authHeroRoleProductDesigner": {
+    "description": "Illustrative job-title chip in the sign-in hero animation. Job title — stays Latin in every locale."
+  },
+
+  "authHeroRoleDataEngineer": "Data Engineer",
+  "@authHeroRoleDataEngineer": {
+    "description": "Illustrative job-title chip in the sign-in hero animation. Job title — stays Latin in every locale."
+  },
+
+  "authHeroSalaryRange": "₹18–28L",
+  "@authHeroSalaryRange": {
+    "description": "Illustrative salary-range chip in the sign-in hero animation."
+  },
+
+  "authHeroRemoteFirst": "रिमोट-फ़र्स्ट",
+  "@authHeroRemoteFirst": {
+    "description": "Illustrative work-arrangement chip in the sign-in hero animation."
+  },
+
+  "authHeroMatchPercent": "92% मैच",
+  "@authHeroMatchPercent": {
+    "description": "Illustrative match-score chip in the sign-in hero animation."
+  },
+
+  "authSigningIn": "साइन इन हो रहा है…",
+  "@authSigningIn": {
+    "description": "Sign-in button label while the sign-in request is in flight."
+  },
+
+  "authContinueWithGoogle": "Google से जारी रखें",
+  "@authContinueWithGoogle": {
+    "description": "Sign-in button label (mobile)."
+  },
+
+  "authGoogleSignInLoadError": "Google साइन-इन लोड नहीं हो सका। रीफ़्रेश करें और फिर से कोशिश करें।",
+  "@authGoogleSignInLoadError": {
+    "description": "Web sign-in fallback message shown if the Google Identity Services client fails to initialize."
+  },
+
+  "onboardingCompanyNameTooShort": "अपनी कंपनी का नाम दर्ज करें (न्यूनतम 2 अक्षर)",
+  "@onboardingCompanyNameTooShort": {
+    "description": "Validation error when the employer onboarding company-name field is too short."
+  },
+
+  "onboardingCompanyNameTooLong": "कंपनी का नाम बहुत लंबा है",
+  "@onboardingCompanyNameTooLong": {
+    "description": "Validation error when the employer onboarding company-name field is too long."
+  },
+
+  "onboardingGstinLength": "GSTIN ठीक 15 अक्षरों का होना चाहिए",
+  "@onboardingGstinLength": {
+    "description": "Validation error when the employer onboarding GSTIN field is the wrong length."
+  },
+
+  "onboardingCompanyNameTaken": "वह कंपनी नाम पहले से ही पंजीकृत है।",
+  "@onboardingCompanyNameTaken": {
+    "description": "Snackbar shown when creating an employer fails because the name is already taken."
+  },
+
+  "onboardingCreateEmployerFailed": "एम्प्लॉयर नहीं बनाया जा सका। कृपया फिर से कोशिश करें।",
+  "@onboardingCreateEmployerFailed": {
+    "description": "Snackbar shown when creating an employer fails for a generic reason."
+  },
+
+  "onboardingTitle": "अपनी कंपनी सेट करें",
+  "@onboardingTitle": {
+    "description": "AppBar title for the employer onboarding screen."
+  },
+
+  "onboardingIntro": "नौकरियां पोस्ट करना शुरू करने के लिए हमें अपनी कंपनी के बारे में बताएं।",
+  "@onboardingIntro": {
+    "description": "Employer onboarding screen intro copy."
+  },
+
+  "onboardingCompanyNameLabel": "कंपनी का नाम",
+  "@onboardingCompanyNameLabel": {
+    "description": "Label for the company name text field."
+  },
+
+  "onboardingGstinLabel": "GSTIN (वैकल्पिक)",
+  "@onboardingGstinLabel": {
+    "description": "Label for the optional GSTIN text field."
+  },
+
+  "onboardingCreateCompanyButton": "कंपनी बनाएं",
+  "@onboardingCreateCompanyButton": {
+    "description": "Submit button label for the employer onboarding form."
+  },
+
+  "feedRatingSaveError": "आपकी रेटिंग सेव नहीं हो सकी",
+  "@feedRatingSaveError": {
+    "description": "Snackbar shown when a thumbs up/down match-feedback rating fails to save."
+  },
+
+  "feedHiddenSnackbar": "आपकी फ़ीड से छिपाया गया",
+  "@feedHiddenSnackbar": {
+    "description": "Snackbar shown after thumbs-down hides a job from the feed."
+  },
+
+  "feedHeaderTitle": "आपके लिए",
+  "@feedHeaderTitle": {
+    "description": "Feed screen header title."
+  },
+
+  "feedHeaderSubtitle": "आपकी प्रोफ़ाइल से मेल खाती भूमिकाएं",
+  "@feedHeaderSubtitle": {
+    "description": "Feed screen header subtitle."
+  },
+
+  "feedEmptyHeadline": "हम अभी भी आपके लिए मैच ढूंढ रहे हैं",
+  "@feedEmptyHeadline": {
+    "description": "Empty-state headline shown when the feed has no items and no filters are active."
+  },
+
+  "feedEmptyBody": "बेहतर नौकरियां पाने के लिए अपना रिज़्यूमे अपलोड करें।",
+  "@feedEmptyBody": {
+    "description": "Empty-state body shown when the feed has no items and no filters are active."
+  },
+
+  "feedFilteredEmptyHeadline": "आपके फ़िल्टर से कुछ मेल नहीं खाता",
+  "@feedFilteredEmptyHeadline": {
+    "description": "Empty-state headline shown when the feed has no items because filters are active."
+  },
+
+  "feedFilteredEmptyBody": "कोई फ़िल्टर हटाएं या अपनी खोज को व्यापक बनाएं।",
+  "@feedFilteredEmptyBody": {
+    "description": "Empty-state body shown when the feed has no items because filters are active."
+  },
+
+  "feedClearFiltersButton": "फ़िल्टर हटाएं",
+  "@feedClearFiltersButton": {
+    "description": "Button in the filtered-empty state that clears all active feed filters."
+  },
+
+  "feedAllCaughtUp": "आप सब कुछ देख चुके हैं",
+  "@feedAllCaughtUp": {
+    "description": "Caption shown at the end of the feed list when there are no more items to load."
+  },
+
+  "feedNewMatchesSinceVisit": "{count, plural, one{आपकी पिछली विज़िट के बाद 1 नया मैच} other{आपकी पिछली विज़िट के बाद {count} नए मैच}}",
+  "@feedNewMatchesSinceVisit": {
+    "description": "Headline showing how many new matches surfaced since the applicant's last feed visit.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "feedThumbUpTooltip": "अच्छा मैच",
+  "@feedThumbUpTooltip": {
+    "description": "Tooltip for the thumbs-up (positive match feedback) icon button."
+  },
+
+  "feedThumbDownTooltip": "दिलचस्पी नहीं",
+  "@feedThumbDownTooltip": {
+    "description": "Tooltip for the thumbs-down (negative match feedback) icon button."
+  },
+
+  "matchCaveatPrefix": "इसके खिलाफ जाता है: {reason}",
+  "@matchCaveatPrefix": {
+    "description": "Prefix shown before a match's caveat/downside text.",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+
+  "feedClosedPill": "बंद",
+  "@feedClosedPill": {
+    "description": "Pill label shown on a job card when the job listing is closed."
+  },
+
+  "feedPostedMonthsAgo": "{months} महीने पहले",
+  "@feedPostedMonthsAgo": {
+    "description": "Relative time since a job was posted, in months.",
+    "placeholders": {
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+
+  "feedPostedDaysAgo": "{days} दिन पहले",
+  "@feedPostedDaysAgo": {
+    "description": "Relative time since a job was posted, in days.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+
+  "feedPostedHoursAgo": "{hours} घंटे पहले",
+  "@feedPostedHoursAgo": {
+    "description": "Relative time since a job was posted, in hours.",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+
+  "feedPostedJustNow": "अभी-अभी",
+  "@feedPostedJustNow": {
+    "description": "Relative time since a job was posted, when under an hour ago."
+  },
+
+  "feedSearchHint": "टाइटल या कंपनी खोजें",
+  "@feedSearchHint": {
+    "description": "Hint text for the feed search field."
+  },
+
+  "feedFiltersTooltip": "फ़िल्टर",
+  "@feedFiltersTooltip": {
+    "description": "Tooltip for the feed filter icon button that opens the filter sheet."
+  },
+
+  "feedMinCtcChipLabel": "≥ ₹{amount}L",
+  "@feedMinCtcChipLabel": {
+    "description": "Active-filter chip label for a minimum-CTC filter, in lakhs.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+
+  "feedYearsSuffix": "{years} वर्ष",
+  "@feedYearsSuffix": {
+    "description": "Compact years-of-experience label, e.g. on a filter chip or the filter sheet stepper.",
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
+
+  "feedClearAllButton": "सभी हटाएं",
+  "@feedClearAllButton": {
+    "description": "Button that clears every active feed filter at once."
+  },
+
+  "feedFilterSheetTitle": "मैच फ़िल्टर करें",
+  "@feedFilterSheetTitle": {
+    "description": "Title of the feed filter bottom sheet."
+  },
+
+  "feedFilterLocationLabel": "स्थान",
+  "@feedFilterLocationLabel": {
+    "description": "Section label for the location filter in the filter sheet."
+  },
+
+  "feedFilterAddCityHint": "एक और शहर जोड़ें",
+  "@feedFilterAddCityHint": {
+    "description": "Hint text for the custom-city text field in the filter sheet."
+  },
+
+  "feedFilterExperienceLabel": "अनुभव",
+  "@feedFilterExperienceLabel": {
+    "description": "Section label for the minimum-experience filter in the filter sheet."
+  },
+
+  "feedFilterExperienceAny": "कोई भी",
+  "@feedFilterExperienceAny": {
+    "description": "Value shown for the experience stepper when no minimum is set."
+  },
+
+  "feedFilterMinCtcLabel": "न्यूनतम CTC (लाख में)",
+  "@feedFilterMinCtcLabel": {
+    "description": "Section label for the minimum-CTC filter in the filter sheet."
+  },
+
+  "feedFilterCtcHint": "जैसे 5",
+  "@feedFilterCtcHint": {
+    "description": "Hint text for the minimum-CTC text field in the filter sheet."
+  },
+
+  "feedFilterCtcPrefix": "₹ ",
+  "@feedFilterCtcPrefix": {
+    "description": "Currency prefix for the minimum-CTC text field in the filter sheet."
+  },
+
+  "feedFilterCtcSuffix": "L",
+  "@feedFilterCtcSuffix": {
+    "description": "Lakh-unit suffix for the minimum-CTC text field in the filter sheet."
+  },
+
+  "feedFilterResetButton": "रीसेट करें",
+  "@feedFilterResetButton": {
+    "description": "Button that resets the filter sheet's draft state (keeps the search query)."
+  },
+
+  "feedFilterApplyButton": "लागू करें",
+  "@feedFilterApplyButton": {
+    "description": "Button that commits the filter sheet's draft state to the active feed filters."
+  },
+
+  "feedCityBangalore": "Bangalore",
+  "@feedCityBangalore": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityMumbai": "Mumbai",
+  "@feedCityMumbai": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityDelhiNcr": "Delhi NCR",
+  "@feedCityDelhiNcr": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityHyderabad": "Hyderabad",
+  "@feedCityHyderabad": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityChennai": "Chennai",
+  "@feedCityChennai": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityPune": "Pune",
+  "@feedCityPune": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityRemote": "रिमोट",
+  "@feedCityRemote": {
+    "description": "Preset work-arrangement option in the feed location filter."
+  },
+
+  "feedSummaryUploadResume": "रिज़्यूमे अपलोड करें",
+  "@feedSummaryUploadResume": {
+    "description": "Feed home-summary match-profile tile label prompting a résumé upload."
+  },
+
+  "feedSummaryFinishProfile": "अपनी प्रोफ़ाइल पूरी करें",
+  "@feedSummaryFinishProfile": {
+    "description": "Feed home-summary match-profile tile label prompting completion of preferences."
+  },
+
+  "feedSummaryProfileComplete": "प्रोफ़ाइल पूरी हुई",
+  "@feedSummaryProfileComplete": {
+    "description": "Feed home-summary match-profile tile label shown once the profile is complete."
+  },
+
+  "jobDetailActionFailed": "कार्रवाई विफल रही",
+  "@jobDetailActionFailed": {
+    "description": "Fallback snackbar message for a job-detail action error with no server detail."
+  },
+
+  "jobDetailNetworkError": "Jobify तक नहीं पहुंच सके।",
+  "@jobDetailNetworkError": {
+    "description": "Snackbar message for a job-detail action error caused by a network failure."
+  },
+
+  "jobDetailGoneHeadline": "यह नौकरी अब उपलब्ध नहीं है",
+  "@jobDetailGoneHeadline": {
+    "description": "Empty-state headline shown when a job detail 404s (closed or removed)."
+  },
+
+  "jobDetailGoneBody": "इसे बंद या हटाया जा चुका होगा।",
+  "@jobDetailGoneBody": {
+    "description": "Empty-state body shown when a job detail 404s (closed or removed)."
+  },
+
+  "jobDetailWhyThisMatch": "यह मैच क्यों",
+  "@jobDetailWhyThisMatch": {
+    "description": "Heading for the match explanation card on the job detail screen."
+  },
+
+  "jobDetailMatchFeedbackPrompt": "क्या यह मैच आपके लिए सही था?",
+  "@jobDetailMatchFeedbackPrompt": {
+    "description": "Prompt above the thumbs up/down match-feedback row on the job detail screen."
+  },
+
+  "jobDetailTimelineHeading": "टाइमलाइन",
+  "@jobDetailTimelineHeading": {
+    "description": "Heading for the application stage-change timeline on the job detail screen."
+  },
+
+  "jobDetailApplyButton": "आवेदन करें",
+  "@jobDetailApplyButton": {
+    "description": "Button label to apply to a job."
+  },
+
+  "jobDetailWithdrawButton": "वापस लें",
+  "@jobDetailWithdrawButton": {
+    "description": "Button label to withdraw an application."
+  },
+
+  "jobDetailWithdrawDialogTitle": "आवेदन वापस लें?",
+  "@jobDetailWithdrawDialogTitle": {
+    "description": "Confirmation dialog title for withdrawing an application."
+  },
+
+  "jobDetailWithdrawDialogBody": "यदि आप अपना मन बदलते हैं तो बाद में फिर से आवेदन कर सकते हैं।",
+  "@jobDetailWithdrawDialogBody": {
+    "description": "Confirmation dialog body for withdrawing an application."
+  },
+
+  "savedHeaderTitle": "सहेजी गई नौकरियां",
+  "@savedHeaderTitle": {
+    "description": "Saved screen header title. Not reused from shellTabSaved: the tab label is deliberately transliterated (\"सेव्ड\") to fit the NavigationBar's tight width, a constraint that doesn't apply to the full-width screen header."
+  },
+
+  "savedHeaderSubtitle": "वे नौकरियां जो आपने बाद के लिए रखीं",
+  "@savedHeaderSubtitle": {
+    "description": "Saved screen header subtitle."
+  },
+
+  "savedEmptyHeadline": "अभी तक कुछ भी सेव नहीं किया गया",
+  "@savedEmptyHeadline": {
+    "description": "Empty-state headline shown when the applicant has no saved jobs."
+  },
+
+  "savedEmptyBody": "बाद में देखने के लिए किसी भी नौकरी को दिल पर टैप करके सेव करें।",
+  "@savedEmptyBody": {
+    "description": "Empty-state body shown when the applicant has no saved jobs."
   }
 }

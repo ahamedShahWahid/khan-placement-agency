@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
 import 'package:jobify_app/data/feed/feed_dto.dart';
 import 'package:jobify_app/data/feed/match_feedback_rating.dart';
 import 'package:jobify_app/data/jobs/job_status.dart';
@@ -33,12 +34,15 @@ class FeedItemCard extends StatelessWidget {
   final VoidCallback? onThumbUp;
   final VoidCallback? onThumbDown;
 
-  String _ago(DateTime d) {
+  String _ago(BuildContext context, DateTime d) {
+    final l10n = context.l10n;
     final delta = DateTime.now().toUtc().difference(d.toUtc());
-    if (delta.inDays >= 30) return '${(delta.inDays / 30).floor()}mo ago';
-    if (delta.inDays >= 1) return '${delta.inDays}d ago';
-    if (delta.inHours >= 1) return '${delta.inHours}h ago';
-    return 'just now';
+    if (delta.inDays >= 30) {
+      return l10n.feedPostedMonthsAgo((delta.inDays / 30).floor());
+    }
+    if (delta.inDays >= 1) return l10n.feedPostedDaysAgo(delta.inDays);
+    if (delta.inHours >= 1) return l10n.feedPostedHoursAgo(delta.inHours);
+    return l10n.feedPostedJustNow;
   }
 
   @override
@@ -47,7 +51,7 @@ class FeedItemCard extends StatelessWidget {
     final isClosed = job.status != JobStatus.open;
     final meta = [
       if (job.locations.isNotEmpty) job.locations.join(', '),
-      _ago(job.postedAt),
+      _ago(context, job.postedAt),
     ].join(' · ');
     return Card(
       child: InkWell(
@@ -115,7 +119,7 @@ class FeedItemCard extends StatelessWidget {
                       onThumbUp != null &&
                       onThumbDown != null) ...[
                     IconButton(
-                      tooltip: 'Good match',
+                      tooltip: context.l10n.feedThumbUpTooltip,
                       visualDensity: VisualDensity.compact,
                       icon: Icon(
                         myFeedback == MatchFeedbackRating.up
@@ -126,7 +130,7 @@ class FeedItemCard extends StatelessWidget {
                       onPressed: onThumbUp,
                     ),
                     IconButton(
-                      tooltip: 'Not interested',
+                      tooltip: context.l10n.feedThumbDownTooltip,
                       visualDensity: VisualDensity.compact,
                       icon: const Icon(Icons.thumb_down_outlined, size: 18),
                       onPressed: onThumbDown,
@@ -156,7 +160,7 @@ class _CaveatLine extends StatelessWidget {
         border: Border(left: BorderSide(color: amber, width: 2.5)),
       ),
       child: Text(
-        'Counts against: $text',
+        context.l10n.matchCaveatPrefix(text),
         style: Theme.of(context).textTheme.bodySmall?.copyWith(color: amber),
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
@@ -182,7 +186,7 @@ class _ClosedPill extends StatelessWidget {
         borderRadius: JobifyRadii.borderRadiusPill,
       ),
       child: Text(
-        'Closed',
+        context.l10n.feedClosedPill,
         style: theme.textTheme.labelSmall
             ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
       ),

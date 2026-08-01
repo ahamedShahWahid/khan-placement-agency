@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jobify_app/core/error/exceptions.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/theme/jobify_colors.dart';
 import 'package:jobify_app/presentation/widgets/jobify_empty_state.dart';
 import 'package:jobify_app/presentation/widgets/jobify_error_view.dart';
@@ -13,6 +14,8 @@ import 'package:jobify_app/presentation/widgets/jobify_score_badge.dart';
 Widget _wrap(Widget child) {
   return MaterialApp(
     theme: ThemeData.light(useMaterial3: true),
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
     home: Scaffold(body: child),
   );
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
 import 'package:jobify_app/data/feed/feed_dto.dart';
 import 'package:jobify_app/data/feed/feed_visit_repository_impl.dart';
 import 'package:jobify_app/presentation/feed/feed_controller.dart';
@@ -88,26 +89,27 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Couldn't save your rating")),
+        SnackBar(content: Text(context.l10n.feedRatingSaveError)),
       );
     }
   }
 
   Future<void> _rateDown(String jobId) async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     try {
       await ref.read(feedControllerProvider.notifier).rateDown(jobId);
     } catch (_) {
       messenger.showSnackBar(
-        const SnackBar(content: Text("Couldn't save your rating")),
+        SnackBar(content: Text(l10n.feedRatingSaveError)),
       );
       return;
     }
     messenger.showSnackBar(
       SnackBar(
-        content: const Text('Hidden from your feed'),
+        content: Text(l10n.feedHiddenSnackbar),
         action: SnackBarAction(
-          label: 'Undo',
+          label: l10n.commonUndo,
           onPressed: () => unawaited(_undoDown(jobId)),
         ),
       ),
@@ -116,11 +118,12 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
 
   Future<void> _undoDown(String jobId) async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     try {
       await ref.read(feedControllerProvider.notifier).undoDown(jobId);
     } catch (_) {
       messenger.showSnackBar(
-        const SnackBar(content: Text("Couldn't save your rating")),
+        SnackBar(content: Text(l10n.feedRatingSaveError)),
       );
     }
   }
@@ -132,11 +135,11 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
         value.value != null ? _newMatchesCount(value.value!.items) : 0;
     return BoldScaffold(
       header: BoldHeader(
-        title: 'For you',
-        subtitle: 'Roles matched to your profile',
+        title: context.l10n.feedHeaderTitle,
+        subtitle: context.l10n.feedHeaderSubtitle,
         trailing: IconButton(
           icon: const Icon(Icons.refresh),
-          tooltip: 'Refresh',
+          tooltip: context.l10n.commonRefresh,
           onPressed: () => unawaited(_refreshAll()),
         ),
       ),
@@ -174,21 +177,21 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
               empty: () {
                 final filters = ref.watch(feedFiltersControllerProvider);
                 if (filters.isEmpty) {
-                  return const JobifyEmptyState(
-                    headline: "We're still looking for matches",
-                    body: 'Upload a resume to help us find you better roles.',
+                  return JobifyEmptyState(
+                    headline: context.l10n.feedEmptyHeadline,
+                    body: context.l10n.feedEmptyBody,
                     icon: Icons.search_off,
                   );
                 }
                 return JobifyEmptyState(
-                  headline: 'Nothing matches your filters',
-                  body: 'Try removing a filter or broadening your search.',
+                  headline: context.l10n.feedFilteredEmptyHeadline,
+                  body: context.l10n.feedFilteredEmptyBody,
                   icon: Icons.filter_alt_off,
                   primaryAction: TextButton(
                     onPressed: () => ref
                         .read(feedFiltersControllerProvider.notifier)
                         .clear(),
-                    child: const Text('Clear filters'),
+                    child: Text(context.l10n.feedClearFiltersButton),
                   ),
                 );
               },
@@ -213,7 +216,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                           padding: const EdgeInsets.all(JobifySpacing.lg),
                           child: Center(
                             child: Text(
-                              "You're all caught up",
+                              context.l10n.feedAllCaughtUp,
                               style: Theme.of(context)
                                   .textTheme
                                   .bodySmall
@@ -267,9 +270,7 @@ class _NewMatchesHeadline extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: JobifySpacing.md),
       child: Text(
-        count == 1
-            ? '1 new match since your last visit'
-            : '$count new matches since your last visit',
+        context.l10n.feedNewMatchesSinceVisit(count),
         style: theme.textTheme.titleMedium?.copyWith(color: brand),
       ),
     );

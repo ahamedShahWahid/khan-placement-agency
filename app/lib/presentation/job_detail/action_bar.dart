@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
 import 'package:jobify_app/data/jobs/application_status.dart';
 import 'package:jobify_app/data/jobs/jobs_dto.dart';
 import 'package:jobify_app/presentation/job_detail/apply_to_job_controller.dart';
@@ -60,12 +61,12 @@ class ActionBar extends ConsumerWidget {
             ? null
             : () =>
                 ref.read(applyToJobControllerProvider(jobId).notifier).submit(),
-        child: const Text('Apply'),
+        child: Text(ctx.l10n.jobDetailApplyButton),
       );
     }
     return OutlinedButton(
       onPressed: isBusy ? null : () => _confirmWithdraw(ctx, ref, app, jobId),
-      child: const Text('Withdraw'),
+      child: Text(ctx.l10n.jobDetailWithdrawButton),
     );
   }
 
@@ -97,21 +98,20 @@ class ActionBar extends ConsumerWidget {
     ApplicationDto app,
     String jobId,
   ) async {
+    final l10n = ctx.l10n;
     final ok = await showDialog<bool>(
       context: ctx,
       builder: (c) => AlertDialog(
-        title: const Text('Withdraw application?'),
-        content: const Text(
-          'You can re-apply later if you change your mind.',
-        ),
+        title: Text(l10n.jobDetailWithdrawDialogTitle),
+        content: Text(l10n.jobDetailWithdrawDialogBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(c, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(c, true),
-            child: const Text('Withdraw'),
+            child: Text(l10n.jobDetailWithdrawButton),
           ),
         ],
       ),

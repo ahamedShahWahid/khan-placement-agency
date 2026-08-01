@@ -15,6 +15,7 @@ import 'package:jobify_app/data/resume/resume_dto.dart';
 import 'package:jobify_app/data/resume/resume_parse_status.dart';
 import 'package:jobify_app/data/resume/resume_repository.dart';
 import 'package:jobify_app/data/resume/resume_repository_impl.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/feed/feed_filter_bar.dart';
 import 'package:jobify_app/presentation/feed/feed_filters_provider.dart';
 import 'package:jobify_app/presentation/feed/feed_screen.dart';
@@ -25,6 +26,8 @@ import '../helpers/fake_repositories.dart';
 Widget _wrap(Widget child) => ProviderScope(
       child: MaterialApp(
         theme: ThemeData.light(useMaterial3: true),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(body: child),
       ),
     );
@@ -84,6 +87,8 @@ Widget _wrapFeedScreen({required FeedRepository repo}) => ProviderScope(
       ],
       child: MaterialApp(
         theme: ThemeData.light(useMaterial3: true),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: const FeedScreen(),
       ),
     );

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jobify_app/core/error/exceptions.dart';
 import 'package:jobify_app/core/format/date_formats.dart';
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
 import 'package:jobify_app/data/feed/feed_dto.dart';
 import 'package:jobify_app/data/feed/match_feedback_rating.dart';
 import 'package:jobify_app/data/feed/match_generator.dart';
@@ -29,12 +30,13 @@ class JobDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     void listenErr(AsyncValue<dynamic> v) {
       v.whenOrNull(
         error: (e, _) {
           final msg = e is ApiException
-              ? (e.detail ?? 'Action failed')
-              : "Couldn't reach Jobify.";
+              ? (e.detail ?? l10n.jobDetailActionFailed)
+              : l10n.jobDetailNetworkError;
           ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text(msg)));
         },
@@ -65,11 +67,11 @@ class JobDetailScreen extends ConsumerWidget {
         error: (e, s) {
           if (e is ApiException && e.statusCode == 404) {
             return JobifyEmptyState(
-              headline: 'This job is no longer available',
-              body: 'It may have been closed or removed.',
+              headline: l10n.jobDetailGoneHeadline,
+              body: l10n.jobDetailGoneBody,
               primaryAction: FilledButton(
                 onPressed: () => context.pop(),
-                child: const Text('Back'),
+                child: Text(l10n.commonBack),
               ),
             );
           }
@@ -144,7 +146,7 @@ class _CaveatLine extends StatelessWidget {
         border: Border(left: BorderSide(color: amber, width: 2.5)),
       ),
       child: Text(
-        'Counts against: $text',
+        context.l10n.matchCaveatPrefix(text),
         style: Theme.of(context).textTheme.bodySmall?.copyWith(color: amber),
       ),
     );
@@ -168,7 +170,7 @@ class _MatchCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  'Why this match',
+                  context.l10n.jobDetailWhyThisMatch,
                   style: theme.textTheme.titleMedium,
                 ),
                 const Spacer(),
@@ -233,13 +235,13 @@ class _MatchFeedbackRow extends ConsumerWidget {
         children: [
           Expanded(
             child: Text(
-              'Was this match right for you?',
+              context.l10n.jobDetailMatchFeedbackPrompt,
               style: theme.textTheme.bodySmall
                   ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
             ),
           ),
           IconButton(
-            tooltip: 'Good match',
+            tooltip: context.l10n.feedThumbUpTooltip,
             visualDensity: VisualDensity.compact,
             icon: Icon(
               current == MatchFeedbackRating.up
@@ -250,7 +252,7 @@ class _MatchFeedbackRow extends ConsumerWidget {
             onPressed: pending ? null : () => toggle(MatchFeedbackRating.up),
           ),
           IconButton(
-            tooltip: 'Not interested',
+            tooltip: context.l10n.feedThumbDownTooltip,
             visualDensity: VisualDensity.compact,
             icon: Icon(
               current == MatchFeedbackRating.down
@@ -283,7 +285,10 @@ class _ApplicationTimeline extends ConsumerWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Timeline', style: theme.textTheme.titleMedium),
+            Text(
+              context.l10n.jobDetailTimelineHeading,
+              style: theme.textTheme.titleMedium,
+            ),
             const SizedBox(height: JobifySpacing.sm),
             for (final e in items)
               Padding(

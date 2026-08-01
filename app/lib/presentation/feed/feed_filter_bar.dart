@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
 import 'package:jobify_app/data/feed/feed_filters.dart';
 import 'package:jobify_app/presentation/feed/feed_filter_sheet.dart';
 import 'package:jobify_app/presentation/feed/feed_filters_provider.dart';
@@ -125,9 +126,9 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
     required FeedFiltersController notifier,
   }) {
     final decimals = filters.minCtc! % 100000 == 0 ? 0 : 1;
-    final label = '≥ ₹${(filters.minCtc! / 100000).toStringAsFixed(decimals)}L';
+    final amount = (filters.minCtc! / 100000).toStringAsFixed(decimals);
     return InputChip(
-      label: Text(label),
+      label: Text(context.l10n.feedMinCtcChipLabel(amount)),
       onDeleted: () => _mutateSelf(
         () => notifier.set(filters.copyWith(minCtc: null)),
       ),
@@ -153,9 +154,9 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
                 onChanged: _onSearchChanged,
                 textInputAction: TextInputAction.search,
                 maxLength: 100,
-                decoration: const InputDecoration(
-                  hintText: 'Search title or company',
-                  prefixIcon: Icon(Icons.search),
+                decoration: InputDecoration(
+                  hintText: context.l10n.feedSearchHint,
+                  prefixIcon: const Icon(Icons.search),
                   isDense: true,
                   counterText: '',
                 ),
@@ -163,7 +164,7 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
             ),
             const SizedBox(width: JobifySpacing.sm),
             IconButton(
-              tooltip: 'Filters',
+              tooltip: context.l10n.feedFiltersTooltip,
               onPressed: () => showModalBottomSheet<void>(
                 context: context,
                 isScrollControlled: true,
@@ -200,7 +201,9 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
                 ),
               if (filters.minYears != null)
                 InputChip(
-                  label: Text('${filters.minYears} yrs'),
+                  label: Text(
+                    context.l10n.feedYearsSuffix(filters.minYears!),
+                  ),
                   onDeleted: () => _mutateSelf(
                     () => notifier.set(filters.copyWith(minYears: null)),
                   ),
@@ -212,7 +215,7 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
                 ),
               ],
               ActionChip(
-                label: const Text('Clear all'),
+                label: Text(context.l10n.feedClearAllButton),
                 onPressed: () => _mutateSelf(() {
                   // Cancel HERE, not in the listener: this is a self-
                   // mutation, so `_syncControllerFromExternalClear` short-

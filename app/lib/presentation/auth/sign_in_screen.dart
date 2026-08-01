@@ -6,6 +6,7 @@ import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:jobify_app/core/error/exceptions.dart';
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
 import 'package:jobify_app/data/auth/google_web_sign_in.dart';
 import 'package:jobify_app/presentation/auth/delete_success_snackbar_provider.dart';
 import 'package:jobify_app/presentation/auth/sign_in_controller.dart';
@@ -26,7 +27,7 @@ class SignInScreen extends ConsumerWidget {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (ref.read(deleteSuccessSnackbarProvider)) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Your account has been deleted.')),
+          SnackBar(content: Text(context.l10n.authAccountDeletedSnackbar)),
         );
         ref.read(deleteSuccessSnackbarProvider.notifier).consume();
       }
@@ -39,11 +40,10 @@ class SignInScreen extends ConsumerWidget {
             AuthException(:final slug)
                 when slug == 'google_sign_in_cancelled' =>
               null,
-            NetworkException _ =>
-              "Couldn't reach Jobify. Check your connection.",
+            NetworkException _ => context.l10n.authSignInNetworkError,
             AuthException(:final detail) =>
-              detail ?? 'Sign-in failed. Try again.',
-            _ => 'Sign-in failed. Try again.',
+              detail ?? context.l10n.authSignInFailed,
+            _ => context.l10n.authSignInFailed,
           };
           if (msg != null) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -145,7 +145,7 @@ class _Intro extends StatelessWidget {
         Arrive(
           index: 1,
           child: Text(
-            'Job will\nfind you.',
+            context.l10n.authHeroTitle,
             style: text.displayLarge?.copyWith(
               fontSize: wide ? 56 : 40,
               height: 1.05,
@@ -159,8 +159,7 @@ class _Intro extends StatelessWidget {
         Arrive(
           index: 2,
           child: Text(
-            'We read your résumé and bring the roles that fit — '
-            'with the reason, and the catch, in plain words.',
+            context.l10n.authHeroSubtitle,
             style: text.bodyLarge?.copyWith(
               color: Colors.white.withValues(alpha: 0.74),
               height: 1.5,
@@ -183,7 +182,7 @@ class _Wordmark extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'Jobify',
+          context.l10n.authWordmark,
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
@@ -225,14 +224,17 @@ class _ArrivalSceneState extends State<_ArrivalScene>
     duration: const Duration(seconds: 11),
   );
 
-  static const _labels = <String>[
-    'Backend Engineer',
-    'Product Designer',
-    'Data Engineer',
-    '₹18–28L',
-    'Remote-first',
-    '92% match',
-  ];
+  List<String> get _labels {
+    final l10n = context.l10n;
+    return <String>[
+      l10n.authHeroRoleBackendEngineer,
+      l10n.authHeroRoleProductDesigner,
+      l10n.authHeroRoleDataEngineer,
+      l10n.authHeroSalaryRange,
+      l10n.authHeroRemoteFirst,
+      l10n.authHeroMatchPercent,
+    ];
+  }
 
   // Scene geometry / animation thresholds (fractions of `size`).
   static const _kPersonRatio = 0.135;
@@ -261,6 +263,10 @@ class _ArrivalSceneState extends State<_ArrivalScene>
   void didChangeDependencies() {
     super.didChangeDependencies();
     _reconcileMotion(); // reacts to live reduced-motion (MediaQuery) changes
+    // Force the cached chip labels to rebuild on the next frame — a locale
+    // change is a dependency change too, and `_ensureCache` otherwise only
+    // keys its cache on `size`, so a language switch wouldn't refresh them.
+    _builtForSize = -1;
   }
 
   @override
@@ -462,7 +468,11 @@ class _SignInBlock extends ConsumerWidget {
               ),
             )
           : const Icon(Icons.login),
-      label: Text(isLoading ? 'Signing in…' : 'Continue with Google'),
+      label: Text(
+        isLoading
+            ? context.l10n.authSigningIn
+            : context.l10n.authContinueWithGoogle,
+      ),
       onPressed: isLoading
           ? null
           : () =>
@@ -491,7 +501,7 @@ class _WebSignInButton extends ConsumerWidget {
           ),
           loading: () => const _LightSpinner(),
           error: (_, __) => Text(
-            "Couldn't load Google sign-in. Refresh and try again.",
+            context.l10n.authGoogleSignInLoadError,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Colors.white.withValues(alpha: 0.8),

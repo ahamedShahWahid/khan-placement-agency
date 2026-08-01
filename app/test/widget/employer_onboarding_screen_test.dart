@@ -9,6 +9,7 @@ import 'package:jobify_app/data/auth/user_role.dart';
 import 'package:jobify_app/data/employers/employer_dto.dart';
 import 'package:jobify_app/data/employers/employer_repository.dart';
 import 'package:jobify_app/data/employers/employer_repository_impl.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/onboarding/employer_onboarding_screen.dart';
 
 // ---------------------------------------------------------------------------
@@ -102,6 +103,8 @@ Widget _buildTestWidget({
   return UncontrolledProviderScope(
     container: container,
     child: const MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: EmployerOnboardingScreen(),
     ),
   );

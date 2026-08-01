@@ -49,5 +49,535 @@
   "commonSomethingWentWrong": "Something went wrong",
   "@commonSomethingWentWrong": {
     "description": "Generic error headline shown when an action or load fails."
+  },
+
+  "commonUndo": "Undo",
+  "@commonUndo": {
+    "description": "Button label to undo the last action (shown in a SnackBar)."
+  },
+
+  "commonRefresh": "Refresh",
+  "@commonRefresh": {
+    "description": "Tooltip for a refresh icon button."
+  },
+
+  "commonBack": "Back",
+  "@commonBack": {
+    "description": "Button label to go back to the previous screen."
+  },
+
+  "commonNothingHereYet": "Nothing here yet",
+  "@commonNothingHereYet": {
+    "description": "Default empty-state headline used when no more specific copy is supplied."
+  },
+
+  "commonTryAgain": "Try again",
+  "@commonTryAgain": {
+    "description": "Button label on the generic error view to retry the failed action."
+  },
+
+  "commonCouldntReachJobify": "Couldn't reach Jobify",
+  "@commonCouldntReachJobify": {
+    "description": "Generic error headline shown when a network request fails."
+  },
+
+  "commonCheckConnectionRetry": "Check your connection and try again.",
+  "@commonCheckConnectionRetry": {
+    "description": "Generic error body shown alongside commonCouldntReachJobify."
+  },
+
+  "commonSignedOut": "Signed out",
+  "@commonSignedOut": {
+    "description": "Generic error headline shown when the user's session has ended."
+  },
+
+  "commonSessionEnded": "Your session ended. Sign in to continue.",
+  "@commonSessionEnded": {
+    "description": "Generic error body shown alongside commonSignedOut."
+  },
+
+  "commonPleaseTryAgainMoment": "Please try again in a moment.",
+  "@commonPleaseTryAgainMoment": {
+    "description": "Fallback error body when the server didn't provide a detail message."
+  },
+
+  "commonUnexpectedError": "An unexpected error occurred.",
+  "@commonUnexpectedError": {
+    "description": "Fallback error body for an unrecognised error type."
+  },
+
+  "recruiterShellTabDashboard": "Dashboard",
+  "@recruiterShellTabDashboard": {
+    "description": "Bottom navigation tab label for the recruiter's dashboard."
+  },
+
+  "recruiterShellTabJobs": "Jobs",
+  "@recruiterShellTabJobs": {
+    "description": "Bottom navigation tab label for the recruiter's job postings."
+  },
+
+  "recruiterShellTabEmployer": "Employer",
+  "@recruiterShellTabEmployer": {
+    "description": "Bottom navigation tab label for the recruiter's employer/team settings."
+  },
+
+  "authAccountDeletedSnackbar": "Your account has been deleted.",
+  "@authAccountDeletedSnackbar": {
+    "description": "Snackbar shown on the sign-in screen right after a successful account deletion."
+  },
+
+  "authSignInNetworkError": "Couldn't reach Jobify. Check your connection.",
+  "@authSignInNetworkError": {
+    "description": "Snackbar shown when sign-in fails due to a network error."
+  },
+
+  "authSignInFailed": "Sign-in failed. Try again.",
+  "@authSignInFailed": {
+    "description": "Snackbar shown when sign-in fails for an unspecified or generic reason."
+  },
+
+  "authHeroTitle": "Job will\nfind you.",
+  "@authHeroTitle": {
+    "description": "Sign-in screen hero headline — the brand promise."
+  },
+
+  "authHeroSubtitle": "We read your résumé and bring the roles that fit — with the reason, and the catch, in plain words.",
+  "@authHeroSubtitle": {
+    "description": "Sign-in screen hero sub-headline explaining the product."
+  },
+
+  "authWordmark": "Jobify",
+  "@authWordmark": {
+    "description": "The Jobify product wordmark on the sign-in screen. Product name — stays Latin in every locale."
+  },
+
+  "authHeroRoleBackendEngineer": "Backend Engineer",
+  "@authHeroRoleBackendEngineer": {
+    "description": "Illustrative job-title chip in the sign-in hero animation. Job title — stays Latin in every locale."
+  },
+
+  "authHeroRoleProductDesigner": "Product Designer",
+  "@authHeroRoleProductDesigner": {
+    "description": "Illustrative job-title chip in the sign-in hero animation. Job title — stays Latin in every locale."
+  },
+
+  "authHeroRoleDataEngineer": "Data Engineer",
+  "@authHeroRoleDataEngineer": {
+    "description": "Illustrative job-title chip in the sign-in hero animation. Job title — stays Latin in every locale."
+  },
+
+  "authHeroSalaryRange": "₹18–28L",
+  "@authHeroSalaryRange": {
+    "description": "Illustrative salary-range chip in the sign-in hero animation."
+  },
+
+  "authHeroRemoteFirst": "Remote-first",
+  "@authHeroRemoteFirst": {
+    "description": "Illustrative work-arrangement chip in the sign-in hero animation."
+  },
+
+  "authHeroMatchPercent": "92% match",
+  "@authHeroMatchPercent": {
+    "description": "Illustrative match-score chip in the sign-in hero animation."
+  },
+
+  "authSigningIn": "Signing in…",
+  "@authSigningIn": {
+    "description": "Sign-in button label while the sign-in request is in flight."
+  },
+
+  "authContinueWithGoogle": "Continue with Google",
+  "@authContinueWithGoogle": {
+    "description": "Sign-in button label (mobile)."
+  },
+
+  "authGoogleSignInLoadError": "Couldn't load Google sign-in. Refresh and try again.",
+  "@authGoogleSignInLoadError": {
+    "description": "Web sign-in fallback message shown if the Google Identity Services client fails to initialize."
+  },
+
+  "onboardingCompanyNameTooShort": "Enter your company name (min 2 characters)",
+  "@onboardingCompanyNameTooShort": {
+    "description": "Validation error when the employer onboarding company-name field is too short."
+  },
+
+  "onboardingCompanyNameTooLong": "Company name is too long",
+  "@onboardingCompanyNameTooLong": {
+    "description": "Validation error when the employer onboarding company-name field is too long."
+  },
+
+  "onboardingGstinLength": "GSTIN must be exactly 15 characters",
+  "@onboardingGstinLength": {
+    "description": "Validation error when the employer onboarding GSTIN field is the wrong length."
+  },
+
+  "onboardingCompanyNameTaken": "That company name is already registered.",
+  "@onboardingCompanyNameTaken": {
+    "description": "Snackbar shown when creating an employer fails because the name is already taken."
+  },
+
+  "onboardingCreateEmployerFailed": "Could not create employer. Please try again.",
+  "@onboardingCreateEmployerFailed": {
+    "description": "Snackbar shown when creating an employer fails for a generic reason."
+  },
+
+  "onboardingTitle": "Set up your company",
+  "@onboardingTitle": {
+    "description": "AppBar title for the employer onboarding screen."
+  },
+
+  "onboardingIntro": "Tell us about your company to start posting jobs.",
+  "@onboardingIntro": {
+    "description": "Employer onboarding screen intro copy."
+  },
+
+  "onboardingCompanyNameLabel": "Company name",
+  "@onboardingCompanyNameLabel": {
+    "description": "Label for the company name text field."
+  },
+
+  "onboardingGstinLabel": "GSTIN (optional)",
+  "@onboardingGstinLabel": {
+    "description": "Label for the optional GSTIN text field."
+  },
+
+  "onboardingCreateCompanyButton": "Create company",
+  "@onboardingCreateCompanyButton": {
+    "description": "Submit button label for the employer onboarding form."
+  },
+
+  "feedRatingSaveError": "Couldn't save your rating",
+  "@feedRatingSaveError": {
+    "description": "Snackbar shown when a thumbs up/down match-feedback rating fails to save."
+  },
+
+  "feedHiddenSnackbar": "Hidden from your feed",
+  "@feedHiddenSnackbar": {
+    "description": "Snackbar shown after thumbs-down hides a job from the feed."
+  },
+
+  "feedHeaderTitle": "For you",
+  "@feedHeaderTitle": {
+    "description": "Feed screen header title."
+  },
+
+  "feedHeaderSubtitle": "Roles matched to your profile",
+  "@feedHeaderSubtitle": {
+    "description": "Feed screen header subtitle."
+  },
+
+  "feedEmptyHeadline": "We're still looking for matches",
+  "@feedEmptyHeadline": {
+    "description": "Empty-state headline shown when the feed has no items and no filters are active."
+  },
+
+  "feedEmptyBody": "Upload a resume to help us find you better roles.",
+  "@feedEmptyBody": {
+    "description": "Empty-state body shown when the feed has no items and no filters are active."
+  },
+
+  "feedFilteredEmptyHeadline": "Nothing matches your filters",
+  "@feedFilteredEmptyHeadline": {
+    "description": "Empty-state headline shown when the feed has no items because filters are active."
+  },
+
+  "feedFilteredEmptyBody": "Try removing a filter or broadening your search.",
+  "@feedFilteredEmptyBody": {
+    "description": "Empty-state body shown when the feed has no items because filters are active."
+  },
+
+  "feedClearFiltersButton": "Clear filters",
+  "@feedClearFiltersButton": {
+    "description": "Button in the filtered-empty state that clears all active feed filters."
+  },
+
+  "feedAllCaughtUp": "You're all caught up",
+  "@feedAllCaughtUp": {
+    "description": "Caption shown at the end of the feed list when there are no more items to load."
+  },
+
+  "feedNewMatchesSinceVisit": "{count, plural, one{1 new match since your last visit} other{{count} new matches since your last visit}}",
+  "@feedNewMatchesSinceVisit": {
+    "description": "Headline showing how many new matches surfaced since the applicant's last feed visit.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "feedThumbUpTooltip": "Good match",
+  "@feedThumbUpTooltip": {
+    "description": "Tooltip for the thumbs-up (positive match feedback) icon button."
+  },
+
+  "feedThumbDownTooltip": "Not interested",
+  "@feedThumbDownTooltip": {
+    "description": "Tooltip for the thumbs-down (negative match feedback) icon button."
+  },
+
+  "matchCaveatPrefix": "Counts against: {reason}",
+  "@matchCaveatPrefix": {
+    "description": "Prefix shown before a match's caveat/downside text.",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+
+  "feedClosedPill": "Closed",
+  "@feedClosedPill": {
+    "description": "Pill label shown on a job card when the job listing is closed."
+  },
+
+  "feedPostedMonthsAgo": "{months}mo ago",
+  "@feedPostedMonthsAgo": {
+    "description": "Relative time since a job was posted, in months.",
+    "placeholders": {
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+
+  "feedPostedDaysAgo": "{days}d ago",
+  "@feedPostedDaysAgo": {
+    "description": "Relative time since a job was posted, in days.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+
+  "feedPostedHoursAgo": "{hours}h ago",
+  "@feedPostedHoursAgo": {
+    "description": "Relative time since a job was posted, in hours.",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+
+  "feedPostedJustNow": "just now",
+  "@feedPostedJustNow": {
+    "description": "Relative time since a job was posted, when under an hour ago."
+  },
+
+  "feedSearchHint": "Search title or company",
+  "@feedSearchHint": {
+    "description": "Hint text for the feed search field."
+  },
+
+  "feedFiltersTooltip": "Filters",
+  "@feedFiltersTooltip": {
+    "description": "Tooltip for the feed filter icon button that opens the filter sheet."
+  },
+
+  "feedMinCtcChipLabel": "≥ ₹{amount}L",
+  "@feedMinCtcChipLabel": {
+    "description": "Active-filter chip label for a minimum-CTC filter, in lakhs.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+
+  "feedYearsSuffix": "{years} yrs",
+  "@feedYearsSuffix": {
+    "description": "Compact years-of-experience label, e.g. on a filter chip or the filter sheet stepper.",
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
+
+  "feedClearAllButton": "Clear all",
+  "@feedClearAllButton": {
+    "description": "Button that clears every active feed filter at once."
+  },
+
+  "feedFilterSheetTitle": "Filter matches",
+  "@feedFilterSheetTitle": {
+    "description": "Title of the feed filter bottom sheet."
+  },
+
+  "feedFilterLocationLabel": "Location",
+  "@feedFilterLocationLabel": {
+    "description": "Section label for the location filter in the filter sheet."
+  },
+
+  "feedFilterAddCityHint": "Add another city",
+  "@feedFilterAddCityHint": {
+    "description": "Hint text for the custom-city text field in the filter sheet."
+  },
+
+  "feedFilterExperienceLabel": "Experience",
+  "@feedFilterExperienceLabel": {
+    "description": "Section label for the minimum-experience filter in the filter sheet."
+  },
+
+  "feedFilterExperienceAny": "Any",
+  "@feedFilterExperienceAny": {
+    "description": "Value shown for the experience stepper when no minimum is set."
+  },
+
+  "feedFilterMinCtcLabel": "Minimum CTC (lakhs)",
+  "@feedFilterMinCtcLabel": {
+    "description": "Section label for the minimum-CTC filter in the filter sheet."
+  },
+
+  "feedFilterCtcHint": "e.g. 5",
+  "@feedFilterCtcHint": {
+    "description": "Hint text for the minimum-CTC text field in the filter sheet."
+  },
+
+  "feedFilterCtcPrefix": "₹ ",
+  "@feedFilterCtcPrefix": {
+    "description": "Currency prefix for the minimum-CTC text field in the filter sheet."
+  },
+
+  "feedFilterCtcSuffix": "L",
+  "@feedFilterCtcSuffix": {
+    "description": "Lakh-unit suffix for the minimum-CTC text field in the filter sheet."
+  },
+
+  "feedFilterResetButton": "Reset",
+  "@feedFilterResetButton": {
+    "description": "Button that resets the filter sheet's draft state (keeps the search query)."
+  },
+
+  "feedFilterApplyButton": "Apply",
+  "@feedFilterApplyButton": {
+    "description": "Button that commits the filter sheet's draft state to the active feed filters."
+  },
+
+  "feedCityBangalore": "Bangalore",
+  "@feedCityBangalore": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityMumbai": "Mumbai",
+  "@feedCityMumbai": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityDelhiNcr": "Delhi NCR",
+  "@feedCityDelhiNcr": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityHyderabad": "Hyderabad",
+  "@feedCityHyderabad": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityChennai": "Chennai",
+  "@feedCityChennai": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityPune": "Pune",
+  "@feedCityPune": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityRemote": "Remote",
+  "@feedCityRemote": {
+    "description": "Preset work-arrangement option in the feed location filter."
+  },
+
+  "feedSummaryUploadResume": "Upload résumé",
+  "@feedSummaryUploadResume": {
+    "description": "Feed home-summary match-profile tile label prompting a résumé upload."
+  },
+
+  "feedSummaryFinishProfile": "Finish your profile",
+  "@feedSummaryFinishProfile": {
+    "description": "Feed home-summary match-profile tile label prompting completion of preferences."
+  },
+
+  "feedSummaryProfileComplete": "Profile complete",
+  "@feedSummaryProfileComplete": {
+    "description": "Feed home-summary match-profile tile label shown once the profile is complete."
+  },
+
+  "jobDetailActionFailed": "Action failed",
+  "@jobDetailActionFailed": {
+    "description": "Fallback snackbar message for a job-detail action error with no server detail."
+  },
+
+  "jobDetailNetworkError": "Couldn't reach Jobify.",
+  "@jobDetailNetworkError": {
+    "description": "Snackbar message for a job-detail action error caused by a network failure."
+  },
+
+  "jobDetailGoneHeadline": "This job is no longer available",
+  "@jobDetailGoneHeadline": {
+    "description": "Empty-state headline shown when a job detail 404s (closed or removed)."
+  },
+
+  "jobDetailGoneBody": "It may have been closed or removed.",
+  "@jobDetailGoneBody": {
+    "description": "Empty-state body shown when a job detail 404s (closed or removed)."
+  },
+
+  "jobDetailWhyThisMatch": "Why this match",
+  "@jobDetailWhyThisMatch": {
+    "description": "Heading for the match explanation card on the job detail screen."
+  },
+
+  "jobDetailMatchFeedbackPrompt": "Was this match right for you?",
+  "@jobDetailMatchFeedbackPrompt": {
+    "description": "Prompt above the thumbs up/down match-feedback row on the job detail screen."
+  },
+
+  "jobDetailTimelineHeading": "Timeline",
+  "@jobDetailTimelineHeading": {
+    "description": "Heading for the application stage-change timeline on the job detail screen."
+  },
+
+  "jobDetailApplyButton": "Apply",
+  "@jobDetailApplyButton": {
+    "description": "Button label to apply to a job."
+  },
+
+  "jobDetailWithdrawButton": "Withdraw",
+  "@jobDetailWithdrawButton": {
+    "description": "Button label to withdraw an application."
+  },
+
+  "jobDetailWithdrawDialogTitle": "Withdraw application?",
+  "@jobDetailWithdrawDialogTitle": {
+    "description": "Confirmation dialog title for withdrawing an application."
+  },
+
+  "jobDetailWithdrawDialogBody": "You can re-apply later if you change your mind.",
+  "@jobDetailWithdrawDialogBody": {
+    "description": "Confirmation dialog body for withdrawing an application."
+  },
+
+  "savedHeaderTitle": "Saved",
+  "@savedHeaderTitle": {
+    "description": "Saved screen header title. Not reused from shellTabSaved: the tab label is deliberately transliterated (\"सेव्ड\") to fit the NavigationBar's tight width, a constraint that doesn't apply to the full-width screen header."
+  },
+
+  "savedHeaderSubtitle": "Jobs you kept for later",
+  "@savedHeaderSubtitle": {
+    "description": "Saved screen header subtitle."
+  },
+
+  "savedEmptyHeadline": "Nothing saved yet",
+  "@savedEmptyHeadline": {
+    "description": "Empty-state headline shown when the applicant has no saved jobs."
+  },
+
+  "savedEmptyBody": "Tap the heart on any job to save it for later.",
+  "@savedEmptyBody": {
+    "description": "Empty-state body shown when the applicant has no saved jobs."
   }
 }

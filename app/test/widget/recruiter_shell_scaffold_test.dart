@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/widgets/jobify_recruiter_shell_scaffold.dart';
 
 /// Trivial branch body so this test stays focused on the shell scaffold's
@@ -63,6 +64,8 @@ void main() {
     await tester.pumpWidget(
       MaterialApp.router(
         theme: ThemeData.light(useMaterial3: true),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         routerConfig: router,
       ),
     );

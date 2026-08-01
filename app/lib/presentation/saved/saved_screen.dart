@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
 import 'package:jobify_app/data/jobs/job_status.dart';
 import 'package:jobify_app/presentation/feed/feed_item_card.dart';
 import 'package:jobify_app/presentation/routing/routes.dart';
@@ -41,17 +42,17 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
   Widget build(BuildContext context) {
     final value = ref.watch(savedControllerProvider);
     return BoldScaffold(
-      header: const BoldHeader(
-        title: 'Saved',
-        subtitle: 'Jobs you kept for later',
+      header: BoldHeader(
+        title: context.l10n.savedHeaderTitle,
+        subtitle: context.l10n.savedHeaderSubtitle,
       ),
       child: AsyncValueWidget<SavedState>(
         value: value,
         onRetry: () => ref.read(savedControllerProvider.notifier).refresh(),
         isEmpty: (s) => s.items.isEmpty,
-        empty: () => const JobifyEmptyState(
-          headline: 'Nothing saved yet',
-          body: 'Tap the heart on any job to save it for later.',
+        empty: () => JobifyEmptyState(
+          headline: context.l10n.savedEmptyHeadline,
+          body: context.l10n.savedEmptyBody,
           icon: Icons.bookmark_outline,
         ),
         data: (s) => RefreshIndicator(

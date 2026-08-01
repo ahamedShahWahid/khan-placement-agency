@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jobify_app/core/error/exceptions.dart';
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
 import 'package:jobify_app/presentation/onboarding/employer_onboarding_controller.dart';
 
 class EmployerOnboardingScreen extends ConsumerStatefulWidget {
@@ -26,15 +27,15 @@ class _EmployerOnboardingScreenState
 
   String? _validateName(String? v) {
     final s = (v ?? '').trim();
-    if (s.length < 2) return 'Enter your company name (min 2 characters)';
-    if (s.length > 200) return 'Company name is too long';
+    if (s.length < 2) return context.l10n.onboardingCompanyNameTooShort;
+    if (s.length > 200) return context.l10n.onboardingCompanyNameTooLong;
     return null;
   }
 
   String? _validateGst(String? v) {
     final s = (v ?? '').trim();
     if (s.isEmpty) return null;
-    if (s.length != 15) return 'GSTIN must be exactly 15 characters';
+    if (s.length != 15) return context.l10n.onboardingGstinLength;
     return null;
   }
 
@@ -55,8 +56,8 @@ class _EmployerOnboardingScreenState
       if (next.hasError && context.mounted) {
         final err = next.error;
         final msg = err is ApiException && err.slug == 'employer_name_taken'
-            ? 'That company name is already registered.'
-            : 'Could not create employer. Please try again.';
+            ? context.l10n.onboardingCompanyNameTaken
+            : context.l10n.onboardingCreateEmployerFailed;
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(SnackBar(content: Text(msg)));
@@ -64,7 +65,7 @@ class _EmployerOnboardingScreenState
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Set up your company')),
+      appBar: AppBar(title: Text(context.l10n.onboardingTitle)),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -72,22 +73,22 @@ class _EmployerOnboardingScreenState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text('Tell us about your company to start posting jobs.'),
+              Text(context.l10n.onboardingIntro),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _name,
-                decoration: const InputDecoration(
-                  labelText: 'Company name',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: context.l10n.onboardingCompanyNameLabel,
+                  border: const OutlineInputBorder(),
                 ),
                 validator: _validateName,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _gst,
-                decoration: const InputDecoration(
-                  labelText: 'GSTIN (optional)',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: context.l10n.onboardingGstinLabel,
+                  border: const OutlineInputBorder(),
                 ),
                 validator: _validateGst,
               ),
@@ -100,7 +101,7 @@ class _EmployerOnboardingScreenState
                         width: 18,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Create company'),
+                    : Text(context.l10n.onboardingCreateCompanyButton),
               ),
             ],
           ),
