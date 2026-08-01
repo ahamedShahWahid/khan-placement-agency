@@ -81,3 +81,11 @@ class ParserError(Exception):
 
 class TransientParserError(Exception):
     """Recoverable failure — worker autoretries up to 3 times with exponential backoff."""
+
+
+class LlmParserError(ParserError):
+    """Post-extraction failure inside the LLM parser (API error, blocked/empty
+    response, schema-invalid JSON). Subclasses :class:`ParserError` so it stays
+    permanent-class if it ever escapes the fallback composite; the composite
+    catches it (and any non-ParserError) and runs the fallback parser instead.
+    """
