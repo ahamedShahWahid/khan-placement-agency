@@ -1,4 +1,4 @@
-"""F1 scoring for the LibraryResumeParser against the gold dataset.
+"""F1 scoring for resume parsers against the gold dataset.
 
 Scores four fields per example:
 - ``name`` (scalar)
@@ -15,6 +15,7 @@ with only a handful of relevant items doesn't get drowned out by skills.
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TypedDict
@@ -183,10 +184,18 @@ def _load_examples(data_dir: Path) -> list[tuple[str, str, _ExpectedExample]]:
     return examples
 
 
-def eval_gold_dataset(data_dir: Path | None = None) -> EvalReport:
-    """Score the LibraryResumeParser against the gold dataset and return
-    the per-field + overall F1 report."""
+def eval_gold_dataset(
+    data_dir: Path | None = None,
+    parse_fn: Callable[[str], ParsedResume] | None = None,
+) -> EvalReport:
+    """Score a parser against the gold dataset and return the F1 report.
+
+    ``parse_fn`` maps raw text to a ParsedResume; defaults to the library
+    parser's text-only heuristics. The LLM eval lane passes a Gemini-backed
+    fn — scoring and normalization are parser-agnostic.
+    """
     data_dir = data_dir or DEFAULT_DATA_DIR
+    parse_fn = parse_fn or _parse_text_only
     examples = _load_examples(data_dir)
     if not examples:
         raise RuntimeError(f"no gold examples found in {data_dir}")
@@ -199,7 +208,7 @@ def eval_gold_dataset(data_dir: Path | None = None) -> EvalReport:
     }
     results: list[ExampleResult] = []
     for example_id, text, expected in examples:
-        parsed = _parse_text_only(text)
+        parsed = parse_fn(text)
         per_field: dict[str, Counts] = {}
 
         per_field["name"] = _score_scalar(
