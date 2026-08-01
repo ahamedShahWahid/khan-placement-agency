@@ -17,10 +17,13 @@ from sqlalchemy.pool import NullPool
 
 from jobify.db.models import Applicant, Resume, ResumeParseStatus, User, UserRole
 from jobify.integrations.parser.base import (
+    LlmParserError,
     ParsedResume,
     ParserError,
     TransientParserError,
 )
+from jobify.integrations.parser.fallback import FallbackResumeParser
+from jobify.integrations.parser.library import LibraryResumeParser
 from jobify_worker.tasks.parse import _parse_resume_async
 
 pytestmark = pytest.mark.integration  # uses local Postgres for the session
@@ -245,3 +248,98 @@ async def test_parse_picks_up_row_already_in_parsing_state(
         assert row.parse_status == ResumeParseStatus.PARSED
         assert row.parsed_json is not None
     assert parser.parse_calls == 1
+
+
+class _FakeLlmParser:
+    async def parse(self, *, content: bytes, content_type: str) -> ParsedResume:
+        return ParsedResume(parser_name="llm.gemini.v1", raw_text="fake", name="Fake Name")
+
+
+class _AlwaysFailingPrimary:
+    async def parse(self, *, content: bytes, content_type: str) -> ParsedResume:
+        raise LlmParserError("llm_call_failed: Boom")
+
+
+def _valid_pdf_bytes(text: str) -> bytes:
+    """A minimal but real, extractable single-page PDF containing `text`.
+
+    Unlike `_FakeStorage`'s default placeholder bytes, the fallback-provenance
+    test below exercises the REAL `LibraryResumeParser`, which extracts text
+    via pypdf — it needs well-formed PDF bytes, not an opaque fake.
+    """
+    stream_bytes = f"BT /F1 12 Tf 10 300 Td ({text}) Tj ET".encode("latin-1")
+    objects = [
+        b"1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n",
+        b"2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n",
+        b"3 0 obj\n<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 4 0 R >> >> "
+        b"/MediaBox [0 0 400 400] /Contents 5 0 R >>\nendobj\n",
+        b"4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n",
+        b"5 0 obj\n<< /Length "
+        + str(len(stream_bytes)).encode()
+        + b" >>\nstream\n"
+        + stream_bytes
+        + b"\nendstream\nendobj\n",
+    ]
+
+    header = b"%PDF-1.4\n"
+    offsets = [0]  # object 0 is the free-list head
+    body = b""
+    pos = len(header)
+    for obj in objects:
+        offsets.append(pos)
+        body += obj
+        pos += len(obj)
+
+    xref_start = len(header) + len(body)
+    xref = b"xref\n0 %d\n" % (len(objects) + 1)
+    xref += b"0000000000 65535 f \n"
+    for offset in offsets[1:]:
+        xref += ("%010d 00000 n \n" % offset).encode()
+
+    trailer = b"trailer\n<< /Size %d /Root 1 0 R >>\nstartxref\n%d\n%%%%EOF" % (
+        len(objects) + 1,
+        xref_start,
+    )
+    return header + body + xref + trailer
+
+
+async def test_parse_stores_llm_provenance(
+    sm: async_sessionmaker[AsyncSession],
+) -> None:
+    resume_id = await _make_resume_row(sm)
+    storage = _FakeStorage()
+    parser = _FakeLlmParser()
+
+    await _parse_resume_async(resume_id, sm=sm, storage=storage, parser=parser)
+
+    async with sm() as session:
+        row = await session.get(Resume, resume_id)
+        assert row is not None
+        assert row.parse_status == ResumeParseStatus.PARSED
+        assert row.parsed_json is not None
+        assert row.parsed_json["parser_name"] == "llm.gemini.v1"
+        assert row.parse_error is None
+    assert storage.read_calls == 1
+
+
+async def test_parse_falls_back_to_library_provenance(
+    sm: async_sessionmaker[AsyncSession],
+) -> None:
+    resume_id = await _make_resume_row(sm)
+    storage = _FakeStorage(
+        content=_valid_pdf_bytes(
+            "Fake Name Software Engineer with five years experience in Python and cloud tools."
+        )
+    )
+    parser = FallbackResumeParser(primary=_AlwaysFailingPrimary(), fallback=LibraryResumeParser())
+
+    await _parse_resume_async(resume_id, sm=sm, storage=storage, parser=parser)
+
+    async with sm() as session:
+        row = await session.get(Resume, resume_id)
+        assert row is not None
+        assert row.parse_status == ResumeParseStatus.PARSED
+        assert row.parsed_json is not None
+        assert row.parsed_json["parser_name"] == "library.v1"
+        assert row.parse_error is None
+    assert storage.read_calls == 1

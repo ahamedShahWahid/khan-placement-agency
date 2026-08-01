@@ -16,6 +16,7 @@ Load-bearing invariants for the Celery tasks (`worker/src/jobify_worker`): parse
 - **3-txn split** (`parse.py:_parse_resume_async`): Txn1 load + idempotency gate + mark `parsing`; (no DB) read blob + extract + parse; Txn3 reload, verify still `parsing`, write `parsed_json` + `parsed`. A lock across extraction starves writers — keep the split.
 - **Retry:** `ParserError` → immediate `failed`; `TransientParserError` → autoretry ×3 exp backoff; unknown → wrapped. On exhaustion the row is marked `failed` BEFORE the raise (no wedge at `parsing`).
 - **Eager mode + running loop:** with `JOBIFY_CELERY_TASK_ALWAYS_EAGER=true` inside an async request, `asyncio.run()` would explode — shared `async_bridge.run_async()` dispatches to a fresh thread. Tests rely on this.
+- **Parser selection:** `get_resume_parser()` (runtime.py, explainer-precedent lazy singleton) — `llm` (default) = `FallbackResumeParser(GeminiResumeParser, LibraryResumeParser)`; ANY LLM failure degrades to library (`parse.llm-failed` log + `parser_name` provenance in the stored row), extraction `ParserError`s stay permanent. Keyless `llm` degrades to library at build time (no raise, unlike the explainer). `thinking_budget=0` + `max_output_tokens=8192` are load-bearing in `llm_parser.py`.
 
 ## Embedding worker (Gemini) — spec `2026-05-19-embedding-worker-design.md`
 

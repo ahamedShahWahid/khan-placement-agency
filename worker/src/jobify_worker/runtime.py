@@ -14,16 +14,20 @@ from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING
 
+import structlog
 from celery.signals import worker_process_init, worker_shutting_down
 from sqlalchemy.pool import NullPool
 
 from jobify_worker.celery_app import settings
+
+_log = structlog.get_logger(__name__)
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
     from jobify.integrations.embeddings.gemini import GeminiEmbeddingProvider
     from jobify.integrations.notifications.base import EmailChannel
+    from jobify.integrations.parser.base import ResumeParser
     from jobify.integrations.storage.base import Storage
     from jobify.scoring.explainer import MatchExplainer
 
@@ -200,3 +204,56 @@ def get_match_explainer() -> MatchExplainer:
         else:
             raise ValueError(f"unknown match_explainer: {settings.match_explainer!r}")
     return _match_explainer
+
+
+# --- Per-worker resume parser ---
+
+_resume_parser: ResumeParser | None = None
+
+
+def get_resume_parser() -> ResumeParser:
+    """Return the worker's resume parser, building it lazily.
+
+    Reads ``settings.resume_parser``:
+    - ``"library"`` — ``LibraryResumeParser`` (deterministic, no network).
+    - ``"llm"``     — ``FallbackResumeParser(GeminiResumeParser, LibraryResumeParser)``.
+
+    Unlike ``get_match_explainer``, a missing Gemini key with ``"llm"`` selected
+    degrades to the library parser with a warning instead of raising — the
+    parser has a same-quality-as-today fallback, so keyless dev boots fine.
+    Same monkeypatch-before-first-call contract as the other factories.
+    """
+    global _resume_parser
+    if _resume_parser is None:
+        if settings.resume_parser == "library":
+            from jobify.integrations.parser.library import LibraryResumeParser
+
+            _resume_parser = LibraryResumeParser()
+        elif settings.resume_parser == "llm":
+            if settings.gemini_api_key is None:
+                from jobify.integrations.parser.library import LibraryResumeParser
+
+                _log.warning("resume-parser.no-gemini-key-degrading-to-library")
+                _resume_parser = LibraryResumeParser()
+            else:
+                from google import genai
+
+                from jobify.integrations.parser.fallback import FallbackResumeParser
+                from jobify.integrations.parser.library import LibraryResumeParser
+                from jobify.integrations.parser.llm_parser import GeminiResumeParser
+
+                _resume_parser = FallbackResumeParser(
+                    primary=GeminiResumeParser(
+                        client=genai.Client(
+                            api_key=settings.gemini_api_key.get_secret_value(),
+                            http_options=genai.types.HttpOptions(
+                                timeout=int(settings.provider_read_timeout_seconds * 1000)
+                            ),
+                        ),
+                        model=settings.resume_parser_model,
+                    ),
+                    fallback=LibraryResumeParser(),
+                )
+        else:
+            raise ValueError(f"unknown resume_parser: {settings.resume_parser!r}")
+    return _resume_parser
