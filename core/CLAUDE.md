@@ -43,6 +43,10 @@ Every domain table: `id` (uuid4), `created_at`, `updated_at`, `deleted_at TIMEST
 - Scopes are `StrEnum` at the boundary, TEXT in DB; reserved scopes ship default `false` so impls skip an enum migration.
 - **Adding a Postgres enum value** can't share a txn with other DDL. Try `op.get_context().autocommit_block()` first; our async setup trips on `_in_external_transaction` — Alembic 0014's `bind.commit()` + `run_async(...)` is a **documented exception, DO NOT copy unprompted** (document the error first).
 
+## LLM parser — spec `2026-08-01-llm-resume-parsing-design.md`
+
+- **LLM parser (spec `2026-08-01-llm-resume-parsing-design.md`):** `parser/llm_parser.py` is the ONLY module importing `google.genai` in the parser package — never re-export `GeminiResumeParser` from `parser/__init__` (would drag genai into every import). `thinking_budget=0` + `max_output_tokens=8192` are load-bearing (explainer starvation precedent). `LlmParserError(ParserError)` = post-extraction LLM failure; `FallbackResumeParser` catches it (and any non-ParserError) → library fallback + `parse.llm-failed` log; plain extraction `ParserError`s propagate (permanent for any parser). Two eval lanes: CI = library at 0.85 (deterministic); acceptance 0.90 = on-demand LLM lane, record committed at `core/data/parse_eval/LLM_EVAL_REPORT.md` — refresh it in the same commit as any prompt/model/dataset change. (Report pending — first measurement blocked on free-tier daily quota, see the llm-resume-parsing PR.)
+
 ## Match explanations — specs `p2.4` + `2026-05-28-llm-match-explanations-design.md`
 
 The explainer modules live here (`jobify` integrations); they are invoked inline by the score workers (see `worker/CLAUDE.md`).
