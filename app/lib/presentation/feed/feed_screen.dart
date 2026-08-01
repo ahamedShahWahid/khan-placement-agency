@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:jobify_app/data/feed/feed_dto.dart';
 import 'package:jobify_app/data/feed/feed_visit_repository_impl.dart';
 import 'package:jobify_app/presentation/feed/feed_controller.dart';
+import 'package:jobify_app/presentation/feed/feed_filter_bar.dart';
+import 'package:jobify_app/presentation/feed/feed_filters_provider.dart';
 import 'package:jobify_app/presentation/feed/feed_item_card.dart';
 import 'package:jobify_app/presentation/feed/feed_summary_controller.dart';
 import 'package:jobify_app/presentation/feed/feed_summary_row.dart';
@@ -158,6 +160,8 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                 // ("BoxConstraints forces an infinite height").
                 // IntrinsicHeight resolves a concrete height first.
                 const IntrinsicHeight(child: FeedSummaryRow()),
+                const SizedBox(height: JobifySpacing.md),
+                const FeedFilterBar(),
               ],
             ),
           ),
@@ -167,11 +171,27 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
               onRetry: () =>
                   ref.read(feedControllerProvider.notifier).refresh(),
               isEmpty: (s) => s.items.isEmpty,
-              empty: () => const JobifyEmptyState(
-                headline: "We're still looking for matches",
-                body: 'Upload a resume to help us find you better roles.',
-                icon: Icons.search_off,
-              ),
+              empty: () {
+                final filters = ref.watch(feedFiltersControllerProvider);
+                if (filters.isEmpty) {
+                  return const JobifyEmptyState(
+                    headline: "We're still looking for matches",
+                    body: 'Upload a resume to help us find you better roles.',
+                    icon: Icons.search_off,
+                  );
+                }
+                return JobifyEmptyState(
+                  headline: 'Nothing matches your filters',
+                  body: 'Try removing a filter or broadening your search.',
+                  icon: Icons.filter_alt_off,
+                  primaryAction: TextButton(
+                    onPressed: () => ref
+                        .read(feedFiltersControllerProvider.notifier)
+                        .clear(),
+                    child: const Text('Clear filters'),
+                  ),
+                );
+              },
               data: (s) => RefreshIndicator(
                 onRefresh: _refreshAll,
                 child: ListView.separated(

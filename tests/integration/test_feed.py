@@ -45,6 +45,10 @@ async def _make_job_and_employer(
     title: str = "Engineer",
     employer_name: str = "Acme",
     status_value: JobStatus = JobStatus.OPEN,
+    locations: list[str] | None = None,
+    min_exp_years: int = 1,
+    max_exp_years: int = 5,
+    ctc_max: float | None = None,
 ) -> tuple[Job, Employer]:
     employer = Employer(name=employer_name, name_norm=employer_name.lower())
     session.add(employer)
@@ -53,9 +57,10 @@ async def _make_job_and_employer(
         employer_id=employer.id,
         title=title,
         description="x",
-        locations=["Bangalore"],
-        min_exp_years=1,
-        max_exp_years=5,
+        locations=locations if locations is not None else ["Bangalore"],
+        min_exp_years=min_exp_years,
+        max_exp_years=max_exp_years,
+        ctc_max=ctc_max,
         status=status_value,
     )
     session.add(job)
@@ -422,3 +427,207 @@ async def test_feed_etag_changes_on_feedback_change(
     items = r2.json()["items"]
     assert len(items) == 1
     assert items[0]["match"]["my_feedback"] == "up"
+
+
+async def _seed_three(session: AsyncSession, email: str) -> tuple[User, Applicant]:
+    """Three surfaced matches: Flutter/Pune, Backend/Bangalore, Data/Remote."""
+    user, applicant = await _make_applicant(session, email=email)
+    j1, _ = await _make_job_and_employer(
+        session,
+        title="Flutter Developer",
+        employer_name="Acme Mobile",
+        locations=["Pune"],
+        min_exp_years=2,
+        max_exp_years=5,
+        ctc_max=1_200_000,
+    )
+    j2, _ = await _make_job_and_employer(
+        session,
+        title="Backend Engineer",
+        employer_name="Beta Systems",
+        locations=["Bangalore"],
+        min_exp_years=0,
+        max_exp_years=2,
+        ctc_max=600_000,
+    )
+    j3, _ = await _make_job_and_employer(
+        session,
+        title="Data Analyst",
+        employer_name="Gamma Insights",
+        locations=["Remote"],
+        min_exp_years=1,
+        max_exp_years=8,
+        ctc_max=None,
+    )
+    await _make_match(session, applicant_id=applicant.id, job_id=j1.id, total_score=0.9)
+    await _make_match(session, applicant_id=applicant.id, job_id=j2.id, total_score=0.8)
+    await _make_match(session, applicant_id=applicant.id, job_id=j3.id, total_score=0.7)
+    await session.commit()
+    return user, applicant
+
+
+@pytest.mark.integration
+async def test_feed_q_matches_title_and_employer_case_insensitive(
+    session: AsyncSession, async_client: AsyncClient
+) -> None:
+    user, _ = await _seed_three(session, "q1@example.com")
+    h = _token_headers(user)
+
+    resp = await async_client.get("/v1/feed", params={"q": "flutter"}, headers=h)
+    assert [i["job"]["title"] for i in resp.json()["items"]] == ["Flutter Developer"]
+
+    resp = await async_client.get("/v1/feed", params={"q": "beta"}, headers=h)
+    assert [i["job"]["title"] for i in resp.json()["items"]] == ["Backend Engineer"]
+
+
+@pytest.mark.integration
+async def test_feed_q_whitespace_treated_as_absent(
+    session: AsyncSession, async_client: AsyncClient
+) -> None:
+    user, _ = await _seed_three(session, "q2@example.com")
+    resp = await async_client.get("/v1/feed", params={"q": "   "}, headers=_token_headers(user))
+    assert len(resp.json()["items"]) == 3
+
+
+@pytest.mark.integration
+async def test_feed_q_ilike_metacharacters_literal(
+    session: AsyncSession, async_client: AsyncClient
+) -> None:
+    user, applicant = await _make_applicant(session, email="q3@example.com")
+    j1, _ = await _make_job_and_employer(session, title="100% Remote QA")
+    j2, _ = await _make_job_and_employer(session, title="100x Growth QA", employer_name="Bx")
+    await _make_match(session, applicant_id=applicant.id, job_id=j1.id, total_score=0.9)
+    await _make_match(session, applicant_id=applicant.id, job_id=j2.id, total_score=0.8)
+    await session.commit()
+
+    resp = await async_client.get("/v1/feed", params={"q": "100%"}, headers=_token_headers(user))
+    assert [i["job"]["title"] for i in resp.json()["items"]] == ["100% Remote QA"]
+
+
+@pytest.mark.integration
+async def test_feed_location_or_semantics_case_insensitive(
+    session: AsyncSession, async_client: AsyncClient
+) -> None:
+    user, _ = await _seed_three(session, "loc@example.com")
+    resp = await async_client.get(
+        "/v1/feed",
+        params=[("location", "pune"), ("location", "REMOTE")],
+        headers=_token_headers(user),
+    )
+    titles = [i["job"]["title"] for i in resp.json()["items"]]
+    assert titles == ["Flutter Developer", "Data Analyst"]  # score order kept
+
+
+@pytest.mark.integration
+async def test_feed_min_years_fit_band(session: AsyncSession, async_client: AsyncClient) -> None:
+    user, _ = await _seed_three(session, "yrs@example.com")
+    # 6 years: fits only Data Analyst (1-8); Flutter is 2-5, Backend 0-2.
+    resp = await async_client.get("/v1/feed", params={"min_years": 6}, headers=_token_headers(user))
+    assert [i["job"]["title"] for i in resp.json()["items"]] == ["Data Analyst"]
+
+
+@pytest.mark.integration
+async def test_feed_min_ctc_keeps_undisclosed(
+    session: AsyncSession, async_client: AsyncClient
+) -> None:
+    user, _ = await _seed_three(session, "ctc@example.com")
+    # 10L: drops Backend (6L max), keeps Flutter (12L) AND Data (undisclosed).
+    resp = await async_client.get(
+        "/v1/feed", params={"min_ctc": 1_000_000}, headers=_token_headers(user)
+    )
+    titles = [i["job"]["title"] for i in resp.json()["items"]]
+    assert titles == ["Flutter Developer", "Data Analyst"]
+
+
+@pytest.mark.integration
+async def test_feed_filters_compose_with_and(
+    session: AsyncSession, async_client: AsyncClient
+) -> None:
+    user, _ = await _seed_three(session, "and@example.com")
+    resp = await async_client.get(
+        "/v1/feed",
+        params={"q": "developer", "location": "Pune", "min_years": 3},
+        headers=_token_headers(user),
+    )
+    assert [i["job"]["title"] for i in resp.json()["items"]] == ["Flutter Developer"]
+
+
+@pytest.mark.integration
+async def test_feed_filtered_pagination_and_cursor_binding(
+    session: AsyncSession, async_client: AsyncClient
+) -> None:
+    user, _ = await _seed_three(session, "page@example.com")
+    h = _token_headers(user)
+
+    # Filter matching 2 jobs (Flutter + Data via min_ctc), page size 1.
+    p1 = await async_client.get("/v1/feed", params={"min_ctc": 1_000_000, "limit": 1}, headers=h)
+    body = p1.json()
+    assert [i["job"]["title"] for i in body["items"]] == ["Flutter Developer"]
+    cur = body["next_cursor"]
+    assert cur is not None
+
+    # Same filters + cursor → page 2.
+    p2 = await async_client.get(
+        "/v1/feed", params={"min_ctc": 1_000_000, "limit": 1, "cursor": cur}, headers=h
+    )
+    assert [i["job"]["title"] for i in p2.json()["items"]] == ["Data Analyst"]
+
+    # Same cursor WITHOUT the filter → 400 invalid_cursor.
+    p3 = await async_client.get("/v1/feed", params={"cursor": cur}, headers=h)
+    assert p3.status_code == 400
+
+    # Same cursor with a DIFFERENT filter value → 400.
+    p4 = await async_client.get("/v1/feed", params={"min_ctc": 999, "cursor": cur}, headers=h)
+    assert p4.status_code == 400
+
+
+@pytest.mark.integration
+async def test_feed_unfiltered_cursor_rejected_once_filters_added(
+    session: AsyncSession, async_client: AsyncClient
+) -> None:
+    user, _ = await _seed_three(session, "legacy@example.com")
+    h = _token_headers(user)
+    p1 = await async_client.get("/v1/feed", params={"limit": 1}, headers=h)
+    cur = p1.json()["next_cursor"]
+    assert cur is not None  # f-less cursor (also the pre-deploy legacy shape)
+
+    ok = await async_client.get("/v1/feed", params={"cursor": cur}, headers=h)
+    assert ok.status_code == 200  # still valid unfiltered
+
+    bad = await async_client.get("/v1/feed", params={"cursor": cur, "q": "flutter"}, headers=h)
+    assert bad.status_code == 400
+
+
+@pytest.mark.integration
+async def test_feed_filter_validation_422(session: AsyncSession, async_client: AsyncClient) -> None:
+    user, _ = await _make_applicant(session, email="v@example.com")
+    await session.commit()
+    h = _token_headers(user)
+    r1 = await async_client.get("/v1/feed", params={"min_years": -1}, headers=h)
+    assert r1.status_code == 422
+    r2 = await async_client.get("/v1/feed", params={"min_ctc": -5}, headers=h)
+    assert r2.status_code == 422
+    r3 = await async_client.get("/v1/feed", params={"q": "x" * 101}, headers=h)
+    assert r3.status_code == 422
+
+
+@pytest.mark.integration
+async def test_feed_min_years_above_bound_returns_422(
+    session: AsyncSession, async_client: AsyncClient
+) -> None:
+    user, _ = await _make_applicant(session, email="v2@example.com")
+    await session.commit()
+    h = _token_headers(user)
+    resp = await async_client.get("/v1/feed", params={"min_years": 9999999999}, headers=h)
+    assert resp.status_code == 422
+
+
+@pytest.mark.integration
+async def test_feed_location_list_capped_at_20(
+    session: AsyncSession, async_client: AsyncClient
+) -> None:
+    user, _ = await _make_applicant(session, email="cap@example.com")
+    await session.commit()
+    params = [("location", f"City{i}") for i in range(21)]
+    resp = await async_client.get("/v1/feed", params=params, headers=_token_headers(user))
+    assert resp.status_code == 422

@@ -6,6 +6,7 @@ import 'package:jobify_app/data/consents/consents_repository.dart';
 import 'package:jobify_app/data/dsr/dsr_dto.dart';
 import 'package:jobify_app/data/dsr/dsr_repository.dart';
 import 'package:jobify_app/data/feed/feed_dto.dart';
+import 'package:jobify_app/data/feed/feed_filters.dart';
 import 'package:jobify_app/data/feed/feed_repository.dart';
 import 'package:jobify_app/data/feed/match_feedback_dto.dart';
 import 'package:jobify_app/data/feed/match_feedback_rating.dart';
@@ -75,8 +76,14 @@ class FakeAuthRepository implements AuthRepository {
 class FakeFeedRepository implements FeedRepository {
   FakeFeedRepository({required this.items});
   final List<FeedItemDto> items;
+  FeedFilters? lastFilters;
   @override
-  Future<FeedPageDto> fetchPage({String? cursor, int limit = 20}) async {
+  Future<FeedPageDto> fetchPage({
+    String? cursor,
+    int limit = 20,
+    FeedFilters? filters,
+  }) async {
+    lastFilters = filters;
     return FeedPageDto(items: items);
   }
 }
