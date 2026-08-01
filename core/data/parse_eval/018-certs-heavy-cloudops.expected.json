@@ -1,0 +1,20 @@
+{
+  "name": "Alok Verma",
+  "email": "alok.verma@example.com",
+  "phone": "+91 97110 88234",
+  "skills": [
+    "ansible",
+    "aws",
+    "azure",
+    "bash",
+    "docker",
+    "gcp",
+    "google cloud",
+    "grafana",
+    "jenkins",
+    "kubernetes",
+    "linux",
+    "prometheus",
+    "terraform"
+  ]
+}

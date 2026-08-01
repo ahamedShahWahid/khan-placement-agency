@@ -43,6 +43,10 @@ Every domain table: `id` (uuid4), `created_at`, `updated_at`, `deleted_at TIMEST
 - Scopes are `StrEnum` at the boundary, TEXT in DB; reserved scopes ship default `false` so impls skip an enum migration.
 - **Adding a Postgres enum value** can't share a txn with other DDL. Try `op.get_context().autocommit_block()` first; our async setup trips on `_in_external_transaction` — Alembic 0014's `bind.commit()` + `run_async(...)` is a **documented exception, DO NOT copy unprompted** (document the error first).
 
+## LLM parser — spec `2026-08-01-llm-resume-parsing-design.md`
+
+- **LLM parser (spec `2026-08-01-llm-resume-parsing-design.md`):** `parser/llm_parser.py` is the ONLY module importing `google.genai` in the parser package — never re-export `GeminiResumeParser` from `parser/__init__` (would drag genai into every import). `thinking_budget=0` + `max_output_tokens=8192` are load-bearing (explainer starvation precedent). `LlmParserError(ParserError)` = post-extraction LLM failure; `FallbackResumeParser` catches it (and any non-ParserError) → library fallback + `parse.llm-failed` log; plain extraction `ParserError`s propagate (permanent for any parser). Two eval lanes: CI = library at 0.85 (deterministic); acceptance 0.90 = on-demand LLM lane, record committed at `core/data/parse_eval/LLM_EVAL_REPORT.md` — refresh it in the same commit as any prompt/model/dataset change. (Report pending — first measurement blocked on the free-tier key's *interactive* `generate_content` daily quota, see the llm-resume-parsing PR.) Eval/bulk go through `parse_texts_batch` (Batch API, a separate quota pool from interactive); the live parse path stays interactive — don't move it to batch, the 10-min first-match criterion depends on it.
+
 ## Match explanations — specs `p2.4` + `2026-05-28-llm-match-explanations-design.md`
 
 The explainer modules live here (`jobify` integrations); they are invoked inline by the score workers (see `worker/CLAUDE.md`).
@@ -60,6 +64,7 @@ The explainer modules live here (`jobify` integrations); they are invoked inline
 - **`uv run pytest -m eval`** → `test_library_parser_meets_quality_gate` → `jobify.eval.parse_f1.eval_gold_dataset()`. CI runs it (`lint-types-unit-eval`, no DB) before integration.
 - **Gate** (spec §13 P1): macro-F1 ≥ 0.85; floors `email ≥ 0.95`/`phone ≥ 0.85`/`name ≥ 0.70`/`skills ≥ 0.75`. **Only those 4 fields gate** (others print only). Set-skills F1 counts FPs (measures `_extract_skills` over-match drift).
 - New gold example: drop a pair with the next id, re-run `-m eval -v -s`; if it tanks a floor, fix the expectation or document the limitation.
+- **20 examples (001-020)** — 009-020 are deliberately hard (mangled two-column text, unconventional headers, non-tech vocabularies, name mid-header). `_extract_certifications` requires the literal word "certif\*" — a "PAPERS & BADGES"-style header with real credentials scores zero on that (non-gated) field; `_extract_skills`'s substring containment has predictable false positives ("gin" in "engineer", "sql"/"postgres" as substrings of "postgresql"). Full list in `core/data/parse_eval/000_README.md`'s "Documented limitations" section.
 
 ## Seeding — spec `2026-05-20-p2.0-jobs-and-seeding-design.md`
 

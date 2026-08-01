@@ -1,0 +1,63 @@
+*** CONFIDENTIAL RESUME ***
+
+== Resume of Lakshmi Venkatesan ==
+Senior Financial Analyst
+
+Chennai, Tamil Nadu | +91 91500 62347
+
+SUMMARY
+Financial analyst with 9 years of experience in FP&A, budgeting, and
+management reporting for manufacturing and retail businesses. Skilled
+in building rolling forecasts, variance analysis, and board-level
+reporting decks. Advanced Excel user with hands-on SQL and Power BI
+experience for self-serve reporting.
+
+EXPERIENCE
+
+Senior Financial Analyst, Ashok Leyland
+Jul 2020 - Present
+- Own the monthly management reporting pack for the commercial vehicles
+  division, covering revenue, margin, and working capital.
+- Built a rolling 18-month forecast model used by the CFO's office.
+- Automated recurring MIS reports using SQL and Power BI, cutting the
+  monthly close reporting cycle from 6 days to 2 days.
+
+Financial Analyst, TVS Motor Company
+May 2016 - Jun 2020
+- Supported annual budgeting and quarterly forecasting for two business
+  units.
+- Built variance-analysis dashboards in Excel and Power BI for plant
+  leadership reviews.
+- Assisted with statutory audit data requests and schedules.
+
+Finance Executive, TVS Motor Company
+Jun 2014 - Apr 2016
+- Prepared vendor payment schedules and reconciled sub-ledgers monthly.
+- Supported the treasury team with daily cash-position reporting.
+- Helped the finance manager close a two-week gap during a colleague's
+  leave by taking over the vendor reconciliation process without any
+  slippage in the payment cycle.
+
+ACHIEVEMENTS
+Shortlisted for Ashok Leyland's internal "Finance Excellence" award in
+2023 for the forecast-model rebuild that cut the CFO office's monthly
+review preparation time in half. Frequently asked to walk new analysts
+through the reporting pack structure during their first few weeks, and
+has put together a short onboarding guide that the team still uses.
+
+EDUCATION
+MBA Finance, Great Lakes Institute of Management, Chennai, 2014
+B.Com, Loyola College, Chennai, 2012
+
+CERTIFICATIONS
+CFA Level II Candidate
+Advanced Excel and Power BI for Finance, 2021
+
+SKILLS
+Excel, SQL, Power BI, Financial Modeling, Variance Analysis, Budgeting,
+Forecasting, FP&A
+
+------------------------------------------------------------
+For queries regarding this profile, please write to:
+lakshmi.venkatesan@example.com
+------------------------------------------------------------

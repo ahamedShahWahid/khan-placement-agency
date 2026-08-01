@@ -29,11 +29,10 @@ from jobify.integrations.parser.base import (
     ResumeParser,
     TransientParserError,
 )
-from jobify.integrations.parser.library import LibraryResumeParser
 from jobify.outbox import enqueue_task
 from jobify_worker.async_bridge import run_async
 from jobify_worker.celery_app import celery_app
-from jobify_worker.runtime import get_session_maker, get_storage
+from jobify_worker.runtime import get_resume_parser, get_session_maker, get_storage
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -99,11 +98,12 @@ async def _parse_resume_async(
     """Async body — split out for unit testing with injected fakes.
 
     Production callers (the Celery task) pass nothing; this resolves the real
-    sessionmaker, configured storage adapter, and LibraryResumeParser.
+    sessionmaker, configured storage adapter, and the configured resume parser
+    (``get_resume_parser()`` — see ``runtime.py``).
     """
     sm = sm or get_session_maker()
     storage = storage or get_storage()
-    parser = parser or LibraryResumeParser()
+    parser = parser or get_resume_parser()
 
     # --- Transaction 1: load + gate + mark parsing ---
     async with sm() as session:

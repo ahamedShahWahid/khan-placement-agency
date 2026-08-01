@@ -75,6 +75,8 @@ In addition to database, Redis, storage, and logging variables in `.env`:
 | `JOBIFY_OUTBOX_RETENTION_DAYS` | `30` | Terminal outbox retention before cleanup |
 | `JOBIFY_OUTBOX_CLEANUP_BATCH_SIZE` | `1000` | Terminal rows physically deleted per cleanup run |
 | `JOBIFY_SCORE_BATCH_SIZE` | `100` | Applicant/job pairs processed per task batch |
+| `JOBIFY_RESUME_PARSER` | `llm` | Resume parser: `llm` (Gemini with library fallback) or `library` (deterministic, no network). Keyless + `llm` degrades to library with a warning. |
+| `JOBIFY_RESUME_PARSER_MODEL` | `gemini-2.5-flash` | Gemini model for resume parsing. |
 
 ### Notification lease rollout
 

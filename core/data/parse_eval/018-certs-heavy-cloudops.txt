@@ -1,0 +1,61 @@
+Alok Verma
+
+alok.verma@example.com
++91 97110 88234
+Noida, Uttar Pradesh
+
+SUMMARY
+Cloud operations engineer with 5 years of experience across AWS, GCP,
+and Kubernetes environments. Certification-heavy background with a
+focus on reliability, cost optimisation, and infrastructure automation.
+Currently supporting a multi-cloud platform for a logistics company.
+
+EXPERIENCE
+
+Cloud Operations Engineer, RouteMetrics
+Feb 2023 - Present
+- Manage EKS and GKE clusters serving the company's core platform.
+- Automated infrastructure provisioning using Terraform and Ansible.
+- Set up Prometheus and Grafana dashboards for cluster-wide monitoring.
+- Reduced monthly cloud spend by 18% through right-sizing and reserved
+  instance planning.
+
+Cloud Support Engineer, Netweb Cloud Services
+Jan 2021 - Jan 2023
+- Provided L2 support for AWS and Azure customers, focused on networking
+  and IAM issues.
+- Wrote Ansible playbooks to automate routine patching across 200+ VMs.
+- Built a Jenkins pipeline for the team's internal tooling releases.
+- Wrote internal documentation for the on-call escalation process,
+  which the team still uses as the starting point for new hires.
+- Volunteered for weekend patching windows on a rotating basis and
+  kept a clean track record with zero unplanned downtime.
+
+ACHIEVEMENTS
+Recognised by RouteMetrics leadership for the cost-optimisation work,
+which freed up budget for two additional monitoring tools the team had
+been asking for. Regularly shares certification study notes internally
+and has informally coached three colleagues through their first AWS
+certification exam. Represented the infrastructure team at an internal
+tech talk on right-sizing cloud workloads, drawing on the RouteMetrics
+cost work as the main case study.
+
+EDUCATION
+B.Tech Electronics and Communication, ABES Engineering College, 2020
+
+CERTIFICATIONS
+AWS Certified Solutions Architect - Associate, 2021
+AWS Certified DevOps Engineer - Professional, 2022
+Google Cloud Certified Professional Cloud Architect, 2022
+Certified Kubernetes Administrator (CKA), 2022
+Certified Kubernetes Application Developer (CKAD), 2023
+HashiCorp Certified Terraform Associate, 2023
+Microsoft Certified Azure Administrator Associate, 2023
+Certified Ansible Automation Specialist, 2023
+AWS Certified Security - Specialty, 2024
+
+SKILLS
+AWS, GCP, Azure, Kubernetes, Terraform, Ansible, Docker, Prometheus,
+Grafana, Jenkins, Linux, Bash
+
+Expected CTC: Rs 16,50,000 per annum

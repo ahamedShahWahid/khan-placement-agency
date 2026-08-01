@@ -1,0 +1,61 @@
+Devjyoti
+Chatterjee — QA Engineer
+
+devjyoti.chatterjee
+@qatestlabs.co.in
++91 90271 63840
+Kolkata, West Bengal
+
+SUMMARY   CORE SKILLS
+Detail-oriented QA engineer   Selenium, Java, TestNG
+with 5 years of experience   Postman, JIRA, REST API
+in manual and automation   Cypress, SQL, Git
+testing for fintech products.  Agile, Jenkins
+
+EXPERIENCE
+
+Senior QA Engineer, PayEase Technologies
+Mar 2022 - Present
+- Automated 300+ regression test cases using Selenium and TestNG.
+- Built a REST API test suite in Postman covering 40 payment endpoints.
+- Set up a Jenkins pipeline to run the automation suite on every merge.
+- Reduced release-cycle manual testing effort by 35%.
+
+QA Engineer, Cognizant Technology Solutions
+Jul 2019 - Feb 2022
+- Executed manual test cycles for a banking client's core platform.
+- Logged and tracked defects in JIRA across 4 sprint teams.
+- Wrote SQL queries to validate data migrations between environments.
+- Contributed to test-case reviews for two client-facing releases per quarter.
+
+QA Trainee, Cognizant Technology Solutions
+Jan 2019 - Jun 2019
+- Shadowed senior testers on smoke and sanity testing for a retail client.
+- Learned Git workflows and the team's test-management tooling.
+- Documented over 50 defect reports and helped write the team's first
+  smoke-test checklist for new builds.
+
+ACHIEVEMENTS
+Recognised with a "Quality Champion" award at PayEase Technologies for
+driving down escaped defects in the payments module over two quarters.
+Presented a lightning talk on API test strategy at an internal QA guild
+meetup attended by testers from four different product teams. Also
+volunteers as a mentor for junior testers joining the automation team,
+helping them get comfortable with the existing test framework and the
+team's release checklist within their first month.
+
+EDUCATION
+B.Tech Information Technology, Jadavpur University, 2018
+
+CERTIFICATIONS
+ISTQB Certified Tester, Foundation Level, 2020
+
+SKILLS
+Selenium, Java, TestNG, Postman, JIRA, REST API, Cypress, SQL, Git,
+Agile, Jenkins, Manual Testing
+
+Open to relocating within India for the right opportunity, and prefers
+teams that treat testing as a first-class part of the development
+process rather than an afterthought before release.
+
+Expected CTC: Rs. 11,00,000 per annum

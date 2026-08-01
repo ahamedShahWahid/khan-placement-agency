@@ -1,7 +1,14 @@
 # Parse F1 gold dataset
 
-Eight hand-crafted synthetic resumes covering realistic patterns for the
-Indian placement-market context Jobify targets. Each example is two files:
+Twenty hand-crafted synthetic resumes covering realistic patterns for the
+Indian placement-market context Jobify targets. The first eight (001-008)
+are straightforward; 009-020 add deliberately hard cases (mangled
+two-column extraction artifacts, unconventional section headers, phone
+numbers without a country code, Hinglish prose, non-tech vocabularies,
+a name hidden mid-header, career gaps, long multi-role documents) so the
+dataset stresses the library parser's regex/keyword heuristics and gives
+the future LLM parser lane (Task 6) real signal. Each example is two
+files:
 
 - `<id>-<name-slug>.txt` — raw resume text (UTF-8, no extraction needed).
 - `<id>-<name-slug>.expected.json` — expected `name`, `email`, `phone`, and
@@ -57,6 +64,36 @@ When the LLM parser ships, all seven fields will gate.
 
 Below either gate fails the test. Ratchet upward as the parser improves —
 spec target is ≥ 0.90 before launch.
+
+## Documented limitations (non-gated fields)
+
+These are known, accepted gaps in the library parser's non-gated
+extractors — surfaced by the harder examples in 009-020. They don't fail
+CI (only `name`/`email`/`phone`/`skills` gate) but are worth tracking so
+the LLM parser lane has a concrete bar to clear:
+
+- **Certifications keyed on the literal word "certif\*"** —
+  `009-020/017-unconventional-headers-dev.txt` lists two real
+  certifications under a "PAPERS & BADGES" header instead of a
+  "CERTIFICATIONS"-style header/keyword; `_extract_certifications` finds
+  zero entries. Any resume that doesn't use the word
+  "certified"/"certification" near a credential is invisible to this
+  extractor, regardless of header wording.
+- **`_extract_skills` substring containment produces predictable false
+  positives on common English words/proper nouns** (e.g. "gin" inside
+  "engineer"/"engineering"/"margin"/"beginning", "ember" inside "member",
+  "ios" inside "Symbiosis", "scala" inside "escalation", "perl" inside
+  "hyperlocal", "sql"/"postgres" as substrings of "postgresql"). Already
+  present in the original eight examples' FP counts; 009-020 make it more
+  visible. The `skills_dict.py` module header tracks the fix
+  (word-boundary matching) as `TODO(P3-llm-parser)`.
+- **Non-tech vocabularies score near-zero recall on `skills`** —
+  009 (FMCG sales), 013 (ops executive), 014 (school teacher), 016 (HR
+  generalist), 019 (delivery ops), 020 (financial analyst — 7 of 8
+  expected skills, e.g. "financial modeling"/"fp&a"/"power bi", are
+  outside the dict) have skills entirely or mostly outside the curated
+  tech dictionary by design; this is expected, not a bug, and is exactly
+  the gap the LLM parser is meant to close.
 
 ## Adding examples
 

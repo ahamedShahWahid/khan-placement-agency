@@ -54,6 +54,8 @@ class WorkerSettings(BaseSettings):
     match_vector_weight: float = Field(default=0.6, ge=0.0, le=1.0)
     match_explainer: Literal["templated", "llm"] = "llm"
     match_explainer_model: str = "gemini-2.5-flash"
+    resume_parser: Literal["library", "llm"] = "llm"
+    resume_parser_model: str = "gemini-2.5-flash"
     score_batch_size: int = Field(default=100, ge=1, le=1000)
 
     email_channel: Literal["logging", "ses"] = "logging"
