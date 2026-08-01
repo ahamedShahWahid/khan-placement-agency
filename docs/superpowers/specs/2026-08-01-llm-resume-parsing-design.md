@@ -157,9 +157,10 @@ bulk re-parse job, go through the Gemini **Batch API**
 
 **The LIVE path (`parse`/`parse_text`) stays interactive — never moved to
 batch.** Batch jobs are asynchronous and can take anywhere from minutes to
-hours to complete; the spec's **≤10-min first-match criterion** (§ above)
-depends on the live parse path returning within one interactive round trip
-per resume upload. `parse_texts_batch` is therefore a separate, deliberately
+hours to complete; the **≤10-min first-match criterion in
+`IMPLEMENTATION_SPEC.md`** depends on the live parse path returning within
+one interactive round trip per resume upload. `parse_texts_batch` is
+therefore a separate, deliberately
 sync method (batch create+poll is long-running job management, not
 request/response) used only by the eval lane today and reserved for a future
 bulk re-parse job — never called from the worker's parse task.

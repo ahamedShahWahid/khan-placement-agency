@@ -200,8 +200,16 @@ class GeminiResumeParser:
                 raise LlmParserError(f"llm_batch_poll_failed: {type(exc).__name__}") from exc
 
         if job.state != types.JobState.JOB_STATE_SUCCEEDED:
-            _log.debug("parse.llm-batch-job-failed", job_name=job_name, state=str(job.state))
-            raise LlmParserError(f"llm_batch_job_failed: job {job_name} state={job.state}")
+            job_error = getattr(job, "error", None)
+            _log.debug(
+                "parse.llm-batch-job-failed",
+                job_name=job_name,
+                state=str(job.state),
+                error=job_error,
+            )
+            raise LlmParserError(
+                f"llm_batch_job_failed: job {job_name} state={job.state} error={job_error}"
+            )
 
         responses = list(job.dest.inlined_responses or []) if job.dest else []
         if len(responses) != len(texts):
@@ -264,3 +272,15 @@ class GeminiResumeParser:
             # got ..."); never model-echoed content.
             _log.debug("parse.llm-raw-output", raw_model_output=(raw or "")[:500])
             raise LlmParserError(f"llm_output_invalid: {exc}") from exc
+        except Exception as exc:
+            # Blanket arm restoring the module's documented "ANY
+            # post-extraction failure raises LlmParserError" contract for
+            # whatever falls outside the two specific arms above (e.g. an
+            # unexpected error constructing ParsedResume). Type name only —
+            # never str(exc), which for this model can carry the resume's
+            # own PII the same way ValidationError's message does. In the
+            # batch loop this keeps an unforeseen failure scoped to its own
+            # index instead of raising an uncaught exception that aborts the
+            # whole batch.
+            _log.debug("parse.llm-raw-output", raw_model_output=(raw or "")[:500])
+            raise LlmParserError(f"llm_output_invalid: {type(exc).__name__}") from exc
