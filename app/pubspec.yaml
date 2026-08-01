@@ -10,6 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   # State management
   flutter_riverpod: ^3.1.0
@@ -33,7 +35,7 @@ dependencies:
   # Misc
   google_fonts: ^6.2.1
   package_info_plus: ^8.1.1
-  intl: ^0.19.0
+  intl: ^0.20.2
   uuid: ^4.5.1                  # X-Request-Id generation
   file_picker: ^8.1.4
   web: ^1.1.0                   # Blob download (recruiter résumé, web only)
@@ -62,5 +64,6 @@ dev_dependencies:
   riverpod: any
 flutter:
   uses-material-design: true
+  generate: true
   # No font assets here — google_fonts fetches Inter at runtime and caches.
   # If we later bundle Inter as an asset, register it in this `fonts:` section.

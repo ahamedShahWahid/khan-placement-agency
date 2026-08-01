@@ -1,0 +1,53 @@
+{
+  "@@locale": "hi",
+
+  "shellTabFeed": "फ़ीड",
+  "@shellTabFeed": {
+    "description": "Bottom navigation tab label for the job feed."
+  },
+
+  "shellTabSaved": "सेव्ड",
+  "@shellTabSaved": {
+    "description": "Bottom navigation tab label for saved jobs."
+  },
+
+  "shellTabApplications": "आवेदन",
+  "@shellTabApplications": {
+    "description": "Bottom navigation tab label for the applicant's applications."
+  },
+
+  "shellTabProfile": "प्रोफ़ाइल",
+  "@shellTabProfile": {
+    "description": "Bottom navigation tab label for the applicant's profile."
+  },
+
+  "commonRetry": "पुनः प्रयास करें",
+  "@commonRetry": {
+    "description": "Button label to retry a failed action or request."
+  },
+
+  "commonCancel": "रद्द करें",
+  "@commonCancel": {
+    "description": "Button label to cancel an in-progress action or dialog."
+  },
+
+  "commonSave": "सेव करें",
+  "@commonSave": {
+    "description": "Button label to save a form or setting."
+  },
+
+  "commonLoading": "लोड हो रहा है…",
+  "@commonLoading": {
+    "description": "Generic loading indicator caption."
+  },
+
+  "commonOk": "ठीक है",
+  "@commonOk": {
+    "description": "Button label to acknowledge/dismiss a dialog."
+  },
+
+  "commonSomethingWentWrong": "कुछ गलत हो गया",
+  "@commonSomethingWentWrong": {
+    "description": "Generic error headline shown when an action or load fails."
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "@@locale": "en",
+
+  "shellTabFeed": "Feed",
+  "@shellTabFeed": {
+    "description": "Bottom navigation tab label for the job feed."
+  },
+
+  "shellTabSaved": "Saved",
+  "@shellTabSaved": {
+    "description": "Bottom navigation tab label for saved jobs."
+  },
+
+  "shellTabApplications": "Applications",
+  "@shellTabApplications": {
+    "description": "Bottom navigation tab label for the applicant's applications."
+  },
+
+  "shellTabProfile": "Profile",
+  "@shellTabProfile": {
+    "description": "Bottom navigation tab label for the applicant's profile."
+  },
+
+  "commonRetry": "Retry",
+  "@commonRetry": {
+    "description": "Button label to retry a failed action or request."
+  },
+
+  "commonCancel": "Cancel",
+  "@commonCancel": {
+    "description": "Button label to cancel an in-progress action or dialog."
+  },
+
+  "commonSave": "Save",
+  "@commonSave": {
+    "description": "Button label to save a form or setting."
+  },
+
+  "commonLoading": "Loading…",
+  "@commonLoading": {
+    "description": "Generic loading indicator caption."
+  },
+
+  "commonOk": "OK",
+  "@commonOk": {
+    "description": "Button label to acknowledge/dismiss a dialog."
+  },
+
+  "commonSomethingWentWrong": "Something went wrong",
+  "@commonSomethingWentWrong": {
+    "description": "Generic error headline shown when an action or load fails."
+  }
+}
