@@ -9,6 +9,12 @@ import 'package:jobify_app/data/preferences/desired_role.dart';
 /// this app build doesn't recognise): the key is OMITTED so saving preserves
 /// the server value instead of clearing it.
 ///
+/// `language` is ALWAYS sent too (no "clear" semantics — it's always one of
+/// "en"/"hi"). Every caller that doesn't offer a language switcher (the two
+/// form screens) must seed it from the currently-loaded `PreferencesDto` and
+/// pass it through unchanged; only the Profile screen's language switcher
+/// changes it.
+///
 /// toJson() is hand-written, not code-generated: `@JsonSerializable(
 /// includeIfNull: false)` on this project's installed json_serializable +
 /// Dart SDK combination emits generated code using the "null-aware
@@ -21,6 +27,7 @@ class PreferencesUpdateDto {
     required this.desiredRole,
     required this.locations,
     required this.expectedCtc,
+    required this.language,
   });
 
   /// null = clear; unknown = preserve server value (key omitted).
@@ -32,6 +39,9 @@ class PreferencesUpdateDto {
   /// null = clear.
   final num? expectedCtc;
 
+  /// "en" | "hi". Always sent — see the class doc comment.
+  final String language;
+
   Map<String, dynamic> toJson() => {
         // `unknown` = the server sent a role this app build doesn't know;
         // omit the key so saving preserves it (an explicit null would
@@ -40,5 +50,6 @@ class PreferencesUpdateDto {
           'desired_role': desiredRole?.wireValue,
         'locations': locations,
         'expected_ctc': expectedCtc,
+        'language': language,
       };
 }

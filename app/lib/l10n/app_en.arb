@@ -1219,6 +1219,21 @@
     "description": "Segmented-button label for the dark theme."
   },
 
+  "profileLanguageLabel": "Language",
+  "@profileLanguageLabel": {
+    "description": "Heading above the English/Hindi language switcher."
+  },
+
+  "profileLanguageEnglish": "English",
+  "@profileLanguageEnglish": {
+    "description": "Segmented-button label for English. A language's own name renders in that language, so this value is identical in every ARB file."
+  },
+
+  "profileLanguageHindi": "हिन्दी",
+  "@profileLanguageHindi": {
+    "description": "Segmented-button label for Hindi. A language's own name renders in that language, so this value is identical in every ARB file."
+  },
+
   "profileSigningOutButton": "Signing out…",
   "@profileSigningOutButton": {
     "description": "Sign-out button label while the sign-out request is in flight."

@@ -775,6 +775,15 @@ class AppLocalizationsHi extends AppLocalizations {
   String get profileAppearanceDark => 'डार्क';
 
   @override
+  String get profileLanguageLabel => 'भाषा';
+
+  @override
+  String get profileLanguageEnglish => 'English';
+
+  @override
+  String get profileLanguageHindi => 'हिन्दी';
+
+  @override
   String get profileSigningOutButton => 'साइन आउट हो रहा है…';
 
   @override

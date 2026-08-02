@@ -15,6 +15,7 @@ import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/auth/auth_providers.dart';
 import 'package:jobify_app/presentation/profile/package_info_provider.dart';
 import 'package:jobify_app/presentation/profile/profile_screen.dart';
+import 'package:jobify_app/presentation/routing/locale_controller.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class _FakeRepo implements MeRepository {
@@ -35,6 +36,30 @@ class _FakePrefsRepo implements PreferencesRepository {
       );
   @override
   Future<PreferencesDto> update(PreferencesUpdateDto update) async => fetch();
+}
+
+/// Records every `update()` call so the language-switcher test can assert
+/// on the exact DTO the switcher sent.
+class _RecordingPrefsRepo implements PreferencesRepository {
+  final List<PreferencesUpdateDto> updates = [];
+
+  @override
+  Future<PreferencesDto> fetch() async => const PreferencesDto(
+        desiredRole: null,
+        locations: ['Pune'],
+        expectedCtc: '1800000.00',
+      );
+
+  @override
+  Future<PreferencesDto> update(PreferencesUpdateDto update) async {
+    updates.add(update);
+    return PreferencesDto(
+      desiredRole: update.desiredRole,
+      locations: update.locations,
+      expectedCtc: update.expectedCtc?.toString(),
+      language: update.language,
+    );
+  }
 }
 
 const _me = MeDto(
@@ -92,6 +117,10 @@ void main() {
         100,
         scrollable: find.byType(Scrollable).first,
       );
+      // Flush the Arrive entrance-animation timers for the rows below the
+      // fold (the language switcher added one more staggered index) so none
+      // are still pending when the widget tree is disposed at teardown.
+      await tester.pumpAndSettle();
       expect(find.text('Sign out'), findsOneWidget);
     },
   );
@@ -129,6 +158,54 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.text("I'm hiring — post a job"), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'tapping हिन्दी on the language switcher saves language "hi" and '
+    'flips the app locale',
+    (tester) async {
+      final repo = _RecordingPrefsRepo();
+      final container = ProviderContainer(
+        overrides: [
+          meRepositoryProvider.overrideWithValue(_FakeRepo(_me)),
+          preferencesRepositoryProvider.overrideWithValue(repo),
+          packageInfoProvider.overrideWith(
+            (_) async => PackageInfo(
+              appName: 'Jobify',
+              packageName: 'com.jobify.app',
+              version: '1.0.0',
+              buildNumber: '1',
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            theme: ThemeData.light(useMaterial3: true),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: const ProfileScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.text('हिन्दी'),
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.text('हिन्दी'));
+      await tester.pumpAndSettle();
+
+      expect(repo.updates, isNotEmpty);
+      expect(repo.updates.last.language, 'hi');
+      expect(container.read(localeControllerProvider), const Locale('hi'));
     },
   );
 }

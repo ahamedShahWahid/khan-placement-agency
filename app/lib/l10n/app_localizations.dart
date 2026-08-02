@@ -1443,6 +1443,24 @@ abstract class AppLocalizations {
   /// **'Dark'**
   String get profileAppearanceDark;
 
+  /// Heading above the English/Hindi language switcher.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get profileLanguageLabel;
+
+  /// Segmented-button label for English. A language's own name renders in that language, so this value is identical in every ARB file.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get profileLanguageEnglish;
+
+  /// Segmented-button label for Hindi. A language's own name renders in that language, so this value is identical in every ARB file.
+  ///
+  /// In en, this message translates to:
+  /// **'हिन्दी'**
+  String get profileLanguageHindi;
+
   /// Sign-out button label while the sign-out request is in flight.
   ///
   /// In en, this message translates to:

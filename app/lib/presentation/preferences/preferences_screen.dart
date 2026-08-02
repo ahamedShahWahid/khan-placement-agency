@@ -30,6 +30,7 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
   late final TextEditingController _expectedCtc;
   List<String> _locations = [];
   DesiredRole? _desiredRole;
+  String _language = 'en';
   bool _seeded = false;
 
   @override
@@ -46,6 +47,9 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
     _desiredRole = prefs.desiredRole;
     _locations = List<String>.from(prefs.locations);
     _expectedCtc.text = prefs.expectedCtc ?? '';
+    // No language switcher on this screen — carry the current value through
+    // unchanged (PreferencesUpdateDto is full-form and always sends it).
+    _language = prefs.language;
   }
 
   @override
@@ -75,6 +79,7 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
       desiredRole: _desiredRole,
       locations: _locations,
       expectedCtc: num.tryParse(_expectedCtc.text.trim()),
+      language: _language,
     );
     final ok =
         await ref.read(preferencesControllerProvider.notifier).submit(update);

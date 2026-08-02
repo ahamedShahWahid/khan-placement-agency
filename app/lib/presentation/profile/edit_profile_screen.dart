@@ -33,6 +33,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   final _locationInput = TextEditingController();
   List<String> _locations = [];
   DesiredRole? _desiredRole;
+  String _language = 'en';
   bool _seeded = false;
 
   /// One-shot seed from resolved data (mirrors PreferencesScreen's
@@ -52,6 +53,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     // is omitted on save, preserving the server's (newer-than-this-build)
     // role instead of clearing it.
     _desiredRole = prefs.desiredRole;
+    // No language switcher on this screen — carry the current value through
+    // unchanged (PreferencesUpdateDto is full-form and always sends it).
+    _language = prefs.language;
   }
 
   @override
@@ -100,6 +104,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       desiredRole: _desiredRole,
       locations: _locations,
       expectedCtc: num.tryParse(_expectedCtc.text.trim()),
+      language: _language,
     );
     final profileOk = await ref
         .read(profileEditControllerProvider.notifier)

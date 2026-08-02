@@ -769,6 +769,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileAppearanceDark => 'Dark';
 
   @override
+  String get profileLanguageLabel => 'Language';
+
+  @override
+  String get profileLanguageEnglish => 'English';
+
+  @override
+  String get profileLanguageHindi => 'हिन्दी';
+
+  @override
   String get profileSigningOutButton => 'Signing out…';
 
   @override

@@ -9,6 +9,7 @@ import 'package:jobify_app/data/auth/user_role.dart';
 import 'package:jobify_app/data/me/me_dto.dart';
 import 'package:jobify_app/data/preferences/desired_role.dart';
 import 'package:jobify_app/data/preferences/preferences_dto.dart';
+import 'package:jobify_app/data/preferences/preferences_update_dto.dart';
 import 'package:jobify_app/presentation/auth/current_role_provider.dart';
 import 'package:jobify_app/presentation/preferences/desired_role_label.dart';
 import 'package:jobify_app/presentation/preferences/preferences_controller.dart';
@@ -16,6 +17,7 @@ import 'package:jobify_app/presentation/profile/ctc_format.dart';
 import 'package:jobify_app/presentation/profile/me_controller.dart';
 import 'package:jobify_app/presentation/profile/package_info_provider.dart';
 import 'package:jobify_app/presentation/profile/sign_out_controller.dart';
+import 'package:jobify_app/presentation/routing/locale_controller.dart';
 import 'package:jobify_app/presentation/routing/routes.dart';
 import 'package:jobify_app/presentation/theme/jobify_colors.dart';
 import 'package:jobify_app/presentation/theme/jobify_spacing.dart';
@@ -204,6 +206,20 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: JobifySpacing.sm),
                     _AppearanceSelector(),
+                  ],
+                ),
+              ),
+              const SizedBox(height: JobifySpacing.xl),
+              arrive(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.profileLanguageLabel,
+                      style: theme.textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: JobifySpacing.sm),
+                    _LanguageSelector(preferences: preferences),
                   ],
                 ),
               ),
@@ -457,6 +473,53 @@ class _AddFieldAction extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// English/Hindi language switcher. Tapping a segment (a) optimistically
+/// flips the app locale so the UI re-renders immediately, then (b) saves
+/// through the shared preferences controller's `submit` path, seeding every
+/// other field from the currently-loaded preferences (full-form contract —
+/// see `PreferencesUpdateDto`). On save failure, `PreferencesController.
+/// submit` itself restores the pre-tap locale (see its rollback branch).
+class _LanguageSelector extends ConsumerWidget {
+  const _LanguageSelector({required this.preferences});
+
+  final AsyncValue<PreferencesDto> preferences;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final locale = ref.watch(localeControllerProvider);
+    final l10n = context.l10n;
+    final selected = locale?.languageCode ?? 'en';
+    return SegmentedButton<String>(
+      segments: [
+        ButtonSegment(value: 'en', label: Text(l10n.profileLanguageEnglish)),
+        ButtonSegment(value: 'hi', label: Text(l10n.profileLanguageHindi)),
+      ],
+      selected: {selected},
+      onSelectionChanged: preferences.hasValue
+          ? (selection) =>
+              _onChanged(ref, preferences.requireValue, selection.first)
+          : null,
+    );
+  }
+
+  Future<void> _onChanged(
+    WidgetRef ref,
+    PreferencesDto current,
+    String language,
+  ) async {
+    ref.read(localeControllerProvider.notifier).setFromLanguage(language);
+    final update = PreferencesUpdateDto(
+      desiredRole: current.desiredRole,
+      locations: current.locations,
+      expectedCtc: current.expectedCtc == null
+          ? null
+          : num.tryParse(current.expectedCtc!),
+      language: language,
+    );
+    await ref.read(preferencesControllerProvider.notifier).submit(update);
   }
 }
 
