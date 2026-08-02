@@ -9,6 +9,7 @@ import 'package:jobify_app/data/jobs/applications_repository.dart';
 import 'package:jobify_app/data/jobs/applications_repository_impl.dart';
 import 'package:jobify_app/data/jobs/job_status.dart';
 import 'package:jobify_app/data/jobs/jobs_dto.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/applications/applications_screen.dart';
 
 class _FakeRepo implements ApplicationsRepository {
@@ -33,6 +34,8 @@ Widget _wrap(Widget child, {required ApplicationsRepository repo}) =>
       overrides: [applicationsRepositoryProvider.overrideWithValue(repo)],
       child: MaterialApp(
         theme: ThemeData.light(useMaterial3: true),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: child,
       ),
     );

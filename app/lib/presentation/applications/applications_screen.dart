@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:jobify_app/core/format/date_formats.dart';
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
 import 'package:jobify_app/data/jobs/application_stage.dart';
 import 'package:jobify_app/data/jobs/application_status.dart';
 import 'package:jobify_app/data/jobs/jobs_dto.dart';
@@ -43,10 +44,11 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> {
   @override
   Widget build(BuildContext context) {
     final value = ref.watch(applicationsControllerProvider);
+    final l10n = context.l10n;
     return BoldScaffold(
-      header: const BoldHeader(
-        title: 'Applications',
-        subtitle: 'Roles you applied to',
+      header: BoldHeader(
+        title: l10n.applicationsHeaderTitle,
+        subtitle: l10n.applicationsHeaderSubtitle,
       ),
       child: AsyncValueWidget<ApplicationsState>(
         value: value,
@@ -54,12 +56,12 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> {
             ref.read(applicationsControllerProvider.notifier).refresh(),
         isEmpty: (s) => s.items.isEmpty,
         empty: () => JobifyEmptyState(
-          headline: 'No applications yet',
-          body: 'Browse the feed and apply to roles you like.',
+          headline: l10n.applicationsEmptyHeadline,
+          body: l10n.applicationsEmptyBody,
           icon: Icons.assignment_outlined,
           primaryAction: FilledButton(
             onPressed: () => context.go(Routes.feed),
-            child: const Text('Browse the feed'),
+            child: Text(l10n.applicationsBrowseFeedButton),
           ),
         ),
         data: (s) => RefreshIndicator(
@@ -118,8 +120,8 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> {
                                 : item.application.createdAt;
                             final when = jobifyLongDateFormat.format(whenDate);
                             return isWithdrawn
-                                ? 'Withdrawn $when'
-                                : 'Applied $when';
+                                ? l10n.applicationsWithdrawnOn(when)
+                                : l10n.applicationsAppliedOn(when);
                           }(),
                           style: JobifyTypography.mono(
                             fontSize: 12,
@@ -141,7 +143,9 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> {
 }
 
 /// Applicant-facing stage copy — spec-locked (rejected -> "Not selected",
-/// unknown -> "In progress"). Reused by the job-detail application timeline.
+/// unknown -> "In progress"). English-only: reused by the (deliberately
+/// unlocalized) recruiter pipeline view (`job_applicants_screen.dart`).
+/// Applicant-facing surfaces must use [applicationStageLabel] instead.
 String stageLabel(ApplicationStage stage) => switch (stage) {
       ApplicationStage.applied => 'Applied',
       ApplicationStage.shortlisted => 'Shortlisted',
@@ -152,6 +156,21 @@ String stageLabel(ApplicationStage stage) => switch (stage) {
       ApplicationStage.unknown => 'In progress',
     };
 
+/// Localized applicant-facing stage copy. Reused by the job-detail
+/// application timeline.
+String applicationStageLabel(BuildContext context, ApplicationStage stage) {
+  final l10n = context.l10n;
+  return switch (stage) {
+    ApplicationStage.applied => l10n.stageApplied,
+    ApplicationStage.shortlisted => l10n.stageShortlisted,
+    ApplicationStage.interview => l10n.stageInterview,
+    ApplicationStage.offer => l10n.stageOffer,
+    ApplicationStage.hired => l10n.stageHired,
+    ApplicationStage.rejected => l10n.stageRejected,
+    ApplicationStage.unknown => l10n.stageInProgress,
+  };
+}
+
 class _StagePill extends StatelessWidget {
   const _StagePill({required this.application});
   final ApplicationDto application;
@@ -160,23 +179,23 @@ class _StagePill extends StatelessWidget {
     final c = Theme.of(context);
     final (label, bg, fg) = application.status == ApplicationStatus.withdrawn
         ? (
-            'Withdrawn',
+            context.l10n.stageWithdrawn,
             c.colorScheme.surfaceContainerHighest,
             c.colorScheme.onSurfaceVariant,
           )
         : switch (application.stage) {
             ApplicationStage.offer || ApplicationStage.hired => (
-                stageLabel(application.stage),
+                applicationStageLabel(context, application.stage),
                 c.colorScheme.tertiaryContainer,
                 c.colorScheme.onTertiaryContainer,
               ),
             ApplicationStage.rejected => (
-                stageLabel(application.stage),
+                applicationStageLabel(context, application.stage),
                 c.colorScheme.surfaceContainerHighest,
                 c.colorScheme.onSurfaceVariant,
               ),
             _ => (
-                stageLabel(application.stage),
+                applicationStageLabel(context, application.stage),
                 c.colorScheme.primaryContainer,
                 c.colorScheme.onPrimaryContainer,
               ),

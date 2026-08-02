@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:jobify_app/data/notifications/notification_dto.dart';
 import 'package:jobify_app/data/notifications/notifications_repository.dart';
 import 'package:jobify_app/data/notifications/notifications_repository_impl.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/notifications/notifications_screen.dart';
 
 NotificationDto _n(String id, {DateTime? readAt}) => NotificationDto(
@@ -46,7 +47,11 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [notificationsRepositoryProvider.overrideWithValue(repo)],
-        child: MaterialApp.router(routerConfig: router),
+        child: MaterialApp.router(
+          routerConfig: router,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
       ),
     );
     await tester.pumpAndSettle();

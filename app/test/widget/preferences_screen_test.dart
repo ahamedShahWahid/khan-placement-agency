@@ -8,6 +8,7 @@ import 'package:jobify_app/data/preferences/preferences_repository_impl.dart';
 import 'package:jobify_app/data/preferences/preferences_update_dto.dart';
 import 'package:jobify_app/data/resume/resume_dto.dart';
 import 'package:jobify_app/data/resume/resume_parse_status.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/preferences/preferences_screen.dart';
 
 class _CapturingRepo implements PreferencesRepository {
@@ -60,7 +61,11 @@ Future<void> _pump(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [preferencesRepositoryProvider.overrideWithValue(repo)],
-      child: MaterialApp.router(routerConfig: router),
+      child: MaterialApp.router(
+        routerConfig: router,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+      ),
     ),
   );
   await tester.pumpAndSettle();

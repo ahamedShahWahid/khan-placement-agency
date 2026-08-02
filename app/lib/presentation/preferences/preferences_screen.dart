@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
 import 'package:jobify_app/data/preferences/desired_role.dart';
 import 'package:jobify_app/data/preferences/preferences_dto.dart';
 import 'package:jobify_app/data/preferences/preferences_update_dto.dart';
 import 'package:jobify_app/data/resume/resume_dto.dart';
+import 'package:jobify_app/presentation/preferences/desired_role_label.dart';
 import 'package:jobify_app/presentation/preferences/preferences_controller.dart';
 import 'package:jobify_app/presentation/theme/jobify_colors.dart';
 import 'package:jobify_app/presentation/theme/jobify_radii.dart';
@@ -81,7 +83,7 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
       if (context.canPop()) context.pop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Couldn't save. Try again.")),
+        SnackBar(content: Text(context.l10n.formSaveFailedGeneric)),
       );
     }
   }
@@ -95,6 +97,7 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
     final prefsState = ref.watch(preferencesControllerProvider);
     if (prefsState.hasValue) _seedFromPreferences(prefsState.requireValue);
     final saving = prefsState.isLoading && _seeded;
+    final l10n = context.l10n;
 
     // The form must only render once seeded from real data — saving a
     // half-seeded form would clear server-side values. Skip stays available
@@ -102,9 +105,12 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
     if (!_seeded) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('What are you looking for?'),
+          title: Text(l10n.preferencesTitle),
           actions: [
-            TextButton(onPressed: _skip, child: const Text('Skip')),
+            TextButton(
+              onPressed: _skip,
+              child: Text(l10n.preferencesSkipButton),
+            ),
           ],
         ),
         body: Center(
@@ -112,12 +118,12 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
               ? Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text("Couldn't load your preferences."),
+                    Text(l10n.preferencesLoadError),
                     const SizedBox(height: JobifySpacing.sm),
                     TextButton(
                       onPressed: () =>
                           ref.invalidate(preferencesControllerProvider),
-                      child: const Text('Retry'),
+                      child: Text(l10n.commonRetry),
                     ),
                   ],
                 )
@@ -129,9 +135,9 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('What are you looking for?'),
+        title: Text(l10n.preferencesTitle),
         actions: [
-          TextButton(onPressed: _skip, child: const Text('Skip')),
+          TextButton(onPressed: _skip, child: Text(l10n.preferencesSkipButton)),
         ],
       ),
       body: Form(
@@ -141,7 +147,10 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
           children: [
             _ResumeSummaryCard(resume: widget.resume),
             const SizedBox(height: JobifySpacing.xl),
-            Text('Your preferences', style: theme.textTheme.titleMedium),
+            Text(
+              l10n.preferencesSectionHeading,
+              style: theme.textTheme.titleMedium,
+            ),
             const SizedBox(height: JobifySpacing.sm),
             Card(
               child: Padding(
@@ -158,25 +167,29 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
                       initialValue: _desiredRole == DesiredRole.unknown
                           ? null
                           : _desiredRole,
-                      decoration:
-                          const InputDecoration(labelText: 'Desired role'),
+                      decoration: InputDecoration(
+                        labelText: l10n.preferencesDesiredRoleLabel,
+                      ),
                       items: [
                         // A null item so a previously set role can be
                         // CLEARED.
-                        const DropdownMenuItem<DesiredRole>(
-                          child: Text('No preference'),
+                        DropdownMenuItem<DesiredRole>(
+                          child: Text(l10n.preferencesNoPreferenceOption),
                         ),
                         for (final role in DesiredRole.values
                             .where((r) => r != DesiredRole.unknown))
                           DropdownMenuItem(
                             value: role,
-                            child: Text(role.label),
+                            child: Text(desiredRoleLabel(context, role)),
                           ),
                       ],
                       onChanged: (role) => setState(() => _desiredRole = role),
                     ),
                     const SizedBox(height: JobifySpacing.lg),
-                    Text('Locations', style: theme.textTheme.labelLarge),
+                    Text(
+                      l10n.preferencesLocationsLabel,
+                      style: theme.textTheme.labelLarge,
+                    ),
                     const SizedBox(height: JobifySpacing.sm),
                     if (_locations.isNotEmpty) ...[
                       Wrap(
@@ -198,8 +211,8 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
                         Expanded(
                           child: TextField(
                             controller: _locationInput,
-                            decoration: const InputDecoration(
-                              labelText: 'Add location',
+                            decoration: InputDecoration(
+                              labelText: l10n.preferencesAddLocationLabel,
                             ),
                             onSubmitted: (_) => _addLocation(),
                           ),
@@ -218,8 +231,8 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
                         fontSize: 16,
                         color: theme.colorScheme.onSurface,
                       ),
-                      decoration: const InputDecoration(
-                        labelText: 'Expected CTC (₹/yr)',
+                      decoration: InputDecoration(
+                        labelText: l10n.preferencesExpectedCtcLabel,
                       ),
                     ),
                   ],
@@ -229,7 +242,7 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
             const SizedBox(height: JobifySpacing.xl),
             FilledButton(
               onPressed: saving ? null : _save,
-              child: Text(saving ? 'Saving…' : 'Save'),
+              child: Text(saving ? l10n.commonSaving : l10n.commonSave),
             ),
           ],
         ),
@@ -252,7 +265,7 @@ class _ResumeSummaryCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(JobifySpacing.lg),
           child: Text(
-            "We couldn't read your résumé — tell us directly below.",
+            context.l10n.preferencesResumeUnparsedBody,
             style: theme.textTheme.bodyMedium,
           ),
         ),
@@ -266,7 +279,10 @@ class _ResumeSummaryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Your résumé', style: theme.textTheme.titleMedium),
+            Text(
+              context.l10n.preferencesResumeHeading,
+              style: theme.textTheme.titleMedium,
+            ),
             const SizedBox(height: JobifySpacing.xs),
             if (name != null) Text(name, style: theme.textTheme.bodyMedium),
             if (skills.isNotEmpty) ...[

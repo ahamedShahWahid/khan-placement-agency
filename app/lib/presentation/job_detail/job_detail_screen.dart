@@ -9,7 +9,7 @@ import 'package:jobify_app/data/feed/match_feedback_rating.dart';
 import 'package:jobify_app/data/feed/match_generator.dart';
 import 'package:jobify_app/data/jobs/jobs_dto.dart';
 import 'package:jobify_app/presentation/applications/applications_screen.dart'
-    show stageLabel;
+    show applicationStageLabel;
 import 'package:jobify_app/presentation/job_detail/action_bar.dart';
 import 'package:jobify_app/presentation/job_detail/application_timeline_controller.dart';
 import 'package:jobify_app/presentation/job_detail/apply_to_job_controller.dart';
@@ -297,7 +297,7 @@ class _ApplicationTimeline extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        stageLabel(e.toStage),
+                        applicationStageLabel(context, e.toStage),
                         style: theme.textTheme.bodyMedium,
                       ),
                     ),

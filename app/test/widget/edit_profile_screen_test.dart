@@ -12,6 +12,7 @@ import 'package:jobify_app/data/preferences/preferences_dto.dart';
 import 'package:jobify_app/data/preferences/preferences_repository.dart';
 import 'package:jobify_app/data/preferences/preferences_repository_impl.dart';
 import 'package:jobify_app/data/preferences/preferences_update_dto.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/profile/edit_profile_screen.dart';
 
 class _CapturingMeRepo implements MeRepository {
@@ -79,7 +80,11 @@ Future<void> _pump(
         meRepositoryProvider.overrideWithValue(meRepo),
         preferencesRepositoryProvider.overrideWithValue(prefsRepo),
       ],
-      child: MaterialApp.router(routerConfig: router),
+      child: MaterialApp.router(
+        routerConfig: router,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+      ),
     ),
   );
   if (settle) await tester.pumpAndSettle();

@@ -11,6 +11,7 @@ import 'package:jobify_app/data/preferences/preferences_dto.dart';
 import 'package:jobify_app/data/preferences/preferences_repository.dart';
 import 'package:jobify_app/data/preferences/preferences_repository_impl.dart';
 import 'package:jobify_app/data/preferences/preferences_update_dto.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/auth/auth_providers.dart';
 import 'package:jobify_app/presentation/profile/package_info_provider.dart';
 import 'package:jobify_app/presentation/profile/profile_screen.dart';
@@ -64,6 +65,8 @@ ProviderScope _buildScope({
     ],
     child: MaterialApp(
       theme: ThemeData.light(useMaterial3: true),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: home,
     ),
   );

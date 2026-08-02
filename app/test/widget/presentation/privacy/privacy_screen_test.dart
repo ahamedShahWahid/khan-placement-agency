@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jobify_app/data/consents/consents_repository_impl.dart';
 import 'package:jobify_app/data/dsr/dsr_repository_impl.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/privacy/privacy_screen.dart';
 
 import '../../../helpers/fake_repositories.dart';
@@ -18,6 +19,8 @@ Widget _buildApp({
     ],
     child: MaterialApp(
       theme: ThemeData.light(useMaterial3: true),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: const PrivacyScreen(),
     ),
   );

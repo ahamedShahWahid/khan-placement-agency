@@ -181,6 +181,9 @@ void main() {
       sendAfter: DateTime.utc(2026, 7, 19),
       createdAt: DateTime.utc(2026, 7, 19),
     );
-    expect(notificationTitle(n), 'Shortlisted for QA Engineer');
+    expect(
+      notificationTitle(lookupAppLocalizations(const Locale('en')), n),
+      'Shortlisted for QA Engineer',
+    );
   });
 }

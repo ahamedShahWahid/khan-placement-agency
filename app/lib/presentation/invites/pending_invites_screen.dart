@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:jobify_app/core/format/date_formats.dart';
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
 import 'package:jobify_app/data/employers/team/employer_invite_dto.dart';
 import 'package:jobify_app/presentation/invites/invite_response_controller.dart';
 import 'package:jobify_app/presentation/invites/my_invites_controller.dart';
@@ -19,16 +20,17 @@ class PendingInvitesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final invites = ref.watch(myInvitesControllerProvider);
+    final l10n = context.l10n;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Pending invitations')),
+      appBar: AppBar(title: Text(l10n.invitesTitle)),
       body: AsyncValueWidget<List<MyInviteDto>>(
         value: invites,
         onRetry: () => ref.read(myInvitesControllerProvider.notifier).refresh(),
         isEmpty: (list) => list.isEmpty,
-        empty: () => const JobifyEmptyState(
-          headline: 'No invitations',
-          body: "When a company invites you to recruit, it'll show up here.",
+        empty: () => JobifyEmptyState(
+          headline: l10n.invitesEmptyHeadline,
+          body: l10n.invitesEmptyBody,
           icon: Icons.mail_outline,
         ),
         data: (list) => RefreshIndicator(
@@ -54,7 +56,9 @@ class _InviteCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final busy = ref.watch(inviteResponseControllerProvider).isLoading;
+    final expires = jobifyLongDateFormat.format(invite.expiresAt);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(JobifySpacing.lg),
@@ -64,8 +68,9 @@ class _InviteCard extends ConsumerWidget {
             Text(invite.employerName, style: theme.textTheme.titleMedium),
             const SizedBox(height: JobifySpacing.xs),
             Text(
-              'Invited as ${invite.role == 'owner' ? 'owner' : 'member'} · '
-              'expires ${jobifyLongDateFormat.format(invite.expiresAt)}',
+              invite.role == 'owner'
+                  ? l10n.invitesCardSubtitleOwner(expires)
+                  : l10n.invitesCardSubtitleMember(expires),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -76,12 +81,12 @@ class _InviteCard extends ConsumerWidget {
               children: [
                 TextButton(
                   onPressed: busy ? null : () => _decline(context, ref),
-                  child: const Text('Decline'),
+                  child: Text(l10n.invitesDeclineButton),
                 ),
                 const SizedBox(width: JobifySpacing.sm),
                 FilledButton(
                   onPressed: busy ? null : () => _accept(context, ref),
-                  child: const Text('Accept'),
+                  child: Text(l10n.invitesAcceptButton),
                 ),
               ],
             ),
@@ -93,29 +98,33 @@ class _InviteCard extends ConsumerWidget {
 
   Future<void> _accept(BuildContext context, WidgetRef ref) async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final ok = await ref
         .read(inviteResponseControllerProvider.notifier)
         .accept(invite.id);
     if (ok) {
       // Role flips to recruiter → router redirects to the recruiter shell.
       messenger.showSnackBar(
-        SnackBar(content: Text('You joined ${invite.employerName}.')),
+        SnackBar(
+          content: Text(l10n.invitesJoinedSnackbar(invite.employerName)),
+        ),
       );
     } else {
       messenger.showSnackBar(
-        const SnackBar(content: Text("Couldn't accept the invitation.")),
+        SnackBar(content: Text(l10n.invitesAcceptErrorSnackbar)),
       );
     }
   }
 
   Future<void> _decline(BuildContext context, WidgetRef ref) async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final ok = await ref
         .read(inviteResponseControllerProvider.notifier)
         .decline(invite.id);
     if (!ok) {
       messenger.showSnackBar(
-        const SnackBar(content: Text("Couldn't decline the invitation.")),
+        SnackBar(content: Text(l10n.invitesDeclineErrorSnackbar)),
       );
     }
   }

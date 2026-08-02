@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
 import 'package:jobify_app/data/me/me_dto.dart';
 import 'package:jobify_app/data/me/profile_update_dto.dart';
 import 'package:jobify_app/data/preferences/desired_role.dart';
 import 'package:jobify_app/data/preferences/preferences_dto.dart';
 import 'package:jobify_app/data/preferences/preferences_update_dto.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
+import 'package:jobify_app/presentation/preferences/desired_role_label.dart';
 import 'package:jobify_app/presentation/preferences/preferences_controller.dart';
 import 'package:jobify_app/presentation/profile/me_controller.dart';
 import 'package:jobify_app/presentation/profile/profile_edit_controller.dart';
@@ -66,15 +69,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final v = _locationInput.text.trim();
     if (v.isEmpty || _locations.contains(v)) return;
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     if (v.length > 100) {
       messenger.showSnackBar(
-        const SnackBar(content: Text('Location too long (max 100 chars).')),
+        SnackBar(content: Text(l10n.editProfileLocationTooLong)),
       );
       return;
     }
     if (_locations.length >= 10) {
       messenger.showSnackBar(
-        const SnackBar(content: Text('Up to 10 locations.')),
+        SnackBar(content: Text(l10n.editProfileLocationsLimitReached)),
       );
       return;
     }
@@ -109,12 +113,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       return;
     }
     // Two sequential PATCHes can partially succeed — say which half failed.
+    final l10n = context.l10n;
     final message = profileOk
-        ? "Saved your profile, but couldn't save preferences. Try again."
+        ? l10n.editProfileSavedProfileOnly
         : prefsOk
-            ? "Saved your preferences, but couldn't save your profile. "
-                'Try again.'
-            : "Couldn't save. Try again.";
+            ? l10n.editProfileSavedPreferencesOnly
+            : l10n.formSaveFailedGeneric;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
     );
@@ -124,6 +128,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   Widget build(BuildContext context) {
     final me = ref.watch(meControllerProvider);
     final prefs = ref.watch(preferencesControllerProvider);
+    final l10n = context.l10n;
 
     if (!_seeded) {
       if (me.hasValue && prefs.hasValue) {
@@ -134,13 +139,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         final meFailed = me.hasError && !me.hasValue;
         final prefsFailed = prefs.hasError && !prefs.hasValue;
         return Scaffold(
-          appBar: AppBar(title: const Text('Edit Profile')),
+          appBar: AppBar(title: Text(l10n.editProfileTitle)),
           body: Center(
             child: meFailed || prefsFailed
                 ? Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text("Couldn't load your profile."),
+                      Text(l10n.editProfileLoadError),
                       const SizedBox(height: JobifySpacing.sm),
                       TextButton(
                         onPressed: () {
@@ -149,7 +154,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                             ref.invalidate(preferencesControllerProvider);
                           }
                         },
-                        child: const Text('Retry'),
+                        child: Text(l10n.commonRetry),
                       ),
                     ],
                   )
@@ -164,11 +169,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         ref.watch(profileEditControllerProvider).isLoading || prefs.isLoading;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Profile'),
+        title: Text(l10n.editProfileTitle),
         actions: [
           TextButton(
             onPressed: saving ? null : _save,
-            child: Text(saving ? 'Saving…' : 'Save'),
+            child: Text(saving ? l10n.commonSaving : l10n.commonSave),
           ),
         ],
       ),
@@ -177,7 +182,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         child: ListView(
           padding: const EdgeInsets.all(JobifySpacing.lg),
           children: [
-            Text('About you', style: theme.textTheme.titleMedium),
+            Text(
+              l10n.editProfileAboutYouHeading,
+              style: theme.textTheme.titleMedium,
+            ),
             const SizedBox(height: JobifySpacing.sm),
             Card(
               child: Padding(
@@ -187,11 +195,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   children: [
                     TextFormField(
                       controller: _fullName,
-                      decoration: const InputDecoration(labelText: 'Full name'),
+                      decoration: InputDecoration(
+                        labelText: l10n.editProfileFullNameLabel,
+                      ),
                       validator: (v) {
                         final t = v?.trim() ?? '';
-                        if (t.isEmpty) return 'Required';
-                        if (t.length > 200) return 'Too long (max 200)';
+                        if (t.isEmpty) {
+                          return l10n.editProfileRequiredValidation;
+                        }
+                        if (t.length > 200) {
+                          return l10n.editProfileTooLongValidation;
+                        }
                         return null;
                       },
                     ),
@@ -205,25 +219,29 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       initialValue: _desiredRole == DesiredRole.unknown
                           ? null
                           : _desiredRole,
-                      decoration:
-                          const InputDecoration(labelText: 'Desired role'),
+                      decoration: InputDecoration(
+                        labelText: l10n.preferencesDesiredRoleLabel,
+                      ),
                       items: [
                         // A null item so a previously set role can be
                         // CLEARED.
-                        const DropdownMenuItem<DesiredRole>(
-                          child: Text('No preference'),
+                        DropdownMenuItem<DesiredRole>(
+                          child: Text(l10n.preferencesNoPreferenceOption),
                         ),
                         for (final role in DesiredRole.values
                             .where((r) => r != DesiredRole.unknown))
                           DropdownMenuItem(
                             value: role,
-                            child: Text(role.label),
+                            child: Text(desiredRoleLabel(context, role)),
                           ),
                       ],
                       onChanged: (role) => setState(() => _desiredRole = role),
                     ),
                     const SizedBox(height: JobifySpacing.lg),
-                    Text('Locations', style: theme.textTheme.labelLarge),
+                    Text(
+                      l10n.preferencesLocationsLabel,
+                      style: theme.textTheme.labelLarge,
+                    ),
                     const SizedBox(height: JobifySpacing.sm),
                     if (_locations.isNotEmpty) ...[
                       Wrap(
@@ -245,8 +263,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         Expanded(
                           child: TextField(
                             controller: _locationInput,
-                            decoration: const InputDecoration(
-                              labelText: 'Add location',
+                            decoration: InputDecoration(
+                              labelText: l10n.preferencesAddLocationLabel,
                             ),
                             onSubmitted: (_) => _addLocation(),
                           ),
@@ -262,7 +280,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               ),
             ),
             const SizedBox(height: JobifySpacing.xl),
-            Text('The numbers', style: theme.textTheme.titleMedium),
+            Text(
+              l10n.editProfileTheNumbersHeading,
+              style: theme.textTheme.titleMedium,
+            ),
             const SizedBox(height: JobifySpacing.sm),
             Card(
               child: Padding(
@@ -277,11 +298,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         fontSize: 16,
                         color: theme.colorScheme.onSurface,
                       ),
-                      decoration: const InputDecoration(
-                        labelText: 'Years of experience',
+                      decoration: InputDecoration(
+                        labelText: l10n.editProfileYearsExperienceLabel,
                       ),
                       validator: (v) => _validateOptionalNumber(
                         v,
+                        l10n,
                         min: 0,
                         max: 60,
                         maxDecimals: 1,
@@ -295,11 +317,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         fontSize: 16,
                         color: theme.colorScheme.onSurface,
                       ),
-                      decoration: const InputDecoration(
-                        labelText: 'Notice period (days)',
+                      decoration: InputDecoration(
+                        labelText: l10n.editProfileNoticePeriodLabel,
                       ),
                       validator: (v) => _validateOptionalNumber(
                         v,
+                        l10n,
                         min: 0,
                         max: 365,
                         maxDecimals: 0,
@@ -313,11 +336,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         fontSize: 16,
                         color: theme.colorScheme.onSurface,
                       ),
-                      decoration: const InputDecoration(
-                        labelText: 'Current CTC (₹/yr)',
+                      decoration: InputDecoration(
+                        labelText: l10n.editProfileCurrentCtcLabel,
                       ),
                       validator: (v) => _validateOptionalNumber(
                         v,
+                        l10n,
                         min: 0,
                         max: 9999999999.99,
                         maxDecimals: 2,
@@ -331,11 +355,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         fontSize: 16,
                         color: theme.colorScheme.onSurface,
                       ),
-                      decoration: const InputDecoration(
-                        labelText: 'Expected CTC (₹/yr)',
+                      decoration: InputDecoration(
+                        labelText: l10n.preferencesExpectedCtcLabel,
                       ),
                       validator: (v) => _validateOptionalNumber(
                         v,
+                        l10n,
                         min: 0,
                         max: 9999999999.99,
                         maxDecimals: 2,
@@ -357,7 +382,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 /// valid. `maxDecimals` mirrors the column scale (e.g. Numeric(4,1) → 1) so the
 /// user is told instead of the DB silently rounding.
 String? _validateOptionalNumber(
-  String? raw, {
+  String? raw,
+  AppLocalizations l10n, {
   required num min,
   required num max,
   required int maxDecimals,
@@ -365,13 +391,13 @@ String? _validateOptionalNumber(
   final t = raw?.trim() ?? '';
   if (t.isEmpty) return null;
   final n = num.tryParse(t);
-  if (n == null) return 'Enter a number';
-  if (n < min || n > max) return 'Must be between $min and $max';
+  if (n == null) return l10n.editProfileEnterNumberValidation;
+  if (n < min || n > max) return l10n.editProfileRangeValidation(min, max);
   final dot = t.indexOf('.');
   if (dot >= 0 && t.length - dot - 1 > maxDecimals) {
     return maxDecimals == 0
-        ? 'Whole number only'
-        : 'At most $maxDecimals decimal place${maxDecimals == 1 ? '' : 's'}';
+        ? l10n.editProfileWholeNumberValidation
+        : l10n.editProfileDecimalPlacesValidation(maxDecimals);
   }
   return null;
 }

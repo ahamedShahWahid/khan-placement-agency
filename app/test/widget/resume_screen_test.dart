@@ -11,6 +11,7 @@ import 'package:jobify_app/data/resume/resume_dto.dart';
 import 'package:jobify_app/data/resume/resume_parse_status.dart';
 import 'package:jobify_app/data/resume/resume_repository.dart';
 import 'package:jobify_app/data/resume/resume_repository_impl.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/preferences/preferences_screen.dart';
 import 'package:jobify_app/presentation/resume/resume_screen.dart';
 
@@ -79,7 +80,11 @@ Future<void> _pump(WidgetTester tester, ResumeDto? current) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [resumeRepositoryProvider.overrideWithValue(_Repo(current))],
-      child: const MaterialApp(home: ResumeScreen()),
+      child: const MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: ResumeScreen(),
+      ),
     ),
   );
   await tester.pumpAndSettle();
@@ -127,7 +132,11 @@ void main() {
           preferencesRepositoryProvider
               .overrideWithValue(_IncompletePrefsRepo()),
         ],
-        child: MaterialApp.router(routerConfig: router),
+        child: MaterialApp.router(
+          routerConfig: router,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -168,7 +177,11 @@ void main() {
               .overrideWithValue(_Repo(_dto(ResumeParseStatus.parsed))),
           preferencesRepositoryProvider.overrideWithValue(prefsRepo),
         ],
-        child: MaterialApp.router(routerConfig: router),
+        child: MaterialApp.router(
+          routerConfig: router,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
       ),
     );
     await tester.pumpAndSettle();

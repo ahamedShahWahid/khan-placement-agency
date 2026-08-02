@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:jobify_app/core/error/exceptions.dart';
 import 'package:jobify_app/core/format/date_formats.dart';
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
 import 'package:jobify_app/data/resume/resume_dto.dart';
 import 'package:jobify_app/data/resume/resume_parse_status.dart';
 import 'package:jobify_app/presentation/preferences/preferences_controller.dart';
@@ -39,12 +40,13 @@ class _ResumeScreenState extends ConsumerState<ResumeScreen> {
       withData: true,
     );
     if (result == null || result.files.isEmpty) return; // cancelled
+    if (!mounted) return;
     final file = result.files.single;
     final bytes = file.bytes;
     final ext = (file.extension ?? '').toLowerCase();
     final contentType = _extToContentType[ext];
     if (bytes == null || contentType == null) {
-      _snack('Unsupported file type (PDF, DOC, DOCX).');
+      _snack(context.l10n.resumeUnsupportedFileType);
       return;
     }
     final ok =
@@ -120,22 +122,24 @@ class _ResumeScreenState extends ConsumerState<ResumeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
 
   String _errorText(Object? e) {
+    final l10n = context.l10n;
     if (e is ApiException && e.statusCode == 415) {
-      return 'Unsupported file type (PDF, DOC, DOCX).';
+      return l10n.resumeUnsupportedFileType;
     }
     if (e is ApiException && e.statusCode == 413) {
-      return 'File too large (max 10 MB).';
+      return l10n.resumeFileTooLarge;
     }
-    if (e is NetworkException) return "Couldn't reach Jobify.";
-    return "Couldn't upload. Try again.";
+    if (e is NetworkException) return l10n.resumeNetworkError;
+    return l10n.resumeUploadFailedGeneric;
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(resumeControllerProvider);
     final uploading = state.isLoading;
+    final l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: const Text('Résumé')),
+      appBar: AppBar(title: Text(l10n.resumeTitle)),
       body: RefreshIndicator(
         onRefresh: () => ref.read(resumeControllerProvider.notifier).refresh(),
         child: ListView(
@@ -153,7 +157,9 @@ class _ResumeScreenState extends ConsumerState<ResumeScreen> {
               onPressed: uploading ? null : _pickAndUpload,
               icon: const Icon(Icons.upload_file),
               label: Text(
-                uploading ? 'Uploading…' : 'Upload / Replace r\xe9sum\xe9',
+                uploading
+                    ? l10n.resumeUploadingButton
+                    : l10n.resumeUploadButton,
               ),
             ),
           ],
@@ -170,7 +176,7 @@ class _Empty extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.symmetric(vertical: JobifySpacing.xl),
         child: Text(
-          'No r\xe9sum\xe9 yet. Upload one so we can match you to roles.',
+          context.l10n.resumeEmptyBody,
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       );
@@ -183,16 +189,17 @@ class _ResumeCard extends StatelessWidget {
 
   ({String label, Color fg, Color bg}) _status(BuildContext context) {
     final c = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     switch (resume.parseStatus) {
       case ResumeParseStatus.parsed:
         return (
-          label: 'Ready',
+          label: l10n.resumeStatusReady,
           fg: c.onPrimaryContainer,
           bg: c.primaryContainer,
         );
       case ResumeParseStatus.failed:
         return (
-          label: "Couldn't parse — try again",
+          label: l10n.resumeStatusFailed,
           fg: c.onErrorContainer,
           bg: c.errorContainer,
         );
@@ -200,7 +207,7 @@ class _ResumeCard extends StatelessWidget {
       case ResumeParseStatus.parsing:
       case ResumeParseStatus.unknown:
         return (
-          label: 'Processing…',
+          label: l10n.resumeStatusProcessing,
           fg: c.onSurfaceVariant,
           bg: c.surfaceContainerHighest,
         );
@@ -220,7 +227,9 @@ class _ResumeCard extends StatelessWidget {
             Text(resume.originalFilename, style: theme.textTheme.titleMedium),
             const SizedBox(height: JobifySpacing.xs),
             Text(
-              'Uploaded ${jobifyLongDateFormat.format(resume.createdAt)}',
+              context.l10n.resumeUploadedOn(
+                jobifyLongDateFormat.format(resume.createdAt),
+              ),
               style: theme.textTheme.bodySmall
                   ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
             ),
