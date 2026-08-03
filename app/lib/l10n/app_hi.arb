@@ -1,0 +1,1492 @@
+{
+  "@@locale": "hi",
+
+  "shellTabFeed": "फ़ीड",
+  "@shellTabFeed": {
+    "description": "Bottom navigation tab label for the job feed."
+  },
+
+  "shellTabSaved": "सेव्ड",
+  "@shellTabSaved": {
+    "description": "Bottom navigation tab label for saved jobs."
+  },
+
+  "shellTabApplications": "आवेदन",
+  "@shellTabApplications": {
+    "description": "Bottom navigation tab label for the applicant's applications."
+  },
+
+  "shellTabProfile": "प्रोफ़ाइल",
+  "@shellTabProfile": {
+    "description": "Bottom navigation tab label for the applicant's profile."
+  },
+
+  "commonRetry": "पुनः प्रयास करें",
+  "@commonRetry": {
+    "description": "Button label to retry a failed action or request."
+  },
+
+  "commonCancel": "रद्द करें",
+  "@commonCancel": {
+    "description": "Button label to cancel an in-progress action or dialog."
+  },
+
+  "commonSave": "सेव करें",
+  "@commonSave": {
+    "description": "Button label to save a form or setting."
+  },
+
+  "commonLoading": "लोड हो रहा है…",
+  "@commonLoading": {
+    "description": "Generic loading indicator caption."
+  },
+
+  "commonOk": "ठीक है",
+  "@commonOk": {
+    "description": "Button label to acknowledge/dismiss a dialog."
+  },
+
+  "commonSomethingWentWrong": "कुछ गलत हो गया",
+  "@commonSomethingWentWrong": {
+    "description": "Generic error headline shown when an action or load fails."
+  },
+
+  "commonUndo": "पूर्ववत करें",
+  "@commonUndo": {
+    "description": "Button label to undo the last action (shown in a SnackBar)."
+  },
+
+  "commonRefresh": "रीफ़्रेश करें",
+  "@commonRefresh": {
+    "description": "Tooltip for a refresh icon button."
+  },
+
+  "commonBack": "वापस",
+  "@commonBack": {
+    "description": "Button label to go back to the previous screen."
+  },
+
+  "commonNothingHereYet": "यहाँ अभी कुछ नहीं है",
+  "@commonNothingHereYet": {
+    "description": "Default empty-state headline used when no more specific copy is supplied."
+  },
+
+  "commonTryAgain": "फिर से कोशिश करें",
+  "@commonTryAgain": {
+    "description": "Button label on the generic error view to retry the failed action."
+  },
+
+  "commonCouldntReachJobify": "Jobify तक नहीं पहुंच सके",
+  "@commonCouldntReachJobify": {
+    "description": "Generic error headline shown when a network request fails."
+  },
+
+  "commonCheckConnectionRetry": "अपना कनेक्शन जांचें और फिर से कोशिश करें।",
+  "@commonCheckConnectionRetry": {
+    "description": "Generic error body shown alongside commonCouldntReachJobify."
+  },
+
+  "commonSignedOut": "साइन आउट हो गए",
+  "@commonSignedOut": {
+    "description": "Generic error headline shown when the user's session has ended."
+  },
+
+  "commonSessionEnded": "आपका सत्र समाप्त हो गया। जारी रखने के लिए साइन इन करें।",
+  "@commonSessionEnded": {
+    "description": "Generic error body shown alongside commonSignedOut."
+  },
+
+  "commonPleaseTryAgainMoment": "कृपया थोड़ी देर में फिर से कोशिश करें।",
+  "@commonPleaseTryAgainMoment": {
+    "description": "Fallback error body when the server didn't provide a detail message."
+  },
+
+  "commonUnexpectedError": "एक अनपेक्षित त्रुटि हुई।",
+  "@commonUnexpectedError": {
+    "description": "Fallback error body for an unrecognised error type."
+  },
+
+  "authAccountDeletedSnackbar": "आपका खाता हटा दिया गया है।",
+  "@authAccountDeletedSnackbar": {
+    "description": "Snackbar shown on the sign-in screen right after a successful account deletion."
+  },
+
+  "authSignInNetworkError": "Jobify तक नहीं पहुंच सके। अपना कनेक्शन जांचें।",
+  "@authSignInNetworkError": {
+    "description": "Snackbar shown when sign-in fails due to a network error."
+  },
+
+  "authSignInFailed": "साइन-इन विफल हुआ। फिर से कोशिश करें।",
+  "@authSignInFailed": {
+    "description": "Snackbar shown when sign-in fails for an unspecified or generic reason."
+  },
+
+  "authHeroTitle": "नौकरी\nआपको ढूंढ लेगी।",
+  "@authHeroTitle": {
+    "description": "Sign-in screen hero headline — the brand promise."
+  },
+
+  "authHeroSubtitle": "हम आपका रिज़्यूमे पढ़ते हैं और आपके लिए सही भूमिकाएं लाते हैं — सीधे शब्दों में कारण और कमी के साथ।",
+  "@authHeroSubtitle": {
+    "description": "Sign-in screen hero sub-headline explaining the product."
+  },
+
+  "authWordmark": "Jobify",
+  "@authWordmark": {
+    "description": "The Jobify product wordmark on the sign-in screen. Product name — stays Latin in every locale."
+  },
+
+  "authHeroRoleBackendEngineer": "Backend Engineer",
+  "@authHeroRoleBackendEngineer": {
+    "description": "Illustrative job-title chip in the sign-in hero animation. Job title — stays Latin in every locale."
+  },
+
+  "authHeroRoleProductDesigner": "Product Designer",
+  "@authHeroRoleProductDesigner": {
+    "description": "Illustrative job-title chip in the sign-in hero animation. Job title — stays Latin in every locale."
+  },
+
+  "authHeroRoleDataEngineer": "Data Engineer",
+  "@authHeroRoleDataEngineer": {
+    "description": "Illustrative job-title chip in the sign-in hero animation. Job title — stays Latin in every locale."
+  },
+
+  "authHeroSalaryRange": "₹18–28L",
+  "@authHeroSalaryRange": {
+    "description": "Illustrative salary-range chip in the sign-in hero animation."
+  },
+
+  "authHeroRemoteFirst": "रिमोट-फ़र्स्ट",
+  "@authHeroRemoteFirst": {
+    "description": "Illustrative work-arrangement chip in the sign-in hero animation."
+  },
+
+  "authHeroMatchPercent": "92% मैच",
+  "@authHeroMatchPercent": {
+    "description": "Illustrative match-score chip in the sign-in hero animation."
+  },
+
+  "authSigningIn": "साइन इन हो रहा है…",
+  "@authSigningIn": {
+    "description": "Sign-in button label while the sign-in request is in flight."
+  },
+
+  "authContinueWithGoogle": "Google से जारी रखें",
+  "@authContinueWithGoogle": {
+    "description": "Sign-in button label (mobile)."
+  },
+
+  "authGoogleSignInLoadError": "Google साइन-इन लोड नहीं हो सका। रीफ़्रेश करें और फिर से कोशिश करें।",
+  "@authGoogleSignInLoadError": {
+    "description": "Web sign-in fallback message shown if the Google Identity Services client fails to initialize."
+  },
+
+  "onboardingCompanyNameTooShort": "अपनी कंपनी का नाम दर्ज करें (न्यूनतम 2 अक्षर)",
+  "@onboardingCompanyNameTooShort": {
+    "description": "Validation error when the employer onboarding company-name field is too short."
+  },
+
+  "onboardingCompanyNameTooLong": "कंपनी का नाम बहुत लंबा है",
+  "@onboardingCompanyNameTooLong": {
+    "description": "Validation error when the employer onboarding company-name field is too long."
+  },
+
+  "onboardingGstinLength": "GSTIN ठीक 15 अक्षरों का होना चाहिए",
+  "@onboardingGstinLength": {
+    "description": "Validation error when the employer onboarding GSTIN field is the wrong length."
+  },
+
+  "onboardingCompanyNameTaken": "वह कंपनी नाम पहले से ही पंजीकृत है।",
+  "@onboardingCompanyNameTaken": {
+    "description": "Snackbar shown when creating an employer fails because the name is already taken."
+  },
+
+  "onboardingCreateEmployerFailed": "नियोक्ता नहीं बनाया जा सका। कृपया फिर से कोशिश करें।",
+  "@onboardingCreateEmployerFailed": {
+    "description": "Snackbar shown when creating an employer fails for a generic reason."
+  },
+
+  "onboardingTitle": "अपनी कंपनी सेट करें",
+  "@onboardingTitle": {
+    "description": "AppBar title for the employer onboarding screen."
+  },
+
+  "onboardingIntro": "नौकरियां पोस्ट करना शुरू करने के लिए हमें अपनी कंपनी के बारे में बताएं।",
+  "@onboardingIntro": {
+    "description": "Employer onboarding screen intro copy."
+  },
+
+  "onboardingCompanyNameLabel": "कंपनी का नाम",
+  "@onboardingCompanyNameLabel": {
+    "description": "Label for the company name text field."
+  },
+
+  "onboardingGstinLabel": "GSTIN (वैकल्पिक)",
+  "@onboardingGstinLabel": {
+    "description": "Label for the optional GSTIN text field."
+  },
+
+  "onboardingCreateCompanyButton": "कंपनी बनाएं",
+  "@onboardingCreateCompanyButton": {
+    "description": "Submit button label for the employer onboarding form."
+  },
+
+  "feedRatingSaveError": "आपकी रेटिंग सेव नहीं हो सकी",
+  "@feedRatingSaveError": {
+    "description": "Snackbar shown when a thumbs up/down match-feedback rating fails to save."
+  },
+
+  "feedHiddenSnackbar": "आपकी फ़ीड से छिपाई गई",
+  "@feedHiddenSnackbar": {
+    "description": "Snackbar shown after thumbs-down hides a job from the feed."
+  },
+
+  "feedHeaderTitle": "आपके लिए",
+  "@feedHeaderTitle": {
+    "description": "Feed screen header title."
+  },
+
+  "feedHeaderSubtitle": "आपकी प्रोफ़ाइल से मेल खाती भूमिकाएं",
+  "@feedHeaderSubtitle": {
+    "description": "Feed screen header subtitle."
+  },
+
+  "feedEmptyHeadline": "हम अभी भी आपके लिए मैच ढूंढ रहे हैं",
+  "@feedEmptyHeadline": {
+    "description": "Empty-state headline shown when the feed has no items and no filters are active."
+  },
+
+  "feedEmptyBody": "बेहतर नौकरियां पाने के लिए अपना रिज़्यूमे अपलोड करें।",
+  "@feedEmptyBody": {
+    "description": "Empty-state body shown when the feed has no items and no filters are active."
+  },
+
+  "feedFilteredEmptyHeadline": "आपके फ़िल्टर से कुछ मेल नहीं खाता",
+  "@feedFilteredEmptyHeadline": {
+    "description": "Empty-state headline shown when the feed has no items because filters are active."
+  },
+
+  "feedFilteredEmptyBody": "कोई फ़िल्टर हटाएं या अपनी खोज को व्यापक बनाएं।",
+  "@feedFilteredEmptyBody": {
+    "description": "Empty-state body shown when the feed has no items because filters are active."
+  },
+
+  "feedClearFiltersButton": "फ़िल्टर हटाएं",
+  "@feedClearFiltersButton": {
+    "description": "Button in the filtered-empty state that clears all active feed filters."
+  },
+
+  "feedAllCaughtUp": "आप सब कुछ देख चुके हैं",
+  "@feedAllCaughtUp": {
+    "description": "Caption shown at the end of the feed list when there are no more items to load."
+  },
+
+  "feedNewMatchesSinceVisit": "{count, plural, one{आपकी पिछली विज़िट के बाद 1 नया मैच} other{आपकी पिछली विज़िट के बाद {count} नए मैच}}",
+  "@feedNewMatchesSinceVisit": {
+    "description": "Headline showing how many new matches surfaced since the applicant's last feed visit.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "feedThumbUpTooltip": "अच्छा मैच",
+  "@feedThumbUpTooltip": {
+    "description": "Tooltip for the thumbs-up (positive match feedback) icon button."
+  },
+
+  "feedThumbDownTooltip": "दिलचस्पी नहीं",
+  "@feedThumbDownTooltip": {
+    "description": "Tooltip for the thumbs-down (negative match feedback) icon button."
+  },
+
+  "matchCaveatPrefix": "ध्यान देने योग्य: {reason}",
+  "@matchCaveatPrefix": {
+    "description": "Prefix shown before a match's caveat/downside text.",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+
+  "feedClosedPill": "बंद",
+  "@feedClosedPill": {
+    "description": "Pill label shown on a job card when the job listing is closed."
+  },
+
+  "feedPostedMonthsAgo": "{months, plural, one{{months} महीना पहले} other{{months} महीने पहले}}",
+  "@feedPostedMonthsAgo": {
+    "description": "Relative time since a job was posted, in months.",
+    "placeholders": {
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+
+  "feedPostedDaysAgo": "{days} दिन पहले",
+  "@feedPostedDaysAgo": {
+    "description": "Relative time since a job was posted, in days.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+
+  "feedPostedHoursAgo": "{hours, plural, one{{hours} घंटा पहले} other{{hours} घंटे पहले}}",
+  "@feedPostedHoursAgo": {
+    "description": "Relative time since a job was posted, in hours.",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+
+  "feedPostedJustNow": "अभी-अभी",
+  "@feedPostedJustNow": {
+    "description": "Relative time since a job was posted, when under an hour ago."
+  },
+
+  "feedSearchHint": "टाइटल या कंपनी खोजें",
+  "@feedSearchHint": {
+    "description": "Hint text for the feed search field."
+  },
+
+  "feedFiltersTooltip": "फ़िल्टर",
+  "@feedFiltersTooltip": {
+    "description": "Tooltip for the feed filter icon button that opens the filter sheet."
+  },
+
+  "feedMinCtcChipLabel": "≥ ₹{amount}L",
+  "@feedMinCtcChipLabel": {
+    "description": "Active-filter chip label for a minimum-CTC filter, in lakhs.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+
+  "feedYearsSuffix": "{years} वर्ष",
+  "@feedYearsSuffix": {
+    "description": "Compact years-of-experience label, e.g. on a filter chip or the filter sheet stepper.",
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
+
+  "feedClearAllButton": "सभी हटाएं",
+  "@feedClearAllButton": {
+    "description": "Button that clears every active feed filter at once."
+  },
+
+  "feedFilterSheetTitle": "मैच फ़िल्टर करें",
+  "@feedFilterSheetTitle": {
+    "description": "Title of the feed filter bottom sheet."
+  },
+
+  "feedFilterLocationLabel": "स्थान",
+  "@feedFilterLocationLabel": {
+    "description": "Section label for the location filter in the filter sheet."
+  },
+
+  "feedFilterAddCityHint": "एक और शहर जोड़ें",
+  "@feedFilterAddCityHint": {
+    "description": "Hint text for the custom-city text field in the filter sheet."
+  },
+
+  "feedFilterExperienceLabel": "अनुभव",
+  "@feedFilterExperienceLabel": {
+    "description": "Section label for the minimum-experience filter in the filter sheet."
+  },
+
+  "feedFilterExperienceAny": "कोई भी",
+  "@feedFilterExperienceAny": {
+    "description": "Value shown for the experience stepper when no minimum is set."
+  },
+
+  "feedFilterMinCtcLabel": "न्यूनतम CTC (लाख में)",
+  "@feedFilterMinCtcLabel": {
+    "description": "Section label for the minimum-CTC filter in the filter sheet."
+  },
+
+  "feedFilterCtcHint": "जैसे 5",
+  "@feedFilterCtcHint": {
+    "description": "Hint text for the minimum-CTC text field in the filter sheet."
+  },
+
+  "feedFilterCtcPrefix": "₹ ",
+  "@feedFilterCtcPrefix": {
+    "description": "Currency prefix for the minimum-CTC text field in the filter sheet."
+  },
+
+  "feedFilterCtcSuffix": "L",
+  "@feedFilterCtcSuffix": {
+    "description": "Lakh-unit suffix for the minimum-CTC text field in the filter sheet."
+  },
+
+  "feedFilterResetButton": "रीसेट करें",
+  "@feedFilterResetButton": {
+    "description": "Button that resets the filter sheet's draft state (keeps the search query)."
+  },
+
+  "feedFilterApplyButton": "लागू करें",
+  "@feedFilterApplyButton": {
+    "description": "Button that commits the filter sheet's draft state to the active feed filters."
+  },
+
+  "feedCityBangalore": "Bangalore",
+  "@feedCityBangalore": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityMumbai": "Mumbai",
+  "@feedCityMumbai": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityDelhiNcr": "Delhi NCR",
+  "@feedCityDelhiNcr": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityHyderabad": "Hyderabad",
+  "@feedCityHyderabad": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityChennai": "Chennai",
+  "@feedCityChennai": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityPune": "Pune",
+  "@feedCityPune": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityRemote": "रिमोट",
+  "@feedCityRemote": {
+    "description": "Preset work-arrangement option in the feed location filter."
+  },
+
+  "feedSummaryUploadResume": "रिज़्यूमे अपलोड करें",
+  "@feedSummaryUploadResume": {
+    "description": "Feed home-summary match-profile tile label prompting a résumé upload."
+  },
+
+  "feedSummaryFinishProfile": "अपनी प्रोफ़ाइल पूरी करें",
+  "@feedSummaryFinishProfile": {
+    "description": "Feed home-summary match-profile tile label prompting completion of preferences."
+  },
+
+  "feedSummaryProfileComplete": "प्रोफ़ाइल पूरी हुई",
+  "@feedSummaryProfileComplete": {
+    "description": "Feed home-summary match-profile tile label shown once the profile is complete."
+  },
+
+  "jobDetailActionFailed": "कार्रवाई विफल रही",
+  "@jobDetailActionFailed": {
+    "description": "Fallback snackbar message for a job-detail action error with no server detail."
+  },
+
+  "jobDetailNetworkError": "Jobify तक नहीं पहुंच सके।",
+  "@jobDetailNetworkError": {
+    "description": "Snackbar message for a job-detail action error caused by a network failure."
+  },
+
+  "jobDetailGoneHeadline": "यह नौकरी अब उपलब्ध नहीं है",
+  "@jobDetailGoneHeadline": {
+    "description": "Empty-state headline shown when a job detail 404s (closed or removed)."
+  },
+
+  "jobDetailGoneBody": "इसे बंद या हटाई जा चुकी होगी।",
+  "@jobDetailGoneBody": {
+    "description": "Empty-state body shown when a job detail 404s (closed or removed)."
+  },
+
+  "jobDetailWhyThisMatch": "यह मैच क्यों",
+  "@jobDetailWhyThisMatch": {
+    "description": "Heading for the match explanation card on the job detail screen."
+  },
+
+  "jobDetailMatchFeedbackPrompt": "क्या यह मैच आपके लिए सही था?",
+  "@jobDetailMatchFeedbackPrompt": {
+    "description": "Prompt above the thumbs up/down match-feedback row on the job detail screen."
+  },
+
+  "jobDetailTimelineHeading": "टाइमलाइन",
+  "@jobDetailTimelineHeading": {
+    "description": "Heading for the application stage-change timeline on the job detail screen."
+  },
+
+  "jobDetailApplyButton": "आवेदन करें",
+  "@jobDetailApplyButton": {
+    "description": "Button label to apply to a job."
+  },
+
+  "jobDetailWithdrawButton": "वापस लें",
+  "@jobDetailWithdrawButton": {
+    "description": "Button label to withdraw an application."
+  },
+
+  "jobDetailWithdrawDialogTitle": "आवेदन वापस लें?",
+  "@jobDetailWithdrawDialogTitle": {
+    "description": "Confirmation dialog title for withdrawing an application."
+  },
+
+  "jobDetailWithdrawDialogBody": "यदि आप अपना मन बदलते हैं तो बाद में फिर से आवेदन कर सकते हैं।",
+  "@jobDetailWithdrawDialogBody": {
+    "description": "Confirmation dialog body for withdrawing an application."
+  },
+
+  "savedHeaderTitle": "सहेजी गई नौकरियां",
+  "@savedHeaderTitle": {
+    "description": "Saved screen header title. Not reused from shellTabSaved: the tab label is deliberately transliterated (\"सेव्ड\") to fit the NavigationBar's tight width, a constraint that doesn't apply to the full-width screen header."
+  },
+
+  "savedHeaderSubtitle": "वे नौकरियां जो आपने बाद के लिए रखीं",
+  "@savedHeaderSubtitle": {
+    "description": "Saved screen header subtitle."
+  },
+
+  "savedEmptyHeadline": "अभी तक कुछ भी सेव नहीं किया गया",
+  "@savedEmptyHeadline": {
+    "description": "Empty-state headline shown when the applicant has no saved jobs."
+  },
+
+  "savedEmptyBody": "बाद में देखने के लिए किसी भी नौकरी को दिल पर टैप करके सेव करें।",
+  "@savedEmptyBody": {
+    "description": "Empty-state body shown when the applicant has no saved jobs."
+  },
+
+  "commonSaving": "सेव हो रहा है…",
+  "@commonSaving": {
+    "description": "Button label while a form submit is in flight. Reused by the preferences and edit-profile screens."
+  },
+
+  "stageApplied": "आवेदन किया",
+  "@stageApplied": {
+    "description": "Applicant-facing label for the 'applied' application stage."
+  },
+
+  "stageShortlisted": "शॉर्टलिस्ट",
+  "@stageShortlisted": {
+    "description": "Applicant-facing label for the 'shortlisted' application stage."
+  },
+
+  "stageInterview": "इंटरव्यू",
+  "@stageInterview": {
+    "description": "Applicant-facing label for the 'interview' application stage."
+  },
+
+  "stageOffer": "ऑफ़र",
+  "@stageOffer": {
+    "description": "Applicant-facing label for the 'offer' application stage."
+  },
+
+  "stageHired": "चयनित",
+  "@stageHired": {
+    "description": "Applicant-facing label for the 'hired' application stage."
+  },
+
+  "stageRejected": "चयन नहीं हुआ",
+  "@stageRejected": {
+    "description": "Applicant-facing label for the 'rejected' application stage — spec-locked softened wording."
+  },
+
+  "stageInProgress": "प्रगति पर",
+  "@stageInProgress": {
+    "description": "Applicant-facing label for an unrecognised/unknown application stage."
+  },
+
+  "stageWithdrawn": "वापस लिया गया",
+  "@stageWithdrawn": {
+    "description": "Stage-pill label shown when the application itself has been withdrawn (a status, not a pipeline stage)."
+  },
+
+  "applicationsHeaderTitle": "आवेदन",
+  "@applicationsHeaderTitle": {
+    "description": "Applications screen header title."
+  },
+
+  "applicationsHeaderSubtitle": "जिन भूमिकाओं के लिए आपने आवेदन किया",
+  "@applicationsHeaderSubtitle": {
+    "description": "Applications screen header subtitle."
+  },
+
+  "applicationsEmptyHeadline": "अभी तक कोई आवेदन नहीं",
+  "@applicationsEmptyHeadline": {
+    "description": "Empty-state headline shown when the applicant has no applications."
+  },
+
+  "applicationsEmptyBody": "फ़ीड ब्राउज़ करें और अपनी पसंदीदा भूमिकाओं के लिए आवेदन करें।",
+  "@applicationsEmptyBody": {
+    "description": "Empty-state body shown when the applicant has no applications."
+  },
+
+  "applicationsBrowseFeedButton": "फ़ीड ब्राउज़ करें",
+  "@applicationsBrowseFeedButton": {
+    "description": "Button in the applications empty state that navigates to the feed."
+  },
+
+  "applicationsWithdrawnOn": "{when} को वापस लिया गया",
+  "@applicationsWithdrawnOn": {
+    "description": "Applications row caption when the application was withdrawn — {when} is a pre-formatted date.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+
+  "applicationsAppliedOn": "{when} को आवेदन किया",
+  "@applicationsAppliedOn": {
+    "description": "Applications row caption when the application is active — {when} is a pre-formatted date.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationsTitle": "सूचनाएं",
+  "@notificationsTitle": {
+    "description": "Notifications screen AppBar title. Reused as the profile screen's notifications row title."
+  },
+
+  "notificationsEmpty": "अभी तक कोई सूचना नहीं",
+  "@notificationsEmpty": {
+    "description": "Empty-state text shown when the applicant has no notifications."
+  },
+
+  "notificationApplicationReceivedWithEmployer": "{employer} में {job} के लिए आवेदन प्राप्त हुआ",
+  "@notificationApplicationReceivedWithEmployer": {
+    "description": "Notification title for an 'application_received' notification with both a job title and employer name in its payload.",
+    "placeholders": {
+      "job": {
+        "type": "String"
+      },
+      "employer": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationApplicationReceivedWithJob": "{job} के लिए आवेदन प्राप्त हुआ",
+  "@notificationApplicationReceivedWithJob": {
+    "description": "Notification title for an 'application_received' notification with only a job title in its payload.",
+    "placeholders": {
+      "job": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationApplicationReceived": "आवेदन प्राप्त हुआ",
+  "@notificationApplicationReceived": {
+    "description": "Notification title for an 'application_received' notification with no job title in its payload."
+  },
+
+  "notificationStageShortlistedJob": "{job} के लिए शॉर्टलिस्ट किया गया",
+  "@notificationStageShortlistedJob": {
+    "description": "Notification title for an 'application_stage_changed' notification (stage: shortlisted) with a job title in its payload.",
+    "placeholders": {
+      "job": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationStageShortlisted": "शॉर्टलिस्ट किया गया",
+  "@notificationStageShortlisted": {
+    "description": "Notification title for an 'application_stage_changed' notification (stage: shortlisted) with no job title in its payload."
+  },
+
+  "notificationStageInterviewJob": "{job} के लिए इंटरव्यू चरण",
+  "@notificationStageInterviewJob": {
+    "description": "Notification title for an 'application_stage_changed' notification (stage: interview) with a job title in its payload.",
+    "placeholders": {
+      "job": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationStageInterview": "इंटरव्यू चरण",
+  "@notificationStageInterview": {
+    "description": "Notification title for an 'application_stage_changed' notification (stage: interview) with no job title in its payload."
+  },
+
+  "notificationStageOfferJob": "आपके लिए {job} का ऑफ़र है",
+  "@notificationStageOfferJob": {
+    "description": "Notification title for an 'application_stage_changed' notification (stage: offer) with a job title in its payload.",
+    "placeholders": {
+      "job": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationStageOffer": "आपके लिए एक ऑफ़र है",
+  "@notificationStageOffer": {
+    "description": "Notification title for an 'application_stage_changed' notification (stage: offer) with no job title in its payload."
+  },
+
+  "notificationStageHiredJob": "आपको {job} के लिए चयनित किया गया",
+  "@notificationStageHiredJob": {
+    "description": "Notification title for an 'application_stage_changed' notification (stage: hired) with a job title in its payload.",
+    "placeholders": {
+      "job": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationStageHired": "आपको चयनित किया गया",
+  "@notificationStageHired": {
+    "description": "Notification title for an 'application_stage_changed' notification (stage: hired) with no job title in its payload."
+  },
+
+  "notificationStageRejectedJob": "{job} के लिए आपके आवेदन पर अपडेट",
+  "@notificationStageRejectedJob": {
+    "description": "Notification title for an 'application_stage_changed' notification (stage: rejected) with a job title in its payload.",
+    "placeholders": {
+      "job": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationStageRejected": "आपके आवेदन पर अपडेट",
+  "@notificationStageRejected": {
+    "description": "Notification title for an 'application_stage_changed' notification (stage: rejected) with no job title in its payload."
+  },
+
+  "notificationStageDefaultJob": "{job} के लिए आवेदन अपडेट किया गया",
+  "@notificationStageDefaultJob": {
+    "description": "Notification title for an 'application_stage_changed' notification with an unrecognised stage, with a job title in its payload.",
+    "placeholders": {
+      "job": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationStageDefault": "आवेदन अपडेट किया गया",
+  "@notificationStageDefault": {
+    "description": "Notification title for an 'application_stage_changed' notification with an unrecognised stage, with no job title in its payload."
+  },
+
+  "privacyTitle": "गोपनीयता और डेटा",
+  "@privacyTitle": {
+    "description": "Privacy screen AppBar title. Reused as the profile screen's privacy row title."
+  },
+
+  "privacyMutationErrorSnackbar": "प्राथमिकता अपडेट नहीं हो सकी। बदलाव वापस कर दिया गया।",
+  "@privacyMutationErrorSnackbar": {
+    "description": "Snackbar shown when a consent-toggle update fails and is rolled back."
+  },
+
+  "privacyNotificationPrefsHeading": "सूचना प्राथमिकताएं",
+  "@privacyNotificationPrefsHeading": {
+    "description": "Section heading for the consent-toggle list on the privacy screen."
+  },
+
+  "privacyConsentEmailTransactionalTitle": "सेवा अपडेट",
+  "@privacyConsentEmailTransactionalTitle": {
+    "description": "Title for the email_transactional consent toggle."
+  },
+
+  "privacyConsentEmailTransactionalSubtitle": "आपके आवेदनों, मैचों और खाते के बारे में ईमेल।",
+  "@privacyConsentEmailTransactionalSubtitle": {
+    "description": "Subtitle for the email_transactional consent toggle."
+  },
+
+  "privacyConsentEmailMarketingTitle": "नौकरी सिफारिशें",
+  "@privacyConsentEmailMarketingTitle": {
+    "description": "Title for the email_marketing consent toggle."
+  },
+
+  "privacyConsentEmailMarketingSubtitle": "आपकी प्रोफ़ाइल से मेल खाने वाली नौकरियों का साप्ताहिक सारांश।",
+  "@privacyConsentEmailMarketingSubtitle": {
+    "description": "Subtitle for the email_marketing consent toggle."
+  },
+
+  "privacyConsentInAppTitle": "ऐप में सूचनाएं",
+  "@privacyConsentInAppTitle": {
+    "description": "Title for the in_app_notifications consent toggle."
+  },
+
+  "privacyConsentInAppSubtitle": "ऐप के अंदर अलर्ट देखें।",
+  "@privacyConsentInAppSubtitle": {
+    "description": "Subtitle for the in_app_notifications consent toggle."
+  },
+
+  "privacyYourDataHeading": "आपका डेटा",
+  "@privacyYourDataHeading": {
+    "description": "Section heading for the DSR-export section of the privacy screen."
+  },
+
+  "privacyYourDataBody": "आपके बारे में हमारी हर जानकारी की एक कॉपी (JSON)।",
+  "@privacyYourDataBody": {
+    "description": "Body text for the DSR-export section of the privacy screen."
+  },
+
+  "privacyDownloadDataButton": "मेरा डेटा डाउनलोड करें",
+  "@privacyDownloadDataButton": {
+    "description": "Button that triggers a DSR data export. Reused on the delete-account screen."
+  },
+
+  "profileAccountHeading": "खाता",
+  "@profileAccountHeading": {
+    "description": "Section heading for account-level actions. Used on both the profile screen and the privacy screen."
+  },
+
+  "privacyDeleteBody": "अपना डेटा स्थायी रूप से मिटाएं। इसे पूर्ववत नहीं किया जा सकता।",
+  "@privacyDeleteBody": {
+    "description": "Body text for the delete-account section of the privacy screen."
+  },
+
+  "privacyDeleteAccountButton": "मेरा खाता हटाएं",
+  "@privacyDeleteAccountButton": {
+    "description": "Button/title label for deleting the account. Reused across the privacy screen and the delete-account screen (AppBar title + submit button)."
+  },
+
+  "privacyTurnOffEmailsDialogTitle": "सेवा ईमेल बंद करें?",
+  "@privacyTurnOffEmailsDialogTitle": {
+    "description": "Confirmation dialog title shown when turning off the email_transactional consent."
+  },
+
+  "privacyTurnOffEmailsDialogBody": "आपको अपने आवेदनों, मैचों या खाते के बारे में ईमेल नहीं मिलेंगे। क्या आप सुनिश्चित हैं?",
+  "@privacyTurnOffEmailsDialogBody": {
+    "description": "Confirmation dialog body shown when turning off the email_transactional consent."
+  },
+
+  "privacyTurnOffButton": "बंद करें",
+  "@privacyTurnOffButton": {
+    "description": "Confirm button label for turning off the email_transactional consent."
+  },
+
+  "privacyExportSuccessSnackbar": "आपका डेटा क्लिपबोर्ड पर है।\nइसे किसी टेक्स्ट एडिटर में पेस्ट करें और .json फ़ाइल के रूप में सेव करें।",
+  "@privacyExportSuccessSnackbar": {
+    "description": "Snackbar shown after a successful DSR data export."
+  },
+
+  "privacyExportErrorSnackbar": "आपका डेटा एक्सपोर्ट नहीं हो सका। फिर से प्रयास करें।",
+  "@privacyExportErrorSnackbar": {
+    "description": "Snackbar shown when a DSR data export fails."
+  },
+
+  "deleteAccountErrorSnackbar": "आपका खाता हटाया नहीं जा सका। फिर से प्रयास करें।",
+  "@deleteAccountErrorSnackbar": {
+    "description": "Snackbar shown when the delete-account submission fails."
+  },
+
+  "deleteAccountWarningBanner": "इससे Jobify पर आपका व्यक्तिगत डेटा स्थायी रूप से हट जाएगा। यह कार्रवाई पूर्ववत नहीं की जा सकती।",
+  "@deleteAccountWarningBanner": {
+    "description": "Warning banner at the top of the delete-account screen."
+  },
+
+  "deleteAccountWhatWillHappenHeading": "क्या होगा:",
+  "@deleteAccountWhatWillHappenHeading": {
+    "description": "Heading above the delete-account consequence bullets."
+  },
+
+  "deleteAccountBulletProfile": "आपकी प्रोफ़ाइल, रिज्यूमे, आवेदन और सहेजी गई नौकरियां हटा दी जाएंगी।",
+  "@deleteAccountBulletProfile": {
+    "description": "First delete-account consequence bullet."
+  },
+
+  "deleteAccountBulletMatchHistory": "आपका मैच इतिहास और सूचनाएं मिटा दी जाएंगी।",
+  "@deleteAccountBulletMatchHistory": {
+    "description": "Second delete-account consequence bullet."
+  },
+
+  "deleteAccountBulletAnalytics": "अनाम नियोक्ता-पक्ष एनालिटिक्स बने रहेंगे (केवल आवेदन गिनती)।",
+  "@deleteAccountBulletAnalytics": {
+    "description": "Third delete-account consequence bullet."
+  },
+
+  "deleteAccountDownloadHint": "आगे बढ़ने से पहले, हम आपका डेटा डाउनलोड करने की सलाह देते हैं।",
+  "@deleteAccountDownloadHint": {
+    "description": "Hint text below the download-my-data button on the delete-account screen."
+  },
+
+  "deleteAccountConfirmPrompt": "पुष्टि के लिए, नीचे ठीक यह अंग्रेज़ी शब्द टाइप करें: {phrase}",
+  "@deleteAccountConfirmPrompt": {
+    "description": "Prompt above the confirmation text field. {phrase} is the literal wire token 'DELETE_MY_ACCOUNT', which is never translated — the user must type that exact English text; non-English locales should make this explicit in the surrounding sentence.",
+    "placeholders": {
+      "phrase": {
+        "type": "String"
+      }
+    }
+  },
+
+  "deleteAccountConfirmDialogTitle": "क्या आप पूरी तरह सुनिश्चित हैं?",
+  "@deleteAccountConfirmDialogTitle": {
+    "description": "Final confirmation dialog title before deleting the account."
+  },
+
+  "deleteAccountConfirmDialogBody": "आपका खाता और सभी संबंधित डेटा स्थायी रूप से हटा दिया जाएगा।",
+  "@deleteAccountConfirmDialogBody": {
+    "description": "Final confirmation dialog body before deleting the account."
+  },
+
+  "deleteAccountYesDeleteButton": "हां, हटाएं",
+  "@deleteAccountYesDeleteButton": {
+    "description": "Confirm button label in the final delete-account dialog."
+  },
+
+  "resumeUnsupportedFileType": "असमर्थित फ़ाइल प्रकार (PDF, DOC, DOCX)।",
+  "@resumeUnsupportedFileType": {
+    "description": "Error message shown when the picked résumé file type isn't supported."
+  },
+
+  "resumeFileTooLarge": "फ़ाइल बहुत बड़ी है (अधिकतम 10 MB)।",
+  "@resumeFileTooLarge": {
+    "description": "Error message shown when the uploaded résumé exceeds the size limit."
+  },
+
+  "resumeNetworkError": "Jobify तक नहीं पहुंच सके।",
+  "@resumeNetworkError": {
+    "description": "Error message shown when a résumé upload fails due to a network error."
+  },
+
+  "resumeUploadFailedGeneric": "अपलोड नहीं हो सका। फिर से प्रयास करें।",
+  "@resumeUploadFailedGeneric": {
+    "description": "Fallback error message shown when a résumé upload fails for an unrecognised reason."
+  },
+
+  "resumeTitle": "रिज्यूमे",
+  "@resumeTitle": {
+    "description": "Résumé screen AppBar title. Reused as the profile screen's résumé row title."
+  },
+
+  "resumeUploadingButton": "अपलोड हो रहा है…",
+  "@resumeUploadingButton": {
+    "description": "Upload button label while an upload is in flight."
+  },
+
+  "resumeUploadButton": "रिज्यूमे अपलोड करें / बदलें",
+  "@resumeUploadButton": {
+    "description": "Upload button label when idle."
+  },
+
+  "resumeEmptyBody": "अभी तक कोई रिज्यूमे नहीं है। एक अपलोड करें ताकि हम आपको सही भूमिकाओं से मिला सकें।",
+  "@resumeEmptyBody": {
+    "description": "Empty-state body shown when the applicant has no résumé."
+  },
+
+  "resumeStatusReady": "तैयार",
+  "@resumeStatusReady": {
+    "description": "Résumé status chip label once parsing succeeds."
+  },
+
+  "resumeStatusFailed": "पार्स नहीं हो सका — फिर से प्रयास करें",
+  "@resumeStatusFailed": {
+    "description": "Résumé status chip label when parsing fails."
+  },
+
+  "resumeStatusProcessing": "प्रोसेस हो रहा है…",
+  "@resumeStatusProcessing": {
+    "description": "Résumé status chip label while parsing is pending or in progress."
+  },
+
+  "resumeUploadedOn": "{when} को अपलोड किया गया",
+  "@resumeUploadedOn": {
+    "description": "Résumé card caption showing when it was uploaded — {when} is a pre-formatted date.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+
+  "preferencesTitle": "आप क्या तलाश रहे हैं?",
+  "@preferencesTitle": {
+    "description": "Preferences screen AppBar title."
+  },
+
+  "preferencesSkipButton": "छोड़ें",
+  "@preferencesSkipButton": {
+    "description": "Button to skip the preferences capture flow."
+  },
+
+  "preferencesLoadError": "आपकी प्राथमिकताएं लोड नहीं हो सकीं।",
+  "@preferencesLoadError": {
+    "description": "Error text shown when the initial preferences fetch fails."
+  },
+
+  "preferencesSectionHeading": "आपकी प्राथमिकताएं",
+  "@preferencesSectionHeading": {
+    "description": "Section heading above the preferences form."
+  },
+
+  "preferencesDesiredRoleLabel": "वांछित भूमिका",
+  "@preferencesDesiredRoleLabel": {
+    "description": "Label for the desired-role dropdown/field. Reused on the preferences screen, edit-profile screen, and profile spec sheet."
+  },
+
+  "preferencesNoPreferenceOption": "कोई प्राथमिकता नहीं",
+  "@preferencesNoPreferenceOption": {
+    "description": "Dropdown item that clears the desired-role selection. Reused on the preferences and edit-profile screens."
+  },
+
+  "preferencesLocationsLabel": "स्थान",
+  "@preferencesLocationsLabel": {
+    "description": "Label for the locations field/list. Reused on the preferences screen, edit-profile screen, and profile spec sheet."
+  },
+
+  "preferencesAddLocationLabel": "स्थान जोड़ें",
+  "@preferencesAddLocationLabel": {
+    "description": "Label for the add-location text field. Reused on the preferences and edit-profile screens."
+  },
+
+  "preferencesExpectedCtcLabel": "अपेक्षित CTC (₹/वर्ष)",
+  "@preferencesExpectedCtcLabel": {
+    "description": "Label for the expected-CTC field. Reused on the preferences and edit-profile screens."
+  },
+
+  "preferencesResumeUnparsedBody": "हम आपका रिज्यूमे नहीं पढ़ सके — कृपया नीचे सीधे बताएं।",
+  "@preferencesResumeUnparsedBody": {
+    "description": "Body text shown on the preferences screen's résumé summary card when parsing produced no data."
+  },
+
+  "preferencesResumeHeading": "आपका रिज्यूमे",
+  "@preferencesResumeHeading": {
+    "description": "Heading on the preferences screen's résumé summary card when parsed data is available."
+  },
+
+  "formSaveFailedGeneric": "सेव नहीं हो सका। फिर से प्रयास करें।",
+  "@formSaveFailedGeneric": {
+    "description": "Generic save-failure snackbar. Reused by the preferences and edit-profile screens."
+  },
+
+  "desiredRoleSoftwareEngineering": "सॉफ्टवेयर इंजीनियरिंग",
+  "@desiredRoleSoftwareEngineering": {
+    "description": "Display label for the software_engineering desired-role category."
+  },
+
+  "desiredRoleDataAnalytics": "डेटा और एनालिटिक्स",
+  "@desiredRoleDataAnalytics": {
+    "description": "Display label for the data_analytics desired-role category."
+  },
+
+  "desiredRoleProductManagement": "प्रोडक्ट मैनेजमेंट",
+  "@desiredRoleProductManagement": {
+    "description": "Display label for the product_management desired-role category."
+  },
+
+  "desiredRoleDesign": "डिज़ाइन",
+  "@desiredRoleDesign": {
+    "description": "Display label for the design desired-role category."
+  },
+
+  "desiredRoleSales": "सेल्स",
+  "@desiredRoleSales": {
+    "description": "Display label for the sales desired-role category."
+  },
+
+  "desiredRoleMarketing": "मार्केटिंग",
+  "@desiredRoleMarketing": {
+    "description": "Display label for the marketing desired-role category."
+  },
+
+  "desiredRoleCustomerSupport": "कस्टमर सपोर्ट",
+  "@desiredRoleCustomerSupport": {
+    "description": "Display label for the customer_support desired-role category."
+  },
+
+  "desiredRoleOperations": "ऑपरेशंस",
+  "@desiredRoleOperations": {
+    "description": "Display label for the operations desired-role category."
+  },
+
+  "desiredRoleFinanceAccounting": "फाइनेंस और अकाउंटिंग",
+  "@desiredRoleFinanceAccounting": {
+    "description": "Display label for the finance_accounting desired-role category."
+  },
+
+  "desiredRoleHrRecruiting": "एचआर और भर्ती",
+  "@desiredRoleHrRecruiting": {
+    "description": "Display label for the hr_recruiting desired-role category."
+  },
+
+  "desiredRoleLegal": "लीगल",
+  "@desiredRoleLegal": {
+    "description": "Display label for the legal desired-role category."
+  },
+
+  "desiredRoleConsulting": "कंसल्टिंग",
+  "@desiredRoleConsulting": {
+    "description": "Display label for the consulting desired-role category."
+  },
+
+  "desiredRoleBusinessDevelopment": "बिज़नेस डेवलपमेंट",
+  "@desiredRoleBusinessDevelopment": {
+    "description": "Display label for the business_development desired-role category."
+  },
+
+  "desiredRoleContentCommunications": "कंटेंट और कम्युनिकेशन",
+  "@desiredRoleContentCommunications": {
+    "description": "Display label for the content_communications desired-role category."
+  },
+
+  "desiredRoleAdministration": "एडमिनिस्ट्रेशन",
+  "@desiredRoleAdministration": {
+    "description": "Display label for the administration desired-role category."
+  },
+
+  "desiredRoleOther": "अन्य",
+  "@desiredRoleOther": {
+    "description": "Display label for the other desired-role category."
+  },
+
+  "desiredRoleUnknown": "अज्ञात",
+  "@desiredRoleUnknown": {
+    "description": "Fallback display label for an unrecognised desired-role wire value. Should never reach the UI."
+  },
+
+  "profileTitle": "प्रोफ़ाइल",
+  "@profileTitle": {
+    "description": "Profile screen header title."
+  },
+
+  "profileEditButton": "संपादित करें",
+  "@profileEditButton": {
+    "description": "Button that navigates to the edit-profile screen."
+  },
+
+  "profileHiringCtaTitle": "मैं भर्ती कर रहा हूं — नौकरी पोस्ट करें",
+  "@profileHiringCtaTitle": {
+    "description": "Title of the card prompting an applicant to create an employer and start recruiting."
+  },
+
+  "profileHiringCtaSubtitle": "भर्ती शुरू करने के लिए अपनी कंपनी बनाएं",
+  "@profileHiringCtaSubtitle": {
+    "description": "Subtitle of the card prompting an applicant to create an employer and start recruiting."
+  },
+
+  "profileMatchProfileHeading": "मैच प्रोफ़ाइल",
+  "@profileMatchProfileHeading": {
+    "description": "Heading above the match-profile spec sheet on the profile screen."
+  },
+
+  "profileResumeSubtitle": "अपना रिज्यूमे प्रबंधित करें",
+  "@profileResumeSubtitle": {
+    "description": "Subtitle of the résumé row on the profile screen."
+  },
+
+  "profileNotificationsSubtitle": "अपनी सूचनाएं देखें",
+  "@profileNotificationsSubtitle": {
+    "description": "Subtitle of the notifications row on the profile screen."
+  },
+
+  "profileInvitesSubtitle": "भर्ती के लिए कंपनी आमंत्रण",
+  "@profileInvitesSubtitle": {
+    "description": "Subtitle of the pending-invitations row on the profile screen."
+  },
+
+  "profilePrivacySubtitle": "प्राथमिकताएं, एक्सपोर्ट, हटाएं",
+  "@profilePrivacySubtitle": {
+    "description": "Subtitle of the privacy row on the profile screen."
+  },
+
+  "profileAppearanceHeading": "दिखावट",
+  "@profileAppearanceHeading": {
+    "description": "Heading above the light/dark/system theme selector."
+  },
+
+  "profileAppearanceSystem": "सिस्टम",
+  "@profileAppearanceSystem": {
+    "description": "Segmented-button label for following the system theme."
+  },
+
+  "profileAppearanceLight": "लाइट",
+  "@profileAppearanceLight": {
+    "description": "Segmented-button label for the light theme."
+  },
+
+  "profileAppearanceDark": "डार्क",
+  "@profileAppearanceDark": {
+    "description": "Segmented-button label for the dark theme."
+  },
+
+  "profileLanguageLabel": "भाषा",
+  "@profileLanguageLabel": {
+    "description": "Heading above the English/Hindi language switcher."
+  },
+
+  "profileLanguageEnglish": "English",
+  "@profileLanguageEnglish": {
+    "description": "Segmented-button label for English. A language's own name renders in that language, so this value is identical in every ARB file."
+  },
+
+  "profileLanguageHindi": "हिन्दी",
+  "@profileLanguageHindi": {
+    "description": "Segmented-button label for Hindi. A language's own name renders in that language, so this value is identical in every ARB file."
+  },
+
+  "profileSigningOutButton": "साइन आउट हो रहा है…",
+  "@profileSigningOutButton": {
+    "description": "Sign-out button label while the sign-out request is in flight."
+  },
+
+  "profileSignOutButton": "साइन आउट करें",
+  "@profileSignOutButton": {
+    "description": "Sign-out button label when idle. Reused as the confirmation dialog's title question and confirm button."
+  },
+
+  "profileSignOutDialogTitle": "साइन आउट करें?",
+  "@profileSignOutDialogTitle": {
+    "description": "Confirmation dialog title before signing out."
+  },
+
+  "profileSignOutDialogBody": "जारी रखने के लिए आपको फिर से साइन इन करना होगा।",
+  "@profileSignOutDialogBody": {
+    "description": "Confirmation dialog body before signing out."
+  },
+
+  "profileRetryPreferencesLabel": "प्राथमिकताएं",
+  "@profileRetryPreferencesLabel": {
+    "description": "Row label shown on the profile spec sheet when the preferences fetch failed."
+  },
+
+  "profileExperienceLabel": "अनुभव",
+  "@profileExperienceLabel": {
+    "description": "Spec-sheet row label for years of experience on the profile screen."
+  },
+
+  "profileNoticePeriodLabel": "नोटिस अवधि",
+  "@profileNoticePeriodLabel": {
+    "description": "Spec-sheet row label for notice period on the profile screen."
+  },
+
+  "profileNoticePeriodDaysValue": "{days, plural, one{{days} दिन} other{{days} दिन}}",
+  "@profileNoticePeriodDaysValue": {
+    "description": "Spec-sheet row value for notice period, in days.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+
+  "profileCurrentCtcLabel": "वर्तमान CTC",
+  "@profileCurrentCtcLabel": {
+    "description": "Spec-sheet row label for current CTC on the profile screen."
+  },
+
+  "profileExpectedCtcLabel": "अपेक्षित CTC",
+  "@profileExpectedCtcLabel": {
+    "description": "Spec-sheet row label for expected CTC on the profile screen."
+  },
+
+  "profileRetryFailedLabel": "लोड नहीं हो सका",
+  "@profileRetryFailedLabel": {
+    "description": "Inline error text shown next to a failed spec-sheet row's retry button."
+  },
+
+  "profileAddFieldAction": "जोड़ें",
+  "@profileAddFieldAction": {
+    "description": "Tappable prompt shown in place of a missing spec-sheet value, jumping to edit-profile."
+  },
+
+  "profileYearsExperienceSuffix": "{years} वर्ष",
+  "@profileYearsExperienceSuffix": {
+    "description": "Spec-sheet row value for years of experience — {years} is the pre-trimmed numeric string (trailing .0 dropped).",
+    "placeholders": {
+      "years": {
+        "type": "String"
+      }
+    }
+  },
+
+  "profileVersionLabel": "v{version} ({build})",
+  "@profileVersionLabel": {
+    "description": "App version/build stamp at the bottom of the profile screen. Version numbering notation is not natural language, so this value is identical in every ARB file.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "build": {
+        "type": "String"
+      }
+    }
+  },
+
+  "editProfileTitle": "प्रोफ़ाइल संपादित करें",
+  "@editProfileTitle": {
+    "description": "Edit-profile screen AppBar title."
+  },
+
+  "editProfileLoadError": "आपकी प्रोफ़ाइल लोड नहीं हो सकी।",
+  "@editProfileLoadError": {
+    "description": "Error text shown when the initial profile/preferences fetch fails."
+  },
+
+  "editProfileAboutYouHeading": "आपके बारे में",
+  "@editProfileAboutYouHeading": {
+    "description": "Section heading for the personal-details card on the edit-profile screen."
+  },
+
+  "editProfileFullNameLabel": "पूरा नाम",
+  "@editProfileFullNameLabel": {
+    "description": "Label for the full-name field."
+  },
+
+  "editProfileRequiredValidation": "आवश्यक",
+  "@editProfileRequiredValidation": {
+    "description": "Validation error when the full-name field is empty."
+  },
+
+  "editProfileTooLongValidation": "बहुत लंबा (अधिकतम 200)",
+  "@editProfileTooLongValidation": {
+    "description": "Validation error when the full-name field exceeds 200 characters."
+  },
+
+  "editProfileLocationTooLong": "स्थान बहुत लंबा है (अधिकतम 100 अक्षर)।",
+  "@editProfileLocationTooLong": {
+    "description": "Snackbar shown when an entered location exceeds the character limit."
+  },
+
+  "editProfileLocationsLimitReached": "अधिकतम 10 स्थान।",
+  "@editProfileLocationsLimitReached": {
+    "description": "Snackbar shown when the applicant tries to add an 11th location."
+  },
+
+  "editProfileTheNumbersHeading": "आंकड़े",
+  "@editProfileTheNumbersHeading": {
+    "description": "Section heading for the numeric-fields card on the edit-profile screen."
+  },
+
+  "editProfileYearsExperienceLabel": "अनुभव के वर्ष",
+  "@editProfileYearsExperienceLabel": {
+    "description": "Label for the years-of-experience field."
+  },
+
+  "editProfileNoticePeriodLabel": "नोटिस अवधि (दिन)",
+  "@editProfileNoticePeriodLabel": {
+    "description": "Label for the notice-period field."
+  },
+
+  "editProfileCurrentCtcLabel": "वर्तमान CTC (₹/वर्ष)",
+  "@editProfileCurrentCtcLabel": {
+    "description": "Label for the current-CTC field."
+  },
+
+  "editProfileEnterNumberValidation": "एक संख्या दर्ज करें",
+  "@editProfileEnterNumberValidation": {
+    "description": "Validation error when a numeric field can't be parsed."
+  },
+
+  "editProfileRangeValidation": "{min} और {max} के बीच होना चाहिए",
+  "@editProfileRangeValidation": {
+    "description": "Validation error when a numeric field is outside its allowed range.",
+    "placeholders": {
+      "min": {
+        "type": "num"
+      },
+      "max": {
+        "type": "num"
+      }
+    }
+  },
+
+  "editProfileWholeNumberValidation": "केवल पूर्ण संख्या",
+  "@editProfileWholeNumberValidation": {
+    "description": "Validation error when a whole-number-only field has decimal places."
+  },
+
+  "editProfileDecimalPlacesValidation": "{maxDecimals, plural, one{अधिकतम {maxDecimals} दशमलव स्थान} other{अधिकतम {maxDecimals} दशमलव स्थान}}",
+  "@editProfileDecimalPlacesValidation": {
+    "description": "Validation error when a numeric field has more decimal places than allowed.",
+    "placeholders": {
+      "maxDecimals": {
+        "type": "int"
+      }
+    }
+  },
+
+  "editProfileSavedProfileOnly": "आपकी प्रोफ़ाइल सेव हो गई, लेकिन प्राथमिकताएं सेव नहीं हो सकीं। फिर से प्रयास करें।",
+  "@editProfileSavedProfileOnly": {
+    "description": "Snackbar shown when the profile PATCH succeeds but the preferences PATCH fails."
+  },
+
+  "editProfileSavedPreferencesOnly": "आपकी प्राथमिकताएं सेव हो गईं, लेकिन प्रोफ़ाइल सेव नहीं हो सकी। फिर से प्रयास करें।",
+  "@editProfileSavedPreferencesOnly": {
+    "description": "Snackbar shown when the preferences PATCH succeeds but the profile PATCH fails."
+  },
+
+  "invitesTitle": "लंबित आमंत्रण",
+  "@invitesTitle": {
+    "description": "Pending-invitations screen AppBar title. Reused as the profile screen's invitations row title."
+  },
+
+  "invitesEmptyHeadline": "कोई आमंत्रण नहीं",
+  "@invitesEmptyHeadline": {
+    "description": "Empty-state headline shown when the applicant has no pending invitations."
+  },
+
+  "invitesEmptyBody": "जब कोई कंपनी आपको भर्ती के लिए आमंत्रित करेगी, तो वह यहां दिखाई देगी।",
+  "@invitesEmptyBody": {
+    "description": "Empty-state body shown when the applicant has no pending invitations."
+  },
+
+  "invitesCardSubtitleOwner": "मालिक के रूप में आमंत्रित · {expires} को समाप्त",
+  "@invitesCardSubtitleOwner": {
+    "description": "Invite card subtitle when the invited role is owner — {expires} is a pre-formatted date.",
+    "placeholders": {
+      "expires": {
+        "type": "String"
+      }
+    }
+  },
+
+  "invitesCardSubtitleMember": "सदस्य के रूप में आमंत्रित · {expires} को समाप्त",
+  "@invitesCardSubtitleMember": {
+    "description": "Invite card subtitle when the invited role is member — {expires} is a pre-formatted date.",
+    "placeholders": {
+      "expires": {
+        "type": "String"
+      }
+    }
+  },
+
+  "invitesDeclineButton": "अस्वीकार करें",
+  "@invitesDeclineButton": {
+    "description": "Button to decline a pending invitation."
+  },
+
+  "invitesAcceptButton": "स्वीकार करें",
+  "@invitesAcceptButton": {
+    "description": "Button to accept a pending invitation."
+  },
+
+  "invitesJoinedSnackbar": "आप {employerName} से जुड़ गए।",
+  "@invitesJoinedSnackbar": {
+    "description": "Snackbar shown after successfully accepting an invitation.",
+    "placeholders": {
+      "employerName": {
+        "type": "String"
+      }
+    }
+  },
+
+  "invitesAcceptErrorSnackbar": "आमंत्रण स्वीकार नहीं हो सका।",
+  "@invitesAcceptErrorSnackbar": {
+    "description": "Snackbar shown when accepting an invitation fails."
+  },
+
+  "invitesDeclineErrorSnackbar": "आमंत्रण अस्वीकार नहीं हो सका।",
+  "@invitesDeclineErrorSnackbar": {
+    "description": "Snackbar shown when declining an invitation fails."
+  }
+}

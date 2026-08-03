@@ -33,12 +33,14 @@ class LoggingEmailChannel:
         notification: Notification,
         *,
         recipient: str,
+        language: str = "en",
     ) -> ChannelResult:
         """Log the would-be email and return success.
 
         Args:
             notification: The ``Notification`` ORM row.
             recipient: The resolved recipient email address.
+            language: The recipient's content language (``"en"`` or ``"hi"``).
 
         Returns:
             Always ``ChannelResult.success()``.
@@ -48,6 +50,7 @@ class LoggingEmailChannel:
             notification_id=str(notification.id),
             kind=notification.kind,
             recipient=recipient,
+            language=language,
             payload=notification.payload,
         )
         return ChannelResult.success()

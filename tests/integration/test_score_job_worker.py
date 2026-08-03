@@ -31,14 +31,18 @@ def _make_sm(session: AsyncSession) -> async_sessionmaker[AsyncSession]:
     return async_sessionmaker(bind=session.bind, expire_on_commit=False)
 
 
-async def _seed_applicant_with_emb(session: AsyncSession, *, email: str) -> Applicant:
+async def _seed_applicant_with_emb(
+    session: AsyncSession, *, email: str, language: str = "en"
+) -> Applicant:
     user = User(email=email, role=UserRole.APPLICANT)
     session.add(user)
     await session.flush()
     applicant = Applicant(user_id=user.id, full_name="A")
     session.add(applicant)
     await session.flush()
-    session.add(ApplicantPreferences(applicant_id=applicant.id, locations=["Bangalore"]))
+    session.add(
+        ApplicantPreferences(applicant_id=applicant.id, locations=["Bangalore"], language=language)
+    )
     session.add(
         ApplicantEmbedding(
             applicant_id=applicant.id,
@@ -100,6 +104,27 @@ async def test_score_job_writes_rows_for_all_applicants_with_embeddings(
         assert "fit" in row.explanation
         assert row.explanation["generator"] == "templated"
         assert row.explanation["generator_version"] == "1"
+
+
+@pytest.mark.integration
+async def test_score_job_resolves_language_per_applicant(session: AsyncSession) -> None:
+    """One job scores many applicants — language must resolve per applicant row,
+    not be fixed once for the whole batch (see score_job.py language wiring)."""
+    a_hi = await _seed_applicant_with_emb(session, email="hi@example.com", language="hi")
+    a_en = await _seed_applicant_with_emb(session, email="en@example.com", language="en")
+    job = await _seed_job_with_emb(session)
+    await session.commit()
+
+    await _score_job_async(job.id, sm=_make_sm(session))
+
+    row_hi = (
+        await session.execute(select(Match).where(Match.applicant_id == a_hi.id))
+    ).scalar_one()
+    row_en = (
+        await session.execute(select(Match).where(Match.applicant_id == a_en.id))
+    ).scalar_one()
+    assert any("ऀ" <= ch <= "ॿ" for ch in row_hi.explanation["fit"])
+    assert not any("ऀ" <= ch <= "ॿ" for ch in row_en.explanation["fit"])
 
 
 @pytest.mark.integration

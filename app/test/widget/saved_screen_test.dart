@@ -6,6 +6,7 @@ import 'package:jobify_app/data/jobs/job_status.dart';
 import 'package:jobify_app/data/jobs/jobs_dto.dart';
 import 'package:jobify_app/data/jobs/saved_jobs_repository.dart';
 import 'package:jobify_app/data/jobs/saved_jobs_repository_impl.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/saved/saved_screen.dart';
 
 class _FakeRepo implements SavedJobsRepository {
@@ -24,6 +25,8 @@ Widget _wrap(Widget child, {required SavedJobsRepository repo}) =>
       overrides: [savedJobsRepositoryProvider.overrideWithValue(repo)],
       child: MaterialApp(
         theme: ThemeData.light(useMaterial3: true),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: child,
       ),
     );

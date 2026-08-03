@@ -127,6 +127,7 @@ async def _score_job_async(
                     applicant_prefs.expected_ctc if applicant_prefs else None,
                     list(applicant_emb.embedding),
                     applicant_emb.model_name,
+                    applicant_prefs.language if applicant_prefs else "en",
                 )
             )
         job_emb_vec = list(job_emb.embedding)
@@ -168,6 +169,7 @@ async def _score_job_async(
             job_ctc_min=job_ctc_min,
             job_ctc_max=job_ctc_max,
             employer_name=job_employer_name,
+            language=applicant_language,
         )
         for (
             applicant_id,
@@ -176,6 +178,7 @@ async def _score_job_async(
             applicant_ctc,
             applicant_emb_vec,
             applicant_emb_model,
+            applicant_language,
         ) in scored_inputs
     ]
     scores = await explain_scores(

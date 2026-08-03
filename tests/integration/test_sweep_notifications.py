@@ -28,6 +28,8 @@ from sqlalchemy.pool import NullPool
 from structlog.testing import capture_logs
 
 from jobify.db.models import (
+    Applicant,
+    ApplicantPreferences,
     ConsentScope,
     Notification,
     NotificationChannel,
@@ -153,7 +155,9 @@ async def test_sweep_skips_already_sent(session: AsyncSession) -> None:
     call_log: list[str] = []
 
     class _CountingChannel:
-        async def send(self, notification: Notification, *, recipient: str) -> ChannelResult:
+        async def send(
+            self, notification: Notification, *, recipient: str, language: str = "en"
+        ) -> ChannelResult:
             call_log.append(str(notification.id))
             return ChannelResult.success()
 
@@ -225,7 +229,9 @@ async def test_sweep_retries_on_failed_channel(
     await session.commit()
 
     class _FailingChannel:
-        async def send(self, notification: Notification, *, recipient: str) -> ChannelResult:
+        async def send(
+            self, notification: Notification, *, recipient: str, language: str = "en"
+        ) -> ChannelResult:
             return ChannelResult.failed("simulated")
 
     failing = _FailingChannel()
@@ -296,7 +302,9 @@ async def test_slow_notification_claim_does_not_preclaim_later_rows(
     release_first_send = asyncio.Event()
 
     class _SlowFirstChannel:
-        async def send(self, row: Notification, *, recipient: str) -> ChannelResult:
+        async def send(
+            self, row: Notification, *, recipient: str, language: str = "en"
+        ) -> ChannelResult:
             if row.id == notification_ids[0]:
                 first_send_started.set()
                 await release_first_send.wait()
@@ -394,7 +402,9 @@ async def test_sweep_does_not_complete_stale_claim_after_dispatch(
     sm = _make_sm(session)
 
     class _TokenStealingChannel:
-        async def send(self, row: Notification, *, recipient: str) -> ChannelResult:
+        async def send(
+            self, row: Notification, *, recipient: str, language: str = "en"
+        ) -> ChannelResult:
             async with sm() as claim_session:
                 current = await claim_session.get(Notification, row.id, with_for_update=True)
                 assert current is not None
@@ -444,6 +454,68 @@ async def test_sweep_fails_when_recipient_email_is_missing(session: AsyncSession
     await session.refresh(notification)
     assert notification.status == NotificationStatus.FAILED
     assert notification.last_error == "user_missing_or_no_email"
+
+
+@pytest.mark.integration
+async def test_sweep_resolves_applicant_language_for_email_dispatch(
+    session: AsyncSession,
+) -> None:
+    """An applicant with language='hi' in live preferences dispatches with
+    language='hi' passed to the email channel."""
+    user = User(email="hi-applicant@example.com", role=UserRole.APPLICANT)
+    session.add(user)
+    await session.flush()
+    applicant = Applicant(user_id=user.id, full_name="Hindi Applicant")
+    session.add(applicant)
+    await session.flush()
+    session.add(ApplicantPreferences(applicant_id=applicant.id, language="hi"))
+    n = await _seed_notification(session, user, channel=NotificationChannel.EMAIL)
+    await session.commit()
+
+    captured: dict[str, object] = {}
+
+    class _CapturingChannel:
+        async def send(
+            self, notification: Notification, *, recipient: str, language: str = "en"
+        ) -> ChannelResult:
+            captured["recipient"] = recipient
+            captured["language"] = language
+            return ChannelResult.success()
+
+    sm = _make_sm(session)
+    await _sweep_notifications_async(sm=sm, email_channel=_CapturingChannel(), batch_size=10)
+
+    assert captured["recipient"] == "hi-applicant@example.com"
+    assert captured["language"] == "hi"
+
+    await session.refresh(n)
+    assert n.status == NotificationStatus.SENT
+
+
+@pytest.mark.integration
+async def test_sweep_defaults_recruiter_recipient_to_english(session: AsyncSession) -> None:
+    """A recipient with no Applicant row (e.g. a recruiter) dispatches with
+    language='en' — the join misses and the sweep falls back to the default."""
+    user = await _seed_user(session, email="recruiter@example.com")
+    n = await _seed_notification(session, user, channel=NotificationChannel.EMAIL)
+    await session.commit()
+
+    captured: dict[str, object] = {}
+
+    class _CapturingChannel:
+        async def send(
+            self, notification: Notification, *, recipient: str, language: str = "en"
+        ) -> ChannelResult:
+            captured["language"] = language
+            return ChannelResult.success()
+
+    sm = _make_sm(session)
+    await _sweep_notifications_async(sm=sm, email_channel=_CapturingChannel(), batch_size=10)
+
+    assert captured["language"] == "en"
+
+    await session.refresh(n)
+    assert n.status == NotificationStatus.SENT
 
 
 @pytest.mark.integration

@@ -1,0 +1,1492 @@
+{
+  "@@locale": "en",
+
+  "shellTabFeed": "Feed",
+  "@shellTabFeed": {
+    "description": "Bottom navigation tab label for the job feed."
+  },
+
+  "shellTabSaved": "Saved",
+  "@shellTabSaved": {
+    "description": "Bottom navigation tab label for saved jobs."
+  },
+
+  "shellTabApplications": "Applications",
+  "@shellTabApplications": {
+    "description": "Bottom navigation tab label for the applicant's applications."
+  },
+
+  "shellTabProfile": "Profile",
+  "@shellTabProfile": {
+    "description": "Bottom navigation tab label for the applicant's profile."
+  },
+
+  "commonRetry": "Retry",
+  "@commonRetry": {
+    "description": "Button label to retry a failed action or request."
+  },
+
+  "commonCancel": "Cancel",
+  "@commonCancel": {
+    "description": "Button label to cancel an in-progress action or dialog."
+  },
+
+  "commonSave": "Save",
+  "@commonSave": {
+    "description": "Button label to save a form or setting."
+  },
+
+  "commonLoading": "Loading…",
+  "@commonLoading": {
+    "description": "Generic loading indicator caption."
+  },
+
+  "commonOk": "OK",
+  "@commonOk": {
+    "description": "Button label to acknowledge/dismiss a dialog."
+  },
+
+  "commonSomethingWentWrong": "Something went wrong",
+  "@commonSomethingWentWrong": {
+    "description": "Generic error headline shown when an action or load fails."
+  },
+
+  "commonUndo": "Undo",
+  "@commonUndo": {
+    "description": "Button label to undo the last action (shown in a SnackBar)."
+  },
+
+  "commonRefresh": "Refresh",
+  "@commonRefresh": {
+    "description": "Tooltip for a refresh icon button."
+  },
+
+  "commonBack": "Back",
+  "@commonBack": {
+    "description": "Button label to go back to the previous screen."
+  },
+
+  "commonNothingHereYet": "Nothing here yet",
+  "@commonNothingHereYet": {
+    "description": "Default empty-state headline used when no more specific copy is supplied."
+  },
+
+  "commonTryAgain": "Try again",
+  "@commonTryAgain": {
+    "description": "Button label on the generic error view to retry the failed action."
+  },
+
+  "commonCouldntReachJobify": "Couldn't reach Jobify",
+  "@commonCouldntReachJobify": {
+    "description": "Generic error headline shown when a network request fails."
+  },
+
+  "commonCheckConnectionRetry": "Check your connection and try again.",
+  "@commonCheckConnectionRetry": {
+    "description": "Generic error body shown alongside commonCouldntReachJobify."
+  },
+
+  "commonSignedOut": "Signed out",
+  "@commonSignedOut": {
+    "description": "Generic error headline shown when the user's session has ended."
+  },
+
+  "commonSessionEnded": "Your session ended. Sign in to continue.",
+  "@commonSessionEnded": {
+    "description": "Generic error body shown alongside commonSignedOut."
+  },
+
+  "commonPleaseTryAgainMoment": "Please try again in a moment.",
+  "@commonPleaseTryAgainMoment": {
+    "description": "Fallback error body when the server didn't provide a detail message."
+  },
+
+  "commonUnexpectedError": "An unexpected error occurred.",
+  "@commonUnexpectedError": {
+    "description": "Fallback error body for an unrecognised error type."
+  },
+
+  "authAccountDeletedSnackbar": "Your account has been deleted.",
+  "@authAccountDeletedSnackbar": {
+    "description": "Snackbar shown on the sign-in screen right after a successful account deletion."
+  },
+
+  "authSignInNetworkError": "Couldn't reach Jobify. Check your connection.",
+  "@authSignInNetworkError": {
+    "description": "Snackbar shown when sign-in fails due to a network error."
+  },
+
+  "authSignInFailed": "Sign-in failed. Try again.",
+  "@authSignInFailed": {
+    "description": "Snackbar shown when sign-in fails for an unspecified or generic reason."
+  },
+
+  "authHeroTitle": "Job will\nfind you.",
+  "@authHeroTitle": {
+    "description": "Sign-in screen hero headline — the brand promise."
+  },
+
+  "authHeroSubtitle": "We read your résumé and bring the roles that fit — with the reason, and the catch, in plain words.",
+  "@authHeroSubtitle": {
+    "description": "Sign-in screen hero sub-headline explaining the product."
+  },
+
+  "authWordmark": "Jobify",
+  "@authWordmark": {
+    "description": "The Jobify product wordmark on the sign-in screen. Product name — stays Latin in every locale."
+  },
+
+  "authHeroRoleBackendEngineer": "Backend Engineer",
+  "@authHeroRoleBackendEngineer": {
+    "description": "Illustrative job-title chip in the sign-in hero animation. Job title — stays Latin in every locale."
+  },
+
+  "authHeroRoleProductDesigner": "Product Designer",
+  "@authHeroRoleProductDesigner": {
+    "description": "Illustrative job-title chip in the sign-in hero animation. Job title — stays Latin in every locale."
+  },
+
+  "authHeroRoleDataEngineer": "Data Engineer",
+  "@authHeroRoleDataEngineer": {
+    "description": "Illustrative job-title chip in the sign-in hero animation. Job title — stays Latin in every locale."
+  },
+
+  "authHeroSalaryRange": "₹18–28L",
+  "@authHeroSalaryRange": {
+    "description": "Illustrative salary-range chip in the sign-in hero animation."
+  },
+
+  "authHeroRemoteFirst": "Remote-first",
+  "@authHeroRemoteFirst": {
+    "description": "Illustrative work-arrangement chip in the sign-in hero animation."
+  },
+
+  "authHeroMatchPercent": "92% match",
+  "@authHeroMatchPercent": {
+    "description": "Illustrative match-score chip in the sign-in hero animation."
+  },
+
+  "authSigningIn": "Signing in…",
+  "@authSigningIn": {
+    "description": "Sign-in button label while the sign-in request is in flight."
+  },
+
+  "authContinueWithGoogle": "Continue with Google",
+  "@authContinueWithGoogle": {
+    "description": "Sign-in button label (mobile)."
+  },
+
+  "authGoogleSignInLoadError": "Couldn't load Google sign-in. Refresh and try again.",
+  "@authGoogleSignInLoadError": {
+    "description": "Web sign-in fallback message shown if the Google Identity Services client fails to initialize."
+  },
+
+  "onboardingCompanyNameTooShort": "Enter your company name (min 2 characters)",
+  "@onboardingCompanyNameTooShort": {
+    "description": "Validation error when the employer onboarding company-name field is too short."
+  },
+
+  "onboardingCompanyNameTooLong": "Company name is too long",
+  "@onboardingCompanyNameTooLong": {
+    "description": "Validation error when the employer onboarding company-name field is too long."
+  },
+
+  "onboardingGstinLength": "GSTIN must be exactly 15 characters",
+  "@onboardingGstinLength": {
+    "description": "Validation error when the employer onboarding GSTIN field is the wrong length."
+  },
+
+  "onboardingCompanyNameTaken": "That company name is already registered.",
+  "@onboardingCompanyNameTaken": {
+    "description": "Snackbar shown when creating an employer fails because the name is already taken."
+  },
+
+  "onboardingCreateEmployerFailed": "Could not create employer. Please try again.",
+  "@onboardingCreateEmployerFailed": {
+    "description": "Snackbar shown when creating an employer fails for a generic reason."
+  },
+
+  "onboardingTitle": "Set up your company",
+  "@onboardingTitle": {
+    "description": "AppBar title for the employer onboarding screen."
+  },
+
+  "onboardingIntro": "Tell us about your company to start posting jobs.",
+  "@onboardingIntro": {
+    "description": "Employer onboarding screen intro copy."
+  },
+
+  "onboardingCompanyNameLabel": "Company name",
+  "@onboardingCompanyNameLabel": {
+    "description": "Label for the company name text field."
+  },
+
+  "onboardingGstinLabel": "GSTIN (optional)",
+  "@onboardingGstinLabel": {
+    "description": "Label for the optional GSTIN text field."
+  },
+
+  "onboardingCreateCompanyButton": "Create company",
+  "@onboardingCreateCompanyButton": {
+    "description": "Submit button label for the employer onboarding form."
+  },
+
+  "feedRatingSaveError": "Couldn't save your rating",
+  "@feedRatingSaveError": {
+    "description": "Snackbar shown when a thumbs up/down match-feedback rating fails to save."
+  },
+
+  "feedHiddenSnackbar": "Hidden from your feed",
+  "@feedHiddenSnackbar": {
+    "description": "Snackbar shown after thumbs-down hides a job from the feed."
+  },
+
+  "feedHeaderTitle": "For you",
+  "@feedHeaderTitle": {
+    "description": "Feed screen header title."
+  },
+
+  "feedHeaderSubtitle": "Roles matched to your profile",
+  "@feedHeaderSubtitle": {
+    "description": "Feed screen header subtitle."
+  },
+
+  "feedEmptyHeadline": "We're still looking for matches",
+  "@feedEmptyHeadline": {
+    "description": "Empty-state headline shown when the feed has no items and no filters are active."
+  },
+
+  "feedEmptyBody": "Upload a resume to help us find you better roles.",
+  "@feedEmptyBody": {
+    "description": "Empty-state body shown when the feed has no items and no filters are active."
+  },
+
+  "feedFilteredEmptyHeadline": "Nothing matches your filters",
+  "@feedFilteredEmptyHeadline": {
+    "description": "Empty-state headline shown when the feed has no items because filters are active."
+  },
+
+  "feedFilteredEmptyBody": "Try removing a filter or broadening your search.",
+  "@feedFilteredEmptyBody": {
+    "description": "Empty-state body shown when the feed has no items because filters are active."
+  },
+
+  "feedClearFiltersButton": "Clear filters",
+  "@feedClearFiltersButton": {
+    "description": "Button in the filtered-empty state that clears all active feed filters."
+  },
+
+  "feedAllCaughtUp": "You're all caught up",
+  "@feedAllCaughtUp": {
+    "description": "Caption shown at the end of the feed list when there are no more items to load."
+  },
+
+  "feedNewMatchesSinceVisit": "{count, plural, one{1 new match since your last visit} other{{count} new matches since your last visit}}",
+  "@feedNewMatchesSinceVisit": {
+    "description": "Headline showing how many new matches surfaced since the applicant's last feed visit.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "feedThumbUpTooltip": "Good match",
+  "@feedThumbUpTooltip": {
+    "description": "Tooltip for the thumbs-up (positive match feedback) icon button."
+  },
+
+  "feedThumbDownTooltip": "Not interested",
+  "@feedThumbDownTooltip": {
+    "description": "Tooltip for the thumbs-down (negative match feedback) icon button."
+  },
+
+  "matchCaveatPrefix": "Counts against: {reason}",
+  "@matchCaveatPrefix": {
+    "description": "Prefix shown before a match's caveat/downside text.",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+
+  "feedClosedPill": "Closed",
+  "@feedClosedPill": {
+    "description": "Pill label shown on a job card when the job listing is closed."
+  },
+
+  "feedPostedMonthsAgo": "{months, plural, one{{months}mo ago} other{{months}mo ago}}",
+  "@feedPostedMonthsAgo": {
+    "description": "Relative time since a job was posted, in months.",
+    "placeholders": {
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+
+  "feedPostedDaysAgo": "{days}d ago",
+  "@feedPostedDaysAgo": {
+    "description": "Relative time since a job was posted, in days.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+
+  "feedPostedHoursAgo": "{hours, plural, one{{hours}h ago} other{{hours}h ago}}",
+  "@feedPostedHoursAgo": {
+    "description": "Relative time since a job was posted, in hours.",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+
+  "feedPostedJustNow": "just now",
+  "@feedPostedJustNow": {
+    "description": "Relative time since a job was posted, when under an hour ago."
+  },
+
+  "feedSearchHint": "Search title or company",
+  "@feedSearchHint": {
+    "description": "Hint text for the feed search field."
+  },
+
+  "feedFiltersTooltip": "Filters",
+  "@feedFiltersTooltip": {
+    "description": "Tooltip for the feed filter icon button that opens the filter sheet."
+  },
+
+  "feedMinCtcChipLabel": "≥ ₹{amount}L",
+  "@feedMinCtcChipLabel": {
+    "description": "Active-filter chip label for a minimum-CTC filter, in lakhs.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+
+  "feedYearsSuffix": "{years} yrs",
+  "@feedYearsSuffix": {
+    "description": "Compact years-of-experience label, e.g. on a filter chip or the filter sheet stepper.",
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
+
+  "feedClearAllButton": "Clear all",
+  "@feedClearAllButton": {
+    "description": "Button that clears every active feed filter at once."
+  },
+
+  "feedFilterSheetTitle": "Filter matches",
+  "@feedFilterSheetTitle": {
+    "description": "Title of the feed filter bottom sheet."
+  },
+
+  "feedFilterLocationLabel": "Location",
+  "@feedFilterLocationLabel": {
+    "description": "Section label for the location filter in the filter sheet."
+  },
+
+  "feedFilterAddCityHint": "Add another city",
+  "@feedFilterAddCityHint": {
+    "description": "Hint text for the custom-city text field in the filter sheet."
+  },
+
+  "feedFilterExperienceLabel": "Experience",
+  "@feedFilterExperienceLabel": {
+    "description": "Section label for the minimum-experience filter in the filter sheet."
+  },
+
+  "feedFilterExperienceAny": "Any",
+  "@feedFilterExperienceAny": {
+    "description": "Value shown for the experience stepper when no minimum is set."
+  },
+
+  "feedFilterMinCtcLabel": "Minimum CTC (lakhs)",
+  "@feedFilterMinCtcLabel": {
+    "description": "Section label for the minimum-CTC filter in the filter sheet."
+  },
+
+  "feedFilterCtcHint": "e.g. 5",
+  "@feedFilterCtcHint": {
+    "description": "Hint text for the minimum-CTC text field in the filter sheet."
+  },
+
+  "feedFilterCtcPrefix": "₹ ",
+  "@feedFilterCtcPrefix": {
+    "description": "Currency prefix for the minimum-CTC text field in the filter sheet."
+  },
+
+  "feedFilterCtcSuffix": "L",
+  "@feedFilterCtcSuffix": {
+    "description": "Lakh-unit suffix for the minimum-CTC text field in the filter sheet."
+  },
+
+  "feedFilterResetButton": "Reset",
+  "@feedFilterResetButton": {
+    "description": "Button that resets the filter sheet's draft state (keeps the search query)."
+  },
+
+  "feedFilterApplyButton": "Apply",
+  "@feedFilterApplyButton": {
+    "description": "Button that commits the filter sheet's draft state to the active feed filters."
+  },
+
+  "feedCityBangalore": "Bangalore",
+  "@feedCityBangalore": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityMumbai": "Mumbai",
+  "@feedCityMumbai": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityDelhiNcr": "Delhi NCR",
+  "@feedCityDelhiNcr": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityHyderabad": "Hyderabad",
+  "@feedCityHyderabad": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityChennai": "Chennai",
+  "@feedCityChennai": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityPune": "Pune",
+  "@feedCityPune": {
+    "description": "Preset city option in the feed location filter. City name — stays Latin in every locale."
+  },
+
+  "feedCityRemote": "Remote",
+  "@feedCityRemote": {
+    "description": "Preset work-arrangement option in the feed location filter."
+  },
+
+  "feedSummaryUploadResume": "Upload résumé",
+  "@feedSummaryUploadResume": {
+    "description": "Feed home-summary match-profile tile label prompting a résumé upload."
+  },
+
+  "feedSummaryFinishProfile": "Finish your profile",
+  "@feedSummaryFinishProfile": {
+    "description": "Feed home-summary match-profile tile label prompting completion of preferences."
+  },
+
+  "feedSummaryProfileComplete": "Profile complete",
+  "@feedSummaryProfileComplete": {
+    "description": "Feed home-summary match-profile tile label shown once the profile is complete."
+  },
+
+  "jobDetailActionFailed": "Action failed",
+  "@jobDetailActionFailed": {
+    "description": "Fallback snackbar message for a job-detail action error with no server detail."
+  },
+
+  "jobDetailNetworkError": "Couldn't reach Jobify.",
+  "@jobDetailNetworkError": {
+    "description": "Snackbar message for a job-detail action error caused by a network failure."
+  },
+
+  "jobDetailGoneHeadline": "This job is no longer available",
+  "@jobDetailGoneHeadline": {
+    "description": "Empty-state headline shown when a job detail 404s (closed or removed)."
+  },
+
+  "jobDetailGoneBody": "It may have been closed or removed.",
+  "@jobDetailGoneBody": {
+    "description": "Empty-state body shown when a job detail 404s (closed or removed)."
+  },
+
+  "jobDetailWhyThisMatch": "Why this match",
+  "@jobDetailWhyThisMatch": {
+    "description": "Heading for the match explanation card on the job detail screen."
+  },
+
+  "jobDetailMatchFeedbackPrompt": "Was this match right for you?",
+  "@jobDetailMatchFeedbackPrompt": {
+    "description": "Prompt above the thumbs up/down match-feedback row on the job detail screen."
+  },
+
+  "jobDetailTimelineHeading": "Timeline",
+  "@jobDetailTimelineHeading": {
+    "description": "Heading for the application stage-change timeline on the job detail screen."
+  },
+
+  "jobDetailApplyButton": "Apply",
+  "@jobDetailApplyButton": {
+    "description": "Button label to apply to a job."
+  },
+
+  "jobDetailWithdrawButton": "Withdraw",
+  "@jobDetailWithdrawButton": {
+    "description": "Button label to withdraw an application."
+  },
+
+  "jobDetailWithdrawDialogTitle": "Withdraw application?",
+  "@jobDetailWithdrawDialogTitle": {
+    "description": "Confirmation dialog title for withdrawing an application."
+  },
+
+  "jobDetailWithdrawDialogBody": "You can re-apply later if you change your mind.",
+  "@jobDetailWithdrawDialogBody": {
+    "description": "Confirmation dialog body for withdrawing an application."
+  },
+
+  "savedHeaderTitle": "Saved",
+  "@savedHeaderTitle": {
+    "description": "Saved screen header title. Not reused from shellTabSaved: the tab label is deliberately transliterated (\"सेव्ड\") to fit the NavigationBar's tight width, a constraint that doesn't apply to the full-width screen header."
+  },
+
+  "savedHeaderSubtitle": "Jobs you kept for later",
+  "@savedHeaderSubtitle": {
+    "description": "Saved screen header subtitle."
+  },
+
+  "savedEmptyHeadline": "Nothing saved yet",
+  "@savedEmptyHeadline": {
+    "description": "Empty-state headline shown when the applicant has no saved jobs."
+  },
+
+  "savedEmptyBody": "Tap the heart on any job to save it for later.",
+  "@savedEmptyBody": {
+    "description": "Empty-state body shown when the applicant has no saved jobs."
+  },
+
+  "commonSaving": "Saving…",
+  "@commonSaving": {
+    "description": "Button label while a form submit is in flight. Reused by the preferences and edit-profile screens."
+  },
+
+  "stageApplied": "Applied",
+  "@stageApplied": {
+    "description": "Applicant-facing label for the 'applied' application stage."
+  },
+
+  "stageShortlisted": "Shortlisted",
+  "@stageShortlisted": {
+    "description": "Applicant-facing label for the 'shortlisted' application stage."
+  },
+
+  "stageInterview": "Interview",
+  "@stageInterview": {
+    "description": "Applicant-facing label for the 'interview' application stage."
+  },
+
+  "stageOffer": "Offer",
+  "@stageOffer": {
+    "description": "Applicant-facing label for the 'offer' application stage."
+  },
+
+  "stageHired": "Hired",
+  "@stageHired": {
+    "description": "Applicant-facing label for the 'hired' application stage."
+  },
+
+  "stageRejected": "Not selected",
+  "@stageRejected": {
+    "description": "Applicant-facing label for the 'rejected' application stage — spec-locked softened wording."
+  },
+
+  "stageInProgress": "In progress",
+  "@stageInProgress": {
+    "description": "Applicant-facing label for an unrecognised/unknown application stage."
+  },
+
+  "stageWithdrawn": "Withdrawn",
+  "@stageWithdrawn": {
+    "description": "Stage-pill label shown when the application itself has been withdrawn (a status, not a pipeline stage)."
+  },
+
+  "applicationsHeaderTitle": "Applications",
+  "@applicationsHeaderTitle": {
+    "description": "Applications screen header title."
+  },
+
+  "applicationsHeaderSubtitle": "Roles you applied to",
+  "@applicationsHeaderSubtitle": {
+    "description": "Applications screen header subtitle."
+  },
+
+  "applicationsEmptyHeadline": "No applications yet",
+  "@applicationsEmptyHeadline": {
+    "description": "Empty-state headline shown when the applicant has no applications."
+  },
+
+  "applicationsEmptyBody": "Browse the feed and apply to roles you like.",
+  "@applicationsEmptyBody": {
+    "description": "Empty-state body shown when the applicant has no applications."
+  },
+
+  "applicationsBrowseFeedButton": "Browse the feed",
+  "@applicationsBrowseFeedButton": {
+    "description": "Button in the applications empty state that navigates to the feed."
+  },
+
+  "applicationsWithdrawnOn": "Withdrawn {when}",
+  "@applicationsWithdrawnOn": {
+    "description": "Applications row caption when the application was withdrawn — {when} is a pre-formatted date.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+
+  "applicationsAppliedOn": "Applied {when}",
+  "@applicationsAppliedOn": {
+    "description": "Applications row caption when the application is active — {when} is a pre-formatted date.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationsTitle": "Notifications",
+  "@notificationsTitle": {
+    "description": "Notifications screen AppBar title. Reused as the profile screen's notifications row title."
+  },
+
+  "notificationsEmpty": "No notifications yet",
+  "@notificationsEmpty": {
+    "description": "Empty-state text shown when the applicant has no notifications."
+  },
+
+  "notificationApplicationReceivedWithEmployer": "Application received for {job} at {employer}",
+  "@notificationApplicationReceivedWithEmployer": {
+    "description": "Notification title for an 'application_received' notification with both a job title and employer name in its payload.",
+    "placeholders": {
+      "job": {
+        "type": "String"
+      },
+      "employer": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationApplicationReceivedWithJob": "Application received for {job}",
+  "@notificationApplicationReceivedWithJob": {
+    "description": "Notification title for an 'application_received' notification with only a job title in its payload.",
+    "placeholders": {
+      "job": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationApplicationReceived": "Application received",
+  "@notificationApplicationReceived": {
+    "description": "Notification title for an 'application_received' notification with no job title in its payload."
+  },
+
+  "notificationStageShortlistedJob": "Shortlisted for {job}",
+  "@notificationStageShortlistedJob": {
+    "description": "Notification title for an 'application_stage_changed' notification (stage: shortlisted) with a job title in its payload.",
+    "placeholders": {
+      "job": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationStageShortlisted": "Shortlisted",
+  "@notificationStageShortlisted": {
+    "description": "Notification title for an 'application_stage_changed' notification (stage: shortlisted) with no job title in its payload."
+  },
+
+  "notificationStageInterviewJob": "Interview stage for {job}",
+  "@notificationStageInterviewJob": {
+    "description": "Notification title for an 'application_stage_changed' notification (stage: interview) with a job title in its payload.",
+    "placeholders": {
+      "job": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationStageInterview": "Interview stage",
+  "@notificationStageInterview": {
+    "description": "Notification title for an 'application_stage_changed' notification (stage: interview) with no job title in its payload."
+  },
+
+  "notificationStageOfferJob": "You have an offer for {job}",
+  "@notificationStageOfferJob": {
+    "description": "Notification title for an 'application_stage_changed' notification (stage: offer) with a job title in its payload.",
+    "placeholders": {
+      "job": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationStageOffer": "You have an offer",
+  "@notificationStageOffer": {
+    "description": "Notification title for an 'application_stage_changed' notification (stage: offer) with no job title in its payload."
+  },
+
+  "notificationStageHiredJob": "You were hired for {job}",
+  "@notificationStageHiredJob": {
+    "description": "Notification title for an 'application_stage_changed' notification (stage: hired) with a job title in its payload.",
+    "placeholders": {
+      "job": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationStageHired": "You were hired",
+  "@notificationStageHired": {
+    "description": "Notification title for an 'application_stage_changed' notification (stage: hired) with no job title in its payload."
+  },
+
+  "notificationStageRejectedJob": "Update on your application for {job}",
+  "@notificationStageRejectedJob": {
+    "description": "Notification title for an 'application_stage_changed' notification (stage: rejected) with a job title in its payload.",
+    "placeholders": {
+      "job": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationStageRejected": "Update on your application",
+  "@notificationStageRejected": {
+    "description": "Notification title for an 'application_stage_changed' notification (stage: rejected) with no job title in its payload."
+  },
+
+  "notificationStageDefaultJob": "Application updated for {job}",
+  "@notificationStageDefaultJob": {
+    "description": "Notification title for an 'application_stage_changed' notification with an unrecognised stage, with a job title in its payload.",
+    "placeholders": {
+      "job": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationStageDefault": "Application updated",
+  "@notificationStageDefault": {
+    "description": "Notification title for an 'application_stage_changed' notification with an unrecognised stage, with no job title in its payload."
+  },
+
+  "privacyTitle": "Privacy & data",
+  "@privacyTitle": {
+    "description": "Privacy screen AppBar title. Reused as the profile screen's privacy row title."
+  },
+
+  "privacyMutationErrorSnackbar": "Couldn't update preference. Change was reverted.",
+  "@privacyMutationErrorSnackbar": {
+    "description": "Snackbar shown when a consent-toggle update fails and is rolled back."
+  },
+
+  "privacyNotificationPrefsHeading": "Notification preferences",
+  "@privacyNotificationPrefsHeading": {
+    "description": "Section heading for the consent-toggle list on the privacy screen."
+  },
+
+  "privacyConsentEmailTransactionalTitle": "Service updates",
+  "@privacyConsentEmailTransactionalTitle": {
+    "description": "Title for the email_transactional consent toggle."
+  },
+
+  "privacyConsentEmailTransactionalSubtitle": "Email about your applications, matches, and account.",
+  "@privacyConsentEmailTransactionalSubtitle": {
+    "description": "Subtitle for the email_transactional consent toggle."
+  },
+
+  "privacyConsentEmailMarketingTitle": "Job recommendations",
+  "@privacyConsentEmailMarketingTitle": {
+    "description": "Title for the email_marketing consent toggle."
+  },
+
+  "privacyConsentEmailMarketingSubtitle": "Weekly digest of jobs that fit your profile.",
+  "@privacyConsentEmailMarketingSubtitle": {
+    "description": "Subtitle for the email_marketing consent toggle."
+  },
+
+  "privacyConsentInAppTitle": "In-app notifications",
+  "@privacyConsentInAppTitle": {
+    "description": "Title for the in_app_notifications consent toggle."
+  },
+
+  "privacyConsentInAppSubtitle": "See alerts inside the app.",
+  "@privacyConsentInAppSubtitle": {
+    "description": "Subtitle for the in_app_notifications consent toggle."
+  },
+
+  "privacyYourDataHeading": "Your data",
+  "@privacyYourDataHeading": {
+    "description": "Section heading for the DSR-export section of the privacy screen."
+  },
+
+  "privacyYourDataBody": "A copy of everything we know about you (JSON).",
+  "@privacyYourDataBody": {
+    "description": "Body text for the DSR-export section of the privacy screen."
+  },
+
+  "privacyDownloadDataButton": "Download my data",
+  "@privacyDownloadDataButton": {
+    "description": "Button that triggers a DSR data export. Reused on the delete-account screen."
+  },
+
+  "profileAccountHeading": "Account",
+  "@profileAccountHeading": {
+    "description": "Section heading for account-level actions. Used on both the profile screen and the privacy screen."
+  },
+
+  "privacyDeleteBody": "Permanently erase your data. This can't be undone.",
+  "@privacyDeleteBody": {
+    "description": "Body text for the delete-account section of the privacy screen."
+  },
+
+  "privacyDeleteAccountButton": "Delete my account",
+  "@privacyDeleteAccountButton": {
+    "description": "Button/title label for deleting the account. Reused across the privacy screen and the delete-account screen (AppBar title + submit button)."
+  },
+
+  "privacyTurnOffEmailsDialogTitle": "Turn off service emails?",
+  "@privacyTurnOffEmailsDialogTitle": {
+    "description": "Confirmation dialog title shown when turning off the email_transactional consent."
+  },
+
+  "privacyTurnOffEmailsDialogBody": "You won't receive emails about your applications, matches, or account. Are you sure?",
+  "@privacyTurnOffEmailsDialogBody": {
+    "description": "Confirmation dialog body shown when turning off the email_transactional consent."
+  },
+
+  "privacyTurnOffButton": "Turn off",
+  "@privacyTurnOffButton": {
+    "description": "Confirm button label for turning off the email_transactional consent."
+  },
+
+  "privacyExportSuccessSnackbar": "Your data is on your clipboard.\nPaste it into a text editor and save as a .json file.",
+  "@privacyExportSuccessSnackbar": {
+    "description": "Snackbar shown after a successful DSR data export."
+  },
+
+  "privacyExportErrorSnackbar": "Couldn't export your data. Try again.",
+  "@privacyExportErrorSnackbar": {
+    "description": "Snackbar shown when a DSR data export fails."
+  },
+
+  "deleteAccountErrorSnackbar": "Couldn't delete your account. Try again.",
+  "@deleteAccountErrorSnackbar": {
+    "description": "Snackbar shown when the delete-account submission fails."
+  },
+
+  "deleteAccountWarningBanner": "This will permanently delete your personal data on Jobify. This action is irreversible.",
+  "@deleteAccountWarningBanner": {
+    "description": "Warning banner at the top of the delete-account screen."
+  },
+
+  "deleteAccountWhatWillHappenHeading": "What will happen:",
+  "@deleteAccountWhatWillHappenHeading": {
+    "description": "Heading above the delete-account consequence bullets."
+  },
+
+  "deleteAccountBulletProfile": "Your profile, resume, applications, and saved jobs are removed.",
+  "@deleteAccountBulletProfile": {
+    "description": "First delete-account consequence bullet."
+  },
+
+  "deleteAccountBulletMatchHistory": "Your match history and notifications are erased.",
+  "@deleteAccountBulletMatchHistory": {
+    "description": "Second delete-account consequence bullet."
+  },
+
+  "deleteAccountBulletAnalytics": "Anonymized employer-side analytics survive (apply counts only).",
+  "@deleteAccountBulletAnalytics": {
+    "description": "Third delete-account consequence bullet."
+  },
+
+  "deleteAccountDownloadHint": "Before you continue, we recommend downloading your data.",
+  "@deleteAccountDownloadHint": {
+    "description": "Hint text below the download-my-data button on the delete-account screen."
+  },
+
+  "deleteAccountConfirmPrompt": "To confirm, type {phrase} below:",
+  "@deleteAccountConfirmPrompt": {
+    "description": "Prompt above the confirmation text field. {phrase} is the literal wire token 'DELETE_MY_ACCOUNT', which is never translated — the user must type that exact English text; non-English locales should make this explicit in the surrounding sentence.",
+    "placeholders": {
+      "phrase": {
+        "type": "String"
+      }
+    }
+  },
+
+  "deleteAccountConfirmDialogTitle": "Are you absolutely sure?",
+  "@deleteAccountConfirmDialogTitle": {
+    "description": "Final confirmation dialog title before deleting the account."
+  },
+
+  "deleteAccountConfirmDialogBody": "Your account and all associated data will be permanently deleted.",
+  "@deleteAccountConfirmDialogBody": {
+    "description": "Final confirmation dialog body before deleting the account."
+  },
+
+  "deleteAccountYesDeleteButton": "Yes, delete",
+  "@deleteAccountYesDeleteButton": {
+    "description": "Confirm button label in the final delete-account dialog."
+  },
+
+  "resumeUnsupportedFileType": "Unsupported file type (PDF, DOC, DOCX).",
+  "@resumeUnsupportedFileType": {
+    "description": "Error message shown when the picked résumé file type isn't supported."
+  },
+
+  "resumeFileTooLarge": "File too large (max 10 MB).",
+  "@resumeFileTooLarge": {
+    "description": "Error message shown when the uploaded résumé exceeds the size limit."
+  },
+
+  "resumeNetworkError": "Couldn't reach Jobify.",
+  "@resumeNetworkError": {
+    "description": "Error message shown when a résumé upload fails due to a network error."
+  },
+
+  "resumeUploadFailedGeneric": "Couldn't upload. Try again.",
+  "@resumeUploadFailedGeneric": {
+    "description": "Fallback error message shown when a résumé upload fails for an unrecognised reason."
+  },
+
+  "resumeTitle": "Résumé",
+  "@resumeTitle": {
+    "description": "Résumé screen AppBar title. Reused as the profile screen's résumé row title."
+  },
+
+  "resumeUploadingButton": "Uploading…",
+  "@resumeUploadingButton": {
+    "description": "Upload button label while an upload is in flight."
+  },
+
+  "resumeUploadButton": "Upload / Replace résumé",
+  "@resumeUploadButton": {
+    "description": "Upload button label when idle."
+  },
+
+  "resumeEmptyBody": "No résumé yet. Upload one so we can match you to roles.",
+  "@resumeEmptyBody": {
+    "description": "Empty-state body shown when the applicant has no résumé."
+  },
+
+  "resumeStatusReady": "Ready",
+  "@resumeStatusReady": {
+    "description": "Résumé status chip label once parsing succeeds."
+  },
+
+  "resumeStatusFailed": "Couldn't parse — try again",
+  "@resumeStatusFailed": {
+    "description": "Résumé status chip label when parsing fails."
+  },
+
+  "resumeStatusProcessing": "Processing…",
+  "@resumeStatusProcessing": {
+    "description": "Résumé status chip label while parsing is pending or in progress."
+  },
+
+  "resumeUploadedOn": "Uploaded {when}",
+  "@resumeUploadedOn": {
+    "description": "Résumé card caption showing when it was uploaded — {when} is a pre-formatted date.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+
+  "preferencesTitle": "What are you looking for?",
+  "@preferencesTitle": {
+    "description": "Preferences screen AppBar title."
+  },
+
+  "preferencesSkipButton": "Skip",
+  "@preferencesSkipButton": {
+    "description": "Button to skip the preferences capture flow."
+  },
+
+  "preferencesLoadError": "Couldn't load your preferences.",
+  "@preferencesLoadError": {
+    "description": "Error text shown when the initial preferences fetch fails."
+  },
+
+  "preferencesSectionHeading": "Your preferences",
+  "@preferencesSectionHeading": {
+    "description": "Section heading above the preferences form."
+  },
+
+  "preferencesDesiredRoleLabel": "Desired role",
+  "@preferencesDesiredRoleLabel": {
+    "description": "Label for the desired-role dropdown/field. Reused on the preferences screen, edit-profile screen, and profile spec sheet."
+  },
+
+  "preferencesNoPreferenceOption": "No preference",
+  "@preferencesNoPreferenceOption": {
+    "description": "Dropdown item that clears the desired-role selection. Reused on the preferences and edit-profile screens."
+  },
+
+  "preferencesLocationsLabel": "Locations",
+  "@preferencesLocationsLabel": {
+    "description": "Label for the locations field/list. Reused on the preferences screen, edit-profile screen, and profile spec sheet."
+  },
+
+  "preferencesAddLocationLabel": "Add location",
+  "@preferencesAddLocationLabel": {
+    "description": "Label for the add-location text field. Reused on the preferences and edit-profile screens."
+  },
+
+  "preferencesExpectedCtcLabel": "Expected CTC (₹/yr)",
+  "@preferencesExpectedCtcLabel": {
+    "description": "Label for the expected-CTC field. Reused on the preferences and edit-profile screens."
+  },
+
+  "preferencesResumeUnparsedBody": "We couldn't read your résumé — tell us directly below.",
+  "@preferencesResumeUnparsedBody": {
+    "description": "Body text shown on the preferences screen's résumé summary card when parsing produced no data."
+  },
+
+  "preferencesResumeHeading": "Your résumé",
+  "@preferencesResumeHeading": {
+    "description": "Heading on the preferences screen's résumé summary card when parsed data is available."
+  },
+
+  "formSaveFailedGeneric": "Couldn't save. Try again.",
+  "@formSaveFailedGeneric": {
+    "description": "Generic save-failure snackbar. Reused by the preferences and edit-profile screens."
+  },
+
+  "desiredRoleSoftwareEngineering": "Software Engineering",
+  "@desiredRoleSoftwareEngineering": {
+    "description": "Display label for the software_engineering desired-role category."
+  },
+
+  "desiredRoleDataAnalytics": "Data & Analytics",
+  "@desiredRoleDataAnalytics": {
+    "description": "Display label for the data_analytics desired-role category."
+  },
+
+  "desiredRoleProductManagement": "Product Management",
+  "@desiredRoleProductManagement": {
+    "description": "Display label for the product_management desired-role category."
+  },
+
+  "desiredRoleDesign": "Design",
+  "@desiredRoleDesign": {
+    "description": "Display label for the design desired-role category."
+  },
+
+  "desiredRoleSales": "Sales",
+  "@desiredRoleSales": {
+    "description": "Display label for the sales desired-role category."
+  },
+
+  "desiredRoleMarketing": "Marketing",
+  "@desiredRoleMarketing": {
+    "description": "Display label for the marketing desired-role category."
+  },
+
+  "desiredRoleCustomerSupport": "Customer Support",
+  "@desiredRoleCustomerSupport": {
+    "description": "Display label for the customer_support desired-role category."
+  },
+
+  "desiredRoleOperations": "Operations",
+  "@desiredRoleOperations": {
+    "description": "Display label for the operations desired-role category."
+  },
+
+  "desiredRoleFinanceAccounting": "Finance & Accounting",
+  "@desiredRoleFinanceAccounting": {
+    "description": "Display label for the finance_accounting desired-role category."
+  },
+
+  "desiredRoleHrRecruiting": "HR & Recruiting",
+  "@desiredRoleHrRecruiting": {
+    "description": "Display label for the hr_recruiting desired-role category."
+  },
+
+  "desiredRoleLegal": "Legal",
+  "@desiredRoleLegal": {
+    "description": "Display label for the legal desired-role category."
+  },
+
+  "desiredRoleConsulting": "Consulting",
+  "@desiredRoleConsulting": {
+    "description": "Display label for the consulting desired-role category."
+  },
+
+  "desiredRoleBusinessDevelopment": "Business Development",
+  "@desiredRoleBusinessDevelopment": {
+    "description": "Display label for the business_development desired-role category."
+  },
+
+  "desiredRoleContentCommunications": "Content & Communications",
+  "@desiredRoleContentCommunications": {
+    "description": "Display label for the content_communications desired-role category."
+  },
+
+  "desiredRoleAdministration": "Administration",
+  "@desiredRoleAdministration": {
+    "description": "Display label for the administration desired-role category."
+  },
+
+  "desiredRoleOther": "Other",
+  "@desiredRoleOther": {
+    "description": "Display label for the other desired-role category."
+  },
+
+  "desiredRoleUnknown": "Unknown",
+  "@desiredRoleUnknown": {
+    "description": "Fallback display label for an unrecognised desired-role wire value. Should never reach the UI."
+  },
+
+  "profileTitle": "Profile",
+  "@profileTitle": {
+    "description": "Profile screen header title."
+  },
+
+  "profileEditButton": "Edit",
+  "@profileEditButton": {
+    "description": "Button that navigates to the edit-profile screen."
+  },
+
+  "profileHiringCtaTitle": "I'm hiring — post a job",
+  "@profileHiringCtaTitle": {
+    "description": "Title of the card prompting an applicant to create an employer and start recruiting."
+  },
+
+  "profileHiringCtaSubtitle": "Create your company to start recruiting",
+  "@profileHiringCtaSubtitle": {
+    "description": "Subtitle of the card prompting an applicant to create an employer and start recruiting."
+  },
+
+  "profileMatchProfileHeading": "Match profile",
+  "@profileMatchProfileHeading": {
+    "description": "Heading above the match-profile spec sheet on the profile screen."
+  },
+
+  "profileResumeSubtitle": "Manage your résumé",
+  "@profileResumeSubtitle": {
+    "description": "Subtitle of the résumé row on the profile screen."
+  },
+
+  "profileNotificationsSubtitle": "View your notifications",
+  "@profileNotificationsSubtitle": {
+    "description": "Subtitle of the notifications row on the profile screen."
+  },
+
+  "profileInvitesSubtitle": "Company invites to recruit",
+  "@profileInvitesSubtitle": {
+    "description": "Subtitle of the pending-invitations row on the profile screen."
+  },
+
+  "profilePrivacySubtitle": "Preferences, export, delete",
+  "@profilePrivacySubtitle": {
+    "description": "Subtitle of the privacy row on the profile screen."
+  },
+
+  "profileAppearanceHeading": "Appearance",
+  "@profileAppearanceHeading": {
+    "description": "Heading above the light/dark/system theme selector."
+  },
+
+  "profileAppearanceSystem": "System",
+  "@profileAppearanceSystem": {
+    "description": "Segmented-button label for following the system theme."
+  },
+
+  "profileAppearanceLight": "Light",
+  "@profileAppearanceLight": {
+    "description": "Segmented-button label for the light theme."
+  },
+
+  "profileAppearanceDark": "Dark",
+  "@profileAppearanceDark": {
+    "description": "Segmented-button label for the dark theme."
+  },
+
+  "profileLanguageLabel": "Language",
+  "@profileLanguageLabel": {
+    "description": "Heading above the English/Hindi language switcher."
+  },
+
+  "profileLanguageEnglish": "English",
+  "@profileLanguageEnglish": {
+    "description": "Segmented-button label for English. A language's own name renders in that language, so this value is identical in every ARB file."
+  },
+
+  "profileLanguageHindi": "हिन्दी",
+  "@profileLanguageHindi": {
+    "description": "Segmented-button label for Hindi. A language's own name renders in that language, so this value is identical in every ARB file."
+  },
+
+  "profileSigningOutButton": "Signing out…",
+  "@profileSigningOutButton": {
+    "description": "Sign-out button label while the sign-out request is in flight."
+  },
+
+  "profileSignOutButton": "Sign out",
+  "@profileSignOutButton": {
+    "description": "Sign-out button label when idle. Reused as the confirmation dialog's title question and confirm button."
+  },
+
+  "profileSignOutDialogTitle": "Sign out?",
+  "@profileSignOutDialogTitle": {
+    "description": "Confirmation dialog title before signing out."
+  },
+
+  "profileSignOutDialogBody": "You'll need to sign in again to continue.",
+  "@profileSignOutDialogBody": {
+    "description": "Confirmation dialog body before signing out."
+  },
+
+  "profileRetryPreferencesLabel": "Preferences",
+  "@profileRetryPreferencesLabel": {
+    "description": "Row label shown on the profile spec sheet when the preferences fetch failed."
+  },
+
+  "profileExperienceLabel": "Experience",
+  "@profileExperienceLabel": {
+    "description": "Spec-sheet row label for years of experience on the profile screen."
+  },
+
+  "profileNoticePeriodLabel": "Notice period",
+  "@profileNoticePeriodLabel": {
+    "description": "Spec-sheet row label for notice period on the profile screen."
+  },
+
+  "profileNoticePeriodDaysValue": "{days, plural, one{{days} day} other{{days} days}}",
+  "@profileNoticePeriodDaysValue": {
+    "description": "Spec-sheet row value for notice period, in days.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+
+  "profileCurrentCtcLabel": "Current CTC",
+  "@profileCurrentCtcLabel": {
+    "description": "Spec-sheet row label for current CTC on the profile screen."
+  },
+
+  "profileExpectedCtcLabel": "Expected CTC",
+  "@profileExpectedCtcLabel": {
+    "description": "Spec-sheet row label for expected CTC on the profile screen."
+  },
+
+  "profileRetryFailedLabel": "Couldn't load",
+  "@profileRetryFailedLabel": {
+    "description": "Inline error text shown next to a failed spec-sheet row's retry button."
+  },
+
+  "profileAddFieldAction": "Add",
+  "@profileAddFieldAction": {
+    "description": "Tappable prompt shown in place of a missing spec-sheet value, jumping to edit-profile."
+  },
+
+  "profileYearsExperienceSuffix": "{years} yrs",
+  "@profileYearsExperienceSuffix": {
+    "description": "Spec-sheet row value for years of experience — {years} is the pre-trimmed numeric string (trailing .0 dropped).",
+    "placeholders": {
+      "years": {
+        "type": "String"
+      }
+    }
+  },
+
+  "profileVersionLabel": "v{version} ({build})",
+  "@profileVersionLabel": {
+    "description": "App version/build stamp at the bottom of the profile screen. Version numbering notation is not natural language, so this value is identical in every ARB file.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "build": {
+        "type": "String"
+      }
+    }
+  },
+
+  "editProfileTitle": "Edit Profile",
+  "@editProfileTitle": {
+    "description": "Edit-profile screen AppBar title."
+  },
+
+  "editProfileLoadError": "Couldn't load your profile.",
+  "@editProfileLoadError": {
+    "description": "Error text shown when the initial profile/preferences fetch fails."
+  },
+
+  "editProfileAboutYouHeading": "About you",
+  "@editProfileAboutYouHeading": {
+    "description": "Section heading for the personal-details card on the edit-profile screen."
+  },
+
+  "editProfileFullNameLabel": "Full name",
+  "@editProfileFullNameLabel": {
+    "description": "Label for the full-name field."
+  },
+
+  "editProfileRequiredValidation": "Required",
+  "@editProfileRequiredValidation": {
+    "description": "Validation error when the full-name field is empty."
+  },
+
+  "editProfileTooLongValidation": "Too long (max 200)",
+  "@editProfileTooLongValidation": {
+    "description": "Validation error when the full-name field exceeds 200 characters."
+  },
+
+  "editProfileLocationTooLong": "Location too long (max 100 chars).",
+  "@editProfileLocationTooLong": {
+    "description": "Snackbar shown when an entered location exceeds the character limit."
+  },
+
+  "editProfileLocationsLimitReached": "Up to 10 locations.",
+  "@editProfileLocationsLimitReached": {
+    "description": "Snackbar shown when the applicant tries to add an 11th location."
+  },
+
+  "editProfileTheNumbersHeading": "The numbers",
+  "@editProfileTheNumbersHeading": {
+    "description": "Section heading for the numeric-fields card on the edit-profile screen."
+  },
+
+  "editProfileYearsExperienceLabel": "Years of experience",
+  "@editProfileYearsExperienceLabel": {
+    "description": "Label for the years-of-experience field."
+  },
+
+  "editProfileNoticePeriodLabel": "Notice period (days)",
+  "@editProfileNoticePeriodLabel": {
+    "description": "Label for the notice-period field."
+  },
+
+  "editProfileCurrentCtcLabel": "Current CTC (₹/yr)",
+  "@editProfileCurrentCtcLabel": {
+    "description": "Label for the current-CTC field."
+  },
+
+  "editProfileEnterNumberValidation": "Enter a number",
+  "@editProfileEnterNumberValidation": {
+    "description": "Validation error when a numeric field can't be parsed."
+  },
+
+  "editProfileRangeValidation": "Must be between {min} and {max}",
+  "@editProfileRangeValidation": {
+    "description": "Validation error when a numeric field is outside its allowed range.",
+    "placeholders": {
+      "min": {
+        "type": "num"
+      },
+      "max": {
+        "type": "num"
+      }
+    }
+  },
+
+  "editProfileWholeNumberValidation": "Whole number only",
+  "@editProfileWholeNumberValidation": {
+    "description": "Validation error when a whole-number-only field has decimal places."
+  },
+
+  "editProfileDecimalPlacesValidation": "{maxDecimals, plural, one{At most {maxDecimals} decimal place} other{At most {maxDecimals} decimal places}}",
+  "@editProfileDecimalPlacesValidation": {
+    "description": "Validation error when a numeric field has more decimal places than allowed.",
+    "placeholders": {
+      "maxDecimals": {
+        "type": "int"
+      }
+    }
+  },
+
+  "editProfileSavedProfileOnly": "Saved your profile, but couldn't save preferences. Try again.",
+  "@editProfileSavedProfileOnly": {
+    "description": "Snackbar shown when the profile PATCH succeeds but the preferences PATCH fails."
+  },
+
+  "editProfileSavedPreferencesOnly": "Saved your preferences, but couldn't save your profile. Try again.",
+  "@editProfileSavedPreferencesOnly": {
+    "description": "Snackbar shown when the preferences PATCH succeeds but the profile PATCH fails."
+  },
+
+  "invitesTitle": "Pending invitations",
+  "@invitesTitle": {
+    "description": "Pending-invitations screen AppBar title. Reused as the profile screen's invitations row title."
+  },
+
+  "invitesEmptyHeadline": "No invitations",
+  "@invitesEmptyHeadline": {
+    "description": "Empty-state headline shown when the applicant has no pending invitations."
+  },
+
+  "invitesEmptyBody": "When a company invites you to recruit, it'll show up here.",
+  "@invitesEmptyBody": {
+    "description": "Empty-state body shown when the applicant has no pending invitations."
+  },
+
+  "invitesCardSubtitleOwner": "Invited as owner · expires {expires}",
+  "@invitesCardSubtitleOwner": {
+    "description": "Invite card subtitle when the invited role is owner — {expires} is a pre-formatted date.",
+    "placeholders": {
+      "expires": {
+        "type": "String"
+      }
+    }
+  },
+
+  "invitesCardSubtitleMember": "Invited as member · expires {expires}",
+  "@invitesCardSubtitleMember": {
+    "description": "Invite card subtitle when the invited role is member — {expires} is a pre-formatted date.",
+    "placeholders": {
+      "expires": {
+        "type": "String"
+      }
+    }
+  },
+
+  "invitesDeclineButton": "Decline",
+  "@invitesDeclineButton": {
+    "description": "Button to decline a pending invitation."
+  },
+
+  "invitesAcceptButton": "Accept",
+  "@invitesAcceptButton": {
+    "description": "Button to accept a pending invitation."
+  },
+
+  "invitesJoinedSnackbar": "You joined {employerName}.",
+  "@invitesJoinedSnackbar": {
+    "description": "Snackbar shown after successfully accepting an invitation.",
+    "placeholders": {
+      "employerName": {
+        "type": "String"
+      }
+    }
+  },
+
+  "invitesAcceptErrorSnackbar": "Couldn't accept the invitation.",
+  "@invitesAcceptErrorSnackbar": {
+    "description": "Snackbar shown when accepting an invitation fails."
+  },
+
+  "invitesDeclineErrorSnackbar": "Couldn't decline the invitation.",
+  "@invitesDeclineErrorSnackbar": {
+    "description": "Snackbar shown when declining an invitation fails."
+  }
+}

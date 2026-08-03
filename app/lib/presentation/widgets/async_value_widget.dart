@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
 import 'package:jobify_app/presentation/widgets/jobify_empty_state.dart';
 import 'package:jobify_app/presentation/widgets/jobify_error_view.dart';
 import 'package:jobify_app/presentation/widgets/jobify_loading_view.dart';
@@ -42,8 +43,8 @@ class AsyncValueWidget<T> extends StatelessWidget {
       data: (d) {
         if (isEmpty?.call(d) ?? false) {
           return (empty ??
-              () => const JobifyEmptyState(
-                    headline: 'Nothing here yet',
+              () => JobifyEmptyState(
+                    headline: context.l10n.commonNothingHereYet,
                     body: '',
                   ))();
         }

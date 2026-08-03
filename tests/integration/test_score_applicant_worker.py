@@ -34,7 +34,11 @@ def _make_sm(session: AsyncSession) -> async_sessionmaker[AsyncSession]:
 
 
 async def _seed_applicant(
-    session: AsyncSession, *, email: str = "s@example.com", locations: list[str] | None = None
+    session: AsyncSession,
+    *,
+    email: str = "s@example.com",
+    locations: list[str] | None = None,
+    language: str = "en",
 ) -> Applicant:
     user = User(email=email, role=UserRole.APPLICANT)
     session.add(user)
@@ -43,7 +47,9 @@ async def _seed_applicant(
     session.add(applicant)
     await session.flush()
     session.add(
-        ApplicantPreferences(applicant_id=applicant.id, locations=locations or ["Bangalore"])
+        ApplicantPreferences(
+            applicant_id=applicant.id, locations=locations or ["Bangalore"], language=language
+        )
     )
     session.add(
         ApplicantEmbedding(
@@ -117,6 +123,73 @@ async def test_score_applicant_writes_rows_for_all_open_jobs(session: AsyncSessi
         assert "fit" in row.explanation
         assert row.explanation["generator"] == "templated"
         assert row.explanation["generator_version"] == "1"
+
+
+@pytest.mark.integration
+async def test_score_applicant_hindi_preference_yields_hindi_explanation(
+    session: AsyncSession,
+) -> None:
+    """applicant_preferences.language='hi' propagates through ExplainContext into
+    the stored explanation (see explainer.py + score_applicant.py language wiring)."""
+    applicant = await _seed_applicant(session, language="hi")
+    await _seed_job(session, title="A", embedding=[1.0] * 1536)
+    await session.commit()
+
+    await _score_applicant_async(applicant.id, sm=_make_sm(session))
+
+    row = (
+        await session.execute(select(Match).where(Match.applicant_id == applicant.id))
+    ).scalar_one()
+    assert any("ऀ" <= ch <= "ॿ" for ch in row.explanation["fit"])
+
+
+@pytest.mark.integration
+async def test_score_applicant_rescore_overwrites_english_explanation_with_hindi(
+    session: AsyncSession,
+) -> None:
+    """applicant_preferences.language flips en->hi between two rescores of the
+    SAME (applicant, job) pair — the second run's explanation must overwrite
+    the first's in place (idempotent UPSERT, see
+    test_score_applicant_idempotent_upsert), not just append a new row.
+    Mirrors test_score_applicant_hindi_preference_yields_hindi_explanation's
+    fixtures, but exercises the overwrite-on-rescore path that test doesn't
+    cover (it only scores once, already in Hindi)."""
+    applicant = await _seed_applicant(session, language="en")
+    job = await _seed_job(session, title="A", embedding=[1.0] * 1536)
+    await session.commit()
+
+    await _score_applicant_async(applicant.id, sm=_make_sm(session))
+
+    row = (
+        await session.execute(
+            select(Match)
+            .where(Match.applicant_id == applicant.id, Match.job_id == job.id)
+            .execution_options(populate_existing=True)
+        )
+    ).scalar_one()
+    first_match_id = row.id
+    assert not any("ऀ" <= ch <= "ॿ" for ch in row.explanation["fit"])
+
+    # Flip the SAME applicant's language preference to Hindi, then rescore.
+    prefs = (
+        await session.execute(
+            select(ApplicantPreferences).where(ApplicantPreferences.applicant_id == applicant.id)
+        )
+    ).scalar_one()
+    prefs.language = "hi"
+    await session.commit()
+
+    await _score_applicant_async(applicant.id, sm=_make_sm(session))
+
+    row2 = (
+        await session.execute(
+            select(Match)
+            .where(Match.applicant_id == applicant.id, Match.job_id == job.id)
+            .execution_options(populate_existing=True)
+        )
+    ).scalar_one()
+    assert row2.id == first_match_id  # same row, overwritten in place
+    assert any("ऀ" <= ch <= "ॿ" for ch in row2.explanation["fit"])
 
 
 @pytest.mark.integration

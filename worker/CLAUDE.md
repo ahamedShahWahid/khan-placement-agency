@@ -44,3 +44,4 @@ Writers insert `notifications` rows from the api routes (apply, invite); the swe
 - **Retry ×5**, backoff `min(60·2^(attempt-1), 3600) + jitter(0,30)` → `send_after`; exhaustion → `failed`.
 - **Apply inserts TWO rows** (`email` + `in_app`); idempotent re-applies and re-apply-after-withdraw insert none. `GET /v1/notifications` excludes `failed` + `cancelled`.
 - **Consent gate:** `_dispatch_one` checks consent between user-load and dispatch — see `core/CLAUDE.md` → Consent for the CANCELLED-terminal and `LookupError`-fallback rules.
+- **Email language** resolves per dispatch: user→applicant→live preferences outer join, default "en"; recruiters/admins have no applicant row → English; employer_invite renders English regardless. _render(kind, payload, language) string tables must stay slot-identical across languages (pinned by the render matrix test).

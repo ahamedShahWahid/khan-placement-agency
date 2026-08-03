@@ -1,5 +1,6 @@
 import 'package:jobify_app/data/auth/auth_repository_provider.dart';
 import 'package:jobify_app/presentation/preferences/preferences_controller.dart';
+import 'package:jobify_app/presentation/routing/locale_controller.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'sign_out_controller.g.dart';
@@ -20,5 +21,8 @@ class SignOutController extends _$SignOutController {
     // a same-session sign-out -> sign-in would leak the previous user's
     // cached desired role/locations/expected CTC into the new session.
     ref.invalidate(preferencesControllerProvider);
+    // Same reasoning for the locale override — reset to device-follow so
+    // the next session doesn't inherit the previous applicant's language.
+    ref.read(localeControllerProvider.notifier).reset();
   }
 }

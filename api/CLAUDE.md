@@ -43,9 +43,10 @@ Applicant id is **never** from the URL — from `current_user.id`. Prefix `/v1/a
 ## Applicant profile + preferences — spec `2026-07-01-resume-review-preferences-design.md`
 
 - **The `applicant_preferences` row is eagerly created at signup** (`AuthService._upsert_identity`, like consent seeding). GET/PATCH `/v1/applicants/me/preferences` treat a missing live row as an invariant violation — `_require_preferences_row` logs + raises 500 `applicant_preferences_missing`. Never auto-create on read.
-- **Two disjoint rescore-trigger sets:** `_MATCHING_FIELDS = {years_experience}` (profile PATCH) vs `_PREFERENCES_MATCHING_FIELDS = {locations, expected_ctc}` (preferences PATCH). **`desired_role` is deliberately NOT a trigger** — capture-only; scoring never reads it (see `core/CLAUDE.md`). Don't "fix" that.
+- **Two disjoint rescore-trigger sets:** `_MATCHING_FIELDS = {years_experience}` (profile PATCH) vs `_PREFERENCES_MATCHING_FIELDS = {locations, expected_ctc, language}` (preferences PATCH). **`desired_role` is deliberately NOT a trigger** — capture-only; scoring never reads it (see `core/CLAUDE.md`). Don't "fix" that.
 - **Partial-update contract** (both PATCHes): only `model_fields_set` keys are applied; explicit null clears `desired_role`/`expected_ctc`; `locations` is non-nullable (empty list clears). The setattr-from-fields-set loop is safe ONLY because `extra="forbid"` closes the field set — removing it opens mass assignment.
 - `applicant_preferences` is PII → DSR-wired: exported (ALL rows, list — export convention has no `deleted_at` filter) + hard-deleted in `deleter.py`; pinned in `test_dsr_coverage.py` + `test_builder_signature.py`.
+- **language** rides the standard partial-update contract (Literal["en","hi"], explicit null 422s); it IS in _PREFERENCES_MATCHING_FIELDS (regenerates explanations).
 
 ## Feed + job detail — spec `2026-05-20-p2.3-feed-and-job-detail-design.md`
 

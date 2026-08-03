@@ -4,16 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
 import 'package:jobify_app/data/auth/user_role.dart';
 import 'package:jobify_app/data/me/me_dto.dart';
 import 'package:jobify_app/data/preferences/desired_role.dart';
 import 'package:jobify_app/data/preferences/preferences_dto.dart';
+import 'package:jobify_app/data/preferences/preferences_update_dto.dart';
 import 'package:jobify_app/presentation/auth/current_role_provider.dart';
+import 'package:jobify_app/presentation/preferences/desired_role_label.dart';
 import 'package:jobify_app/presentation/preferences/preferences_controller.dart';
 import 'package:jobify_app/presentation/profile/ctc_format.dart';
 import 'package:jobify_app/presentation/profile/me_controller.dart';
 import 'package:jobify_app/presentation/profile/package_info_provider.dart';
 import 'package:jobify_app/presentation/profile/sign_out_controller.dart';
+import 'package:jobify_app/presentation/routing/locale_controller.dart';
 import 'package:jobify_app/presentation/routing/routes.dart';
 import 'package:jobify_app/presentation/theme/jobify_colors.dart';
 import 'package:jobify_app/presentation/theme/jobify_spacing.dart';
@@ -33,13 +37,14 @@ class ProfileScreen extends ConsumerWidget {
     final signOut = ref.watch(signOutControllerProvider);
     final theme = Theme.of(context);
     final isApplicant = ref.watch(currentRoleProvider) == UserRole.applicant;
+    final l10n = context.l10n;
 
     return BoldScaffold(
       header: BoldHeader(
-        title: 'Profile',
+        title: l10n.profileTitle,
         trailing: TextButton(
           onPressed: () => context.go(Routes.profileEdit),
-          child: const Text('Edit'),
+          child: Text(l10n.profileEditButton),
         ),
       ),
       child: AsyncValueWidget(
@@ -52,6 +57,7 @@ class ProfileScreen extends ConsumerWidget {
 
           final rows = data.applicant != null
               ? _matchProfileRows(
+                  context: context,
                   a: data.applicant!,
                   preferences: preferences,
                   onRetry: () => ref.invalidate(preferencesControllerProvider),
@@ -68,7 +74,7 @@ class ProfileScreen extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      data.displayName ?? data.email ?? 'Profile',
+                      data.displayName ?? data.email ?? l10n.profileTitle,
                       style: theme.textTheme.headlineSmall,
                     ),
                     const SizedBox(height: JobifySpacing.xs),
@@ -88,10 +94,8 @@ class ProfileScreen extends ConsumerWidget {
                   Card(
                     child: ListTile(
                       leading: const Icon(Icons.business_center_outlined),
-                      title: const Text("I'm hiring — post a job"),
-                      subtitle: const Text(
-                        'Create your company to start recruiting',
-                      ),
+                      title: Text(l10n.profileHiringCtaTitle),
+                      subtitle: Text(l10n.profileHiringCtaSubtitle),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => context.push(Routes.onboardingEmployer),
                     ),
@@ -104,7 +108,10 @@ class ProfileScreen extends ConsumerWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Match profile', style: theme.textTheme.titleMedium),
+                      Text(
+                        l10n.profileMatchProfileHeading,
+                        style: theme.textTheme.titleMedium,
+                      ),
                       const SizedBox(height: JobifySpacing.sm),
                       Card(
                         child: Padding(
@@ -135,7 +142,10 @@ class ProfileScreen extends ConsumerWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Account', style: theme.textTheme.titleMedium),
+                    Text(
+                      l10n.profileAccountHeading,
+                      style: theme.textTheme.titleMedium,
+                    ),
                     const SizedBox(height: JobifySpacing.sm),
                     Card(
                       clipBehavior: Clip.antiAlias,
@@ -143,8 +153,8 @@ class ProfileScreen extends ConsumerWidget {
                         children: [
                           ListTile(
                             leading: const Icon(Icons.description_outlined),
-                            title: const Text('Résumé'),
-                            subtitle: const Text('Manage your résumé'),
+                            title: Text(l10n.resumeTitle),
+                            subtitle: Text(l10n.profileResumeSubtitle),
                             onTap: () => context.go(Routes.resume),
                           ),
                           Divider(
@@ -153,8 +163,8 @@ class ProfileScreen extends ConsumerWidget {
                           ),
                           ListTile(
                             leading: const Icon(Icons.notifications_outlined),
-                            title: const Text('Notifications'),
-                            subtitle: const Text('View your notifications'),
+                            title: Text(l10n.notificationsTitle),
+                            subtitle: Text(l10n.profileNotificationsSubtitle),
                             onTap: () => context.go(Routes.notifications),
                           ),
                           if (isApplicant) ...[
@@ -164,9 +174,8 @@ class ProfileScreen extends ConsumerWidget {
                             ),
                             ListTile(
                               leading: const Icon(Icons.mail_outline),
-                              title: const Text('Pending invitations'),
-                              subtitle:
-                                  const Text('Company invites to recruit'),
+                              title: Text(l10n.invitesTitle),
+                              subtitle: Text(l10n.profileInvitesSubtitle),
                               onTap: () => context.go(Routes.profileInvites),
                             ),
                           ],
@@ -176,8 +185,8 @@ class ProfileScreen extends ConsumerWidget {
                           ),
                           ListTile(
                             leading: const Icon(Icons.shield_outlined),
-                            title: const Text('Privacy & data'),
-                            subtitle: const Text('Preferences, export, delete'),
+                            title: Text(l10n.privacyTitle),
+                            subtitle: Text(l10n.profilePrivacySubtitle),
                             onTap: () => context.go(Routes.privacy),
                           ),
                         ],
@@ -191,9 +200,26 @@ class ProfileScreen extends ConsumerWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Appearance', style: theme.textTheme.titleMedium),
+                    Text(
+                      l10n.profileAppearanceHeading,
+                      style: theme.textTheme.titleMedium,
+                    ),
                     const SizedBox(height: JobifySpacing.sm),
                     _AppearanceSelector(),
+                  ],
+                ),
+              ),
+              const SizedBox(height: JobifySpacing.xl),
+              arrive(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.profileLanguageLabel,
+                      style: theme.textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: JobifySpacing.sm),
+                    _LanguageSelector(preferences: preferences),
                   ],
                 ),
               ),
@@ -203,14 +229,21 @@ class ProfileScreen extends ConsumerWidget {
                   onPressed: signOut.isLoading
                       ? null
                       : () => _confirmSignOut(context, ref),
-                  child: Text(signOut.isLoading ? 'Signing out…' : 'Sign out'),
+                  child: Text(
+                    signOut.isLoading
+                        ? l10n.profileSigningOutButton
+                        : l10n.profileSignOutButton,
+                  ),
                 ),
               ),
               const SizedBox(height: JobifySpacing.xxl),
               ref.watch(packageInfoProvider).when(
                     data: (info) => Center(
                       child: Text(
-                        'v${info.version} (${info.buildNumber})',
+                        l10n.profileVersionLabel(
+                          info.version,
+                          info.buildNumber,
+                        ),
                         style: JobifyTypography.mono(
                           fontSize: 11,
                           color: theme.colorScheme.onSurfaceVariant,
@@ -228,21 +261,20 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   Future<void> _confirmSignOut(BuildContext ctx, WidgetRef ref) async {
+    final l10n = ctx.l10n;
     final ok = await showDialog<bool>(
       context: ctx,
       builder: (c) => AlertDialog(
-        title: const Text('Sign out?'),
-        content: const Text(
-          "You'll need to sign in again to continue.",
-        ),
+        title: Text(l10n.profileSignOutDialogTitle),
+        content: Text(l10n.profileSignOutDialogBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(c, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(c, true),
-            child: const Text('Sign out'),
+            child: Text(l10n.profileSignOutButton),
           ),
         ],
       ),
@@ -260,47 +292,64 @@ class ProfileScreen extends ConsumerWidget {
 /// amber — the app's existing "honest weakness" token) instead of a dead
 /// dash, since a missing field here concretely means weaker matches.
 List<Widget> _matchProfileRows({
+  required BuildContext context,
   required ApplicantSummaryDto a,
   required AsyncValue<PreferencesDto> preferences,
   required VoidCallback onRetry,
   required VoidCallback onAdd,
 }) {
+  final l10n = context.l10n;
   final rows = <Widget>[];
   if (preferences.hasError && !preferences.hasValue) {
-    rows.add(_RetryRow(label: 'Preferences', onRetry: onRetry));
+    rows.add(
+      _RetryRow(label: l10n.profileRetryPreferencesLabel, onRetry: onRetry),
+    );
   }
   if (preferences.value case final p?) {
     rows
       ..add(
         _SpecRow(
-          label: 'Desired role',
+          label: l10n.preferencesDesiredRoleLabel,
           value: p.desiredRole == null || p.desiredRole == DesiredRole.unknown
               ? null
-              : p.desiredRole!.label,
+              : desiredRoleLabel(context, p.desiredRole!),
           onAdd: p.desiredRole == null ? onAdd : null,
         ),
       )
       ..add(
         _SpecRow(
-          label: 'Locations',
+          label: l10n.preferencesLocationsLabel,
           value: p.locations.isEmpty ? null : p.locations.join(', '),
           onAdd: p.locations.isEmpty ? onAdd : null,
         ),
       );
   }
-  if (formatYears(a.yearsExperience) case final years?) {
-    rows.add(_SpecRow(label: 'Experience', value: years));
+  if (formatYearsNumber(a.yearsExperience) case final years?) {
+    rows.add(
+      _SpecRow(
+        label: l10n.profileExperienceLabel,
+        value: l10n.profileYearsExperienceSuffix(years),
+      ),
+    );
   }
   if (a.noticePeriodDays != null) {
     rows.add(
-      _SpecRow(label: 'Notice period', value: '${a.noticePeriodDays} days'),
+      _SpecRow(
+        label: l10n.profileNoticePeriodLabel,
+        value: l10n.profileNoticePeriodDaysValue(a.noticePeriodDays!),
+      ),
     );
   }
-  rows.add(_SpecRow(label: 'Current CTC', value: formatCtc(a.currentCtc)));
+  rows.add(
+    _SpecRow(
+      label: l10n.profileCurrentCtcLabel,
+      value: formatCtc(a.currentCtc),
+    ),
+  );
   if (preferences.value case final p?) {
     rows.add(
       _SpecRow(
-        label: 'Expected CTC',
+        label: l10n.profileExpectedCtcLabel,
         value: p.expectedCtc == null ? null : formatCtc(p.expectedCtc),
         onAdd: p.expectedCtc == null ? onAdd : null,
       ),
@@ -313,22 +362,23 @@ class _AppearanceSelector extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentMode = ref.watch(themeModeControllerProvider);
+    final l10n = context.l10n;
     return SegmentedButton<ThemeMode>(
-      segments: const [
+      segments: [
         ButtonSegment(
           value: ThemeMode.system,
-          label: Text('System'),
-          icon: Icon(Icons.brightness_auto_outlined),
+          label: Text(l10n.profileAppearanceSystem),
+          icon: const Icon(Icons.brightness_auto_outlined),
         ),
         ButtonSegment(
           value: ThemeMode.light,
-          label: Text('Light'),
-          icon: Icon(Icons.light_mode_outlined),
+          label: Text(l10n.profileAppearanceLight),
+          icon: const Icon(Icons.light_mode_outlined),
         ),
         ButtonSegment(
           value: ThemeMode.dark,
-          label: Text('Dark'),
-          icon: Icon(Icons.dark_mode_outlined),
+          label: Text(l10n.profileAppearanceDark),
+          icon: const Icon(Icons.dark_mode_outlined),
         ),
       ],
       selected: {currentMode},
@@ -414,7 +464,7 @@ class _AddFieldAction extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Add',
+              context.l10n.profileAddFieldAction,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: color,
                 fontWeight: FontWeight.w600,
@@ -426,6 +476,53 @@ class _AddFieldAction extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// English/Hindi language switcher. Tapping a segment (a) optimistically
+/// flips the app locale so the UI re-renders immediately, then (b) saves
+/// through the shared preferences controller's `submit` path, seeding every
+/// other field from the currently-loaded preferences (full-form contract —
+/// see `PreferencesUpdateDto`). On save failure, `PreferencesController.
+/// submit` itself restores the pre-tap locale (see its rollback branch).
+class _LanguageSelector extends ConsumerWidget {
+  const _LanguageSelector({required this.preferences});
+
+  final AsyncValue<PreferencesDto> preferences;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final locale = ref.watch(localeControllerProvider);
+    final l10n = context.l10n;
+    final selected = locale?.languageCode ?? 'en';
+    return SegmentedButton<String>(
+      segments: [
+        ButtonSegment(value: 'en', label: Text(l10n.profileLanguageEnglish)),
+        ButtonSegment(value: 'hi', label: Text(l10n.profileLanguageHindi)),
+      ],
+      selected: {selected},
+      onSelectionChanged: preferences.hasValue
+          ? (selection) =>
+              _onChanged(ref, preferences.requireValue, selection.first)
+          : null,
+    );
+  }
+
+  Future<void> _onChanged(
+    WidgetRef ref,
+    PreferencesDto current,
+    String language,
+  ) async {
+    ref.read(localeControllerProvider.notifier).setFromLanguage(language);
+    final update = PreferencesUpdateDto(
+      desiredRole: current.desiredRole,
+      locations: current.locations,
+      expectedCtc: current.expectedCtc == null
+          ? null
+          : num.tryParse(current.expectedCtc!),
+      language: language,
+    );
+    await ref.read(preferencesControllerProvider.notifier).submit(update);
   }
 }
 
@@ -451,12 +548,12 @@ class _RetryRow extends StatelessWidget {
             ),
           ),
           Text(
-            "Couldn't load",
+            context.l10n.profileRetryFailedLabel,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.error,
             ),
           ),
-          TextButton(onPressed: onRetry, child: const Text('Retry')),
+          TextButton(onPressed: onRetry, child: Text(context.l10n.commonRetry)),
         ],
       ),
     );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
 import 'package:jobify_app/presentation/feed/feed_summary_controller.dart';
 import 'package:jobify_app/presentation/preferences/preferences_controller.dart';
 import 'package:jobify_app/presentation/resume/resume_controller.dart';
@@ -27,7 +28,7 @@ class FeedSummaryRow extends ConsumerWidget {
         Expanded(
           child: _CountTile(
             icon: Icons.send_outlined,
-            label: 'Applications',
+            label: context.l10n.shellTabApplications,
             value: summary.whenOrNull(
               data: (s) => s.applicationsApprox
                   ? '${s.applicationsCount}+'
@@ -42,7 +43,7 @@ class FeedSummaryRow extends ConsumerWidget {
         Expanded(
           child: _CountTile(
             icon: Icons.bookmark_outline,
-            label: 'Saved',
+            label: context.l10n.shellTabSaved,
             value: summary.whenOrNull(
               data: (s) =>
                   s.savedApprox ? '${s.savedCount}+' : '${s.savedCount}',
@@ -136,7 +137,7 @@ class _MatchProfileTile extends ConsumerWidget {
       return _tile(
         context,
         icon: Icons.badge_outlined,
-        label: 'Profile',
+        label: context.l10n.shellTabProfile,
         color: quiet,
         onTap: () => context.go(Routes.profile),
       );
@@ -146,7 +147,7 @@ class _MatchProfileTile extends ConsumerWidget {
       return _tile(
         context,
         icon: Icons.upload_file_outlined,
-        label: 'Upload résumé',
+        label: context.l10n.feedSummaryUploadResume,
         color: caveat,
         onTap: () => context.push(Routes.resume),
       );
@@ -155,7 +156,7 @@ class _MatchProfileTile extends ConsumerWidget {
       return _tile(
         context,
         icon: Icons.badge_outlined,
-        label: 'Finish your profile',
+        label: context.l10n.feedSummaryFinishProfile,
         color: caveat,
         onTap: () => context.push(Routes.preferences, extra: resume),
       );
@@ -163,7 +164,7 @@ class _MatchProfileTile extends ConsumerWidget {
     return _tile(
       context,
       icon: Icons.check_circle_outline,
-      label: 'Profile complete',
+      label: context.l10n.feedSummaryProfileComplete,
       color: quiet,
       onTap: () => context.go(Routes.profile),
     );

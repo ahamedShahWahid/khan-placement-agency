@@ -8,6 +8,7 @@ import 'package:jobify_app/data/jobs/job_status.dart';
 import 'package:jobify_app/data/jobs/jobs_dto.dart';
 import 'package:jobify_app/data/jobs/jobs_repository.dart';
 import 'package:jobify_app/data/jobs/jobs_repository_impl.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/job_detail/job_detail_screen.dart';
 
 import '../helpers/fake_repositories.dart';
@@ -39,6 +40,8 @@ Widget _wrap(Widget child, {required JobsRepository repo}) {
     overrides: [jobsRepositoryProvider.overrideWithValue(repo)],
     child: MaterialApp(
       theme: ThemeData.light(useMaterial3: true),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: child,
     ),
   );

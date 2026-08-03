@@ -49,8 +49,9 @@ class SesEmailChannel:
         notification: Notification,
         *,
         recipient: str,
+        language: str = "en",
     ) -> ChannelResult:
-        subject, text_body = _render(notification.kind, notification.payload)
+        subject, text_body = _render(notification.kind, notification.payload, language)
         try:
             await asyncio.to_thread(
                 self._client.send_email,
@@ -79,10 +80,19 @@ class SesEmailChannel:
         return ChannelResult.success()
 
 
-def _render(kind: str, payload: dict[str, Any]) -> tuple[str, str]:
+def _render(kind: str, payload: dict[str, Any], language: str = "en") -> tuple[str, str]:
+    # employer_invite always renders English — the invited party's own
+    # applicant-side language preference is irrelevant (the invite is to a
+    # recruiter/employer account, which never has an ApplicantPreferences row).
+    hi = language == "hi" and kind != "employer_invite"
     if kind == "application_received":
-        title = str(payload.get("job_title", "the role"))
-        employer = str(payload.get("employer_name", "the employer"))
+        title = str(payload.get("job_title", "इस पद" if hi else "the role"))
+        employer = str(payload.get("employer_name", "नियोक्ता" if hi else "the employer"))
+        if hi:
+            return (
+                f"आवेदन प्राप्त हुआ — {title}",
+                f"{employer} में {title} के लिए आपका आवेदन प्राप्त हो गया है।",
+            )
         return (
             f"Application received — {title}",
             f"Your application for {title} at {employer} has been received.",
@@ -95,19 +105,42 @@ def _render(kind: str, payload: dict[str, Any]) -> tuple[str, str]:
             f"{employer} invited you to join their Jobify team as {role}. Open Jobify to respond.",
         )
     if kind == "application_stage_changed":
-        title = str(payload.get("job_title", "the role"))
-        employer = str(payload.get("employer_name", "the employer"))
+        title = str(payload.get("job_title", "इस पद" if hi else "the role"))
+        employer = str(payload.get("employer_name", "नियोक्ता" if hi else "the employer"))
         stage = str(payload.get("stage", ""))
         if stage == "rejected":
+            if hi:
+                return (
+                    f"आपके आवेदन पर अपडेट — {title}",
+                    f"नियोक्ता ने {employer} में {title} के लिए अन्य उम्मीदवारों के साथ "
+                    "आगे बढ़ने का निर्णय लिया है।",
+                )
             return (
                 f"Update on your application — {title}",
                 f"The employer moved forward with other candidates for {title} at {employer}.",
             )
         if stage == "hired":
+            if hi:
+                return (
+                    f"बधाई हो — {title}, {employer}",
+                    f"आपको {employer} में {title} के लिए चुना गया है। "
+                    "नियोक्ता अगले चरणों के लिए संपर्क करेंगे।",
+                )
             return (
                 f"Congratulations — {title} at {employer}",
                 f"You've been hired for {title} at {employer}. "
                 "The employer will be in touch with next steps.",
+            )
+        if hi:
+            stage_line_hi = {
+                "shortlisted": "आपको शॉर्टलिस्ट किया गया है",
+                "interview": "आप इंटरव्यू चरण में पहुंच गए हैं",
+                "offer": "आपके पास एक ऑफ़र है",
+            }
+            line_hi = stage_line_hi.get(stage, "आपके आवेदन में बदलाव हुआ है")
+            return (
+                f"{line_hi} — {title}",
+                f"{employer} में {title} के लिए {line_hi}। विवरण के लिए Jobify खोलें।",
             )
         stage_line = {
             "shortlisted": "You've been shortlisted",
@@ -119,4 +152,6 @@ def _render(kind: str, payload: dict[str, Any]) -> tuple[str, str]:
             f"{line} — {title}",
             f"{line} for {title} at {employer}. Open Jobify for details.",
         )
+    if hi:
+        return ("Jobify सूचना", f"आपके लिए एक नई Jobify सूचना है: {kind}।")
     return ("Jobify notification", f"You have a new Jobify notification: {kind}.")

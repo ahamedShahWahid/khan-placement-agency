@@ -14,6 +14,7 @@ PreferencesDto _$PreferencesDtoFromJson(Map<String, dynamic> json) =>
       locations:
           (json['locations'] as List<dynamic>).map((e) => e as String).toList(),
       expectedCtc: json['expected_ctc'] as String?,
+      language: json['language'] as String? ?? 'en',
     );
 
 const _$DesiredRoleEnumMap = {

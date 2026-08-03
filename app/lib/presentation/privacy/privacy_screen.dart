@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:jobify_app/core/consent/consent_scope.dart';
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/privacy/privacy_controller.dart';
 import 'package:jobify_app/presentation/privacy/privacy_state.dart';
 import 'package:jobify_app/presentation/routing/routes.dart';
@@ -17,21 +19,20 @@ class PrivacyScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(privacyControllerProvider);
+    final l10n = context.l10n;
 
     // Show rollback snackbar whenever mutationError is set.
     ref.listen<AsyncValue<PrivacyState>>(privacyControllerProvider, (_, next) {
       final err = next.value?.mutationError;
       if (err != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Couldn't update preference. Change was reverted."),
-          ),
+          SnackBar(content: Text(l10n.privacyMutationErrorSnackbar)),
         );
       }
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Privacy & data')),
+      appBar: AppBar(title: Text(l10n.privacyTitle)),
       body: AsyncValueWidget(
         value: state,
         onRetry: () => ref.invalidate(privacyControllerProvider),
@@ -49,6 +50,7 @@ class _PrivacyBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     // Build a lookup map from scope wire string → granted bool.
     final consentMap = {
@@ -62,13 +64,13 @@ class _PrivacyBody extends ConsumerWidget {
           children: [
             // ── Notification preferences section ──────────────────────────
             Text(
-              'Notification preferences',
+              l10n.privacyNotificationPrefsHeading,
               style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: JobifySpacing.sm),
             ...ConsentScope.v0VisibleScopes.map((scope) {
               final granted = consentMap[scope.wire] ?? false;
-              final labels = _consentLabel(scope);
+              final labels = _consentLabel(l10n, scope);
               return SwitchListTile.adaptive(
                 key: Key('toggle-${scope.wire}'),
                 title: Text(labels.$1),
@@ -84,10 +86,13 @@ class _PrivacyBody extends ConsumerWidget {
             const SizedBox(height: JobifySpacing.xl),
 
             // ── Your data section ─────────────────────────────────────────
-            Text('Your data', style: theme.textTheme.titleMedium),
+            Text(
+              l10n.privacyYourDataHeading,
+              style: theme.textTheme.titleMedium,
+            ),
             const SizedBox(height: JobifySpacing.sm),
             Text(
-              'A copy of everything we know about you (JSON).',
+              l10n.privacyYourDataBody,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -95,7 +100,7 @@ class _PrivacyBody extends ConsumerWidget {
             const SizedBox(height: JobifySpacing.md),
             OutlinedButton.icon(
               icon: const Icon(Icons.download_outlined),
-              label: const Text('Download my data'),
+              label: Text(l10n.privacyDownloadDataButton),
               onPressed: data.exportInProgress
                   ? null
                   : () => _exportData(context, ref),
@@ -106,10 +111,13 @@ class _PrivacyBody extends ConsumerWidget {
             const SizedBox(height: JobifySpacing.xl),
 
             // ── Account section ───────────────────────────────────────────
-            Text('Account', style: theme.textTheme.titleMedium),
+            Text(
+              l10n.profileAccountHeading,
+              style: theme.textTheme.titleMedium,
+            ),
             const SizedBox(height: JobifySpacing.sm),
             Text(
-              "Permanently erase your data. This can't be undone.",
+              l10n.privacyDeleteBody,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -121,7 +129,7 @@ class _PrivacyBody extends ConsumerWidget {
                 foregroundColor: theme.colorScheme.onError,
               ),
               onPressed: () => context.go(Routes.privacyDelete),
-              child: const Text('Delete my account'),
+              child: Text(l10n.privacyDeleteAccountButton),
             ),
           ],
         ),
@@ -143,22 +151,20 @@ class _PrivacyBody extends ConsumerWidget {
   ) async {
     // email_transactional OFF requires confirmation first.
     if (scope == ConsentScope.emailTransactional && !val) {
+      final l10n = context.l10n;
       final ok = await showDialog<bool>(
         context: context,
         builder: (c) => AlertDialog(
-          title: const Text('Turn off service emails?'),
-          content: const Text(
-            "You won't receive emails about your applications, "
-            'matches, or account. Are you sure?',
-          ),
+          title: Text(l10n.privacyTurnOffEmailsDialogTitle),
+          content: Text(l10n.privacyTurnOffEmailsDialogBody),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(c, false),
-              child: const Text('Cancel'),
+              child: Text(l10n.commonCancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(c, true),
-              child: const Text('Turn off'),
+              child: Text(l10n.privacyTurnOffButton),
             ),
           ],
         ),
@@ -172,46 +178,45 @@ class _PrivacyBody extends ConsumerWidget {
   }
 
   Future<void> _exportData(BuildContext context, WidgetRef ref) async {
+    final l10n = context.l10n;
     final result =
         await ref.read(privacyControllerProvider.notifier).exportData();
     if (!context.mounted) return;
     if (result != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Your data is on your clipboard.\n'
-            'Paste it into a text editor and save as a .json file.',
-          ),
-        ),
+        SnackBar(content: Text(l10n.privacyExportSuccessSnackbar)),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Couldn't export your data. Try again.")),
+        SnackBar(content: Text(l10n.privacyExportErrorSnackbar)),
       );
     }
   }
 }
 
 /// Returns (title, subtitle) for a consent scope.
-({String title, String subtitle}) _consentLabelRecord(ConsentScope scope) {
+({String title, String subtitle}) _consentLabelRecord(
+  AppLocalizations l10n,
+  ConsentScope scope,
+) {
   return switch (scope) {
     ConsentScope.emailTransactional => (
-        title: 'Service updates',
-        subtitle: 'Email about your applications, matches, and account.',
+        title: l10n.privacyConsentEmailTransactionalTitle,
+        subtitle: l10n.privacyConsentEmailTransactionalSubtitle,
       ),
     ConsentScope.emailMarketing => (
-        title: 'Job recommendations',
-        subtitle: 'Weekly digest of jobs that fit your profile.',
+        title: l10n.privacyConsentEmailMarketingTitle,
+        subtitle: l10n.privacyConsentEmailMarketingSubtitle,
       ),
     ConsentScope.inAppNotifications => (
-        title: 'In-app notifications',
-        subtitle: 'See alerts inside the app.',
+        title: l10n.privacyConsentInAppTitle,
+        subtitle: l10n.privacyConsentInAppSubtitle,
       ),
     _ => (title: scope.wire, subtitle: ''),
   };
 }
 
-(String, String) _consentLabel(ConsentScope scope) {
-  final r = _consentLabelRecord(scope);
+(String, String) _consentLabel(AppLocalizations l10n, ConsentScope scope) {
+  final r = _consentLabelRecord(l10n, scope);
   return (r.title, r.subtitle);
 }

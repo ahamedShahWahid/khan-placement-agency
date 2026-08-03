@@ -24,12 +24,13 @@ String formatCtcNum(double? value) {
 }
 
 /// Format a wire years-of-experience string (e.g. "5.0", "4.5") for display:
-/// drops a trailing ".0" so whole numbers read cleanly. Returns null for
-/// null/unparseable so the caller can hide the row.
-String? formatYears(String? raw) {
+/// drops a trailing ".0" so whole numbers read cleanly. Returns just the
+/// numeric part — the caller localizes the unit suffix (e.g. via
+/// `l10n.profileYearsExperienceSuffix`). Returns null for null/unparseable
+/// so the caller can hide the row.
+String? formatYearsNumber(String? raw) {
   if (raw == null) return null;
   final v = double.tryParse(raw);
   if (v == null) return null;
-  final n = v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toString();
-  return '$n yrs';
+  return v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toString();
 }

@@ -8,7 +8,7 @@ from decimal import Decimal
 import pytest
 
 from jobify.scoring.explain import templated_explanation
-from jobify.scoring.explainer import ExplainContext, TemplatedExplainer
+from jobify.scoring.explainer import ExplainContext, TemplatedExplainer, _templated_from_ctx
 
 
 def _ctx(**overrides: object) -> ExplainContext:
@@ -62,3 +62,29 @@ def test_explain_context_is_frozen() -> None:
     ctx = _ctx()
     with pytest.raises(FrozenInstanceError):
         ctx.total = 0.1  # type: ignore[misc]
+
+
+def test_templated_explanation_hindi() -> None:
+    ctx = _ctx(language="hi")  # the file's existing builder, with the new field
+    result = _templated_from_ctx(ctx)
+    assert result["generator"] == "templated"
+    # Hindi fit text is Devanagari — assert script, not exact copy.
+    assert any("ऀ" <= ch <= "ॿ" for ch in result["fit"])
+
+
+def test_templated_explanation_hindi_caveat() -> None:
+    """Caveat path is separate from fit — exercise it too (weak exp -> exp caveat)."""
+    ctx = _ctx(
+        language="hi",
+        components={"location": 1.0, "exp": 0.4, "ctc": 1.0},
+    )
+    result = _templated_from_ctx(ctx)
+    assert any("ऀ" <= ch <= "ॿ" for ch in result["caveat"])
+    # {}-slots must survive .format() in the Hindi string.
+    assert "5-9" in result["caveat"]
+
+
+def test_templated_explanation_default_language_unchanged() -> None:
+    ctx = _ctx()  # no language arg -> "en" default
+    result = _templated_from_ctx(ctx)
+    assert not any("ऀ" <= ch <= "ॿ" for ch in result["fit"])

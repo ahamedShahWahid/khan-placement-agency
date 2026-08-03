@@ -18,7 +18,18 @@ def pytest_configure(config: object) -> None:
     which requires JOBIFY_* env vars to be present *before* collection. ``monkeypatch``
     runs after collection, so it's too late for module-level Settings calls.
     ``os.environ.setdefault`` only writes when the key is absent — real shell
-    env vars (e.g. CI overrides) are never shadowed.
+    env vars (e.g. CI overrides) are never shadowed. That's the right behaviour
+    for infra vars (DB/Redis/JWT secret), which are legitimate local overrides.
+
+    Gemini-touching vars are the opposite: they are HARD-SET (``os.environ[...] =``),
+    never ``setdefault``, so the suite is hermetic with respect to Gemini regardless
+    of what the developer's shell exports. A real ``JOBIFY_GEMINI_API_KEY`` sitting in
+    the environment must never let a test reach live Gemini — with a real key present,
+    ``setdefault`` would leave it in place and any settings resolving to the ``"llm"``
+    branch (resume parser, match explainer) would build a real ``genai.Client`` and
+    hit the network for real, 429ing once quota is exhausted. Hard-setting forces a
+    fake key + the non-LLM code paths (``library`` parser, ``templated`` explainer)
+    so stray "llm" resolution is structurally impossible in tests.
     """
     os.environ.setdefault("JOBIFY_ENV", "local")
     os.environ.setdefault("JOBIFY_SERVICE_NAME", "jobify-api")
@@ -27,8 +38,9 @@ def pytest_configure(config: object) -> None:
     )
     os.environ.setdefault("JOBIFY_REDIS_URL", "redis://localhost:6379/0")
     os.environ.setdefault("JOBIFY_JWT_SECRET", "x" * 32)
-    os.environ.setdefault("JOBIFY_GEMINI_API_KEY", "test-gemini-key")
-    os.environ.setdefault("JOBIFY_RESUME_PARSER", "library")
+    os.environ["JOBIFY_GEMINI_API_KEY"] = "test-gemini-key"
+    os.environ["JOBIFY_RESUME_PARSER"] = "library"
+    os.environ["JOBIFY_MATCH_EXPLAINER"] = "templated"
     os.environ.setdefault(
         "JOBIFY_GOOGLE_OAUTH_CLIENT_IDS",
         "test.apps.googleusercontent.com",

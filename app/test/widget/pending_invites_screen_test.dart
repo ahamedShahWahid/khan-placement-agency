@@ -5,6 +5,7 @@ import 'package:jobify_app/data/auth/auth_repository.dart';
 import 'package:jobify_app/data/auth/auth_repository_provider.dart';
 import 'package:jobify_app/data/auth/auth_state.dart';
 import 'package:jobify_app/data/employers/team/employer_team_repository_impl.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/invites/pending_invites_screen.dart';
 
 import '../helpers/fake_employer_team_repository.dart';
@@ -28,6 +29,8 @@ Widget _wrap(
       ],
       child: MaterialApp(
         theme: ThemeData.light(useMaterial3: true),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: const PendingInvitesScreen(),
       ),
     );

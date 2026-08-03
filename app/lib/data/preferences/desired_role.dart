@@ -38,31 +38,6 @@ enum DesiredRole {
   unknown,
 }
 
-extension DesiredRoleLabel on DesiredRole {
-  /// Display label for the dropdown. `unknown` should never reach the UI
-  /// (the form only ever sends a real value or null), but a label avoids a
-  /// crash if it somehow does.
-  String get label => switch (this) {
-        DesiredRole.softwareEngineering => 'Software Engineering',
-        DesiredRole.dataAnalytics => 'Data & Analytics',
-        DesiredRole.productManagement => 'Product Management',
-        DesiredRole.design => 'Design',
-        DesiredRole.sales => 'Sales',
-        DesiredRole.marketing => 'Marketing',
-        DesiredRole.customerSupport => 'Customer Support',
-        DesiredRole.operations => 'Operations',
-        DesiredRole.financeAccounting => 'Finance & Accounting',
-        DesiredRole.hrRecruiting => 'HR & Recruiting',
-        DesiredRole.legal => 'Legal',
-        DesiredRole.consulting => 'Consulting',
-        DesiredRole.businessDevelopment => 'Business Development',
-        DesiredRole.contentCommunications => 'Content & Communications',
-        DesiredRole.administration => 'Administration',
-        DesiredRole.other => 'Other',
-        DesiredRole.unknown => 'Unknown',
-      };
-}
-
 extension DesiredRoleWireValue on DesiredRole {
   /// The wire value sent to the backend, mirroring each @JsonValue above.
   /// Hand-written (not code-generated) because PreferencesUpdateDto's

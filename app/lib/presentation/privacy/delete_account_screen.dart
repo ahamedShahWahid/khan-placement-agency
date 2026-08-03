@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/privacy/delete_account_controller.dart';
 import 'package:jobify_app/presentation/routing/routes.dart';
 import 'package:jobify_app/presentation/theme/jobify_spacing.dart';
@@ -30,15 +32,14 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
   @override
   Widget build(BuildContext context) {
     final controllerState = ref.watch(deleteAccountControllerProvider);
+    final l10n = context.l10n;
 
     // Listen for submission errors and show a snackbar.
     ref.listen<AsyncValue<void>>(deleteAccountControllerProvider, (_, next) {
       next.whenOrNull(
         error: (e, _) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Couldn't delete your account. Try again."),
-            ),
+            SnackBar(content: Text(l10n.deleteAccountErrorSnackbar)),
           );
         },
       );
@@ -48,7 +49,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
     final isLoading = controllerState.isLoading;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Delete my account')),
+      appBar: AppBar(title: Text(l10n.privacyDeleteAccountButton)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(JobifySpacing.lg),
         child: Column(
@@ -71,8 +72,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                   const SizedBox(width: JobifySpacing.sm),
                   Expanded(
                     child: Text(
-                      'This will permanently delete your personal data '
-                      'on Jobify. This action is irreversible.',
+                      l10n.deleteAccountWarningBanner,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onErrorContainer,
                       ),
@@ -83,19 +83,22 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
             ),
 
             const SizedBox(height: JobifySpacing.xl),
-            Text('What will happen:', style: theme.textTheme.titleSmall),
+            Text(
+              l10n.deleteAccountWhatWillHappenHeading,
+              style: theme.textTheme.titleSmall,
+            ),
             const SizedBox(height: JobifySpacing.sm),
-            ..._bullets(theme),
+            ..._bullets(theme, l10n),
 
             const SizedBox(height: JobifySpacing.xl),
             OutlinedButton.icon(
               icon: const Icon(Icons.download_outlined),
-              label: const Text('Download my data'),
+              label: Text(l10n.privacyDownloadDataButton),
               onPressed: () => context.go(Routes.privacy),
             ),
             const SizedBox(height: JobifySpacing.xs),
             Text(
-              'Before you continue, we recommend downloading your data.',
+              l10n.deleteAccountDownloadHint,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -103,7 +106,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
 
             const SizedBox(height: JobifySpacing.xl),
             Text(
-              'To confirm, type $_requiredPhrase below:',
+              l10n.deleteAccountConfirmPrompt(_requiredPhrase),
               style: theme.textTheme.bodyMedium,
             ),
             const SizedBox(height: JobifySpacing.sm),
@@ -140,14 +143,14 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text('Delete my account'),
+                      : Text(l10n.privacyDeleteAccountButton),
                 );
               },
             ),
             const SizedBox(height: JobifySpacing.md),
             OutlinedButton(
               onPressed: isLoading ? null : () => context.pop(),
-              child: const Text('Cancel'),
+              child: Text(l10n.commonCancel),
             ),
           ],
         ),
@@ -155,11 +158,11 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
     );
   }
 
-  List<Widget> _bullets(ThemeData theme) {
-    const items = [
-      'Your profile, resume, applications, and saved jobs are removed.',
-      'Your match history and notifications are erased.',
-      'Anonymized employer-side analytics survive (apply counts only).',
+  List<Widget> _bullets(ThemeData theme, AppLocalizations l10n) {
+    final items = [
+      l10n.deleteAccountBulletProfile,
+      l10n.deleteAccountBulletMatchHistory,
+      l10n.deleteAccountBulletAnalytics,
     ];
     return items
         .map(
@@ -180,17 +183,16 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
   }
 
   Future<void> _attemptDelete(BuildContext context) async {
+    final l10n = context.l10n;
     final ok = await showDialog<bool>(
       context: context,
       builder: (c) => AlertDialog(
-        title: const Text('Are you absolutely sure?'),
-        content: const Text(
-          'Your account and all associated data will be permanently deleted.',
-        ),
+        title: Text(l10n.deleteAccountConfirmDialogTitle),
+        content: Text(l10n.deleteAccountConfirmDialogBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(c, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.commonCancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -198,7 +200,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
               foregroundColor: Theme.of(c).colorScheme.onError,
             ),
             onPressed: () => Navigator.pop(c, true),
-            child: const Text('Yes, delete'),
+            child: Text(l10n.deleteAccountYesDeleteButton),
           ),
         ],
       ),

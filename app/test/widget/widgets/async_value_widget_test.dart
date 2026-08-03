@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jobify_app/core/error/exceptions.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/widgets/async_value_widget.dart';
 
 // NOTE: tests use ThemeData.light() instead of buildTheme() because
@@ -10,6 +11,8 @@ import 'package:jobify_app/presentation/widgets/async_value_widget.dart';
 Widget _wrap(Widget child) {
   return MaterialApp(
     theme: ThemeData.light(useMaterial3: true),
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
     home: Scaffold(body: child),
   );
 }

@@ -45,7 +45,12 @@ async def test_get_preferences_defaults_empty(
     resp = await async_client.get("/v1/applicants/me/preferences", headers=headers)
     assert resp.status_code == 200
     body = resp.json()
-    assert body == {"desired_role": None, "locations": [], "expected_ctc": None}
+    assert body == {
+        "desired_role": None,
+        "locations": [],
+        "expected_ctc": None,
+        "language": "en",
+    }
 
 
 async def test_patch_partial_update(
@@ -236,6 +241,7 @@ async def test_patch_empty_body_is_noop(
         "desired_role": "design",
         "locations": ["Pune"],
         "expected_ctc": "500000.00",
+        "language": "en",
     }
     assert len(await task_event_args(session, "jobify.score_applicant")) == before
 
@@ -262,6 +268,61 @@ async def test_get_soft_deleted_preferences_row_returns_500(
     resp = await async_client.get("/v1/applicants/me/preferences", headers=headers)
     assert resp.status_code == 500
     assert resp.json()["detail"] == "applicant_preferences_missing"
+
+
+async def test_preferences_language_defaults_en_and_round_trips(
+    async_client: httpx.AsyncClient, google_verifier
+) -> None:
+    signin = await _signin(async_client, google_verifier)
+    headers = {"Authorization": f"Bearer {signin['access_token']}"}
+
+    resp = await async_client.get("/v1/applicants/me/preferences", headers=headers)
+    assert resp.json()["language"] == "en"
+
+    resp = await async_client.patch(
+        "/v1/applicants/me/preferences", headers=headers, json={"language": "hi"}
+    )
+    assert resp.status_code == 200
+    assert resp.json()["language"] == "hi"
+
+    resp = await async_client.get("/v1/applicants/me/preferences", headers=headers)
+    assert resp.json()["language"] == "hi"
+
+
+@pytest.mark.parametrize("body", [{"language": "fr"}, {"language": None}])
+async def test_preferences_language_rejects_junk_and_null(
+    async_client: httpx.AsyncClient, google_verifier, body
+) -> None:
+    signin = await _signin(async_client, google_verifier)
+    headers = {"Authorization": f"Bearer {signin['access_token']}"}
+    resp = await async_client.patch("/v1/applicants/me/preferences", headers=headers, json=body)
+    assert resp.status_code == 422
+
+
+async def test_language_change_stages_rescore_but_desired_role_does_not(
+    async_client: httpx.AsyncClient, google_verifier, session
+) -> None:
+    """Language joins the rescore trigger set; desired_role stays capture-only."""
+    signin = await _signin(async_client, google_verifier)
+    headers = {"Authorization": f"Bearer {signin['access_token']}"}
+    before = len(await task_event_args(session, "jobify.score_applicant"))
+
+    resp = await async_client.patch(
+        "/v1/applicants/me/preferences", headers=headers, json={"language": "hi"}
+    )
+    assert resp.status_code == 200
+    assert [signin["user"]["applicant_id"]] in await task_event_args(
+        session, "jobify.score_applicant"
+    )
+    after_language = len(await task_event_args(session, "jobify.score_applicant"))
+    assert after_language == before + 1
+
+    resp = await async_client.patch(
+        "/v1/applicants/me/preferences", headers=headers, json={"desired_role": "design"}
+    )
+    assert resp.status_code == 200
+    assert resp.json()["desired_role"] == "design"
+    assert len(await task_event_args(session, "jobify.score_applicant")) == after_language
 
 
 async def test_get_recruiter_returns_403(

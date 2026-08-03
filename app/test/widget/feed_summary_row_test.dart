@@ -16,6 +16,7 @@ import 'package:jobify_app/data/resume/resume_dto.dart';
 import 'package:jobify_app/data/resume/resume_parse_status.dart';
 import 'package:jobify_app/data/resume/resume_repository.dart';
 import 'package:jobify_app/data/resume/resume_repository_impl.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/feed/feed_summary_row.dart';
 
 class _FakeApplicationsRepo implements ApplicationsRepository {
@@ -192,6 +193,8 @@ Future<void> _pump(
       ],
       child: MaterialApp.router(
         theme: ThemeData.light(useMaterial3: true),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         routerConfig: router,
       ),
     ),

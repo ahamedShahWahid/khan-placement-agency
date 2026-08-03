@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:jobify_app/core/format/date_formats.dart';
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
 import 'package:jobify_app/data/notifications/notification_dto.dart';
 import 'package:jobify_app/presentation/notifications/notification_title.dart';
 import 'package:jobify_app/presentation/notifications/notifications_controller.dart';
@@ -49,14 +50,15 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     final value = ref.watch(notificationsControllerProvider);
+    final l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: const Text('Notifications')),
+      appBar: AppBar(title: Text(l10n.notificationsTitle)),
       body: AsyncValueWidget<NotificationsState>(
         value: value,
         onRetry: () =>
             ref.read(notificationsControllerProvider.notifier).refresh(),
         isEmpty: (s) => s.items.isEmpty,
-        empty: () => const Center(child: Text('No notifications yet')),
+        empty: () => Center(child: Text(l10n.notificationsEmpty)),
         data: (s) => RefreshIndicator(
           onRefresh: () =>
               ref.read(notificationsControllerProvider.notifier).refresh(),
@@ -81,7 +83,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                     ? const Icon(Icons.circle, size: 10, color: Colors.blue)
                     : const SizedBox(width: 10),
                 title: Text(
-                  notificationTitle(n),
+                  notificationTitle(l10n, n),
                   style: TextStyle(
                     fontWeight: unread ? FontWeight.w600 : FontWeight.normal,
                   ),

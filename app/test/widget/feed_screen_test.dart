@@ -27,6 +27,7 @@ import 'package:jobify_app/data/resume/resume_dto.dart';
 import 'package:jobify_app/data/resume/resume_parse_status.dart';
 import 'package:jobify_app/data/resume/resume_repository.dart';
 import 'package:jobify_app/data/resume/resume_repository_impl.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/feed/feed_item_card.dart';
 import 'package:jobify_app/presentation/feed/feed_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -177,6 +178,8 @@ Widget _wrap(
     ],
     child: MaterialApp(
       theme: ThemeData.light(useMaterial3: true),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: child,
     ),
   );
@@ -208,6 +211,8 @@ Widget _wrapCard(FeedItemDto item) => MediaQuery(
       data: const MediaQueryData(disableAnimations: true),
       child: MaterialApp(
         theme: ThemeData.light(useMaterial3: true),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: FeedItemCard(
             job: item.job,
@@ -429,6 +434,8 @@ void main() {
         ],
         child: MaterialApp(
           theme: ThemeData.light(useMaterial3: true),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: const FeedScreen(),
         ),
       ),
@@ -473,6 +480,8 @@ void main() {
         ],
         child: MaterialApp(
           theme: ThemeData.light(useMaterial3: true),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: const FeedScreen(),
         ),
       ),

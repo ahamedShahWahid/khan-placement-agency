@@ -8,6 +8,7 @@ void main() {
       desiredRole: DesiredRole.softwareEngineering,
       locations: ['Pune'],
       expectedCtc: 1800000,
+      language: 'en',
     );
     final json = dto.toJson();
 
@@ -21,6 +22,7 @@ void main() {
       desiredRole: null,
       locations: ['Pune'],
       expectedCtc: 1,
+      language: 'en',
     );
     final json = dto.toJson();
 
@@ -33,6 +35,7 @@ void main() {
       desiredRole: DesiredRole.unknown,
       locations: ['Pune'],
       expectedCtc: 1,
+      language: 'en',
     );
     expect(dto.toJson().containsKey('desired_role'), isFalse);
   });
@@ -42,6 +45,7 @@ void main() {
       desiredRole: DesiredRole.design,
       locations: [],
       expectedCtc: null,
+      language: 'en',
     );
     final json = dto.toJson();
 
@@ -49,5 +53,23 @@ void main() {
     expect(json['expected_ctc'], isNull);
     expect(json.containsKey('locations'), isTrue);
     expect(json['locations'], isEmpty);
+  });
+
+  test('toJson always contains language, for both "en" and "hi"', () {
+    const en = PreferencesUpdateDto(
+      desiredRole: null,
+      locations: [],
+      expectedCtc: null,
+      language: 'en',
+    );
+    const hi = PreferencesUpdateDto(
+      desiredRole: null,
+      locations: [],
+      expectedCtc: null,
+      language: 'hi',
+    );
+
+    expect(en.toJson()['language'], 'en');
+    expect(hi.toJson()['language'], 'hi');
   });
 }

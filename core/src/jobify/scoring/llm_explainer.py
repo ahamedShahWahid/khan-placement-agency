@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 _log = structlog.get_logger(__name__)
 
 LLM_GENERATOR = "llm"
-LLM_GENERATOR_VERSION = "1"
+LLM_GENERATOR_VERSION = "2"
 
 _SYSTEM_INSTRUCTION = (
     "You are Jobify's match explainer. Given a candidate-to-job match summary, "
@@ -36,6 +36,12 @@ _SYSTEM_INSTRUCTION = (
     "optional one-sentence 'caveat' (<=25 words, only if there is a real "
     'concern). Return JSON: {"fit": str, "caveat": str}. '
     "Do not mention scores or thresholds."
+)
+
+_HINDI_DIRECTIVE = (
+    " Respond in Hindi (Devanagari script). Keep the same JSON shape and the "
+    "same length limits. Job titles, company names, and city names stay in "
+    "their original script."
 )
 
 _RESPONSE_SCHEMA = types.Schema(
@@ -67,11 +73,15 @@ class GeminiMatchExplainer:
         text: str | None = None
         try:
             prompt = _build_prompt(ctx)
+            if ctx.language == "hi":
+                instruction = _SYSTEM_INSTRUCTION + _HINDI_DIRECTIVE
+            else:
+                instruction = _SYSTEM_INSTRUCTION
             resp = await self._client.aio.models.generate_content(
                 model=self._model,
                 contents=prompt,
                 config=types.GenerateContentConfig(
-                    system_instruction=_SYSTEM_INSTRUCTION,
+                    system_instruction=instruction,
                     response_mime_type="application/json",
                     response_schema=_RESPONSE_SCHEMA,
                     temperature=0.3,

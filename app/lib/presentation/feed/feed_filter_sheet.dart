@@ -1,18 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
 import 'package:jobify_app/data/feed/feed_filters.dart';
 import 'package:jobify_app/presentation/feed/feed_filters_provider.dart';
 import 'package:jobify_app/presentation/theme/jobify_spacing.dart';
-
-const _presetCities = [
-  'Bangalore',
-  'Mumbai',
-  'Delhi NCR',
-  'Hyderabad',
-  'Chennai',
-  'Pune',
-  'Remote',
-];
 
 /// Bottom sheet editing location / experience / min-CTC. Local draft state;
 /// nothing hits the provider until Apply.
@@ -47,6 +38,25 @@ class _FeedFilterSheetState extends ConsumerState<FeedFilterSheet> {
     super.dispose();
   }
 
+  /// Preset city options, keyed by their CANONICAL (always-English) wire
+  /// value — the value stored in [_locations] and sent to the backend's
+  /// location filter, which matches against employer-authored job location
+  /// strings. Only the display label is localized (`feedCityRemote` is the
+  /// one entry whose Hindi rendering actually differs from the English
+  /// value); the map keys must never change with locale.
+  Map<String, String> _presetCityLabels(BuildContext context) {
+    final l10n = context.l10n;
+    return {
+      'Bangalore': l10n.feedCityBangalore,
+      'Mumbai': l10n.feedCityMumbai,
+      'Delhi NCR': l10n.feedCityDelhiNcr,
+      'Hyderabad': l10n.feedCityHyderabad,
+      'Chennai': l10n.feedCityChennai,
+      'Pune': l10n.feedCityPune,
+      'Remote': l10n.feedCityRemote,
+    };
+  }
+
   void _toggleCity(String city, bool selected) {
     setState(() {
       if (selected) {
@@ -74,6 +84,8 @@ class _FeedFilterSheetState extends ConsumerState<FeedFilterSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
+    final presetLabels = _presetCityLabels(context);
     return Padding(
       padding: EdgeInsets.only(
         left: JobifySpacing.lg,
@@ -85,17 +97,17 @@ class _FeedFilterSheetState extends ConsumerState<FeedFilterSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Filter matches', style: theme.textTheme.titleMedium),
+          Text(l10n.feedFilterSheetTitle, style: theme.textTheme.titleMedium),
           const SizedBox(height: JobifySpacing.lg),
-          Text('Location', style: theme.textTheme.labelLarge),
+          Text(l10n.feedFilterLocationLabel, style: theme.textTheme.labelLarge),
           const SizedBox(height: JobifySpacing.sm),
           Wrap(
             spacing: JobifySpacing.sm,
             runSpacing: JobifySpacing.sm,
             children: [
-              for (final city in {..._presetCities, ..._locations})
+              for (final city in {...presetLabels.keys, ..._locations})
                 FilterChip(
-                  label: Text(city),
+                  label: Text(presetLabels[city] ?? city),
                   selected: _locations.contains(city),
                   onSelected: (sel) => _toggleCity(city, sel),
                 ),
@@ -105,8 +117,8 @@ class _FeedFilterSheetState extends ConsumerState<FeedFilterSheet> {
           TextField(
             controller: _customCityController,
             maxLength: 100,
-            decoration: const InputDecoration(
-              hintText: 'Add another city',
+            decoration: InputDecoration(
+              hintText: l10n.feedFilterAddCityHint,
               isDense: true,
               counterText: '',
             ),
@@ -117,7 +129,10 @@ class _FeedFilterSheetState extends ConsumerState<FeedFilterSheet> {
             },
           ),
           const SizedBox(height: JobifySpacing.lg),
-          Text('Experience', style: theme.textTheme.labelLarge),
+          Text(
+            l10n.feedFilterExperienceLabel,
+            style: theme.textTheme.labelLarge,
+          ),
           Row(
             children: [
               IconButton(
@@ -129,7 +144,11 @@ class _FeedFilterSheetState extends ConsumerState<FeedFilterSheet> {
                         ),
                 icon: const Icon(Icons.remove),
               ),
-              Text(_minYears == null ? 'Any' : '$_minYears yrs'),
+              Text(
+                _minYears == null
+                    ? l10n.feedFilterExperienceAny
+                    : l10n.feedYearsSuffix(_minYears!),
+              ),
               IconButton(
                 onPressed: () =>
                     setState(() => _minYears = (_minYears ?? -1) + 1),
@@ -138,15 +157,15 @@ class _FeedFilterSheetState extends ConsumerState<FeedFilterSheet> {
             ],
           ),
           const SizedBox(height: JobifySpacing.lg),
-          Text('Minimum CTC (lakhs)', style: theme.textTheme.labelLarge),
+          Text(l10n.feedFilterMinCtcLabel, style: theme.textTheme.labelLarge),
           const SizedBox(height: JobifySpacing.sm),
           TextField(
             controller: _ctcLakhController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(
-              prefixText: '₹ ',
-              suffixText: 'L',
-              hintText: 'e.g. 5',
+            decoration: InputDecoration(
+              prefixText: l10n.feedFilterCtcPrefix,
+              suffixText: l10n.feedFilterCtcSuffix,
+              hintText: l10n.feedFilterCtcHint,
               isDense: true,
             ),
           ),
@@ -162,10 +181,13 @@ class _FeedFilterSheetState extends ConsumerState<FeedFilterSheet> {
                       .set(FeedFilters(query: current.query));
                   Navigator.of(context).pop();
                 },
-                child: const Text('Reset'),
+                child: Text(l10n.feedFilterResetButton),
               ),
               const SizedBox(width: JobifySpacing.sm),
-              FilledButton(onPressed: _apply, child: const Text('Apply')),
+              FilledButton(
+                onPressed: _apply,
+                child: Text(l10n.feedFilterApplyButton),
+              ),
             ],
           ),
         ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:jobify_app/core/error/exceptions.dart';
+import 'package:jobify_app/core/l10n/l10n_ext.dart';
 import 'package:jobify_app/presentation/theme/jobify_spacing.dart';
 
 class JobifyErrorView extends StatelessWidget {
@@ -19,7 +20,7 @@ class JobifyErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (h, b) = _describe(error, headline, body);
+    final (h, b) = _describe(context, error, headline, body);
     final theme = Theme.of(context);
     return Center(
       child: Padding(
@@ -48,7 +49,7 @@ class JobifyErrorView extends StatelessWidget {
               const SizedBox(height: JobifySpacing.lg),
               FilledButton(
                 onPressed: onRetry,
-                child: const Text('Try again'),
+                child: Text(context.l10n.commonTryAgain),
               ),
             ],
           ],
@@ -58,31 +59,33 @@ class JobifyErrorView extends StatelessWidget {
   }
 
   (String, String) _describe(
+    BuildContext context,
     Object? error,
     String? headline,
     String? body,
   ) {
     if (headline != null && body != null) return (headline, body);
+    final l10n = context.l10n;
     switch (error) {
       case NetworkException _:
         return (
-          headline ?? "Couldn't reach Jobify",
-          body ?? 'Check your connection and try again.',
+          headline ?? l10n.commonCouldntReachJobify,
+          body ?? l10n.commonCheckConnectionRetry,
         );
       case AuthException _:
         return (
-          headline ?? 'Signed out',
-          body ?? 'Your session ended. Sign in to continue.',
+          headline ?? l10n.commonSignedOut,
+          body ?? l10n.commonSessionEnded,
         );
       case ApiException(:final detail):
         return (
-          headline ?? 'Something went wrong',
-          body ?? (detail ?? 'Please try again in a moment.'),
+          headline ?? l10n.commonSomethingWentWrong,
+          body ?? (detail ?? l10n.commonPleaseTryAgainMoment),
         );
       default:
         return (
-          headline ?? 'Something went wrong',
-          body ?? 'An unexpected error occurred.',
+          headline ?? l10n.commonSomethingWentWrong,
+          body ?? l10n.commonUnexpectedError,
         );
     }
   }

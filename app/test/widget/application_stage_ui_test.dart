@@ -13,6 +13,7 @@ import 'package:jobify_app/data/jobs/jobs_dto.dart';
 import 'package:jobify_app/data/jobs/jobs_repository.dart';
 import 'package:jobify_app/data/jobs/jobs_repository_impl.dart';
 import 'package:jobify_app/data/notifications/notification_dto.dart';
+import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/applications/applications_screen.dart';
 import 'package:jobify_app/presentation/job_detail/job_detail_screen.dart';
 import 'package:jobify_app/presentation/notifications/notification_title.dart';
@@ -34,6 +35,8 @@ Widget _wrap(
     overrides: overrides,
     child: MaterialApp(
       theme: ThemeData.light(useMaterial3: true),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: child,
     ),
   );
@@ -178,6 +181,9 @@ void main() {
       sendAfter: DateTime.utc(2026, 7, 19),
       createdAt: DateTime.utc(2026, 7, 19),
     );
-    expect(notificationTitle(n), 'Shortlisted for QA Engineer');
+    expect(
+      notificationTitle(lookupAppLocalizations(const Locale('en')), n),
+      'Shortlisted for QA Engineer',
+    );
   });
 }
