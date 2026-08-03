@@ -834,6 +834,11 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
+  String profileVersionLabel(String version, String build) {
+    return 'v$version ($build)';
+  }
+
+  @override
   String get editProfileTitle => 'प्रोफ़ाइल संपादित करें';
 
   @override

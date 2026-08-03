@@ -1539,6 +1539,12 @@ abstract class AppLocalizations {
   /// **'{years} yrs'**
   String profileYearsExperienceSuffix(String years);
 
+  /// App version/build stamp at the bottom of the profile screen. Version numbering notation is not natural language, so this value is identical in every ARB file.
+  ///
+  /// In en, this message translates to:
+  /// **'v{version} ({build})'**
+  String profileVersionLabel(String version, String build);
+
   /// Edit-profile screen AppBar title.
   ///
   /// In en, this message translates to:

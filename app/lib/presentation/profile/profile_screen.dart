@@ -240,7 +240,10 @@ class ProfileScreen extends ConsumerWidget {
               ref.watch(packageInfoProvider).when(
                     data: (info) => Center(
                       child: Text(
-                        'v${info.version} (${info.buildNumber})',
+                        l10n.profileVersionLabel(
+                          info.version,
+                          info.buildNumber,
+                        ),
                         style: JobifyTypography.mono(
                           fontSize: 11,
                           color: theme.colorScheme.onSurfaceVariant,

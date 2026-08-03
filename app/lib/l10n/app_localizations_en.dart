@@ -828,6 +828,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String profileVersionLabel(String version, String build) {
+    return 'v$version ($build)';
+  }
+
+  @override
   String get editProfileTitle => 'Edit Profile';
 
   @override
