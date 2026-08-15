@@ -211,4 +211,50 @@ void main() {
     final finalState = c.read(feedControllerProvider).value!;
     expect(finalState.items.map((i) => i.job.id), ['b1']);
   });
+
+  test(
+      'stale in-flight loadMore fetch is discarded even when filters return '
+      'to their original value (A -> B -> A)', () async {
+    // The case a value-equality guard CANNOT catch. `FeedFilters` is @freezed,
+    // so after toggling away and back the live filters compare EQUAL to the
+    // snapshot taken when loadMore started — the old guard saw "unchanged" and
+    // merged the stale page. Two rebuilds have happened by then and page 1 has
+    // already been replaced, so the merge duplicated jobs into a list built
+    // from a different fetch. A monotonic generation counter sees the round
+    // trip that equality erases.
+    final repo = _SlowLoadMoreFeedRepo();
+    final c = ProviderContainer(
+      overrides: [feedRepositoryProvider.overrideWithValue(repo)],
+    );
+    addTearDown(c.dispose);
+    final sub = c.listen(feedControllerProvider, (_, __) {});
+    addTearDown(sub.close);
+
+    await c.read(feedControllerProvider.future);
+
+    // Start loadMore under filters A; its page-2 fetch hangs.
+    final loadMoreFuture = c.read(feedControllerProvider.notifier).loadMore();
+    expect(repo.pendingCompleter, isNotNull);
+
+    // A -> B -> A, both within the one fetch's flight. Each `set` must be
+    // awaited to completion so that TWO rebuilds actually happen — that is
+    // what the generation counter counts.
+    c
+        .read(feedFiltersControllerProvider.notifier)
+        .set(const FeedFilters(locations: ['Pune']));
+    await c.read(feedControllerProvider.future);
+    c.read(feedFiltersControllerProvider.notifier).set(const FeedFilters());
+    final rebuilt = await c.read(feedControllerProvider.future);
+
+    // Live filters are now value-equal to the snapshot loadMore captured.
+    expect(c.read(feedFiltersControllerProvider), const FeedFilters());
+
+    repo.pendingCompleter!.complete(FeedPageDto(items: [_item('a2')]));
+    await loadMoreFuture;
+
+    // The latest rebuild must stand alone — the stale page must not append.
+    final finalState = c.read(feedControllerProvider).value!;
+    expect(finalState.items, rebuilt.items);
+    expect(finalState.items.map((i) => i.job.id), isNot(contains('a2')));
+  });
 }
