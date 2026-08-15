@@ -87,19 +87,13 @@ def test_llm_parser_meets_quality_gate() -> None:
 
     Run: JOBIFY_PARSE_EVAL_PARSER=llm uv run --env-file=.env pytest -m eval -s -k llm
 
-    Calls the same `parse_text` the LIVE parse path uses, fanned out over the
-    20 gold examples. This lane originally routed through `parse_texts_batch`
-    only because free-tier RPM/RPD caps made 20 interactive calls infeasible;
-    with billing enabled that constraint is gone, and measuring the
-    interactive path means the acceptance number describes what production
-    actually runs. Both transports share `_generate_content_config()`
-    (identical system instruction, schema, temperature=0, thinking_budget=0),
-    so the transport does not move the score.
-
-    NOTE: `parse_texts_batch` has no live caller and NO verified coverage
-    against the real API. Batch first returned FAILED_PRECONDITION (paid-tier
-    only), then 403 PERMISSION_DENIED once the project itself was denied
-    access. Treat it as untested until a working project can exercise it.
+    Calls the same `parse_text` the LIVE parse path uses, over the 20 gold
+    examples. This lane originally routed through a `parse_texts_batch` Batch
+    API path, added only because free-tier caps made 20 interactive calls
+    infeasible. That path was never verified against the real API and has
+    since been removed; measuring the interactive path is also strictly
+    better, because the acceptance number then describes what production
+    actually runs rather than a transport nothing else uses.
     """
     import asyncio
     import os
