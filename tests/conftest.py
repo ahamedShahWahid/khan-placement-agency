@@ -30,7 +30,22 @@ def pytest_configure(config: object) -> None:
     hit the network for real, 429ing once quota is exhausted. Hard-setting forces a
     fake key + the non-LLM code paths (``library`` parser, ``templated`` explainer)
     so stray "llm" resolution is structurally impossible in tests.
+
+    ONE opt-in exception: the on-demand LLM parse-F1 lane
+    (``tests/eval/test_parse_f1_gate.py``) is *supposed* to call live Gemini.
+    It cannot read ``JOBIFY_GEMINI_API_KEY`` — the hard-set above replaced it
+    with the fake, so that lane received the literal ``"test-gemini-key"`` and
+    failed with API_KEY_INVALID on every tier. The real key is therefore
+    stashed under a distinct name, and ONLY when the operator explicitly
+    selected the lane via ``JOBIFY_PARSE_EVAL_PARSER=llm``. The hard-set still
+    happens unconditionally, so no settings-resolved code path can reach live
+    Gemini: reaching it requires naming this separate variable on purpose.
     """
+    if os.environ.get("JOBIFY_PARSE_EVAL_PARSER") == "llm":
+        real_gemini_key = os.environ.get("JOBIFY_GEMINI_API_KEY")
+        if real_gemini_key:
+            os.environ["JOBIFY_EVAL_GEMINI_API_KEY"] = real_gemini_key
+
     os.environ.setdefault("JOBIFY_ENV", "local")
     os.environ.setdefault("JOBIFY_SERVICE_NAME", "jobify-api")
     os.environ.setdefault(
