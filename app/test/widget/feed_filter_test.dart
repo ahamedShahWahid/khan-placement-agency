@@ -17,6 +17,7 @@ import 'package:jobify_app/data/resume/resume_repository.dart';
 import 'package:jobify_app/data/resume/resume_repository_impl.dart';
 import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/feed/feed_filter_bar.dart';
+import 'package:jobify_app/presentation/feed/feed_filter_sheet.dart';
 import 'package:jobify_app/presentation/feed/feed_filters_provider.dart';
 import 'package:jobify_app/presentation/feed/feed_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -366,5 +367,33 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(container.read(feedFiltersControllerProvider).isEmpty, isTrue);
+  });
+
+  testWidgets('experience stepper stops at the server bound (80)',
+      (tester) async {
+    // `GET /v1/feed` declares min_years le=80. The stepper had no upper
+    // bound, so 81 taps produced a value the server rejects with 422 —
+    // surfacing as a whole-feed error view, not a field-level message.
+    await tester.pumpWidget(_wrap(const FeedFilterSheet()));
+    await tester.pumpAndSettle();
+
+    final addButton = find.widgetWithIcon(IconButton, Icons.add);
+
+    // First tap moves null -> 0, so 81 taps is the path to the ceiling.
+    for (var i = 0; i < 81; i++) {
+      await tester.tap(addButton);
+      await tester.pump();
+    }
+    expect(find.text('80 yrs'), findsOneWidget);
+
+    // At the ceiling the control is disabled rather than silently capping,
+    // so the UI tells the truth about the bound.
+    expect(tester.widget<IconButton>(addButton).onPressed, isNull);
+
+    // And the value cannot be pushed past it.
+    await tester.tap(addButton, warnIfMissed: false);
+    await tester.pump();
+    expect(find.text('80 yrs'), findsOneWidget);
+    expect(find.text('81 yrs'), findsNothing);
   });
 }

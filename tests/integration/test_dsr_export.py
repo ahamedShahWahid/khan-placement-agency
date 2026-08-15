@@ -32,12 +32,17 @@ from jobify.db.models import (
     EmployerUser,
     Job,
     JobStatus,
+    SavedJob,
     User,
     UserRole,
 )
 from jobify_api.auth.tokens import mint_access_token
 
 pytestmark = pytest.mark.integration
+
+# Round trips `build_user_export` makes for a fully-populated applicant.
+# Verified flat: identical with 3 and with 7 jobs/applications/saved rows.
+_EXPORT_SELECT_COUNT = 14
 
 
 def _live_invite(*, employer_id, email: str, invited_by=None) -> EmployerInvite:
@@ -393,3 +398,72 @@ async def test_export_serializes_pgvector_embedding(
     assert emb is not None
     assert isinstance(emb["embedding"], list)
     assert len(emb["embedding"]) == 1536
+
+
+@pytest.mark.asyncio
+async def test_export_assembly_issues_a_bounded_number_of_queries(
+    session: AsyncSession,
+) -> None:
+    """Pin the round-trip count of ``build_user_export``.
+
+    Assembly is deliberately SERIAL: ``AsyncSession`` is not safe for
+    concurrent use, so ``asyncio.gather`` over one session would corrupt it
+    rather than speed it up. That makes latency linear in the number of
+    sections, and the risk is not the constant — it is silent growth, e.g. a
+    future section that loops per application and turns a flat walk into an
+    N+1 that only shows up as a slow export in production.
+
+    So rather than parallelise (wrong fix) this asserts the shape: a fixed
+    number of SELECTs, INDEPENDENT of how many rows the user owns. The
+    fixture seeds several applications and stage events precisely so that a
+    per-row query would move the count.
+    """
+    from sqlalchemy import event
+    from sqlalchemy.engine import Engine
+
+    from jobify_api.dsr import build_user_export
+
+    user, applicant, _token = await _make_applicant(session)
+
+    employer_name = f"QC Employer {uuid4().hex[:6]}"
+    employer = Employer(name=employer_name, name_norm=employer_name.lower())
+    session.add(employer)
+    await session.flush()
+    for index in range(3):
+        job = Job(
+            employer_id=employer.id,
+            title=f"Role {index}",
+            description="query-count fixture",
+            locations=["Remote"],
+            status=JobStatus.OPEN,
+            min_exp_years=0,
+            max_exp_years=5,
+        )
+        session.add(job)
+        await session.flush()
+        application = Application(applicant_id=applicant.id, job_id=job.id)
+        session.add(application)
+        await session.flush()
+        session.add(SavedJob(applicant_id=applicant.id, job_id=job.id))
+    await session.commit()
+
+    statements: list[str] = []
+
+    def _record(conn, cursor, statement, parameters, context, executemany):
+        if statement.lstrip().upper().startswith("SELECT"):
+            statements.append(statement)
+
+    event.listen(Engine, "before_cursor_execute", _record)
+    try:
+        await build_user_export(session, user=user)
+    finally:
+        event.remove(Engine, "before_cursor_execute", _record)
+
+    # Update deliberately when a section is added/removed -- that is the point
+    # of the pin. A jump proportional to the fixture's 3 jobs is an N+1.
+    assert len(statements) == _EXPORT_SELECT_COUNT, (
+        f"export issued {len(statements)} SELECTs, expected {_EXPORT_SELECT_COUNT}.\n"
+        "If you added a section, bump the constant. If the count scales with "
+        "the number of applications/jobs, you have introduced an N+1.\n"
+        + "\n".join(s.split("\n")[0][:120] for s in statements)
+    )

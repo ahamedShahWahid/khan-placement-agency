@@ -13,8 +13,16 @@ typedef FeedState = PagedState<FeedItemDto>;
 
 @riverpod
 class FeedController extends _$FeedController {
+  /// Bumped on every [build] — every filter change and every [refresh].
+  ///
+  /// Riverpod re-executes `build()` on the SAME notifier instance when a
+  /// watched dependency changes, so this survives across rebuilds and is what
+  /// makes it a usable staleness token.
+  int _generation = 0;
+
   @override
   Future<FeedState> build() async {
+    _generation++;
     final filters = ref.watch(feedFiltersControllerProvider);
     final page = await ref
         .read(feedRepositoryProvider)
@@ -32,13 +40,20 @@ class FeedController extends _$FeedController {
   }
 
   Future<void> loadMore() {
-    // Snapshot the filters this call started under. If they change mid-flight
-    // (user edits filters while a page-2 fetch is in the air), the fetch
-    // that started under the OLD filters must not land on top of the
-    // rebuild the filter change already triggered — `FeedController.build()`
-    // watches the filters provider and replaces `state` wholesale, and a
-    // stale `setState` here would silently merge old-filter pages into it.
-    final filtersAtStart = ref.read(feedFiltersControllerProvider);
+    // Snapshot the GENERATION this call started under, not the filter value.
+    //
+    // If filters change mid-flight (user edits them while a page-2 fetch is in
+    // the air), the fetch that started under the old filters must not land on
+    // top of the rebuild that change already triggered — `build()` watches the
+    // filters provider and replaces `state` wholesale, so a stale `setState`
+    // here would silently merge old-filter jobs into the new result.
+    //
+    // Comparing filter VALUES could not detect this: `FeedFilters` is
+    // @freezed, so an A→B→A toggle within one fetch's flight produces an
+    // object that compares EQUAL to the snapshot even though two rebuilds
+    // have happened and page 1 has already been replaced. A counter is
+    // monotonic, so it catches the round trip that equality cannot.
+    final generationAtStart = _generation;
     return loadNextPage<FeedItemDto>(
       currentState: state,
       fetch: ({String? cursor}) async {
@@ -54,7 +69,7 @@ class FeedController extends _$FeedController {
         );
       },
       setState: (s) {
-        if (ref.read(feedFiltersControllerProvider) != filtersAtStart) return;
+        if (_generation != generationAtStart) return;
         state = s;
       },
     );

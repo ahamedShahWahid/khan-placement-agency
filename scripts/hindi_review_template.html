@@ -1,0 +1,270 @@
+<title>Jobify Hindi Copy Review</title>
+<style>
+  /* ---- tokens: light is the base, complete on bare :root ---------------- */
+  :root {
+    --paper:      #F7F8FA;   /* cool near-white, slight blue bias */
+    --surface:    #FFFFFF;
+    --surface-2:  #EEF1F6;
+    --ink:        #10151F;   /* blue-biased near-black */
+    --muted:      #5B6676;
+    --rule:       #DDE2EA;
+    --brand:      #0048A8;   /* Jobify blue - the project's existing token */
+    --brand-soft: #E3ECF9;
+    --flag:       #A85B00;   /* muted amber: placeholder risk ONLY */
+    --flag-soft:  #FBF0E0;
+    --shadow:     0 1px 2px rgba(16,21,31,.06), 0 8px 24px rgba(16,21,31,.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #0C1017;
+      --surface:    #141A24;
+      --surface-2:  #1C2431;
+      --ink:        #E6EAF1;
+      --muted:      #97A2B2;
+      --rule:       #263041;
+      --brand:      #6BA6FF;
+      --brand-soft: #16233A;
+      --flag:       #E0A257;
+      --flag-soft:  #2C2113;
+      --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:      #0C1017;
+    --surface:    #141A24;
+    --surface-2:  #1C2431;
+    --ink:        #E6EAF1;
+    --muted:      #97A2B2;
+    --rule:       #263041;
+    --brand:      #6BA6FF;
+    --brand-soft: #16233A;
+    --flag:       #E0A257;
+    --flag-soft:  #2C2113;
+    --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+  }
+
+  /* ---- type ------------------------------------------------------------- */
+  /* No webfont links: the artifact CSP blocks font CDNs, and a silent
+     fallback on the Devanagari column would be worse than a system face. */
+  :root {
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    /* Devanagari needs more vertical room and a larger optical size than
+       Latin at the same point size - hence its own stack and scale. */
+    --deva: "Noto Sans Devanagari", "Kohinoor Devanagari", "Devanagari Sangam MN",
+            "Nirmala UI", "Mangal", var(--sans);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--brand); }
+  :focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 3px; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px 96px; }
+
+  /* ---- masthead --------------------------------------------------------- */
+  header.top { border-bottom: 1px solid var(--rule); margin-bottom: 32px; }
+  .top-inner { max-width: 1180px; margin: 0 auto; padding: 40px 24px 28px; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--brand); margin: 0 0 10px;
+  }
+  h1 {
+    font-size: clamp(28px, 4vw, 40px); line-height: 1.12; margin: 0 0 12px;
+    letter-spacing: -.02em; text-wrap: balance; font-weight: 640;
+  }
+  .standfirst { margin: 0; max-width: 62ch; color: var(--muted); font-size: 17px; }
+
+  .stats { display: flex; flex-wrap: wrap; gap: 28px; margin-top: 26px; }
+  .stat .n {
+    font-family: var(--mono); font-size: 26px; font-weight: 600;
+    font-variant-numeric: tabular-nums; display: block; line-height: 1.1;
+  }
+  .stat .l { font-size: 12.5px; color: var(--muted); }
+  .stat.is-flag .n { color: var(--flag); }
+
+  /* ---- how-to ----------------------------------------------------------- */
+  .howto {
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 10px;
+    padding: 20px 22px; margin-bottom: 36px; box-shadow: var(--shadow);
+  }
+  .howto h2 { font-size: 15px; margin: 0 0 10px; letter-spacing: -.01em; }
+  .howto ol { margin: 0; padding-left: 20px; }
+  .howto li { margin-bottom: 7px; color: var(--muted); font-size: 14.5px; }
+  .howto li strong { color: var(--ink); font-weight: 600; }
+  .howto li:last-child { margin-bottom: 0; }
+
+  /* ---- layout ----------------------------------------------------------- */
+  .cols { display: grid; grid-template-columns: 216px minmax(0,1fr); gap: 40px; align-items: start; }
+  @media (max-width: 860px) { .cols { grid-template-columns: 1fr; gap: 24px; } }
+
+  nav.index { position: sticky; top: 20px; }
+  @media (max-width: 860px) { nav.index { position: static; } }
+  nav.index h3 {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 10px;
+  }
+  nav.index ul { list-style: none; margin: 0; padding: 0; }
+  nav.index a {
+    display: flex; justify-content: space-between; gap: 10px;
+    padding: 5px 0; font-size: 13.5px; text-decoration: none; color: var(--ink);
+    border-bottom: 1px solid transparent;
+  }
+  nav.index a:hover { color: var(--brand); }
+  .navct { font-family: var(--mono); font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  /* ---- groups + rows ---------------------------------------------------- */
+  .grp { margin-bottom: 44px; scroll-margin-top: 20px; }
+  .grp h2 {
+    font-size: 19px; margin: 0 0 14px; letter-spacing: -.01em;
+    padding-bottom: 8px; border-bottom: 2px solid var(--brand);
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px;
+  }
+  .grpmeta { font-family: var(--mono); font-size: 11.5px; color: var(--muted); font-weight: 400; }
+
+  .row {
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 8px;
+    padding: 14px 16px; margin-bottom: 10px;
+  }
+  .row.is-same { border-left: 3px solid var(--flag); }
+
+  .rowhead { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 10px; }
+  .key { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .desc { margin: 0; font-size: 12.5px; color: var(--muted); flex-basis: 100%; }
+  .flag {
+    font-size: 11px; padding: 2px 8px; border-radius: 999px;
+    background: var(--flag-soft); color: var(--flag); white-space: nowrap;
+  }
+  .flag code { font-family: var(--mono); font-size: 10.5px; }
+  .flag-ph { background: var(--brand-soft); color: var(--brand); }
+
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .pair { grid-template-columns: 1fr; gap: 10px; } }
+  .cell { display: flex; gap: 10px; align-items: flex-start; }
+  .lang {
+    font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em;
+    color: var(--muted); background: var(--surface-2);
+    padding: 3px 5px; border-radius: 3px; flex-shrink: 0; margin-top: 3px;
+  }
+  .cell p { margin: 0; }
+  .cell.hi p {
+    font-family: var(--deva);
+    font-size: 17.5px;      /* Devanagari carries less x-height per px */
+    line-height: 1.75;      /* room for matras above and below */
+  }
+  code.ph {
+    font-family: var(--mono); font-size: .84em;
+    background: var(--brand-soft); color: var(--brand);
+    padding: 1px 4px; border-radius: 3px; white-space: nowrap;
+  }
+
+  .fix { display: none; }
+
+  footer.end {
+    margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--rule);
+    color: var(--muted); font-size: 13.5px;
+  }
+
+  /* ---- print: the reviewer marks this up by hand ------------------------ */
+  @media print {
+    :root {
+      --paper: #fff; --surface: #fff; --surface-2: #f2f2f2;
+      --ink: #000; --muted: #555; --rule: #bbb;
+      --brand: #003a86; --brand-soft: #eaf0fa;
+      --flag: #7a4200; --flag-soft: #f7efe2; --shadow: none;
+    }
+    body { font-size: 10.5pt; }
+    nav.index, .howto { display: none; }
+    .cols { grid-template-columns: 1fr; }
+    .grp { break-inside: auto; }
+    .row {
+      break-inside: avoid; page-break-inside: avoid;
+      display: grid; grid-template-columns: minmax(0,1fr) 190px; gap: 14px;
+      align-items: start;
+    }
+    .rowhead, .pair { grid-column: 1; }
+    /* Blank ruled gutter for handwritten corrections. */
+    .fix {
+      display: block; grid-column: 2; grid-row: 1 / span 2;
+      min-height: 52px; border: 1px solid var(--rule); border-radius: 4px;
+      background: repeating-linear-gradient(
+        to bottom, transparent 0 21px, #d8d8d8 21px 22px);
+    }
+    .fix::before {
+      content: "corrections"; display: block;
+      font-size: 7pt; letter-spacing: .1em; text-transform: uppercase;
+      color: #999; padding: 3px 5px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<header class="top">
+  <div class="top-inner">
+    <p class="eyebrow">Jobify &middot; applicant app &middot; hi-IN</p>
+    <h1>Hindi copy review</h1>
+    <p class="standfirst">
+      Every Hindi string shipped in the Jobify applicant app, beside the English
+      it was translated from. Read the Hindi as a Hindi speaker would meet it in
+      the app &mdash; not as a translation. Where it reads like translated English,
+      that is the note worth making.
+    </p>
+    <div class="stats">
+      <div class="stat"><span class="n">{{TOTAL}}</span><span class="l">strings</span></div>
+      <div class="stat"><span class="n">{{NGRP}}</span><span class="l">screens</span></div>
+      <div class="stat"><span class="n">{{NPH}}</span><span class="l">carry a value slot</span></div>
+      <div class="stat is-flag"><span class="n">{{NSAME}}</span><span class="l">left in English</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="howto">
+    <h2>Before you start</h2>
+    <ol>
+      <li><strong>Tone:</strong> Jobify speaks to job seekers plainly and warmly &mdash;
+        never formal-officialese, never slangy. Everyday spoken Hindi, the register
+        of a helpful colleague. Common English loanwords that Hindi speakers
+        actually say (resume, profile, interview) are fine to keep.</li>
+      <li><strong>Blue chips like <code class="ph">{count}</code> are live values</strong>
+        the app fills in &mdash; a name, a number, a date. Move them anywhere the Hindi
+        sentence needs, but keep the spelling exactly and never delete or invent one.
+        A changed chip crashes that screen.</li>
+      <li><strong>Amber-edged rows are still in English.</strong> Several are
+        deliberate (a brand name, a currency symbol). Others are city names that do
+        have common Devanagari spellings. Please confirm each one either way.</li>
+      <li><strong>To send corrections:</strong> print this page &mdash; each row gets a
+        ruled box for handwritten notes &mdash; or reply with the grey
+        <code>keyName</code> above any string and your suggested wording.</li>
+    </ol>
+  </div>
+
+  <div class="cols">
+    <nav class="index" aria-label="Screens">
+      <h3>Screens</h3>
+      <ul>
+        <!--NAV-->
+      </ul>
+    </nav>
+    <main>
+      <!--ROWS-->
+      <footer class="end">
+        Generated from <code>app/lib/l10n/app_en.arb</code> and
+        <code>app_hi.arb</code>. Every English string has a Hindi counterpart and
+        every value slot matches across both files &mdash; so nothing here is missing,
+        only possibly unnatural.
+      </footer>
+    </main>
+  </div>
+</div>

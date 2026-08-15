@@ -6,23 +6,29 @@ never re-export this class from the package ``__init__``.
 
 Failure contract: any post-extraction failure (provider exception, blocked or
 empty response, JSON that fails ``ParsedResume`` validation) raises
-:class:`LlmParserError` after logging the truncated raw model text at debug.
+:class:`LlmParserError` after logging a PII-safe SHAPE summary at debug (see
+``_raw_shape`` — never the response body, which restates the resume).
 ONE attempt, no internal retry — :class:`FallbackResumeParser` is the recovery.
 Extraction failures (:class:`ParserError` from ``extract_text``) propagate
 untouched: they are permanent regardless of parser.
 
-Two call shapes: ``parse``/``parse_text`` are the interactive LIVE path
-(async, one ``generate_content`` call — never touch this for the ≤10-min
-first-match criterion). ``parse_texts_batch`` is a sync, eval/bulk-only path
-over the Gemini Batch API (50% of interactive pricing, a separate quota
-pool) — see its docstring.
+One call shape: ``parse``/``parse_text``, the interactive LIVE path (async,
+one ``generate_content`` call) — never move it off interactive, the spec's
+≤10-min first-match criterion depends on its latency.
+
+A ``parse_texts_batch`` Gemini Batch API path existed here for the eval lane
+(50% pricing, separate quota pool) and was removed 2026-08-15: it had no
+caller once the eval lane moved to the paced interactive path, and it was
+never verified against the real API (batch returned FAILED_PRECONDITION on
+the free tier, then 403 once the project was denied). Recover from git
+history if bulk re-parsing becomes real — but verify it live before trusting
+it, since its only coverage was mocked.
 """
 
 from __future__ import annotations
 
 import json
-import time
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Final
 
 import structlog
 from google.genai import types
@@ -96,10 +102,55 @@ _RESPONSE_SCHEMA = types.Schema(
 )
 
 
+_SCHEMA_KEYS: Final[frozenset[str]] = frozenset(ParsedResume.model_fields)
+
+
+def _raw_shape(raw: str | None) -> dict[str, Any]:
+    """Describe a rejected model response WITHOUT echoing its content.
+
+    The response body is the applicant's resume restated as JSON — name,
+    email, phone, employers. Logging even a truncated prefix (this used to
+    emit ``raw_model_output=raw[:500]``) put that PII into the log pipeline
+    at every validation failure, which is exactly the case most likely to be
+    debugged with logs turned up. The same reasoning already governs the
+    exception messages here; the debug line was the hole left in it.
+
+    What survives is the diagnostic signal that is not content: how long the
+    response was, whether it parsed as JSON, where it stopped parsing, and
+    WHICH schema fields came back. Key names are ours (from the response
+    schema), not model-authored — unrecognised keys are counted, never named,
+    since a malformed response could put content in key position.
+    """
+    if not raw:
+        return {"raw_len": 0, "raw_kind": "empty"}
+
+    shape: dict[str, Any] = {"raw_len": len(raw)}
+    try:
+        payload: Any = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        shape["raw_kind"] = "invalid_json"
+        shape["json_error_pos"] = exc.pos
+        return shape
+
+    if not isinstance(payload, dict):
+        shape["raw_kind"] = type(payload).__name__
+        return shape
+
+    keys = set(payload)
+    shape["raw_kind"] = "object"
+    shape["known_keys"] = sorted(keys & _SCHEMA_KEYS)
+    shape["unknown_key_count"] = len(keys - _SCHEMA_KEYS)
+    return shape
+
+
 def _generate_content_config() -> types.GenerateContentConfig:
-    """Shared config for the interactive and batch call shapes — identical
-    system instruction/schema/temperature/thinking budget either way, only
-    the transport (``generate_content`` vs. an inlined batch request) differs.
+    """Request config for the parse call — system instruction, response
+    schema, temperature, thinking budget.
+
+    Still a function rather than a module constant: the on-demand LLM eval
+    lane builds its own parser instance, and sharing one mutable config
+    object across callers invites action-at-a-distance if anything ever
+    tweaks a field.
     """
     return types.GenerateContentConfig(
         system_instruction=_SYSTEM_INSTRUCTION,
@@ -135,10 +186,9 @@ class GeminiResumeParser:
         """Post-extraction path — also the CI eval lane's parser-under-test.
 
         Interactive ``generate_content``, ONE attempt. This is the LIVE path
-        (`parse`/`parse_text`) — never move it to batch. Its latency is what
-        the spec's ≤10-min first-match criterion depends on; batch jobs can
-        take anywhere from minutes to hours. See :meth:`parse_texts_batch`
-        for the eval/bulk-only batch lane.
+        — never move it to the Batch API. Its latency is what the spec's
+        ≤10-min first-match criterion depends on; batch jobs can take
+        anywhere from minutes to hours.
         """
         try:
             resp = await self._client.aio.models.generate_content(
@@ -151,99 +201,11 @@ class GeminiResumeParser:
         raw = getattr(resp, "text", None)
         return self._validated_resume(raw, text)
 
-    def parse_texts_batch(
-        self,
-        texts: list[str],
-        *,
-        poll_interval_s: float = 10.0,
-        timeout_s: float = 1800.0,
-    ) -> list[ParsedResume]:
-        """Batch-mode entry point for the eval lane and future bulk re-parse
-        jobs — Gemini Batch API (50% of interactive ``generate_content``
-        pricing, a separate quota pool). NEVER call this from the live
-        `parse`/`parse_text` path (see their docstrings) — batch jobs are not
-        request/response, so this method is deliberately sync and blocks the
-        calling thread while polling, unlike every other method here.
-
-        All-or-nothing: a job-level failure/timeout, or ANY per-item failure
-        (missing/error response, schema-invalid JSON), raises
-        :class:`LlmParserError` naming the failing indices — callers get
-        every result (index-aligned with ``texts``) or none, never a partial
-        list silently missing entries.
-        """
-        if not texts:
-            return []
-
-        inlined_requests = [
-            types.InlinedRequest(contents=text, config=_generate_content_config()) for text in texts
-        ]
-
-        try:
-            job = self._client.batches.create(model=self._model, src=inlined_requests)
-        except Exception as exc:
-            raise LlmParserError(f"llm_batch_create_failed: {type(exc).__name__}") from exc
-
-        job_name = job.name
-        if job_name is None:
-            raise LlmParserError("llm_batch_create_failed: job has no name")
-
-        deadline = time.monotonic() + timeout_s
-        while not job.done:
-            if time.monotonic() >= deadline:
-                raise LlmParserError(
-                    f"llm_batch_timeout: job {job_name} still {job.state} after {timeout_s}s"
-                )
-            time.sleep(poll_interval_s)
-            try:
-                job = self._client.batches.get(name=job_name)
-            except Exception as exc:
-                raise LlmParserError(f"llm_batch_poll_failed: {type(exc).__name__}") from exc
-
-        if job.state != types.JobState.JOB_STATE_SUCCEEDED:
-            job_error = getattr(job, "error", None)
-            _log.debug(
-                "parse.llm-batch-job-failed",
-                job_name=job_name,
-                state=str(job.state),
-                error=job_error,
-            )
-            raise LlmParserError(
-                f"llm_batch_job_failed: job {job_name} state={job.state} error={job_error}"
-            )
-
-        responses = list(job.dest.inlined_responses or []) if job.dest else []
-        if len(responses) != len(texts):
-            raise LlmParserError(
-                f"llm_batch_response_count_mismatch: expected {len(texts)}, got {len(responses)}"
-            )
-
-        # Index order is a documented SDK guarantee for inlined batch
-        # requests/responses (google.genai.types.BatchJobDestination.
-        # inlined_responses: "will be in the same order as the input
-        # requests") — safe to zip positionally against texts.
-        results: list[ParsedResume] = []
-        failing_indices: list[int] = []
-        for idx, (item, text) in enumerate(zip(responses, texts, strict=True)):
-            if item.error is not None:
-                _log.debug("parse.llm-batch-item-error", index=idx, code=item.error.code)
-                failing_indices.append(idx)
-                continue
-            raw = getattr(item.response, "text", None) if item.response is not None else None
-            try:
-                results.append(self._validated_resume(raw, text))
-            except LlmParserError:
-                failing_indices.append(idx)
-
-        if failing_indices:
-            raise LlmParserError(f"llm_batch_items_failed: indices {failing_indices}")
-
-        return results
-
     def _validated_resume(self, raw: str | None, text: str) -> ParsedResume:
-        """Shared response-text -> ParsedResume validation for the
-        interactive (:meth:`parse_text`) and batch (:meth:`parse_texts_batch`)
-        paths — same JSON parse, same schema-drop, same PII-safe error
-        messages either way.
+        """Response-text -> ParsedResume validation: JSON parse, schema-drop,
+        PII-safe error messages. Kept as its own method (rather than inlined
+        into :meth:`parse_text`) because every arm here is a distinct rejection
+        mode worth testing in isolation.
         """
         try:
             if not raw:
@@ -260,7 +222,7 @@ class GeminiResumeParser:
                 **payload,
             )
         except ValidationError as exc:
-            _log.debug("parse.llm-raw-output", raw_model_output=(raw or "")[:500])
+            _log.debug("parse.llm-output-rejected", **_raw_shape(raw))
             # str(exc) embeds pydantic's "input_value=..." context, which for
             # this model IS the resume's own PII (name/email/phone/etc). Build
             # the message from a slug + failing top-level field names only —
@@ -270,7 +232,7 @@ class GeminiResumeParser:
         except (ValueError, TypeError) as exc:
             # Our own safe messages ("empty response text", "expected object,
             # got ..."); never model-echoed content.
-            _log.debug("parse.llm-raw-output", raw_model_output=(raw or "")[:500])
+            _log.debug("parse.llm-output-rejected", **_raw_shape(raw))
             raise LlmParserError(f"llm_output_invalid: {exc}") from exc
         except Exception as exc:
             # Blanket arm restoring the module's documented "ANY
@@ -278,9 +240,6 @@ class GeminiResumeParser:
             # whatever falls outside the two specific arms above (e.g. an
             # unexpected error constructing ParsedResume). Type name only —
             # never str(exc), which for this model can carry the resume's
-            # own PII the same way ValidationError's message does. In the
-            # batch loop this keeps an unforeseen failure scoped to its own
-            # index instead of raising an uncaught exception that aborts the
-            # whole batch.
-            _log.debug("parse.llm-raw-output", raw_model_output=(raw or "")[:500])
+            # own PII the same way ValidationError's message does.
+            _log.debug("parse.llm-output-rejected", **_raw_shape(raw))
             raise LlmParserError(f"llm_output_invalid: {type(exc).__name__}") from exc

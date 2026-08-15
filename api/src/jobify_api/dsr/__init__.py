@@ -221,10 +221,23 @@ async def build_user_export(
     Raises nothing custom — DB errors propagate to the route, which
     converts to 500 via the standard handler.
 
-    TODO(scale): the ~12 section queries run serially on one session
-    (AsyncSession is not safe for concurrent use). Acceptable at MVP volume;
-    if assembly time grows, switch the route to 202 + async delivery rather
-    than parallelizing here.
+    Assembly is SERIAL by decision, not by oversight. ``AsyncSession`` is not
+    safe for concurrent use, so ``asyncio.gather`` over these sections would
+    corrupt the session rather than speed it up; making them concurrent would
+    mean a connection per section, which trades a bounded, predictable cost
+    for pool pressure on an endpoint one user hits at most a few times ever.
+
+    That leaves latency linear in the number of SECTIONS — currently 14 round
+    trips, flat regardless of how many applications/jobs the user owns
+    (pinned by ``test_export_assembly_issues_a_bounded_number_of_queries``).
+    The real risk was never the constant; it was silent growth into an N+1
+    that shows up only as a slow export in production, which the pin now
+    catches in CI.
+
+    If assembly time does become a problem, the fix is 202 + async delivery
+    (assemble in a worker, notify when ready) — NOT parallelising here.
+    Trigger to revisit: p95 export latency approaching the API timeout, or
+    the section count outgrowing a single request budget.
     """
     user_dict = _row_to_dict(user)
 

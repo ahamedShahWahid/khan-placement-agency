@@ -5,6 +5,12 @@ import 'package:jobify_app/data/feed/feed_filters.dart';
 import 'package:jobify_app/presentation/feed/feed_filters_provider.dart';
 import 'package:jobify_app/presentation/theme/jobify_spacing.dart';
 
+/// Upper bound for the experience stepper, mirroring the server's
+/// `min_years: Query(None, ge=0, le=80)` on `GET /v1/feed`. Exceeding it is a
+/// 422, which surfaces as a full-feed error view rather than a field error —
+/// so the client must not be able to produce the value at all.
+const int _kMaxMinYears = 80;
+
 /// Bottom sheet editing location / experience / min-CTC. Local draft state;
 /// nothing hits the provider until Apply.
 class FeedFilterSheet extends ConsumerStatefulWidget {
@@ -150,8 +156,15 @@ class _FeedFilterSheetState extends ConsumerState<FeedFilterSheet> {
                     : l10n.feedYearsSuffix(_minYears!),
               ),
               IconButton(
-                onPressed: () =>
-                    setState(() => _minYears = (_minYears ?? -1) + 1),
+                // Disabled at the ceiling rather than silently capping, so the
+                // control tells the truth about the bound. `GET /v1/feed`
+                // declares `min_years: Query(ge=0, le=80)`, so an unbounded
+                // stepper let a determined tap reach 81 and turn the whole
+                // feed into an error view on a 422. Keep in lockstep with the
+                // route's `le=`.
+                onPressed: _minYears != null && _minYears! >= _kMaxMinYears
+                    ? null
+                    : () => setState(() => _minYears = (_minYears ?? -1) + 1),
                 icon: const Icon(Icons.add),
               ),
             ],
