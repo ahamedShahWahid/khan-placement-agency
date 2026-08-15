@@ -14,7 +14,8 @@ from docx import Document
 from fpdf import FPDF
 
 from jobify.integrations.parser.base import ParsedResume
-from jobify.integrations.parser.library import LibraryResumeParser
+from jobify.integrations.parser.library import LibraryResumeParser, _extract_skills
+from jobify.integrations.parser.skills_dict import SKILLS
 
 PDF_CT = "application/pdf"
 DOCX_CT = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -136,6 +137,81 @@ async def test_parse_empty_resume_returns_valid_parsed_resume(
     assert pr.skills == []
     assert pr.experience == []
     assert pr.education == []
+
+
+@pytest.mark.parametrize(
+    ("text", "phantom"),
+    [
+        ("Senior Engineer with 6 years", "gin"),
+        ("Team member since 2019", "ember"),
+        ("Studied at Symbiosis Institute", "ios"),
+        ("Handled escalation workflows", "scala"),
+        ("Built a hyperlocal delivery app", "perl"),
+        ("Reduced margin of error", "gin"),
+    ],
+)
+def test_skills_ignores_substrings_inside_longer_words(text: str, phantom: str) -> None:
+    """The dictionary is matched on token boundaries, not raw containment.
+
+    Every `phantom` here is a real SKILLS entry that naive `skill in text`
+    finds inside an unrelated English word. These were the documented
+    false-positive family in `000_README.md`; each one costs precision on
+    the gated `skills` F1, which counts FPs.
+    """
+    assert phantom in SKILLS, f"{phantom!r} must be a real dict entry for this to mean anything"
+    assert phantom not in _extract_skills(text)
+
+
+def test_skills_prefers_the_longer_overlapping_entry() -> None:
+    """`postgres` and `sql` are both entries and both live inside `postgresql`.
+
+    Containment reported all three from one token; boundary matching reports
+    only the token actually written.
+    """
+    found = _extract_skills("Databases: PostgreSQL")
+    assert "postgresql" in found
+    assert "postgres" not in found
+    assert "sql" not in found
+
+
+@pytest.mark.parametrize(
+    "skill",
+    ["c++", "c#", "node.js", "asp.net", "ci/cd", "scikit-learn", "spring boot"],
+)
+def test_skills_still_matches_entries_with_punctuation(skill: str) -> None:
+    """Regression guard for the boundary rule itself.
+
+    A naive ``\\b…\\b`` breaks on entries whose first/last character is not a
+    word character (`c++`, `c#`), because `\\b` is defined between a word and
+    a non-word char — so it demands a word char adjacent to the `+`/`#` and
+    the entry stops matching. The rule must anchor per-side on whether the
+    entry's own edge is alphanumeric.
+    """
+    assert skill in SKILLS
+    assert skill in _extract_skills(f"Skills: {skill}, python")
+
+
+def test_skills_suppresses_an_entry_nested_in_a_longer_match() -> None:
+    """ "Spring Boot" must not also report the bare "spring" entry."""
+    found = _extract_skills("Stack: Java, Spring Boot, MySQL")
+    assert "spring boot" in found
+    assert "spring" not in found
+
+
+def test_skills_keeps_a_short_entry_that_also_stands_alone() -> None:
+    """Suppression is per-occurrence, not per-name.
+
+    This resume writes BOTH "Postgres" on its own and "PostgreSQL"; the short
+    entry is genuinely present, so it must survive. A name-based rule ("drop
+    any entry that is a substring of another match") would wrongly delete it.
+    """
+    found = _extract_skills("Datastores: Postgres pgvector. Also PostgreSQL.")
+    assert {"postgres", "postgresql", "pgvector"}.issubset(found)
+
+
+def test_skills_matches_at_string_edges() -> None:
+    """Boundaries at start/end of input must not require a neighbour char."""
+    assert "python" in _extract_skills("python")
 
 
 async def test_parse_works_on_docx(parser: LibraryResumeParser) -> None:

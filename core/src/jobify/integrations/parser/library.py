@@ -120,10 +120,70 @@ def _extract_phone(text: str) -> str | None:
     return m.group(0).strip() if m else None
 
 
+def _skill_pattern(skill: str) -> re.Pattern[str]:
+    """Compile one dictionary entry into a token-boundary matcher.
+
+    Deliberately NOT ``\\b…\\b``. ``\\b`` sits between a word and a non-word
+    character, so for an entry ending in ``+`` or ``#`` (``c++``, ``c#``) a
+    trailing ``\\b`` would demand a word character right after the ``+`` and
+    the entry would never match. Instead each side is anchored only when the
+    entry's own edge is alphanumeric:
+
+    - ``sql`` gets guards on both sides, so it no longer fires inside
+      ``postgresql``.
+    - ``c++`` gets a left guard only; nothing is required after the ``+``.
+    - ``.net``-style entries get a right guard only.
+
+    Lookarounds (not consuming character classes) so a match at the very
+    start or end of the input still succeeds.
+    """
+    left = r"(?<![a-z0-9_])" if skill[0].isalnum() else ""
+    right = r"(?![a-z0-9_])" if skill[-1].isalnum() else ""
+    return re.compile(left + re.escape(skill) + right)
+
+
+# Compiled once at import: ~180 entries scanned per resume, and re.compile's
+# internal cache is bounded (512) and shared process-wide, so relying on it
+# would risk eviction under other regex traffic.
+_SKILL_PATTERNS: Final[tuple[tuple[str, re.Pattern[str]], ...]] = tuple(
+    (skill, _skill_pattern(skill)) for skill in SKILLS
+)
+
+
 def _extract_skills(text: str) -> list[str]:
-    """Case-insensitive containment against the curated SKILLS dictionary."""
+    """Case-insensitive, token-boundary matching against the SKILLS dictionary.
+
+    Boundary-aware rather than raw containment: plain ``skill in text`` reported
+    ``gin`` for "engineer", ``ios`` for "Symbiosis", ``scala`` for "escalation",
+    and both ``postgres`` and ``sql`` for a lone "PostgreSQL". The gated
+    ``skills`` F1 counts false positives, so each of those was direct precision
+    loss. See ``skills_dict`` for the dictionary itself.
+    """
     lower = text.lower()
-    found = {skill for skill in SKILLS if skill in lower}
+    spans: dict[str, list[tuple[int, int]]] = {}
+    for skill, pattern in _SKILL_PATTERNS:
+        hits = [m.span() for m in pattern.finditer(lower)]
+        if hits:
+            spans[skill] = hits
+
+    # Drop an entry whose every occurrence sits inside a LONGER matched entry:
+    # "Spring Boot" must not also report "spring". Occurrence-based, not
+    # name-based -- a resume writing both "Postgres pgvector" and "PostgreSQL"
+    # genuinely contains `postgres` as its own token, so it survives on the
+    # uncovered occurrence. Suppressing by name alone would lose it.
+    found = {
+        skill
+        for skill, hits in spans.items()
+        if any(
+            not any(
+                other_start <= start and end <= other_end
+                for other, other_hits in spans.items()
+                if len(other) > len(skill)
+                for other_start, other_end in other_hits
+            )
+            for start, end in hits
+        )
+    }
     return sorted(found)
 
 

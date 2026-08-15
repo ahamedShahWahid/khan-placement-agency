@@ -1,13 +1,21 @@
 """Curated skill keyword list for the library resume parser.
 
-Lowercased, unique, sorted. ~200 entries covering languages, frameworks,
-data stores, cloud, infra, tooling, ML/AI. Extend liberally; the parser
-does case-insensitive substring containment, so spelling variants
-(e.g. "node.js" vs "nodejs") should both be listed where common.
+Lowercased, unique, sorted. ~180 entries covering languages, frameworks,
+data stores, cloud, infra, tooling, ML/AI.
 
-# TODO(P3-llm-parser): Replace substring containment with word-boundary
-# detection (regex \\b…\\b or tokenization) to eliminate false positives
-# from short tokens (e.g. single chars, common substrings in framework names).
+Extend liberally, but note how these are matched: `_extract_skills` uses
+**token-boundary** matching, not substring containment. Two consequences
+when adding entries:
+
+- Spelling variants still need their own entry ("node.js" AND "nodejs") —
+  boundary matching does not normalise punctuation.
+- A short entry nested in a longer one is safe to add. "spring" alongside
+  "spring boot" no longer double-reports, because an entry whose every
+  occurrence falls inside a longer match is suppressed.
+
+Adding a very short entry (1-2 chars) is still risky: it will match a real
+standalone token, so "go" would fire on the English verb. Prefer the
+unambiguous spelling ("golang").
 """
 
 from __future__ import annotations

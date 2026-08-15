@@ -79,14 +79,26 @@ the LLM parser lane has a concrete bar to clear:
   zero entries. Any resume that doesn't use the word
   "certified"/"certification" near a credential is invisible to this
   extractor, regardless of header wording.
-- **`_extract_skills` substring containment produces predictable false
-  positives on common English words/proper nouns** (e.g. "gin" inside
-  "engineer"/"engineering"/"margin"/"beginning", "ember" inside "member",
-  "ios" inside "Symbiosis", "scala" inside "escalation", "perl" inside
-  "hyperlocal", "sql"/"postgres" as substrings of "postgresql"). Already
-  present in the original eight examples' FP counts; 009-020 make it more
-  visible. The `skills_dict.py` module header tracks the fix
-  (word-boundary matching) as `TODO(P3-llm-parser)`.
+- ~~**`_extract_skills` substring containment produces predictable false
+  positives**~~ — **FIXED 2026-08-15.** `_extract_skills` now matches on
+  token boundaries, so "gin" no longer fires inside
+  "engineer"/"margin"/"beginning", "ember" inside "member", "ios" inside
+  "Symbiosis", "scala" inside "escalation", "perl" inside "hyperlocal", nor
+  "sql"/"postgres" inside "postgresql". Measured over this dataset: skills
+  **FP 47 → 3**, F1 **0.795 → 0.883**, overall **0.904 → 0.927**, with TP
+  (174) and FN (43) both unchanged — pure precision, no recall traded away.
+  A second rule suppresses an entry whose every occurrence sits inside a
+  longer match ("Spring Boot" no longer also reports "spring"); it is
+  occurrence-based, so a resume writing both "Postgres" and "PostgreSQL"
+  keeps both.
+- **The 3 surviving `skills` FPs are gaps in the EXPECTED files, not parser
+  errors** — `microservices` (001, resume says "Migrated 12 microservices"),
+  and `postgres` + `pgvector` (008, resume says "Postgres pgvector."). Each
+  token really is written in the resume; the hand-authored expectation omits
+  it. Deliberately NOT "fixed" by editing the expectations — that would be
+  tuning ground truth to flatter the parser. Revisit only with a decision on
+  whether "microservices" counts as a skill and whether 008's expectation
+  should list the datastores it names.
 - **Non-tech vocabularies score near-zero recall on `skills`** —
   009 (FMCG sales), 013 (ops executive), 014 (school teacher), 016 (HR
   generalist), 019 (delivery ops), 020 (financial analyst — 7 of 8
