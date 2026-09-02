@@ -94,6 +94,14 @@ def decode_cursor_saved(cursor: str) -> tuple[datetime, uuid.UUID]:
     "/jobs/{job_id}/save",
     status_code=status.HTTP_201_CREATED,
     response_model=SavedJobRead,
+    # Same idempotent-200 branch as POST /jobs/{id}/apply — declare it so the
+    # snapshot (and the clients pinned to it) document both outcomes.
+    responses={
+        status.HTTP_200_OK: {
+            "model": SavedJobRead,
+            "description": "Already saved — the existing saved-job row is returned.",
+        }
+    },
 )
 async def save_job(
     job_id: uuid.UUID,

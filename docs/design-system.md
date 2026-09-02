@@ -104,8 +104,11 @@ Surfaces (`.surface-employers`, `.surface-console`) must NOT redefine tokens.
 - **Accent usage, precisely:** weakest score bar (`.bar-row:has(.bar-fill.acc)`), the why-match
   `⌁` caveat marker, console `.chip.acc` pending/attention states. The reason blockquote border
   is **neutral** — the reason is the voice, not the caveat.
-- **Deliberate exceptions (do not "fix"):** console `.jc-card` is always-light (hardcoded warm
-  palette for candidate preview cards) — intentionally not tokenized.
+- **Deliberate exceptions (do not "fix"):** `.jc-card` is always-light (hardcoded warm
+  palette for candidate preview cards) — intentionally not tokenized. Shared by the console AND
+  employers surfaces from `src/shared/styles/candidate-card.css` via
+  `:is(.surface-console, .surface-employers .dash)`; its `--c-*` props are card-local names, not
+  global-token overrides.
 - **Leverage classes:** when restyling, edit `.kicker`, `.explain`, base `h1,h2,h3`,
   `.btn.primary` / `.btn` / `a` / `.rail-link.active` — one edit restyles every page.
 - **Theming mechanics:** one global `ThemeProvider` (`src/shared/theme/`) sets `data-theme` on

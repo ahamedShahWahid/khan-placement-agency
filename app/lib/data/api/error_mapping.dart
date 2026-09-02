@@ -38,17 +38,60 @@ JobifyException mapDioException(DioException e) {
   }
 }
 
+/// Render a problem `detail` as one display string, tolerating BOTH shapes the
+/// backend can emit. Mirrors `frontend/src/shared/api/transport.ts`'s
+/// `formatDetail` — keep the two in step.
+///
+/// * `HTTPException` (every hand-raised 4xx/5xx) → `detail` is already the
+///   slug string, and the caller compares it against [AuthSlugs].
+/// * **422 validation** → the backend registers handlers only for
+///   `HTTPException` and `Exception`, so FastAPI's own `RequestValidationError`
+///   handler wins and returns `{"detail": [{loc, msg, type}, ...]}`. Casting
+///   that list to `String?` used to throw a `TypeError` from inside the error
+///   mapper, so a 422 surfaced as an unhandled crash instead of an
+///   [ApiException] — reachable on web via a malformed `#/feed/jobs/<id>`
+///   path param, which has no client-side UUID check.
+///
+/// Anything else (a number, a nested object, null) returns null so the caller
+/// falls back to a status-derived message rather than throwing.
+String? formatProblemDetail(Object? detail) {
+  if (detail is String) return detail;
+  if (detail is List) {
+    final parts = <String>[];
+    for (final item in detail) {
+      if (item is Map && item['msg'] != null) {
+        final rawLoc = item['loc'];
+        // Drop the "body" segment the way the React client does — it is
+        // structural noise, not information the user can act on.
+        final loc =
+            rawLoc is List ? rawLoc.where((s) => s != 'body').join('.') : '';
+        final msg = item['msg'].toString();
+        parts.add(loc.isEmpty ? msg : '$loc: $msg');
+      } else {
+        parts.add(item.toString());
+      }
+    }
+    return parts.isEmpty ? null : parts.join('; ');
+  }
+  return null;
+}
+
 JobifyException _mapResponse(
   Response<dynamic> response,
   String? requestId,
   DioException cause,
 ) {
   // Backend emits RFC 7807 problem+json (`{detail, type, title, status,
-  // request_id}`) via middleware/error_handler.py. The "slug" value lives
-  // in `detail`. `AuthSlugs` constants name the string values on the Dart
-  // side. There is no separate `slug` wire field.
+  // request_id}`) via middleware/error_handler.py for every HTTPException.
+  // The "slug" value lives in `detail`; `AuthSlugs` constants name the string
+  // values on the Dart side. There is no separate `slug` wire field.
+  //
+  // 422 is the documented exception — `detail` is a LIST there. Route it
+  // through [formatProblemDetail] so a validation error can never throw a
+  // cast error out of the mapper. Slug comparisons below only ever match the
+  // string form, which is exactly right: a 422 has no slug.
   final body = response.data;
-  final detail = body is Map ? body['detail'] as String? : null;
+  final detail = body is Map ? formatProblemDetail(body['detail']) : null;
   final status = response.statusCode ?? 0;
 
   if (status == 401 && detail == AuthSlugs.invalidAccessToken) {

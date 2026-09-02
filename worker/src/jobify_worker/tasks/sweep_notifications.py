@@ -1,8 +1,9 @@
 """sweep_notifications task — claim pending notification rows and dispatch them.
 
 The sweeper implements the outbox-pattern fan-out for the notifications table.
-It is designed to be called on demand (or via Celery Beat when worker infra
-hardens). Multiple concurrent sweeper instances are safe: ``SKIP LOCKED``
+Celery beat schedules it every ``JOBIFY_NOTIFY_SWEEP_INTERVAL_SECONDS``
+(see ``jobify_worker.celery_app.beat_schedule``); it is also callable on demand.
+Multiple concurrent sweeper instances are safe: ``SKIP LOCKED``
 ensures each one-at-a-time claim owns a distinct row.
 
 State machine per row:

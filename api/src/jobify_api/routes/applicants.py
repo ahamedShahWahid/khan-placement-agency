@@ -84,7 +84,10 @@ async def update_profile(
 
     response = MeResponse(
         id=user.id,
-        email=user.email or "",
+        # NOT `or ""` — MeResponse.email is `str | None` on purpose (see
+        # routes/me.py): null on the wire is honest, whereas "" would pass for
+        # a broken address downstream. GET /v1/me and this PATCH must agree.
+        email=user.email,
         role=user.role.value,
         applicant=ApplicantRead.model_validate(applicant, from_attributes=True),
     )

@@ -48,18 +48,27 @@ async def export_user_data(
     export = await build_user_export(session, user=user)
 
     # 2. Audit completion with section counts.
+    # One entry per LIST/optional section of the envelope. Keep this exhaustive:
+    # it is the audit row's evidence of what was disclosed, so a section that is
+    # exported but uncounted makes the audit trail understate the disclosure.
+    # `test_export_audit_section_counts_cover_every_list_section` pins that.
     section_counts = {
+        "applicant_preferences": len(export.applicant_preferences),
         "oauth_identities": len(export.oauth_identities),
         "resumes": len(export.resumes),
         "applicant_embedding": 1 if export.applicant_embedding else 0,
         "applications": len(export.applications),
+        "application_stage_events": len(export.application_stage_events),
         "saved_jobs": len(export.saved_jobs),
         "matches": len(export.matches),
+        "match_feedback": len(export.match_feedback),
         "notifications": len(export.notifications),
         "user_consents": len(export.user_consents),
         "audit_history": len(export.audit_history),
         "employer_memberships": len(export.employer_memberships),
         "owned_jobs": len(export.owned_jobs),
+        "received_invites": len(export.received_invites),
+        "sent_invites": len(export.sent_invites),
     }
     await audit_log(
         session,

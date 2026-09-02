@@ -10,7 +10,7 @@ from decimal import Decimal
 
 
 def location_fit(applicant_locations: list[str], job_locations: list[str]) -> float:
-    """1.0 if either side is empty: 0.5 (no signal).
+    """0.5 (no signal) if either side is empty.
 
     1.0 if any case-insensitive overlap OR either side includes 'Remote'.
     0.0 if both sides populated with no overlap and no remote on either side.

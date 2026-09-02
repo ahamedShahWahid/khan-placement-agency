@@ -37,6 +37,7 @@ from jobify.db.models import (
     UserRole,
 )
 from jobify_api.auth.tokens import mint_access_token
+from jobify_api.dsr import UserExport
 
 pytestmark = pytest.mark.integration
 
@@ -466,4 +467,48 @@ async def test_export_assembly_issues_a_bounded_number_of_queries(
         "If you added a section, bump the constant. If the count scales with "
         "the number of applications/jobs, you have introduced an N+1.\n"
         + "\n".join(s.split("\n")[0][:120] for s in statements)
+    )
+
+
+@pytest.mark.asyncio
+async def test_export_audit_section_counts_cover_every_list_section(
+    async_client: AsyncClient, session: AsyncSession
+) -> None:
+    """`user.dsr_export_completed`'s `section_counts` is the audit evidence of
+    WHAT was disclosed, so it must name every list/optional section of the
+    envelope. It used to report 11 of them while `UserExport` had 22 fields —
+    `applicant_preferences`, `application_stage_events`, `match_feedback`,
+    `received_invites` and `sent_invites` were exported but uncounted, making
+    the audit row understate the disclosure. Derived from the model so a new
+    section fails here until it is counted.
+    """
+    user, _applicant, token = await _make_applicant(session)
+    await session.commit()
+
+    resp = await async_client.post(
+        "/v1/me/dsr/export", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert resp.status_code == 200
+
+    row = (
+        await session.execute(
+            select(AuditLog).where(AuditLog.action == "user.dsr_export_completed")
+        )
+    ).scalar_one()
+    counted = set(row.context["section_counts"])
+
+    # Envelope metadata + the scalar `user`/`applicant` blocks are not sections.
+    not_sections = {
+        "version",
+        "exported_at",
+        "exported_for_user_id",
+        "user",
+        "applicant",
+        "redactions",
+        "notes",
+    }
+    expected = set(UserExport.model_fields) - not_sections
+    assert counted == expected, (
+        f"uncounted sections={expected - counted}, "
+        f"counted but not a section={counted - expected}"
     )

@@ -264,3 +264,68 @@ async def test_mark_read_other_user_returns_404(
     )
     assert resp.status_code == 404
     assert resp.json()["detail"] == "notification_not_found"
+
+
+@pytest.mark.asyncio
+async def test_inbox_is_reachable_by_a_recruiter(
+    async_client: AsyncClient, session: AsyncSession
+) -> None:
+    """An `employer_invite` notification is written for an invited email that
+    already maps to a user — who may already be a RECRUITER at another
+    employer. Gating the inbox on `require_applicant` made exactly that row
+    unreachable by the person it was addressed to (a 403 on their own inbox).
+    Scope is `notifications.user_id`; role is irrelevant here.
+    """
+    recruiter = User(email="recruiter-inbox@example.com", role=UserRole.RECRUITER)
+    session.add(recruiter)
+    await session.flush()
+    session.add(
+        Notification(
+            user_id=recruiter.id,
+            kind="employer_invite",
+            channel=NotificationChannel.EMAIL,
+            status=NotificationStatus.SENT,
+            payload={"kind": "employer_invite", "employer_name": "Acme", "role": "member"},
+        )
+    )
+    await session.commit()
+
+    resp = await async_client.get("/v1/notifications", headers=_token_headers(recruiter))
+    assert resp.status_code == 200
+    items = resp.json()["items"]
+    assert len(items) == 1
+    assert items[0]["notification"]["kind"] == "employer_invite"
+
+    # ...and they can mark it read.
+    notification_id = items[0]["notification"]["id"]
+    read = await async_client.post(
+        f"/v1/notifications/{notification_id}/read", headers=_token_headers(recruiter)
+    )
+    assert read.status_code == 200
+    assert read.json()["read_at"] is not None
+
+
+@pytest.mark.asyncio
+async def test_inbox_still_scopes_to_the_caller_across_roles(
+    async_client: AsyncClient, session: AsyncSession
+) -> None:
+    """Opening the inbox to every role must not widen VISIBILITY — a recruiter
+    still sees only their own rows."""
+    applicant, _ = await _make_applicant(session, email="scope-applicant@example.com")
+    recruiter = User(email="scope-recruiter@example.com", role=UserRole.RECRUITER)
+    session.add(recruiter)
+    await session.flush()
+    session.add(
+        Notification(
+            user_id=applicant.id,
+            kind="application_received",
+            channel=NotificationChannel.IN_APP,
+            status=NotificationStatus.SENT,
+            payload={"kind": "application_received"},
+        )
+    )
+    await session.commit()
+
+    resp = await async_client.get("/v1/notifications", headers=_token_headers(recruiter))
+    assert resp.status_code == 200
+    assert resp.json()["items"] == []

@@ -3,7 +3,8 @@
 # start-all.sh — boot the full local Jobify stack in the background.
 #
 # Brings up (idempotently — safe to re-run):
-#   • Postgres     (Homebrew service)        • Celery worker (parse/embed/score/notify)
+#   • Postgres     (Homebrew service)        • Celery worker (parse/embed/score/notify/outbox)
+#   • Celery beat  (sweep schedules)
 #   • Redis        (Homebrew service)         • Frontend     (Vite dev server  :5173)
 #   • Alembic migrations → head               • Flutter web  (:8080, opt-in)
 #   • API          (FastAPI/uvicorn  :8000)
@@ -101,8 +102,19 @@ say "Starting API, worker, frontend…"
 spawn api "$RUN_DIR/api.pid" "$RUN_DIR/api.log" \
   "cd '$ROOT' && exec uv run --env-file='$ENV_FILE' uvicorn jobify_api.main:app --reload --port 8000"
 
+# The `outbox` queue is NOT optional: API/worker transactions only STAGE task
+# intents in `outbox_events`, and `jobify.sweep_outbox` (the only thing that
+# publishes them) is dispatched solely by beat. Without both the queue and the
+# beat process below, an upload stages `jobify.parse_resume` and nothing ever
+# runs it — no parse, no embed, no score, empty feed. Keep in step with
+# worker/README.md and the root CLAUDE.md command.
 spawn worker "$RUN_DIR/worker.pid" "$RUN_DIR/worker.log" \
-  "cd '$ROOT' && exec uv run --env-file='$ENV_FILE' celery -A jobify_worker.worker_app worker --pool=solo --concurrency=1 -Q parse,embed,score,notify --loglevel=info"
+  "cd '$ROOT' && exec uv run --env-file='$ENV_FILE' celery -A jobify_worker.worker_app worker --pool=solo --concurrency=1 -Q parse,embed,score,notify,outbox --loglevel=info"
+
+# Beat only ENQUEUES; the worker above executes. Both sweeps (notifications +
+# durable outbox) and the daily outbox cleanup live in its schedule.
+spawn beat "$RUN_DIR/beat.pid" "$RUN_DIR/beat.log" \
+  "cd '$ROOT' && exec uv run --env-file='$ENV_FILE' celery -A jobify_worker.worker_app beat --loglevel=info"
 
 spawn frontend "$RUN_DIR/frontend.pid" "$RUN_DIR/frontend.log" \
   "cd '$ROOT/frontend' && exec npm run dev"
@@ -129,6 +141,7 @@ printf '\n\033[1mServices\033[0m\n'
 printf '  API        http://127.0.0.1:8000   (/docs, /health, /ready)\n'
 printf '  Frontend   http://localhost:5173   (/, /#/employers, /#/console)\n'
 [ "$WITH_FLUTTER" -eq 1 ] && printf '  Flutter    http://localhost:8080   (DDC build — first paint is slow)\n'
-printf '  Worker     queues: parse, embed, score, notify\n'
+printf '  Worker     queues: parse, embed, score, notify, outbox\n'
+printf '  Beat       schedules: sweep_outbox (5s), sweep_notifications (60s), cleanup_outbox (24h)\n'
 printf '\nLogs: %s/*.log   ·   Stop: scripts/stop-all.sh%s\n' \
   "${RUN_DIR#$ROOT/}" "$([ "$WITH_FLUTTER" -eq 1 ] && echo '' )"

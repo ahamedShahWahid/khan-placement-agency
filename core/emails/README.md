@@ -3,7 +3,10 @@
 Production-grade HTML email templates for the Jobify **notifications outbox**.
 
 > "Warm editorial broadsheet" — bone paper, warm ink, persimmon accent, forest-green
-> "verified". Same brand language as the applicant web surface (`frontend/src/sites/web/styles/site.css`).
+> "verified". Same warm-editorial language as the web surfaces
+> (`frontend/src/shared/styles/tokens.css`). The applicant `sites/web` surface these
+> were originally matched to was removed in 2026-07 — the Flutter app is the
+> applicant client now.
 
 These are **real transactional emails**. Today the outbox's email channel is the
 `LoggingEmailChannel` logs local deliveries; `SesEmailChannel` sends production

@@ -7,6 +7,6 @@ The gate's wire is intentionally tiny:
     assert report.overall_f1 >= 0.85
 
 CI calls ``pytest -m eval`` which runs the test in ``tests/eval/`` and
-fails if the gate slips. See ``api/data/parse_eval/000_README.md`` for the
+fails if the gate slips. See ``core/data/parse_eval/000_README.md`` for the
 gold-dataset format and threshold rationale.
 """

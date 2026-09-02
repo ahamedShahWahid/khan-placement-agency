@@ -1,6 +1,7 @@
 """embed_job task — read a Job + Employer, embed, upsert job_embeddings.
 
-Dispatched from the seed CLI's `_dispatch_embeds` post-commit. The body splits
+Dispatched via a durable `jobify.embed_job` outbox event staged by the seed
+CLI and by `jobify_api.jobs.service` (create + content-changing PATCH). The body splits
 work into three transactions identical in shape to embed_applicant's split: a
 short-lock gate, a no-DB external call, and a verify-then-upsert close.
 Holding a row lock across the Gemini API call would starve other writers.

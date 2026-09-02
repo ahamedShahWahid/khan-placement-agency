@@ -334,6 +334,14 @@ Evaluation:
 - REST + JSON. Versioned via path: `/v1/...`. Breaking changes bump major.
 - Pagination: cursor-based (`?cursor=...&limit=...`); no offset pagination on hot paths.
 - Errors: RFC 7807 problem-detail JSON; every error carries `request_id`.
+  - **Exception — 422 validation.** Handlers are registered for `HTTPException`
+    and `Exception` only, so FastAPI's own `RequestValidationError` handler wins
+    and returns its default `{"detail": [{loc, msg, type}, ...]}` — an ARRAY,
+    plain `application/json`, with no `request_id` in the BODY (the
+    `X-Request-Id` response header is still set by `RequestIdMiddleware`, so
+    correlation is intact). Clients must therefore accept both a string and a
+    list `detail`; see `frontend/src/shared/api/transport.ts::formatDetail` and
+    `app/lib/data/api/error_mapping.dart::formatProblemDetail`.
 - All resources expose ETag + `If-None-Match` for cacheable GETs.
 - OpenAPI 3.1 served at `/openapi.json`; the Flutter client codegen consumes this in CI.
 

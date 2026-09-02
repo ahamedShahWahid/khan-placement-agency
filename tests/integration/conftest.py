@@ -425,11 +425,20 @@ async def concurrent_async_client(
     await app.state.db_engine.dispose()
 
     # Truncate in FK-safe order so subsequent tests start with a clean slate.
+    #
+    # `outbox_events` must be listed EXPLICITLY: it is the one table here with
+    # no FK to users/applicants, so `CASCADE` (which follows FK references, not
+    # ON DELETE actions) never reaches it. Every other newer table —
+    # applicant_preferences, user_consents, employer_users, employer_invites,
+    # match_feedback, application_stage_events, audit_logs — is cascaded via its
+    # FK to users/applicants. Without this, intents staged by a real-pool test
+    # leak into later tests and a sweep can pick them up.
     cleanup_engine = create_async_engine(migrated_db, poolclass=NullPool)
     async with cleanup_engine.connect() as conn:
         await conn.execute(
             text(
-                "TRUNCATE jobify.notifications, jobify.applications, jobify.saved_jobs,"
+                "TRUNCATE jobify.outbox_events, jobify.notifications,"
+                " jobify.applications, jobify.saved_jobs,"
                 " jobify.matches, jobify.applicant_embeddings, jobify.job_embeddings,"
                 " jobify.jobs, jobify.employers, jobify.resumes,"
                 " jobify.refresh_tokens, jobify.oauth_identities,"

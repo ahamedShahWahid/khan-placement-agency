@@ -7,7 +7,7 @@ deterministic text + sha256 used as the idempotency key on
 ``applicant_embeddings.canonicalized_text_hash``.
 
 ``GeminiEmbeddingProvider`` is intentionally not imported here — it is deferred
-to the point of use (in ``celery_app.get_embedding_provider()``) so that
+to the point of use (in ``jobify_worker.runtime.get_embedding_provider()``) so that
 ``google.genai`` and its dependencies are not loaded for worker processes
 that don't consume the ``embed`` queue.
 """

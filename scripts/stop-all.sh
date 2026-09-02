@@ -60,6 +60,7 @@ stop_pidfile() {
 say "Stopping app-layer services…"
 stop_pidfile flutter  "$RUN_DIR/flutter.pid"
 stop_pidfile frontend "$RUN_DIR/frontend.pid"
+stop_pidfile beat     "$RUN_DIR/beat.pid"
 stop_pidfile worker   "$RUN_DIR/worker.pid"
 stop_pidfile api      "$RUN_DIR/api.pid"
 
@@ -70,6 +71,7 @@ for port in 8000 5173 8080; do
     kill_tree "$p" TERM
   done
 done
+# Matches BOTH the worker and beat processes (same -A target).
 for p in $(pgrep -f 'celery -A jobify_worker' 2>/dev/null || true); do
   kill_tree "$p" TERM
 done

@@ -53,20 +53,29 @@ EXPECTED_PII_TABLES: frozenset[str] = frozenset(
         "saved_jobs",
         "user_consents",
         "match_feedback",
+        # `audit_logs` is a special member of this set: the ROWS survive a
+        # delete (DPDP evidence), but the deleter must still strip the user's
+        # PII out of `context` (spec §9.2 "anonymize audit records"), so it is
+        # referenced by BOTH modules and belongs in the symmetric contract.
+        "audit_logs",
     }
 )
 
 # Documented intentional asymmetries.
 #   EXPORT-ONLY: anonymized aggregates / append-only history that are
 #   deliberately KEPT on delete (so they never appear in the deleter), but
-#   are returned in the right-of-access export. `audit_logs` survives via
-#   actor_user_id ON DELETE SET NULL; applications/matches are anonymized
-#   aggregates kept after the applicant is tombstoned; jobs belong to the
-#   employer, not the user; application_stage_events is append-only history
-#   on the (kept) application, surviving the same way audit_logs does
-#   (actor_user_id ON DELETE SET NULL).
+#   are returned in the right-of-access export. applications/matches are
+#   anonymized aggregates kept after the applicant is tombstoned; jobs belong
+#   to the employer, not the user; application_stage_events is append-only
+#   history on the (kept) application.
+#
+#   NOTE `audit_logs` used to live here on the grounds that it "survives via
+#   actor_user_id ON DELETE SET NULL". That reasoning was wrong twice over: DSR
+#   only SOFT-deletes the user so the FK action never fires, and the PII at risk
+#   was an email inside the JSONB `context`, which no column-level rule can
+#   reach. The deleter now redacts it, so audit_logs is in EXPECTED_PII_TABLES.
 _EXPORT_ONLY_TABLES: frozenset[str] = frozenset(
-    {"applications", "matches", "audit_logs", "jobs", "application_stage_events"}
+    {"applications", "matches", "jobs", "application_stage_events"}
 )
 #   DELETE-ONLY: session secrets — hard-deleted on erasure, and deliberately
 #   REDACTED from the export (see _REDACTIONS / _REDACTED_COLUMN_NAMES), so
