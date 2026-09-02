@@ -25,7 +25,7 @@ final _patterns = [
     'semanticsLabel',
     'helperText',
     'errorText',
-  ]) ...[RegExp('$p:\\s*\'[A-Za-z]'), RegExp('$p:\\s*"[A-Za-z]')],
+  ]) ...[RegExp("$p:\\s*'[A-Za-z]"), RegExp('$p:\\s*"[A-Za-z]')],
   RegExp(r"Text\(\s*'[A-Za-z]"),
   RegExp(r'Text\(\s*"[A-Za-z]'),
 ];
