@@ -11,14 +11,15 @@ abstract interface class TokenStorage {
 
 class SecureTokenStorage implements TokenStorage {
   SecureTokenStorage([FlutterSecureStorage? storage])
-      : _storage = storage ??
-            const FlutterSecureStorage(
-              aOptions: AndroidOptions(encryptedSharedPreferences: true),
-              iOptions: IOSOptions(
-                accessibility: KeychainAccessibility.first_unlock,
-              ),
-              webOptions: WebOptions(dbName: 'jobify_app_secure'),
-            );
+    : _storage =
+          storage ??
+          const FlutterSecureStorage(
+            aOptions: AndroidOptions(encryptedSharedPreferences: true),
+            iOptions: IOSOptions(
+              accessibility: KeychainAccessibility.first_unlock,
+            ),
+            webOptions: WebOptions(dbName: 'jobify_app_secure'),
+          );
 
   final FlutterSecureStorage _storage;
 

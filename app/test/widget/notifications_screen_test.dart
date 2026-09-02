@@ -9,15 +9,15 @@ import 'package:jobify_app/l10n/app_localizations.dart';
 import 'package:jobify_app/presentation/notifications/notifications_screen.dart';
 
 NotificationDto _n(String id, {DateTime? readAt}) => NotificationDto(
-      id: id,
-      kind: 'application_received',
-      channel: 'in_app',
-      status: 'sent',
-      payload: const {'job_title': 'Engineer', 'employer_name': 'Acme'},
-      sendAfter: DateTime(2026),
-      readAt: readAt,
-      createdAt: DateTime(2026),
-    );
+  id: id,
+  kind: 'application_received',
+  channel: 'in_app',
+  status: 'sent',
+  payload: const {'job_title': 'Engineer', 'employer_name': 'Acme'},
+  sendAfter: DateTime(2026),
+  readAt: readAt,
+  createdAt: DateTime(2026),
+);
 
 class _Repo implements NotificationsRepository {
   final List<String> marked = [];
@@ -25,10 +25,9 @@ class _Repo implements NotificationsRepository {
   Future<NotificationsPageDto> fetchPage({
     String? cursor,
     int limit = 20,
-  }) async =>
-      NotificationsPageDto(
-        items: [NotificationListItemDto(notification: _n('n1'))],
-      );
+  }) async => NotificationsPageDto(
+    items: [NotificationListItemDto(notification: _n('n1'))],
+  );
   @override
   Future<NotificationDto> markRead(String id) async {
     marked.add(id);

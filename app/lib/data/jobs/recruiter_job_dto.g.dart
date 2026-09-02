@@ -42,17 +42,18 @@ Map<String, dynamic> _$RecruiterJobDtoToJson(RecruiterJobDto instance) =>
     };
 
 RecruiterJobsPageDto _$RecruiterJobsPageDtoFromJson(
-        Map<String, dynamic> json) =>
-    RecruiterJobsPageDto(
-      items: (json['items'] as List<dynamic>)
+  Map<String, dynamic> json,
+) => RecruiterJobsPageDto(
+  items:
+      (json['items'] as List<dynamic>)
           .map((e) => RecruiterJobDto.fromJson(e as Map<String, dynamic>))
           .toList(),
-      nextCursor: json['next_cursor'] as String?,
-    );
+  nextCursor: json['next_cursor'] as String?,
+);
 
 Map<String, dynamic> _$RecruiterJobsPageDtoToJson(
-        RecruiterJobsPageDto instance) =>
-    <String, dynamic>{
-      'items': instance.items.map((e) => e.toJson()).toList(),
-      'next_cursor': instance.nextCursor,
-    };
+  RecruiterJobsPageDto instance,
+) => <String, dynamic>{
+  'items': instance.items.map((e) => e.toJson()).toList(),
+  'next_cursor': instance.nextCursor,
+};

@@ -33,8 +33,9 @@ void main() {
       overrides: [meRepositoryProvider.overrideWithValue(_OkRepo())],
     );
     addTearDown(c.dispose);
-    final ok =
-        await c.read(profileEditControllerProvider.notifier).submit(_update);
+    final ok = await c
+        .read(profileEditControllerProvider.notifier)
+        .submit(_update);
     expect(ok, isTrue);
   });
 
@@ -43,8 +44,9 @@ void main() {
       overrides: [meRepositoryProvider.overrideWithValue(_ErrRepo())],
     );
     addTearDown(c.dispose);
-    final ok =
-        await c.read(profileEditControllerProvider.notifier).submit(_update);
+    final ok = await c
+        .read(profileEditControllerProvider.notifier)
+        .submit(_update);
     expect(ok, isFalse);
     expect(c.read(profileEditControllerProvider).hasError, isTrue);
   });

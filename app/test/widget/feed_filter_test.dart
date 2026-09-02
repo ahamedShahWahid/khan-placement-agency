@@ -25,13 +25,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../helpers/fake_repositories.dart';
 
 Widget _wrap(Widget child) => ProviderScope(
-      child: MaterialApp(
-        theme: ThemeData.light(useMaterial3: true),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: Scaffold(body: child),
-      ),
-    );
+  child: MaterialApp(
+    theme: ThemeData.light(useMaterial3: true),
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    home: Scaffold(body: child),
+  ),
+);
 
 class _FakeResumeRepo implements ResumeRepository {
   _FakeResumeRepo(this._current);
@@ -43,8 +43,7 @@ class _FakeResumeRepo implements ResumeRepository {
     required List<int> bytes,
     required String filename,
     required String contentType,
-  }) async =>
-      throw UnimplementedError();
+  }) async => throw UnimplementedError();
 }
 
 class _FakePrefsRepo implements PreferencesRepository {
@@ -75,24 +74,26 @@ const _completePrefs = PreferencesDto(
 /// Same override boilerplate `feed_screen_test.dart` uses to make `FeedScreen`
 /// (and its `FeedSummaryRow`) renderable without hitting real (dio) repos.
 Widget _wrapFeedScreen({required FeedRepository repo}) => ProviderScope(
-      overrides: [
-        feedRepositoryProvider.overrideWithValue(repo),
-        resumeRepositoryProvider
-            .overrideWithValue(_FakeResumeRepo(_completeResumeDto)),
-        preferencesRepositoryProvider
-            .overrideWithValue(_FakePrefsRepo(_completePrefs)),
-        applicationsRepositoryProvider
-            .overrideWithValue(FakeApplicationsRepository()),
-        savedJobsRepositoryProvider
-            .overrideWithValue(FakeSavedJobsRepository()),
-      ],
-      child: MaterialApp(
-        theme: ThemeData.light(useMaterial3: true),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: const FeedScreen(),
-      ),
-    );
+  overrides: [
+    feedRepositoryProvider.overrideWithValue(repo),
+    resumeRepositoryProvider.overrideWithValue(
+      _FakeResumeRepo(_completeResumeDto),
+    ),
+    preferencesRepositoryProvider.overrideWithValue(
+      _FakePrefsRepo(_completePrefs),
+    ),
+    applicationsRepositoryProvider.overrideWithValue(
+      FakeApplicationsRepository(),
+    ),
+    savedJobsRepositoryProvider.overrideWithValue(FakeSavedJobsRepository()),
+  ],
+  child: MaterialApp(
+    theme: ThemeData.light(useMaterial3: true),
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    home: const FeedScreen(),
+  ),
+);
 
 void main() {
   setUp(() {
@@ -119,83 +120,86 @@ void main() {
     expect(container.read(feedFiltersControllerProvider).query, 'flutter');
   });
 
-  testWidgets('search field clears when the query filter is cleared externally',
-      (tester) async {
-    late ProviderContainer container;
-    await tester.pumpWidget(
-      _wrap(
-        Consumer(
-          builder: (context, ref, _) {
-            container = ProviderScope.containerOf(context);
-            return const FeedFilterBar();
-          },
+  testWidgets(
+    'search field clears when the query filter is cleared externally',
+    (tester) async {
+      late ProviderContainer container;
+      await tester.pumpWidget(
+        _wrap(
+          Consumer(
+            builder: (context, ref, _) {
+              container = ProviderScope.containerOf(context);
+              return const FeedFilterBar();
+            },
+          ),
         ),
-      ),
-    );
+      );
 
-    await tester.enterText(find.byType(TextField), 'flutter');
-    await tester.pump(const Duration(milliseconds: 400));
-    expect(container.read(feedFiltersControllerProvider).query, 'flutter');
-    expect(
-      tester.widget<TextField>(find.byType(TextField)).controller!.text,
-      'flutter',
-    );
+      await tester.enterText(find.byType(TextField), 'flutter');
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(container.read(feedFiltersControllerProvider).query, 'flutter');
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller!.text,
+        'flutter',
+      );
 
-    // External clear — e.g. the filtered empty state's "Clear filters"
-    // button — has no reference to FeedFilterBar's private controller.
-    container.read(feedFiltersControllerProvider.notifier).clear();
-    await tester.pump();
+      // External clear — e.g. the filtered empty state's "Clear filters"
+      // button — has no reference to FeedFilterBar's private controller.
+      container.read(feedFiltersControllerProvider.notifier).clear();
+      await tester.pump();
 
-    expect(
-      tester.widget<TextField>(find.byType(TextField)).controller!.text,
-      isEmpty,
-    );
-  });
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller!.text,
+        isEmpty,
+      );
+    },
+  );
 
   testWidgets(
-      'external clear cancels the pending debounce — it does not resurrect '
-      'the query once the original deadline passes', (tester) async {
-    late ProviderContainer container;
-    await tester.pumpWidget(
-      _wrap(
-        Consumer(
-          builder: (context, ref, _) {
-            container = ProviderScope.containerOf(context);
-            return const FeedFilterBar();
-          },
+    'external clear cancels the pending debounce — it does not resurrect '
+    'the query once the original deadline passes',
+    (tester) async {
+      late ProviderContainer container;
+      await tester.pumpWidget(
+        _wrap(
+          Consumer(
+            builder: (context, ref, _) {
+              container = ProviderScope.containerOf(context);
+              return const FeedFilterBar();
+            },
+          ),
         ),
-      ),
-    );
-    // Seed an active (non-query) filter first — realistically, the Clear
-    // affordance that calls `notifier.clear()` externally is only ever
-    // visible/tappable when SOME filter is already active; a query that was
-    // never committed can't be what makes it visible.
-    container
-        .read(feedFiltersControllerProvider.notifier)
-        .set(const FeedFilters(locations: ['Pune']));
-    await tester.pump();
+      );
+      // Seed an active (non-query) filter first — realistically, the Clear
+      // affordance that calls `notifier.clear()` externally is only ever
+      // visible/tappable when SOME filter is already active; a query that was
+      // never committed can't be what makes it visible.
+      container
+          .read(feedFiltersControllerProvider.notifier)
+          .set(const FeedFilters(locations: ['Pune']));
+      await tester.pump();
 
-    await tester.enterText(find.byType(TextField), 'flutter');
-    // Well inside the 400ms debounce window — nothing committed yet.
-    await tester.pump(const Duration(milliseconds: 100));
-    expect(container.read(feedFiltersControllerProvider).query, isNull);
+      await tester.enterText(find.byType(TextField), 'flutter');
+      // Well inside the 400ms debounce window — nothing committed yet.
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(container.read(feedFiltersControllerProvider).query, isNull);
 
-    // External clear races the pending debounce.
-    container.read(feedFiltersControllerProvider.notifier).clear();
-    await tester.pump();
+      // External clear races the pending debounce.
+      container.read(feedFiltersControllerProvider.notifier).clear();
+      await tester.pump();
 
-    // Let the ORIGINAL debounce deadline pass. If the timer wasn't
-    // cancelled, it fires here and silently reinstates `query: 'flutter'`.
-    await tester.pump(const Duration(milliseconds: 400));
-    expect(container.read(feedFiltersControllerProvider).query, isNull);
-    expect(
-      tester.widget<TextField>(find.byType(TextField)).controller!.text,
-      isEmpty,
-    );
-  });
+      // Let the ORIGINAL debounce deadline pass. If the timer wasn't
+      // cancelled, it fires here and silently reinstates `query: 'flutter'`.
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(container.read(feedFiltersControllerProvider).query, isNull);
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller!.text,
+        isEmpty,
+      );
+    },
+  );
 
-  testWidgets(
-      'an unrelated external mutation while typing does not wipe the '
+  testWidgets('an unrelated external mutation while typing does not wipe the '
       'pending search text', (tester) async {
     late ProviderContainer container;
     await tester.pumpWidget(
@@ -230,10 +234,10 @@ void main() {
     expect(container.read(feedFiltersControllerProvider).query, 'flutter');
   });
 
-  testWidgets(
-      'removing the last active chip while typing does not wipe the '
-      'pending search text (structurally identical to an external clear)',
-      (tester) async {
+  testWidgets('removing the last active chip while typing does not wipe the '
+      'pending search text (structurally identical to an external clear)', (
+    tester,
+  ) async {
     late ProviderContainer container;
     await tester.pumpWidget(
       _wrap(
@@ -276,49 +280,52 @@ void main() {
   });
 
   testWidgets(
-      '"Clear all" cancels the pending debounce — it does not resurrect the '
-      'query once the original deadline passes', (tester) async {
-    late ProviderContainer container;
-    await tester.pumpWidget(
-      _wrap(
-        Consumer(
-          builder: (context, ref, _) {
-            container = ProviderScope.containerOf(context);
-            return const FeedFilterBar();
-          },
+    '"Clear all" cancels the pending debounce — it does not resurrect the '
+    'query once the original deadline passes',
+    (tester) async {
+      late ProviderContainer container;
+      await tester.pumpWidget(
+        _wrap(
+          Consumer(
+            builder: (context, ref, _) {
+              container = ProviderScope.containerOf(context);
+              return const FeedFilterBar();
+            },
+          ),
         ),
-      ),
-    );
-    // "Clear all" is an in-widget mutation, so the listener short-circuits on
-    // `_selfMutation` and never reaches the value-based cancel branch — this
-    // call site must cancel the debounce itself. Seed a filter so the chip
-    // row (and therefore "Clear all") renders at all.
-    container
-        .read(feedFiltersControllerProvider.notifier)
-        .set(const FeedFilters(locations: ['Pune']));
-    await tester.pump();
+      );
+      // "Clear all" is an in-widget mutation, so the listener short-circuits on
+      // `_selfMutation` and never reaches the value-based cancel branch — this
+      // call site must cancel the debounce itself. Seed a filter so the chip
+      // row (and therefore "Clear all") renders at all.
+      container
+          .read(feedFiltersControllerProvider.notifier)
+          .set(const FeedFilters(locations: ['Pune']));
+      await tester.pump();
 
-    await tester.enterText(find.byType(TextField), 'flutter');
-    // Well inside the 400ms debounce window — nothing committed yet.
-    await tester.pump(const Duration(milliseconds: 100));
-    expect(container.read(feedFiltersControllerProvider).query, isNull);
+      await tester.enterText(find.byType(TextField), 'flutter');
+      // Well inside the 400ms debounce window — nothing committed yet.
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(container.read(feedFiltersControllerProvider).query, isNull);
 
-    await tester.tap(find.widgetWithText(ActionChip, 'Clear all'));
-    await tester.pump();
+      await tester.tap(find.widgetWithText(ActionChip, 'Clear all'));
+      await tester.pump();
 
-    // Let the ORIGINAL debounce deadline pass. If the timer wasn't
-    // cancelled, it fires here and silently reinstates `query: 'flutter'`
-    // even though the field (and every chip) reads as cleared.
-    await tester.pump(const Duration(milliseconds: 400));
-    expect(container.read(feedFiltersControllerProvider).query, isNull);
-    expect(
-      tester.widget<TextField>(find.byType(TextField)).controller!.text,
-      isEmpty,
-    );
-  });
+      // Let the ORIGINAL debounce deadline pass. If the timer wasn't
+      // cancelled, it fires here and silently reinstates `query: 'flutter'`
+      // even though the field (and every chip) reads as cleared.
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(container.read(feedFiltersControllerProvider).query, isNull);
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller!.text,
+        isEmpty,
+      );
+    },
+  );
 
-  testWidgets('active filters render chips; clearing a chip removes it',
-      (tester) async {
+  testWidgets('active filters render chips; clearing a chip removes it', (
+    tester,
+  ) async {
     late ProviderContainer container;
     await tester.pumpWidget(
       _wrap(
@@ -349,28 +356,30 @@ void main() {
   });
 
   testWidgets(
-      'filtered empty state shows Nothing matches your filters and clears',
-      (tester) async {
-    final fakeRepo = FakeFeedRepository(items: const []);
-    await tester.pumpWidget(_wrapFeedScreen(repo: fakeRepo));
-    await tester.pumpAndSettle();
-    final container = ProviderScope.containerOf(
-      tester.element(find.byType(FeedScreen)),
-    );
-    container.read(feedFiltersControllerProvider.notifier).set(
-          const FeedFilters(locations: ['Pune']),
-        );
-    await tester.pumpAndSettle();
+    'filtered empty state shows Nothing matches your filters and clears',
+    (tester) async {
+      final fakeRepo = FakeFeedRepository(items: const []);
+      await tester.pumpWidget(_wrapFeedScreen(repo: fakeRepo));
+      await tester.pumpAndSettle();
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(FeedScreen)),
+      );
+      container
+          .read(feedFiltersControllerProvider.notifier)
+          .set(const FeedFilters(locations: ['Pune']));
+      await tester.pumpAndSettle();
 
-    expect(find.text('Nothing matches your filters'), findsOneWidget);
-    await tester.tap(find.text('Clear filters'));
-    await tester.pumpAndSettle();
+      expect(find.text('Nothing matches your filters'), findsOneWidget);
+      await tester.tap(find.text('Clear filters'));
+      await tester.pumpAndSettle();
 
-    expect(container.read(feedFiltersControllerProvider).isEmpty, isTrue);
-  });
+      expect(container.read(feedFiltersControllerProvider).isEmpty, isTrue);
+    },
+  );
 
-  testWidgets('experience stepper stops at the server bound (80)',
-      (tester) async {
+  testWidgets('experience stepper stops at the server bound (80)', (
+    tester,
+  ) async {
     // `GET /v1/feed` declares min_years le=80. The stepper had no upper
     // bound, so 81 taps produced a value the server rejects with 422 —
     // surfacing as a whole-feed error view, not a field-level message.

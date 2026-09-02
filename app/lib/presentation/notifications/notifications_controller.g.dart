@@ -12,18 +12,19 @@ part of 'notifications_controller.dart';
 @ProviderFor(NotificationsController)
 final notificationsControllerProvider = NotificationsControllerProvider._();
 
-final class NotificationsControllerProvider extends $AsyncNotifierProvider<
-    NotificationsController, NotificationsState> {
+final class NotificationsControllerProvider
+    extends
+        $AsyncNotifierProvider<NotificationsController, NotificationsState> {
   NotificationsControllerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'notificationsControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'notificationsControllerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$notificationsControllerHash();
@@ -44,11 +45,14 @@ abstract class _$NotificationsController
   void runBuild() {
     final ref =
         this.ref as $Ref<AsyncValue<NotificationsState>, NotificationsState>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<NotificationsState>, NotificationsState>,
-        AsyncValue<NotificationsState>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<NotificationsState>, NotificationsState>,
+              AsyncValue<NotificationsState>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

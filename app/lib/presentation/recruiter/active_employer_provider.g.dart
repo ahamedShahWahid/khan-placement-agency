@@ -12,23 +12,26 @@ part of 'active_employer_provider.dart';
 @ProviderFor(recruiterEmployers)
 final recruiterEmployersProvider = RecruiterEmployersProvider._();
 
-final class RecruiterEmployersProvider extends $FunctionalProvider<
-        AsyncValue<List<EmployerDto>>,
-        List<EmployerDto>,
-        FutureOr<List<EmployerDto>>>
+final class RecruiterEmployersProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<EmployerDto>>,
+          List<EmployerDto>,
+          FutureOr<List<EmployerDto>>
+        >
     with
         $FutureModifier<List<EmployerDto>>,
         $FutureProvider<List<EmployerDto>> {
   RecruiterEmployersProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'recruiterEmployersProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'recruiterEmployersProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$recruiterEmployersHash();
@@ -36,8 +39,8 @@ final class RecruiterEmployersProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<List<EmployerDto>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<EmployerDto>> create(Ref ref) {
@@ -54,15 +57,15 @@ final activeEmployerProvider = ActiveEmployerProvider._();
 final class ActiveEmployerProvider
     extends $NotifierProvider<ActiveEmployer, EmployerDto?> {
   ActiveEmployerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'activeEmployerProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'activeEmployerProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$activeEmployerHash();
@@ -88,11 +91,14 @@ abstract class _$ActiveEmployer extends $Notifier<EmployerDto?> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<EmployerDto?, EmployerDto?>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<EmployerDto?, EmployerDto?>,
-        EmployerDto?,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<EmployerDto?, EmployerDto?>,
+              EmployerDto?,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

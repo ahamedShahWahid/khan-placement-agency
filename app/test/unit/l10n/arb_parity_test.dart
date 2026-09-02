@@ -21,10 +21,12 @@ void main() {
   });
 
   test('en and hi ARB files declare identical key sets', () {
-    final en = json.decode(File('lib/l10n/app_en.arb').readAsStringSync())
-        as Map<String, dynamic>;
-    final hi = json.decode(File('lib/l10n/app_hi.arb').readAsStringSync())
-        as Map<String, dynamic>;
+    final en =
+        json.decode(File('lib/l10n/app_en.arb').readAsStringSync())
+            as Map<String, dynamic>;
+    final hi =
+        json.decode(File('lib/l10n/app_hi.arb').readAsStringSync())
+            as Map<String, dynamic>;
     Set<String> keys(Map<String, dynamic> m) =>
         m.keys.where((k) => !k.startsWith('@')).toSet();
     expect(
@@ -35,8 +37,9 @@ void main() {
   });
 
   test('hi values are Devanagari-bearing (spot check)', () {
-    final hi = json.decode(File('lib/l10n/app_hi.arb').readAsStringSync())
-        as Map<String, dynamic>;
+    final hi =
+        json.decode(File('lib/l10n/app_hi.arb').readAsStringSync())
+            as Map<String, dynamic>;
     final values = hi.entries
         .where((e) => !e.key.startsWith('@') && e.value is String)
         .map((e) => e.value as String);

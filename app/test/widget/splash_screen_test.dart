@@ -38,16 +38,15 @@ void main() {
     await tester.pumpWidget(
       _wrap(
         const SplashScreen(),
-        overrides: [
-          bootstrapControllerProvider.overrideWith(_StubLoading.new),
-        ],
+        overrides: [bootstrapControllerProvider.overrideWith(_StubLoading.new)],
       ),
     );
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 
-  testWidgets('renders error view with retry on NetworkException',
-      (tester) async {
+  testWidgets('renders error view with retry on NetworkException', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _wrap(
         const SplashScreen(),

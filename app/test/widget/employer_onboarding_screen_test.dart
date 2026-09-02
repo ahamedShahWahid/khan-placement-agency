@@ -25,8 +25,7 @@ class _FakeEmployerRepo implements EmployerRepository {
   Future<EmployerDto> createEmployer({
     required String name,
     String? gst,
-  }) async =>
-      _result;
+  }) async => _result;
 
   @override
   Future<List<EmployerDto>> listMyEmployers() async => [];
@@ -41,8 +40,7 @@ class _ThrowingEmployerRepo implements EmployerRepository {
   Future<EmployerDto> createEmployer({
     required String name,
     String? gst,
-  }) async =>
-      throw _error;
+  }) async => throw _error;
 
   @override
   Future<List<EmployerDto>> listMyEmployers() async => [];
@@ -95,8 +93,9 @@ Widget _buildTestWidget({
   final container = ProviderContainer(
     overrides: [
       employerRepositoryProvider.overrideWithValue(employerRepo),
-      authRepositoryProvider
-          .overrideWithValue(authRepo ?? _FakeAuthRepo(_recruiterSignedIn)),
+      authRepositoryProvider.overrideWithValue(
+        authRepo ?? _FakeAuthRepo(_recruiterSignedIn),
+      ),
     ],
   );
 
@@ -134,120 +133,108 @@ void main() {
     },
   );
 
-  testWidgets(
-    'entering a valid name clears validation error',
-    (tester) async {
-      await tester.pumpWidget(
-        _buildTestWidget(employerRepo: _FakeEmployerRepo(_acmeEmployer)),
-      );
-      await tester.pumpAndSettle();
+  testWidgets('entering a valid name clears validation error', (tester) async {
+    await tester.pumpWidget(
+      _buildTestWidget(employerRepo: _FakeEmployerRepo(_acmeEmployer)),
+    );
+    await tester.pumpAndSettle();
 
-      // First tap to trigger validation
-      await tester.tap(find.widgetWithText(FilledButton, 'Create company'));
-      await tester.pumpAndSettle();
+    // First tap to trigger validation
+    await tester.tap(find.widgetWithText(FilledButton, 'Create company'));
+    await tester.pumpAndSettle();
 
-      expect(
-        find.text('Enter your company name (min 2 characters)'),
-        findsOneWidget,
-      );
+    expect(
+      find.text('Enter your company name (min 2 characters)'),
+      findsOneWidget,
+    );
 
-      // Now enter a valid name
-      await tester.enterText(
-        find.widgetWithText(TextFormField, 'Company name'),
-        'Acme',
-      );
-      await tester.tap(find.widgetWithText(FilledButton, 'Create company'));
-      await tester.pumpAndSettle();
+    // Now enter a valid name
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Company name'),
+      'Acme',
+    );
+    await tester.tap(find.widgetWithText(FilledButton, 'Create company'));
+    await tester.pumpAndSettle();
 
-      expect(
-        find.text('Enter your company name (min 2 characters)'),
-        findsNothing,
-      );
-    },
-  );
+    expect(
+      find.text('Enter your company name (min 2 characters)'),
+      findsNothing,
+    );
+  });
 
-  testWidgets(
-    'shows employer_name_taken snackbar message on 409 conflict',
-    (tester) async {
-      await tester.pumpWidget(
-        _buildTestWidget(
-          employerRepo: _ThrowingEmployerRepo(
-            const ApiException(
-              statusCode: 409,
-              slug: 'employer_name_taken',
-              detail: 'An employer with that name already exists.',
-            ),
+  testWidgets('shows employer_name_taken snackbar message on 409 conflict', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _buildTestWidget(
+        employerRepo: _ThrowingEmployerRepo(
+          const ApiException(
+            statusCode: 409,
+            slug: 'employer_name_taken',
+            detail: 'An employer with that name already exists.',
           ),
         ),
-      );
-      await tester.pumpAndSettle();
+      ),
+    );
+    await tester.pumpAndSettle();
 
-      await tester.enterText(
-        find.widgetWithText(TextFormField, 'Company name'),
-        'Acme Corp',
-      );
-      await tester.tap(find.widgetWithText(FilledButton, 'Create company'));
-      await tester.pumpAndSettle();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Company name'),
+      'Acme Corp',
+    );
+    await tester.tap(find.widgetWithText(FilledButton, 'Create company'));
+    await tester.pumpAndSettle();
 
-      expect(
-        find.text('That company name is already registered.'),
-        findsOneWidget,
-      );
-    },
-  );
+    expect(
+      find.text('That company name is already registered.'),
+      findsOneWidget,
+    );
+  });
 
-  testWidgets(
-    'shows generic error snackbar for non-409 errors',
-    (tester) async {
-      await tester.pumpWidget(
-        _buildTestWidget(
-          employerRepo: _ThrowingEmployerRepo(
-            const ApiException(
-              statusCode: 500,
-              slug: 'internal_server_error',
-            ),
-          ),
+  testWidgets('shows generic error snackbar for non-409 errors', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _buildTestWidget(
+        employerRepo: _ThrowingEmployerRepo(
+          const ApiException(statusCode: 500, slug: 'internal_server_error'),
         ),
-      );
-      await tester.pumpAndSettle();
+      ),
+    );
+    await tester.pumpAndSettle();
 
-      await tester.enterText(
-        find.widgetWithText(TextFormField, 'Company name'),
-        'Acme Corp',
-      );
-      await tester.tap(find.widgetWithText(FilledButton, 'Create company'));
-      await tester.pumpAndSettle();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Company name'),
+      'Acme Corp',
+    );
+    await tester.tap(find.widgetWithText(FilledButton, 'Create company'));
+    await tester.pumpAndSettle();
 
-      expect(
-        find.text('Could not create employer. Please try again.'),
-        findsOneWidget,
-      );
-    },
-  );
+    expect(
+      find.text('Could not create employer. Please try again.'),
+      findsOneWidget,
+    );
+  });
 
-  testWidgets(
-    'GST validator: non-empty value with wrong length shows error',
-    (tester) async {
-      await tester.pumpWidget(
-        _buildTestWidget(employerRepo: _FakeEmployerRepo(_acmeEmployer)),
-      );
-      await tester.pumpAndSettle();
+  testWidgets('GST validator: non-empty value with wrong length shows error', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _buildTestWidget(employerRepo: _FakeEmployerRepo(_acmeEmployer)),
+    );
+    await tester.pumpAndSettle();
 
-      await tester.enterText(
-        find.widgetWithText(TextFormField, 'Company name'),
-        'Acme Corp',
-      );
-      await tester.enterText(
-        find.widgetWithText(TextFormField, 'GSTIN (optional)'),
-        '12345', // not 15 chars
-      );
-      await tester.tap(find.widgetWithText(FilledButton, 'Create company'));
-      await tester.pumpAndSettle();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Company name'),
+      'Acme Corp',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'GSTIN (optional)'),
+      '12345', // not 15 chars
+    );
+    await tester.tap(find.widgetWithText(FilledButton, 'Create company'));
+    await tester.pumpAndSettle();
 
-      expect(
-        find.text('GSTIN must be exactly 15 characters'),
-        findsOneWidget,
-      );
-    },
-  );
+    expect(find.text('GSTIN must be exactly 15 characters'), findsOneWidget);
+  });
 }

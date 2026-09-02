@@ -15,10 +15,7 @@ class SavedJobsRepositoryImpl implements SavedJobsRepository {
   final SavedJobsApi _api;
 
   @override
-  Future<SavedJobsPageDto> fetchPage({
-    String? cursor,
-    int limit = 20,
-  }) async {
+  Future<SavedJobsPageDto> fetchPage({String? cursor, int limit = 20}) async {
     try {
       return await _api.list(cursor: cursor, limit: limit);
     } on DioException catch (e) {

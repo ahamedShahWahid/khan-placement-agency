@@ -32,8 +32,10 @@ class RecruiterDashboardController extends _$RecruiterDashboardController {
     return RecruiterDashboardSummary(
       openJobs: items.where((j) => j.status == 'open').length,
       totalApplicants: items.fold(0, (sum, j) => sum + j.applicantCount),
-      totalSurfacedMatches:
-          items.fold(0, (sum, j) => sum + j.surfacedMatchCount),
+      totalSurfacedMatches: items.fold(
+        0,
+        (sum, j) => sum + j.surfacedMatchCount,
+      ),
       recentJobs: items.take(5).toList(),
     );
   }

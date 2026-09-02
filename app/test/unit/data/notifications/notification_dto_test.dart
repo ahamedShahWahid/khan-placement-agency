@@ -21,7 +21,7 @@ void main() {
             'read_at': null,
             'created_at': '2026-05-01T00:00:00Z',
           },
-        }
+        },
       ],
       'next_cursor': null,
     });

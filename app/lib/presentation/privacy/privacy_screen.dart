@@ -53,9 +53,7 @@ class _PrivacyBody extends ConsumerWidget {
     final l10n = context.l10n;
 
     // Build a lookup map from scope wire string → granted bool.
-    final consentMap = {
-      for (final c in data.consents) c.scope: c.granted,
-    };
+    final consentMap = {for (final c in data.consents) c.scope: c.granted};
 
     return Stack(
       children: [
@@ -101,9 +99,10 @@ class _PrivacyBody extends ConsumerWidget {
             OutlinedButton.icon(
               icon: const Icon(Icons.download_outlined),
               label: Text(l10n.privacyDownloadDataButton),
-              onPressed: data.exportInProgress
-                  ? null
-                  : () => _exportData(context, ref),
+              onPressed:
+                  data.exportInProgress
+                      ? null
+                      : () => _exportData(context, ref),
             ),
 
             const SizedBox(height: JobifySpacing.xl),
@@ -154,20 +153,21 @@ class _PrivacyBody extends ConsumerWidget {
       final l10n = context.l10n;
       final ok = await showDialog<bool>(
         context: context,
-        builder: (c) => AlertDialog(
-          title: Text(l10n.privacyTurnOffEmailsDialogTitle),
-          content: Text(l10n.privacyTurnOffEmailsDialogBody),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(c, false),
-              child: Text(l10n.commonCancel),
+        builder:
+            (c) => AlertDialog(
+              title: Text(l10n.privacyTurnOffEmailsDialogTitle),
+              content: Text(l10n.privacyTurnOffEmailsDialogBody),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(c, false),
+                  child: Text(l10n.commonCancel),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.pop(c, true),
+                  child: Text(l10n.privacyTurnOffButton),
+                ),
+              ],
             ),
-            FilledButton(
-              onPressed: () => Navigator.pop(c, true),
-              child: Text(l10n.privacyTurnOffButton),
-            ),
-          ],
-        ),
       );
       if (!(ok ?? false)) return;
     }
@@ -187,9 +187,9 @@ class _PrivacyBody extends ConsumerWidget {
         SnackBar(content: Text(l10n.privacyExportSuccessSnackbar)),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.privacyExportErrorSnackbar)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.privacyExportErrorSnackbar)));
     }
   }
 }
@@ -201,17 +201,17 @@ class _PrivacyBody extends ConsumerWidget {
 ) {
   return switch (scope) {
     ConsentScope.emailTransactional => (
-        title: l10n.privacyConsentEmailTransactionalTitle,
-        subtitle: l10n.privacyConsentEmailTransactionalSubtitle,
-      ),
+      title: l10n.privacyConsentEmailTransactionalTitle,
+      subtitle: l10n.privacyConsentEmailTransactionalSubtitle,
+    ),
     ConsentScope.emailMarketing => (
-        title: l10n.privacyConsentEmailMarketingTitle,
-        subtitle: l10n.privacyConsentEmailMarketingSubtitle,
-      ),
+      title: l10n.privacyConsentEmailMarketingTitle,
+      subtitle: l10n.privacyConsentEmailMarketingSubtitle,
+    ),
     ConsentScope.inAppNotifications => (
-        title: l10n.privacyConsentInAppTitle,
-        subtitle: l10n.privacyConsentInAppSubtitle,
-      ),
+      title: l10n.privacyConsentInAppTitle,
+      subtitle: l10n.privacyConsentInAppSubtitle,
+    ),
     _ => (title: scope.wire, subtitle: ''),
   };
 }

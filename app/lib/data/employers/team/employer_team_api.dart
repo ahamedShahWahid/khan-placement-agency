@@ -11,8 +11,9 @@ class EmployerTeamApi {
   // --- Members ---
 
   Future<List<MemberDto>> listMembers(String employerId) async {
-    final res =
-        await _dio.get<List<dynamic>>('/v1/employers/$employerId/members');
+    final res = await _dio.get<List<dynamic>>(
+      '/v1/employers/$employerId/members',
+    );
     return (res.data ?? [])
         .map((e) => MemberDto.fromJson(e as Map<String, dynamic>))
         .toList();
@@ -49,8 +50,9 @@ class EmployerTeamApi {
   // --- Employer-managed invites ---
 
   Future<List<InviteDto>> listInvites(String employerId) async {
-    final res =
-        await _dio.get<List<dynamic>>('/v1/employers/$employerId/invites');
+    final res = await _dio.get<List<dynamic>>(
+      '/v1/employers/$employerId/invites',
+    );
     return (res.data ?? [])
         .map((e) => InviteDto.fromJson(e as Map<String, dynamic>))
         .toList();

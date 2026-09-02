@@ -25,7 +25,7 @@ const _hi = PreferencesDto(
 
 class _OkRepo implements PreferencesRepository {
   _OkRepo(this._fetchResult, {PreferencesDto? updateResult})
-      : _updateResult = updateResult ?? _fetchResult;
+    : _updateResult = updateResult ?? _fetchResult;
   final PreferencesDto _fetchResult;
   final PreferencesDto _updateResult;
 
@@ -50,30 +50,27 @@ class _FailingUpdateRepo implements PreferencesRepository {
 }
 
 void main() {
-  test(
-    'build() calls localeController.setFromLanguage with the loaded '
-    'language, unconditionally (including "en")',
-    () async {
-      final c = ProviderContainer(
-        overrides: [
-          preferencesRepositoryProvider.overrideWithValue(_OkRepo(_en)),
-        ],
-      );
-      addTearDown(c.dispose);
-      // Keep the autoDispose LocaleController alive for the test's duration.
-      final sub = c.listen(localeControllerProvider, (_, __) {});
-      addTearDown(sub.close);
+  test('build() calls localeController.setFromLanguage with the loaded '
+      'language, unconditionally (including "en")', () async {
+    final c = ProviderContainer(
+      overrides: [
+        preferencesRepositoryProvider.overrideWithValue(_OkRepo(_en)),
+      ],
+    );
+    addTearDown(c.dispose);
+    // Keep the autoDispose LocaleController alive for the test's duration.
+    final sub = c.listen(localeControllerProvider, (_, __) {});
+    addTearDown(sub.close);
 
-      // Seed a stale previous-user locale, as a shared-device 401-forced
-      // sign-out would leave behind (it never resets LocaleController).
-      c.read(localeControllerProvider.notifier).setFromLanguage('hi');
-      expect(c.read(localeControllerProvider), const Locale('hi'));
+    // Seed a stale previous-user locale, as a shared-device 401-forced
+    // sign-out would leave behind (it never resets LocaleController).
+    c.read(localeControllerProvider.notifier).setFromLanguage('hi');
+    expect(c.read(localeControllerProvider), const Locale('hi'));
 
-      await c.read(preferencesControllerProvider.future);
+    await c.read(preferencesControllerProvider.future);
 
-      expect(c.read(localeControllerProvider), const Locale('en'));
-    },
-  );
+    expect(c.read(localeControllerProvider), const Locale('en'));
+  });
 
   test(
     'build() flips the locale to "hi" when the server preference is "hi"',
@@ -110,8 +107,9 @@ void main() {
       expectedCtc: null,
       language: 'en',
     );
-    final ok =
-        await c.read(preferencesControllerProvider.notifier).submit(update);
+    final ok = await c
+        .read(preferencesControllerProvider.notifier)
+        .submit(update);
 
     expect(ok, isTrue);
   });
@@ -121,8 +119,9 @@ void main() {
     () async {
       final c = ProviderContainer(
         overrides: [
-          preferencesRepositoryProvider
-              .overrideWithValue(_FailingUpdateRepo(_en)),
+          preferencesRepositoryProvider.overrideWithValue(
+            _FailingUpdateRepo(_en),
+          ),
         ],
       );
       addTearDown(c.dispose);
@@ -144,8 +143,9 @@ void main() {
         expectedCtc: null,
         language: 'hi',
       );
-      final ok =
-          await c.read(preferencesControllerProvider.notifier).submit(update);
+      final ok = await c
+          .read(preferencesControllerProvider.notifier)
+          .submit(update);
 
       expect(ok, isFalse);
       expect(c.read(preferencesControllerProvider).hasError, isTrue);

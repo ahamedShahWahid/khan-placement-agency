@@ -15,15 +15,15 @@ final preferencesControllerProvider = PreferencesControllerProvider._();
 final class PreferencesControllerProvider
     extends $AsyncNotifierProvider<PreferencesController, PreferencesDto> {
   PreferencesControllerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'preferencesControllerProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'preferencesControllerProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$preferencesControllerHash();
@@ -42,11 +42,14 @@ abstract class _$PreferencesController extends $AsyncNotifier<PreferencesDto> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<AsyncValue<PreferencesDto>, PreferencesDto>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<PreferencesDto>, PreferencesDto>,
-        AsyncValue<PreferencesDto>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<PreferencesDto>, PreferencesDto>,
+              AsyncValue<PreferencesDto>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

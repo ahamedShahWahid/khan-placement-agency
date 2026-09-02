@@ -13,18 +13,22 @@ part of 'recruiter_dashboard_controller.dart';
 final recruiterDashboardControllerProvider =
     RecruiterDashboardControllerProvider._();
 
-final class RecruiterDashboardControllerProvider extends $AsyncNotifierProvider<
-    RecruiterDashboardController, RecruiterDashboardSummary> {
+final class RecruiterDashboardControllerProvider
+    extends
+        $AsyncNotifierProvider<
+          RecruiterDashboardController,
+          RecruiterDashboardSummary
+        > {
   RecruiterDashboardControllerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'recruiterDashboardControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'recruiterDashboardControllerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$recruiterDashboardControllerHash();
@@ -43,14 +47,23 @@ abstract class _$RecruiterDashboardController
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<RecruiterDashboardSummary>,
-        RecruiterDashboardSummary>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<RecruiterDashboardSummary>,
-            RecruiterDashboardSummary>,
-        AsyncValue<RecruiterDashboardSummary>,
-        Object?,
-        Object?>;
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<RecruiterDashboardSummary>,
+              RecruiterDashboardSummary
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<RecruiterDashboardSummary>,
+                RecruiterDashboardSummary
+              >,
+              AsyncValue<RecruiterDashboardSummary>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

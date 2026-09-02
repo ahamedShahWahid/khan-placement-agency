@@ -48,24 +48,25 @@ extension DesiredRoleWireValue on DesiredRole {
   /// value, so callers must OMIT the key instead (which preserves it).
   /// Asking `unknown` for a wire value is therefore a caller bug — it throws.
   String get wireValue => switch (this) {
-        DesiredRole.softwareEngineering => 'software_engineering',
-        DesiredRole.dataAnalytics => 'data_analytics',
-        DesiredRole.productManagement => 'product_management',
-        DesiredRole.design => 'design',
-        DesiredRole.sales => 'sales',
-        DesiredRole.marketing => 'marketing',
-        DesiredRole.customerSupport => 'customer_support',
-        DesiredRole.operations => 'operations',
-        DesiredRole.financeAccounting => 'finance_accounting',
-        DesiredRole.hrRecruiting => 'hr_recruiting',
-        DesiredRole.legal => 'legal',
-        DesiredRole.consulting => 'consulting',
-        DesiredRole.businessDevelopment => 'business_development',
-        DesiredRole.contentCommunications => 'content_communications',
-        DesiredRole.administration => 'administration',
-        DesiredRole.other => 'other',
-        DesiredRole.unknown => throw StateError(
-            'DesiredRole.unknown has no wire value — omit the key instead',
-          ),
-      };
+    DesiredRole.softwareEngineering => 'software_engineering',
+    DesiredRole.dataAnalytics => 'data_analytics',
+    DesiredRole.productManagement => 'product_management',
+    DesiredRole.design => 'design',
+    DesiredRole.sales => 'sales',
+    DesiredRole.marketing => 'marketing',
+    DesiredRole.customerSupport => 'customer_support',
+    DesiredRole.operations => 'operations',
+    DesiredRole.financeAccounting => 'finance_accounting',
+    DesiredRole.hrRecruiting => 'hr_recruiting',
+    DesiredRole.legal => 'legal',
+    DesiredRole.consulting => 'consulting',
+    DesiredRole.businessDevelopment => 'business_development',
+    DesiredRole.contentCommunications => 'content_communications',
+    DesiredRole.administration => 'administration',
+    DesiredRole.other => 'other',
+    DesiredRole.unknown =>
+      throw StateError(
+        'DesiredRole.unknown has no wire value — omit the key instead',
+      ),
+  };
 }

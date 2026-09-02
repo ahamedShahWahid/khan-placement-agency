@@ -14,16 +14,16 @@ final applyToJobControllerProvider = ApplyToJobControllerFamily._();
 
 final class ApplyToJobControllerProvider
     extends $AsyncNotifierProvider<ApplyToJobController, ApplicationDto?> {
-  ApplyToJobControllerProvider._(
-      {required ApplyToJobControllerFamily super.from,
-      required String super.argument})
-      : super(
-          retry: null,
-          name: r'applyToJobControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+  ApplyToJobControllerProvider._({
+    required ApplyToJobControllerFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'applyToJobControllerProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$applyToJobControllerHash();
@@ -55,20 +55,23 @@ String _$applyToJobControllerHash() =>
 
 final class ApplyToJobControllerFamily extends $Family
     with
-        $ClassFamilyOverride<ApplyToJobController, AsyncValue<ApplicationDto?>,
-            ApplicationDto?, FutureOr<ApplicationDto?>, String> {
+        $ClassFamilyOverride<
+          ApplyToJobController,
+          AsyncValue<ApplicationDto?>,
+          ApplicationDto?,
+          FutureOr<ApplicationDto?>,
+          String
+        > {
   ApplyToJobControllerFamily._()
-      : super(
-          retry: null,
-          name: r'applyToJobControllerProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
+    : super(
+        retry: null,
+        name: r'applyToJobControllerProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
-  ApplyToJobControllerProvider call(
-    String jobId,
-  ) =>
+  ApplyToJobControllerProvider call(String jobId) =>
       ApplyToJobControllerProvider._(argument: jobId, from: this);
 
   @override
@@ -79,22 +82,19 @@ abstract class _$ApplyToJobController extends $AsyncNotifier<ApplicationDto?> {
   late final _$args = ref.$arg as String;
   String get jobId => _$args;
 
-  FutureOr<ApplicationDto?> build(
-    String jobId,
-  );
+  FutureOr<ApplicationDto?> build(String jobId);
   @$mustCallSuper
   @override
   void runBuild() {
     final ref = this.ref as $Ref<AsyncValue<ApplicationDto?>, ApplicationDto?>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<ApplicationDto?>, ApplicationDto?>,
-        AsyncValue<ApplicationDto?>,
-        Object?,
-        Object?>;
-    element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<ApplicationDto?>, ApplicationDto?>,
+              AsyncValue<ApplicationDto?>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, () => build(_$args));
   }
 }

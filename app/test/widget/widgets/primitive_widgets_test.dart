@@ -29,8 +29,9 @@ void main() {
     expect(find.text('Loading…'), findsOneWidget);
   });
 
-  testWidgets('JobifyErrorView with NetworkException shows network copy',
-      (tester) async {
+  testWidgets('JobifyErrorView with NetworkException shows network copy', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _wrap(const JobifyErrorView(error: NetworkException(message: 'oops'))),
     );
@@ -41,18 +42,16 @@ void main() {
     var taps = 0;
     await tester.pumpWidget(
       _wrap(
-        JobifyErrorView(
-          error: const NetworkException(),
-          onRetry: () => taps++,
-        ),
+        JobifyErrorView(error: const NetworkException(), onRetry: () => taps++),
       ),
     );
     await tester.tap(find.text('Try again'));
     expect(taps, 1);
   });
 
-  testWidgets('JobifyEmptyState renders headline + body + action',
-      (tester) async {
+  testWidgets('JobifyEmptyState renders headline + body + action', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _wrap(
         JobifyEmptyState(
@@ -70,8 +69,9 @@ void main() {
     expect(find.text('Go'), findsOneWidget);
   });
 
-  testWidgets('JobifyScoreBadge renders rounded percent in mono',
-      (tester) async {
+  testWidgets('JobifyScoreBadge renders rounded percent in mono', (
+    tester,
+  ) async {
     await tester.pumpWidget(_wrap(const JobifyScoreBadge(score: 0.857)));
     expect(find.text('86%'), findsOneWidget);
   });
@@ -82,8 +82,9 @@ void main() {
     expect(JobifyScoreBadge.isStrong(0.95), isTrue);
   });
 
-  testWidgets('strong match uses brand blue, weak uses inkSoft',
-      (tester) async {
+  testWidgets('strong match uses brand blue, weak uses inkSoft', (
+    tester,
+  ) async {
     await tester.pumpWidget(_wrap(const JobifyScoreBadge(score: 0.95)));
     final strong = tester.widget<Text>(find.text('95%'));
     expect(strong.style?.color, JobifyColors.brandBlueLight);

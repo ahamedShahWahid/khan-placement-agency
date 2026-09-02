@@ -42,8 +42,7 @@ class FakeRecruiterJobsRepository implements RecruiterJobsRepository {
     String? status,
     String? cursor,
     int limit = 20,
-  }) async =>
-      jobsPage;
+  }) async => jobsPage;
 
   @override
   Future<RecruiterJobDto> createJob(Map<String, dynamic> body) async {
@@ -68,8 +67,7 @@ class FakeRecruiterJobsRepository implements RecruiterJobsRepository {
     String jobId, {
     String? cursor,
     int limit = 20,
-  }) async =>
-      applicantsPage;
+  }) async => applicantsPage;
 
   @override
   Future<ResumeDownload> downloadResume(String applicationId) async {
@@ -108,22 +106,21 @@ RecruiterJobDto fakeRecruiterJob({
   double? ctcMax,
   int applicantCount = 0,
   int surfacedMatchCount = 0,
-}) =>
-    RecruiterJobDto(
-      id: id,
-      title: title,
-      description: 'A great role doing great things.',
-      locations: locations,
-      minExpYears: minExpYears,
-      maxExpYears: maxExpYears,
-      ctcMin: ctcMin,
-      ctcMax: ctcMax,
-      status: status,
-      postedAt: DateTime.utc(2026),
-      employerVerified: true,
-      applicantCount: applicantCount,
-      surfacedMatchCount: surfacedMatchCount,
-    );
+}) => RecruiterJobDto(
+  id: id,
+  title: title,
+  description: 'A great role doing great things.',
+  locations: locations,
+  minExpYears: minExpYears,
+  maxExpYears: maxExpYears,
+  ctcMin: ctcMin,
+  ctcMax: ctcMax,
+  status: status,
+  postedAt: DateTime.utc(2026),
+  employerVerified: true,
+  applicantCount: applicantCount,
+  surfacedMatchCount: surfacedMatchCount,
+);
 
 /// Test factory for an [ApplicantOfJobDto].
 ApplicantOfJobDto fakeApplicantOfJob({
@@ -135,15 +132,14 @@ ApplicantOfJobDto fakeApplicantOfJob({
   ApplicationStage stage = ApplicationStage.applied,
   double? matchScore = 0.82,
   Map<String, String>? matchExplanation = const {'fit': 'Strong skills match.'},
-}) =>
-    ApplicantOfJobDto(
-      applicationId: applicationId,
-      applicantId: applicantId,
-      displayName: displayName,
-      email: email,
-      status: status,
-      stage: stage,
-      appliedAt: DateTime.utc(2026),
-      matchScore: matchScore,
-      matchExplanation: matchExplanation,
-    );
+}) => ApplicantOfJobDto(
+  applicationId: applicationId,
+  applicantId: applicantId,
+  displayName: displayName,
+  email: email,
+  status: status,
+  stage: stage,
+  appliedAt: DateTime.utc(2026),
+  matchScore: matchScore,
+  matchExplanation: matchExplanation,
+);

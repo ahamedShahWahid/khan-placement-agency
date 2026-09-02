@@ -81,10 +81,11 @@ class _DetailScaffold extends ConsumerWidget {
         title: const Text('Job'),
         actions: [
           TextButton(
-            onPressed: () => context.go(
-              '${Routes.recruiterJobs}/${job.id}/edit',
-              extra: job,
-            ),
+            onPressed:
+                () => context.go(
+                  '${Routes.recruiterJobs}/${job.id}/edit',
+                  extra: job,
+                ),
             child: const Text('Edit'),
           ),
         ],
@@ -97,9 +98,10 @@ class _DetailScaffold extends ConsumerWidget {
           Text(
             isOpen ? 'Open' : 'Closed',
             style: theme.textTheme.labelLarge?.copyWith(
-              color: isOpen
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurfaceVariant,
+              color:
+                  isOpen
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: JobifySpacing.lg),
@@ -140,9 +142,9 @@ class _DetailScaffold extends ConsumerWidget {
           Text(job.description, style: theme.textTheme.bodyMedium),
           const SizedBox(height: JobifySpacing.xl),
           FilledButton.icon(
-            onPressed: () => context.go(
-              '${Routes.recruiterJobs}/${job.id}/applicants',
-            ),
+            onPressed:
+                () =>
+                    context.go('${Routes.recruiterJobs}/${job.id}/applicants'),
             icon: const Icon(Icons.people_outline),
             label: Text('View applicants (${job.applicantCount})'),
           ),
@@ -171,23 +173,24 @@ class _DetailScaffold extends ConsumerWidget {
     final messenger = ScaffoldMessenger.of(context);
     final ok = await showDialog<bool>(
       context: context,
-      builder: (c) => AlertDialog(
-        title: const Text('Close this job?'),
-        content: const Text(
-          "It won't appear in applicants' feeds. You can reopen it later by "
-          'editing the job.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(c, false),
-            child: const Text('Cancel'),
+      builder:
+          (c) => AlertDialog(
+            title: const Text('Close this job?'),
+            content: const Text(
+              "It won't appear in applicants' feeds. You can reopen it "
+              'later by editing the job.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(c, false),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(c, true),
+                child: const Text('Close job'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(c, true),
-            child: const Text('Close job'),
-          ),
-        ],
-      ),
     );
     if (!(ok ?? false)) return;
     await ref.read(jobFormControllerProvider.notifier).close(job.id);
@@ -203,20 +206,21 @@ class _DetailScaffold extends ConsumerWidget {
     final messenger = ScaffoldMessenger.of(context);
     final ok = await showDialog<bool>(
       context: context,
-      builder: (c) => AlertDialog(
-        title: const Text('Delete this job?'),
-        content: const Text('This cannot be undone.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(c, false),
-            child: const Text('Cancel'),
+      builder:
+          (c) => AlertDialog(
+            title: const Text('Delete this job?'),
+            content: const Text('This cannot be undone.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(c, false),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(c, true),
+                child: const Text('Delete'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(c, true),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
     );
     if (!(ok ?? false)) return;
     await ref.read(jobFormControllerProvider.notifier).delete(job.id);

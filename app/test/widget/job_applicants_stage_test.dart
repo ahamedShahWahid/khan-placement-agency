@@ -9,12 +9,12 @@ import 'package:jobify_app/presentation/recruiter/job_applicants_screen.dart';
 import '../helpers/fake_recruiter_jobs_repository.dart';
 
 Widget _wrap(FakeRecruiterJobsRepository repo) => ProviderScope(
-      overrides: [recruiterJobsRepositoryProvider.overrideWithValue(repo)],
-      child: MaterialApp(
-        theme: ThemeData.light(useMaterial3: true),
-        home: const JobApplicantsScreen(jobId: 'j1'),
-      ),
-    );
+  overrides: [recruiterJobsRepositoryProvider.overrideWithValue(repo)],
+  child: MaterialApp(
+    theme: ThemeData.light(useMaterial3: true),
+    home: const JobApplicantsScreen(jobId: 'j1'),
+  ),
+);
 
 void main() {
   testWidgets('row shows current stage and menu changes it', (tester) async {
@@ -52,8 +52,9 @@ void main() {
     expect(find.textContaining("Couldn't update"), findsOneWidget);
   });
 
-  testWidgets('withdrawn-slug failure shows the candidate-withdrew snackbar',
-      (tester) async {
+  testWidgets('withdrawn-slug failure shows the candidate-withdrew snackbar', (
+    tester,
+  ) async {
     final repo = FakeRecruiterJobsRepository(
       applicantsPage: ApplicantsOfJobPageDto(items: [fakeApplicantOfJob()]),
     )..setStageError = 'application_withdrawn';

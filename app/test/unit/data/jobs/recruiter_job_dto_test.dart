@@ -37,8 +37,7 @@ void main() {
       expect(dto.surfacedMatchCount, 5);
     });
 
-    test(
-        'parses a plain JobRead (no count fields) — '
+    test('parses a plain JobRead (no count fields) — '
         'defaults to 0 for both counts', () {
       // POST /v1/jobs and PATCH /v1/jobs/{id} return JobRead without counts.
       final json = <String, dynamic>{
@@ -105,7 +104,7 @@ void main() {
             'employer_verified': false,
             'applicant_count': 1,
             'surfaced_match_count': 0,
-          }
+          },
         ],
         'next_cursor': 'cursor-abc',
       };
@@ -118,10 +117,7 @@ void main() {
     });
 
     test('parses page with null next_cursor', () {
-      final json = <String, dynamic>{
-        'items': <dynamic>[],
-        'next_cursor': null,
-      };
+      final json = <String, dynamic>{'items': <dynamic>[], 'next_cursor': null};
 
       final page = RecruiterJobsPageDto.fromJson(json);
       expect(page.items, isEmpty);

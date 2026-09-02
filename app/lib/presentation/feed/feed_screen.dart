@@ -88,9 +88,9 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
       await ref.read(feedControllerProvider.notifier).rateUp(jobId);
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.feedRatingSaveError)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.l10n.feedRatingSaveError)));
     }
   }
 
@@ -100,9 +100,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
     try {
       await ref.read(feedControllerProvider.notifier).rateDown(jobId);
     } catch (_) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(l10n.feedRatingSaveError)),
-      );
+      messenger.showSnackBar(SnackBar(content: Text(l10n.feedRatingSaveError)));
       return;
     }
     messenger.showSnackBar(
@@ -122,9 +120,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
     try {
       await ref.read(feedControllerProvider.notifier).undoDown(jobId);
     } catch (_) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(l10n.feedRatingSaveError)),
-      );
+      messenger.showSnackBar(SnackBar(content: Text(l10n.feedRatingSaveError)));
     }
   }
 
@@ -171,8 +167,8 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
           Expanded(
             child: AsyncValueWidget<FeedState>(
               value: value,
-              onRetry: () =>
-                  ref.read(feedControllerProvider.notifier).refresh(),
+              onRetry:
+                  () => ref.read(feedControllerProvider.notifier).refresh(),
               isEmpty: (s) => s.items.isEmpty,
               empty: () {
                 final filters = ref.watch(feedFiltersControllerProvider);
@@ -188,67 +184,72 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                   body: context.l10n.feedFilteredEmptyBody,
                   icon: Icons.filter_alt_off,
                   primaryAction: TextButton(
-                    onPressed: () => ref
-                        .read(feedFiltersControllerProvider.notifier)
-                        .clear(),
+                    onPressed:
+                        () =>
+                            ref
+                                .read(feedFiltersControllerProvider.notifier)
+                                .clear(),
                     child: Text(context.l10n.feedClearFiltersButton),
                   ),
                 );
               },
-              data: (s) => RefreshIndicator(
-                onRefresh: _refreshAll,
-                child: ListView.separated(
-                  controller: _scroll,
-                  padding: const EdgeInsets.all(JobifySpacing.lg),
-                  itemCount: s.items.length + 1,
-                  separatorBuilder: (_, __) =>
-                      const SizedBox(height: JobifySpacing.md),
-                  itemBuilder: (context, i) {
-                    if (i == s.items.length) {
-                      if (s.isLoadingMore) {
-                        return const Padding(
-                          padding: EdgeInsets.all(JobifySpacing.lg),
-                          child: JobifyLoadingView(),
-                        );
-                      }
-                      if (!s.hasMore) {
-                        return Padding(
-                          padding: const EdgeInsets.all(JobifySpacing.lg),
-                          child: Center(
-                            child: Text(
-                              context.l10n.feedAllCaughtUp,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
+              data:
+                  (s) => RefreshIndicator(
+                    onRefresh: _refreshAll,
+                    child: ListView.separated(
+                      controller: _scroll,
+                      padding: const EdgeInsets.all(JobifySpacing.lg),
+                      itemCount: s.items.length + 1,
+                      separatorBuilder:
+                          (_, __) => const SizedBox(height: JobifySpacing.md),
+                      itemBuilder: (context, i) {
+                        if (i == s.items.length) {
+                          if (s.isLoadingMore) {
+                            return const Padding(
+                              padding: EdgeInsets.all(JobifySpacing.lg),
+                              child: JobifyLoadingView(),
+                            );
+                          }
+                          if (!s.hasMore) {
+                            return Padding(
+                              padding: const EdgeInsets.all(JobifySpacing.lg),
+                              child: Center(
+                                child: Text(
+                                  context.l10n.feedAllCaughtUp,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.bodySmall?.copyWith(
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).colorScheme.onSurfaceVariant,
                                   ),
-                            ),
+                                ),
+                              ),
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        }
+                        final item = s.items[i];
+                        return Arrive(
+                          index: i,
+                          child: FeedItemCard(
+                            job: item.job,
+                            employer: item.employer,
+                            onTap:
+                                () => context.go(
+                                  '${Routes.feed}/jobs/${item.job.id}',
+                                ),
+                            match: item.match,
+                            explanation: item.match.explanation,
+                            myFeedback: item.match.myFeedback,
+                            onThumbUp: () => _rateUp(item.job.id),
+                            onThumbDown: () => _rateDown(item.job.id),
                           ),
                         );
-                      }
-                      return const SizedBox.shrink();
-                    }
-                    final item = s.items[i];
-                    return Arrive(
-                      index: i,
-                      child: FeedItemCard(
-                        job: item.job,
-                        employer: item.employer,
-                        onTap: () =>
-                            context.go('${Routes.feed}/jobs/${item.job.id}'),
-                        match: item.match,
-                        explanation: item.match.explanation,
-                        myFeedback: item.match.myFeedback,
-                        onThumbUp: () => _rateUp(item.job.id),
-                        onThumbDown: () => _rateDown(item.job.id),
-                      ),
-                    );
-                  },
-                ),
-              ),
+                      },
+                    ),
+                  ),
             ),
           ),
         ],

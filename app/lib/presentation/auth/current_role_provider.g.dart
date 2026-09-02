@@ -20,15 +20,15 @@ final class CurrentRoleProvider
     with $Provider<UserRole?> {
   /// The signed-in user's role, or null when not signed in.
   CurrentRoleProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'currentRoleProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'currentRoleProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$currentRoleHash();

@@ -19,9 +19,12 @@ class JobifyScoreBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final percent = (score * 100).round().clamp(0, 100);
-    final color = isStrong(score)
-        ? (isDark ? JobifyColors.brandBlueDark : JobifyColors.brandBlueLight)
-        : (isDark ? JobifyColors.inkSoftDark : JobifyColors.inkSoftLight);
+    final color =
+        isStrong(score)
+            ? (isDark
+                ? JobifyColors.brandBlueDark
+                : JobifyColors.brandBlueLight)
+            : (isDark ? JobifyColors.inkSoftDark : JobifyColors.inkSoftLight);
     return Text(
       '$percent%',
       style: JobifyTypography.mono(

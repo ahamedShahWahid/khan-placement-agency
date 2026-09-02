@@ -43,10 +43,7 @@ class RecruiterJobsApi {
 
   /// POST /v1/jobs — create a new job posting.
   Future<RecruiterJobDto> createJob(Map<String, dynamic> body) async {
-    final res = await _dio.post<Map<String, dynamic>>(
-      '/v1/jobs',
-      data: body,
-    );
+    final res = await _dio.post<Map<String, dynamic>>('/v1/jobs', data: body);
     return RecruiterJobDto.fromJson(res.data!);
   }
 
@@ -72,10 +69,7 @@ class RecruiterJobsApi {
   }) async {
     final res = await _dio.get<Map<String, dynamic>>(
       '/v1/jobs/$jobId/applicants',
-      queryParameters: {
-        'limit': limit,
-        if (cursor != null) 'cursor': cursor,
-      },
+      queryParameters: {'limit': limit, if (cursor != null) 'cursor': cursor},
     );
     return ApplicantsOfJobPageDto.fromJson(res.data!);
   }

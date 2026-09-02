@@ -119,14 +119,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     }
     // Two sequential PATCHes can partially succeed — say which half failed.
     final l10n = context.l10n;
-    final message = profileOk
-        ? l10n.editProfileSavedProfileOnly
-        : prefsOk
+    final message =
+        profileOk
+            ? l10n.editProfileSavedProfileOnly
+            : prefsOk
             ? l10n.editProfileSavedPreferencesOnly
             : l10n.formSaveFailedGeneric;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -146,24 +147,25 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         return Scaffold(
           appBar: AppBar(title: Text(l10n.editProfileTitle)),
           body: Center(
-            child: meFailed || prefsFailed
-                ? Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(l10n.editProfileLoadError),
-                      const SizedBox(height: JobifySpacing.sm),
-                      TextButton(
-                        onPressed: () {
-                          if (meFailed) ref.invalidate(meControllerProvider);
-                          if (prefsFailed) {
-                            ref.invalidate(preferencesControllerProvider);
-                          }
-                        },
-                        child: Text(l10n.commonRetry),
-                      ),
-                    ],
-                  )
-                : const CircularProgressIndicator(),
+            child:
+                meFailed || prefsFailed
+                    ? Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(l10n.editProfileLoadError),
+                        const SizedBox(height: JobifySpacing.sm),
+                        TextButton(
+                          onPressed: () {
+                            if (meFailed) ref.invalidate(meControllerProvider);
+                            if (prefsFailed) {
+                              ref.invalidate(preferencesControllerProvider);
+                            }
+                          },
+                          child: Text(l10n.commonRetry),
+                        ),
+                      ],
+                    )
+                    : const CircularProgressIndicator(),
           ),
         );
       }
@@ -221,9 +223,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       // the raw `unknown` until the user picks something, so
                       // an untouched save omits the key and preserves the
                       // server value.
-                      initialValue: _desiredRole == DesiredRole.unknown
-                          ? null
-                          : _desiredRole,
+                      initialValue:
+                          _desiredRole == DesiredRole.unknown
+                              ? null
+                              : _desiredRole,
                       decoration: InputDecoration(
                         labelText: l10n.preferencesDesiredRoleLabel,
                       ),
@@ -233,8 +236,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         DropdownMenuItem<DesiredRole>(
                           child: Text(l10n.preferencesNoPreferenceOption),
                         ),
-                        for (final role in DesiredRole.values
-                            .where((r) => r != DesiredRole.unknown))
+                        for (final role in DesiredRole.values.where(
+                          (r) => r != DesiredRole.unknown,
+                        ))
                           DropdownMenuItem(
                             value: role,
                             child: Text(desiredRoleLabel(context, role)),
@@ -256,8 +260,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           for (final loc in _locations)
                             JobifyMatchChip(
                               label: loc,
-                              onDeleted: () =>
-                                  setState(() => _locations.remove(loc)),
+                              onDeleted:
+                                  () => setState(() => _locations.remove(loc)),
                             ),
                         ],
                       ),
@@ -297,8 +301,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   children: [
                     TextFormField(
                       controller: _experience,
-                      keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       style: JobifyTypography.mono(
                         fontSize: 16,
                         color: theme.colorScheme.onSurface,
@@ -306,13 +311,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       decoration: InputDecoration(
                         labelText: l10n.editProfileYearsExperienceLabel,
                       ),
-                      validator: (v) => _validateOptionalNumber(
-                        v,
-                        l10n,
-                        min: 0,
-                        max: 60,
-                        maxDecimals: 1,
-                      ),
+                      validator:
+                          (v) => _validateOptionalNumber(
+                            v,
+                            l10n,
+                            min: 0,
+                            max: 60,
+                            maxDecimals: 1,
+                          ),
                     ),
                     const SizedBox(height: JobifySpacing.lg),
                     TextFormField(
@@ -325,13 +331,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       decoration: InputDecoration(
                         labelText: l10n.editProfileNoticePeriodLabel,
                       ),
-                      validator: (v) => _validateOptionalNumber(
-                        v,
-                        l10n,
-                        min: 0,
-                        max: 365,
-                        maxDecimals: 0,
-                      ),
+                      validator:
+                          (v) => _validateOptionalNumber(
+                            v,
+                            l10n,
+                            min: 0,
+                            max: 365,
+                            maxDecimals: 0,
+                          ),
                     ),
                     const SizedBox(height: JobifySpacing.lg),
                     TextFormField(
@@ -344,13 +351,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       decoration: InputDecoration(
                         labelText: l10n.editProfileCurrentCtcLabel,
                       ),
-                      validator: (v) => _validateOptionalNumber(
-                        v,
-                        l10n,
-                        min: 0,
-                        max: 9999999999.99,
-                        maxDecimals: 2,
-                      ),
+                      validator:
+                          (v) => _validateOptionalNumber(
+                            v,
+                            l10n,
+                            min: 0,
+                            max: 9999999999.99,
+                            maxDecimals: 2,
+                          ),
                     ),
                     const SizedBox(height: JobifySpacing.lg),
                     TextFormField(
@@ -363,13 +371,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       decoration: InputDecoration(
                         labelText: l10n.preferencesExpectedCtcLabel,
                       ),
-                      validator: (v) => _validateOptionalNumber(
-                        v,
-                        l10n,
-                        min: 0,
-                        max: 9999999999.99,
-                        maxDecimals: 2,
-                      ),
+                      validator:
+                          (v) => _validateOptionalNumber(
+                            v,
+                            l10n,
+                            min: 0,
+                            max: 9999999999.99,
+                            maxDecimals: 2,
+                          ),
                     ),
                   ],
                 ),

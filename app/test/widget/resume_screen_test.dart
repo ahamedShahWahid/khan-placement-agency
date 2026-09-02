@@ -27,8 +27,7 @@ class _Repo implements ResumeRepository {
     required List<int> bytes,
     required String filename,
     required String contentType,
-  }) async =>
-      throw UnimplementedError();
+  }) async => throw UnimplementedError();
 }
 
 class _IncompletePrefsRepo implements PreferencesRepository {
@@ -67,14 +66,14 @@ class _CountingPrefsRepo implements PreferencesRepository {
 }
 
 ResumeDto _dto(ResumeParseStatus s) => ResumeDto(
-      id: 'r1',
-      applicantId: 'a1',
-      originalFilename: 'cv.pdf',
-      contentType: 'application/pdf',
-      sizeBytes: 1,
-      parseStatus: s,
-      createdAt: DateTime(2026),
-    );
+  id: 'r1',
+  applicantId: 'a1',
+  originalFilename: 'cv.pdf',
+  contentType: 'application/pdf',
+  sizeBytes: 1,
+  parseStatus: s,
+  createdAt: DateTime(2026),
+);
 
 Future<void> _pump(WidgetTester tester, ResumeDto? current) async {
   await tester.pumpWidget(
@@ -113,8 +112,9 @@ void main() {
     expect(find.text('Processing…'), findsOneWidget);
   });
 
-  testWidgets('navigates to preferences after parse settles when incomplete',
-      (tester) async {
+  testWidgets('navigates to preferences after parse settles when incomplete', (
+    tester,
+  ) async {
     final router = GoRouter(
       routes: [
         GoRoute(path: '/', builder: (_, __) => const ResumeScreen()),
@@ -127,10 +127,12 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          resumeRepositoryProvider
-              .overrideWithValue(_Repo(_dto(ResumeParseStatus.parsed))),
-          preferencesRepositoryProvider
-              .overrideWithValue(_IncompletePrefsRepo()),
+          resumeRepositoryProvider.overrideWithValue(
+            _Repo(_dto(ResumeParseStatus.parsed)),
+          ),
+          preferencesRepositoryProvider.overrideWithValue(
+            _IncompletePrefsRepo(),
+          ),
         ],
         child: MaterialApp.router(
           routerConfig: router,
@@ -156,10 +158,10 @@ void main() {
     expect(find.byType(PreferencesScreen), findsOneWidget);
   });
 
-  testWidgets(
-      'preferencesControllerProvider stays alive across the navigation '
-      '(pins the keepAlive fix — regresses to a double fetch without it)',
-      (tester) async {
+  testWidgets('preferencesControllerProvider stays alive across the navigation '
+      '(pins the keepAlive fix — regresses to a double fetch without it)', (
+    tester,
+  ) async {
     final router = GoRouter(
       routes: [
         GoRoute(path: '/', builder: (_, __) => const ResumeScreen()),
@@ -173,8 +175,9 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          resumeRepositoryProvider
-              .overrideWithValue(_Repo(_dto(ResumeParseStatus.parsed))),
+          resumeRepositoryProvider.overrideWithValue(
+            _Repo(_dto(ResumeParseStatus.parsed)),
+          ),
           preferencesRepositoryProvider.overrideWithValue(prefsRepo),
         ],
         child: MaterialApp.router(

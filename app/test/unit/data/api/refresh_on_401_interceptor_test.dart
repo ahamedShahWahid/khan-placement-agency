@@ -81,7 +81,8 @@ class _RefreshCounter {
   _MockQueueAdapter adapter,
   AccessTokenHolder holder,
   _RefreshCounter counter,
-}) _buildHarness({
+})
+_buildHarness({
   required Future<String> Function(int callNumber) onRefresh,
   void Function()? onSignedOut,
 }) {
@@ -119,12 +120,12 @@ class _RefreshCounter {
 /// NO separate `slug` field. Tests must mirror this so contract drift
 /// (slug-key vs detail-key) cannot pass.
 Map<String, dynamic> _invalidAccess() => {
-      'type': 'about:blank',
-      'title': 'Unauthorized',
-      'status': 401,
-      'detail': 'invalid_access_token',
-      'request_id': 'test-req-id',
-    };
+  'type': 'about:blank',
+  'title': 'Unauthorized',
+  'status': 401,
+  'detail': 'invalid_access_token',
+  'request_id': 'test-req-id',
+};
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -141,11 +142,9 @@ void main() {
       // Replay after refresh → 200. Capture headers for verification.
       final replayHeaders = <String, String>{};
       h.adapter.enqueue(
-        _MockResponse(
-          200,
-          {'items': <dynamic>[]},
-          captureHeaders: replayHeaders,
-        ),
+        _MockResponse(200, {
+          'items': <dynamic>[],
+        }, captureHeaders: replayHeaders),
       );
 
       final res = await h.dio.get<dynamic>('/v1/feed');
@@ -158,24 +157,26 @@ void main() {
       expect(h.adapter.capturedRequests.length, 2);
     });
 
-    test('401 → refresh fails → holder cleared + onSignedOut + throws',
-        () async {
-      var signedOut = false;
-      final h = _buildHarness(
-        onRefresh: (_) async => throw StateError('refresh-failed'),
-        onSignedOut: () => signedOut = true,
-      );
-      h.holder.set('OLD_TOKEN');
+    test(
+      '401 → refresh fails → holder cleared + onSignedOut + throws',
+      () async {
+        var signedOut = false;
+        final h = _buildHarness(
+          onRefresh: (_) async => throw StateError('refresh-failed'),
+          onSignedOut: () => signedOut = true,
+        );
+        h.holder.set('OLD_TOKEN');
 
-      h.adapter.enqueue(_MockResponse(401, _invalidAccess()));
+        h.adapter.enqueue(_MockResponse(401, _invalidAccess()));
 
-      await expectLater(
-        h.dio.get<dynamic>('/v1/feed'),
-        throwsA(isA<DioException>()),
-      );
-      expect(h.holder.current, isNull);
-      expect(signedOut, isTrue);
-    });
+        await expectLater(
+          h.dio.get<dynamic>('/v1/feed'),
+          throwsA(isA<DioException>()),
+        );
+        expect(h.holder.current, isNull);
+        expect(signedOut, isTrue);
+      },
+    );
 
     test('two concurrent 401s → exactly one refresh call', () async {
       final completer = Completer<String>();
@@ -204,9 +205,7 @@ void main() {
     });
 
     test('401 on kSkipAuth request → no refresh', () async {
-      final h = _buildHarness(
-        onRefresh: (_) async => fail('should not run'),
-      );
+      final h = _buildHarness(onRefresh: (_) async => fail('should not run'));
 
       h.adapter.enqueue(_MockResponse(401, _invalidAccess()));
 
@@ -220,36 +219,35 @@ void main() {
       expect(h.counter.calls, 0);
     });
 
-    test('401 with non-invalid_access_token detail → no refresh, sign out',
-        () async {
-      // missing_bearer_token / user_not_found / unknown future slugs all
-      // mean the session is structurally broken — refresh won't help, so
-      // clear the holder and trigger sign-out so the router redirects to
-      // /signin. (Pre-2026-05-29 behavior just fell through, which left
-      // the caller rendering a misleading "Signed out" inline view while
-      // the auth state stayed SignedIn.)
-      var signedOut = false;
-      final h = _buildHarness(
-        onRefresh: (_) async => fail('should not run'),
-        onSignedOut: () => signedOut = true,
-      );
-      h.holder.set('TOK');
+    test(
+      '401 with non-invalid_access_token detail → no refresh, sign out',
+      () async {
+        // missing_bearer_token / user_not_found / unknown future slugs all
+        // mean the session is structurally broken — refresh won't help, so
+        // clear the holder and trigger sign-out so the router redirects to
+        // /signin. (Pre-2026-05-29 behavior just fell through, which left
+        // the caller rendering a misleading "Signed out" inline view while
+        // the auth state stayed SignedIn.)
+        var signedOut = false;
+        final h = _buildHarness(
+          onRefresh: (_) async => fail('should not run'),
+          onSignedOut: () => signedOut = true,
+        );
+        h.holder.set('TOK');
 
-      h.adapter.enqueue(
-        _MockResponse(401, {
-          'status': 401,
-          'detail': 'missing_bearer_token',
-        }),
-      );
+        h.adapter.enqueue(
+          _MockResponse(401, {'status': 401, 'detail': 'missing_bearer_token'}),
+        );
 
-      await expectLater(
-        h.dio.get<dynamic>('/v1/x'),
-        throwsA(isA<DioException>()),
-      );
-      expect(h.counter.calls, 0);
-      expect(h.holder.current, isNull, reason: 'holder cleared on sign-out');
-      expect(signedOut, isTrue);
-    });
+        await expectLater(
+          h.dio.get<dynamic>('/v1/x'),
+          throwsA(isA<DioException>()),
+        );
+        expect(h.counter.calls, 0);
+        expect(h.holder.current, isNull, reason: 'holder cleared on sign-out');
+        expect(signedOut, isTrue);
+      },
+    );
 
     test('401 user_not_found → no refresh, sign out', () async {
       var signedOut = false;
@@ -260,10 +258,7 @@ void main() {
       h.holder.set('TOK');
 
       h.adapter.enqueue(
-        _MockResponse(401, {
-          'status': 401,
-          'detail': 'user_not_found',
-        }),
+        _MockResponse(401, {'status': 401, 'detail': 'user_not_found'}),
       );
 
       await expectLater(
@@ -289,10 +284,7 @@ void main() {
       h.holder.set('TOK');
 
       h.adapter.enqueue(
-        _MockResponse(401, {
-          'status': 401,
-          'detail': 'invalid_refresh_token',
-        }),
+        _MockResponse(401, {'status': 401, 'detail': 'invalid_refresh_token'}),
       );
 
       await expectLater(

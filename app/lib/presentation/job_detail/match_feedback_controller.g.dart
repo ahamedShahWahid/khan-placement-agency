@@ -29,16 +29,16 @@ final class MatchFeedbackControllerProvider
   /// DELIBERATE exception to the "never invalidate the feed on mutation" rule
   /// (app/CLAUDE.md): a down-rate changes feed MEMBERSHIP server-side, so the
   /// kept-alive feed list must refetch or it keeps showing the hidden job.
-  MatchFeedbackControllerProvider._(
-      {required MatchFeedbackControllerFamily super.from,
-      required String super.argument})
-      : super(
-          retry: null,
-          name: r'matchFeedbackControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+  MatchFeedbackControllerProvider._({
+    required MatchFeedbackControllerFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'matchFeedbackControllerProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$matchFeedbackControllerHash();
@@ -77,16 +77,21 @@ String _$matchFeedbackControllerHash() =>
 
 final class MatchFeedbackControllerFamily extends $Family
     with
-        $ClassFamilyOverride<MatchFeedbackController, AsyncValue<void>, void,
-            FutureOr<void>, String> {
+        $ClassFamilyOverride<
+          MatchFeedbackController,
+          AsyncValue<void>,
+          void,
+          FutureOr<void>,
+          String
+        > {
   MatchFeedbackControllerFamily._()
-      : super(
-          retry: null,
-          name: r'matchFeedbackControllerProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
+    : super(
+        retry: null,
+        name: r'matchFeedbackControllerProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
   /// Rates / clears the match rating from job detail.
   ///
@@ -94,9 +99,7 @@ final class MatchFeedbackControllerFamily extends $Family
   /// (app/CLAUDE.md): a down-rate changes feed MEMBERSHIP server-side, so the
   /// kept-alive feed list must refetch or it keeps showing the hidden job.
 
-  MatchFeedbackControllerProvider call(
-    String jobId,
-  ) =>
+  MatchFeedbackControllerProvider call(String jobId) =>
       MatchFeedbackControllerProvider._(argument: jobId, from: this);
 
   @override
@@ -113,22 +116,19 @@ abstract class _$MatchFeedbackController extends $AsyncNotifier<void> {
   late final _$args = ref.$arg as String;
   String get jobId => _$args;
 
-  FutureOr<void> build(
-    String jobId,
-  );
+  FutureOr<void> build(String jobId);
   @$mustCallSuper
   @override
   void runBuild() {
     final ref = this.ref as $Ref<AsyncValue<void>, void>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<void>, void>,
-        AsyncValue<void>,
-        Object?,
-        Object?>;
-    element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<void>, void>,
+              AsyncValue<void>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, () => build(_$args));
   }
 }

@@ -8,18 +8,18 @@ import 'package:jobify_app/data/jobs/jobs_repository_impl.dart';
 import '../../../helpers/mock_interceptor.dart';
 
 Map<String, dynamic> _jobDetail() => {
-      'job': {
-        'id': 'j1',
-        'title': 'Eng',
-        'locations': ['Bangalore'],
-        'status': 'open',
-        'posted_at': '2026-05-18T00:00:00Z',
-      },
-      'employer': {'id': 'e1', 'name': 'Acme', 'verified': false},
-      'match': null,
-      'application': null,
-      'saved_job': null,
-    };
+  'job': {
+    'id': 'j1',
+    'title': 'Eng',
+    'locations': ['Bangalore'],
+    'status': 'open',
+    'posted_at': '2026-05-18T00:00:00Z',
+  },
+  'employer': {'id': 'e1', 'name': 'Acme', 'verified': false},
+  'match': null,
+  'application': null,
+  'saved_job': null,
+};
 
 void main() {
   late Dio dio;
@@ -44,10 +44,7 @@ void main() {
       'status': 404,
       'slug': 'not_found',
     });
-    await expectLater(
-      repo.fetchById('missing'),
-      throwsA(isA<ApiException>()),
-    );
+    await expectLater(repo.fetchById('missing'), throwsA(isA<ApiException>()));
   });
 
   test('applyTo: 201 → ApplicationDto', () async {

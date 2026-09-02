@@ -25,14 +25,14 @@ void main() {
 
   group('ApplicationDto.stage', () {
     Map<String, dynamic> appJson(String stage) => {
-          'id': 'a1',
-          'job_id': 'j1',
-          'status': 'applied',
-          'source': 'feed',
-          'stage': stage,
-          'created_at': '2026-07-19T00:00:00Z',
-          'updated_at': '2026-07-19T00:00:00Z',
-        };
+      'id': 'a1',
+      'job_id': 'j1',
+      'status': 'applied',
+      'source': 'feed',
+      'stage': stage,
+      'created_at': '2026-07-19T00:00:00Z',
+      'updated_at': '2026-07-19T00:00:00Z',
+    };
 
     test('parses a real stage', () {
       expect(

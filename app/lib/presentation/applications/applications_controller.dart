@@ -26,17 +26,17 @@ class ApplicationsController extends _$ApplicationsController {
   }
 
   Future<void> loadMore() => loadNextPage<ApplicationListItemDto>(
-        currentState: state,
-        fetch: ({String? cursor}) async {
-          final page = await ref
-              .read(applicationsRepositoryProvider)
-              .fetchPage(cursor: cursor);
-          return PagedState(
-            items: page.items,
-            cursor: page.nextCursor,
-            hasMore: page.nextCursor != null,
-          );
-        },
-        setState: (s) => state = s,
+    currentState: state,
+    fetch: ({String? cursor}) async {
+      final page = await ref
+          .read(applicationsRepositoryProvider)
+          .fetchPage(cursor: cursor);
+      return PagedState(
+        items: page.items,
+        cursor: page.nextCursor,
+        hasMore: page.nextCursor != null,
       );
+    },
+    setState: (s) => state = s,
+  );
 }

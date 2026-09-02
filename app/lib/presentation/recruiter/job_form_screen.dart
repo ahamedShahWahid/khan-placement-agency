@@ -44,17 +44,17 @@ class EditJobResolver extends ConsumerWidget {
   }
 
   Widget _notFound(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Edit job')),
-        body: JobifyEmptyState(
-          headline: 'Job not found',
-          body: 'Open it from your jobs list to edit.',
-          icon: Icons.search_off_outlined,
-          primaryAction: FilledButton(
-            onPressed: () => context.go(Routes.recruiterJobs),
-            child: const Text('Back to my jobs'),
-          ),
-        ),
-      );
+    appBar: AppBar(title: const Text('Edit job')),
+    body: JobifyEmptyState(
+      headline: 'Job not found',
+      body: 'Open it from your jobs list to edit.',
+      icon: Icons.search_off_outlined,
+      primaryAction: FilledButton(
+        onPressed: () => context.go(Routes.recruiterJobs),
+        child: const Text('Back to my jobs'),
+      ),
+    ),
+  );
 }
 
 /// Post-a-job (create) and edit-a-job form.
@@ -174,9 +174,7 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
       final e = state.error;
       final detail = e is ApiException ? e.detail : null;
       messenger.showSnackBar(
-        SnackBar(
-          content: Text(detail ?? "Couldn't save the job. Try again."),
-        ),
+        SnackBar(content: Text(detail ?? "Couldn't save the job. Try again.")),
       );
       return;
     }
@@ -217,9 +215,10 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
         return _scaffold(
           saving: saving,
           employerId: active.id,
-          employerSelector: list.length > 1
-              ? _EmployerDropdown(employers: list, active: active)
-              : const SizedBox.shrink(),
+          employerSelector:
+              list.length > 1
+                  ? _EmployerDropdown(employers: list, active: active)
+                  : const SizedBox.shrink(),
         );
       },
     );
@@ -289,8 +288,9 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
                 Expanded(
                   child: TextField(
                     controller: _locationInput,
-                    decoration:
-                        const InputDecoration(labelText: 'Add location'),
+                    decoration: const InputDecoration(
+                      labelText: 'Add location',
+                    ),
                     onSubmitted: (_) => _addLocation(),
                   ),
                 ),
@@ -307,8 +307,9 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
                   child: TextFormField(
                     controller: _minExp,
                     keyboardType: TextInputType.number,
-                    decoration:
-                        const InputDecoration(labelText: 'Min exp (yrs)'),
+                    decoration: const InputDecoration(
+                      labelText: 'Min exp (yrs)',
+                    ),
                     validator: _validateExp,
                   ),
                 ),
@@ -317,8 +318,9 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
                   child: TextFormField(
                     controller: _maxExp,
                     keyboardType: TextInputType.number,
-                    decoration:
-                        const InputDecoration(labelText: 'Max exp (yrs)'),
+                    decoration: const InputDecoration(
+                      labelText: 'Max exp (yrs)',
+                    ),
                     validator: (v) {
                       final base = _validateExp(v);
                       if (base != null) return base;
@@ -340,8 +342,9 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
                   child: TextFormField(
                     controller: _ctcMin,
                     keyboardType: TextInputType.number,
-                    decoration:
-                        const InputDecoration(labelText: 'CTC min (₹/yr)'),
+                    decoration: const InputDecoration(
+                      labelText: 'CTC min (₹/yr)',
+                    ),
                     validator: _validateCtc,
                   ),
                 ),
@@ -350,8 +353,9 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
                   child: TextFormField(
                     controller: _ctcMax,
                     keyboardType: TextInputType.number,
-                    decoration:
-                        const InputDecoration(labelText: 'CTC max (₹/yr)'),
+                    decoration: const InputDecoration(
+                      labelText: 'CTC max (₹/yr)',
+                    ),
                     validator: (v) {
                       final base = _validateCtc(v);
                       if (base != null) return base;

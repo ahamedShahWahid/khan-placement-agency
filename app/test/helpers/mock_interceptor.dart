@@ -31,20 +31,12 @@ class MockInterceptor extends Interceptor {
     _listRoutes['$method:$path'] = _ScriptedListResponse(status, body);
   }
 
-  void on(
-    String method,
-    String path,
-    int status,
-    Map<String, dynamic>? body,
-  ) {
+  void on(String method, String path, int status, Map<String, dynamic>? body) {
     _routes['$method:$path'] = _ScriptedResponse(status, body);
   }
 
   @override
-  void onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) {
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     requests.add(options);
     final key = '${options.method}:${options.path}';
     final listResp = _listRoutes[key];
@@ -79,11 +71,7 @@ class MockInterceptor extends Interceptor {
       );
     } else {
       handler.resolve(
-        Response(
-          requestOptions: options,
-          statusCode: r.status,
-          data: r.body,
-        ),
+        Response(requestOptions: options, statusCode: r.status, data: r.body),
       );
     }
   }

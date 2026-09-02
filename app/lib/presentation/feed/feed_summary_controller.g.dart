@@ -15,15 +15,15 @@ final feedSummaryControllerProvider = FeedSummaryControllerProvider._();
 final class FeedSummaryControllerProvider
     extends $AsyncNotifierProvider<FeedSummaryController, FeedSummary> {
   FeedSummaryControllerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'feedSummaryControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'feedSummaryControllerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$feedSummaryControllerHash();
@@ -42,11 +42,14 @@ abstract class _$FeedSummaryController extends $AsyncNotifier<FeedSummary> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<AsyncValue<FeedSummary>, FeedSummary>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<FeedSummary>, FeedSummary>,
-        AsyncValue<FeedSummary>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<FeedSummary>, FeedSummary>,
+              AsyncValue<FeedSummary>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

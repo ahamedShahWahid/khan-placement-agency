@@ -34,11 +34,13 @@ class JobDetailScreen extends ConsumerWidget {
     void listenErr(AsyncValue<dynamic> v) {
       v.whenOrNull(
         error: (e, _) {
-          final msg = e is ApiException
-              ? (e.detail ?? l10n.jobDetailActionFailed)
-              : l10n.jobDetailNetworkError;
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(msg)));
+          final msg =
+              e is ApiException
+                  ? (e.detail ?? l10n.jobDetailActionFailed)
+                  : l10n.jobDetailNetworkError;
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(msg)));
         },
       );
     }
@@ -62,8 +64,9 @@ class JobDetailScreen extends ConsumerWidget {
       appBar: AppBar(leading: BackButton(onPressed: () => context.pop())),
       body: AsyncValueWidget<JobDetailDto>(
         value: value,
-        onRetry: () =>
-            ref.read(jobDetailControllerProvider(jobId).notifier).refresh(),
+        onRetry:
+            () =>
+                ref.read(jobDetailControllerProvider(jobId).notifier).refresh(),
         error: (e, s) {
           if (e is ApiException && e.statusCode == 404) {
             return JobifyEmptyState(
@@ -77,56 +80,57 @@ class JobDetailScreen extends ConsumerWidget {
           }
           return Center(child: Text(e.toString()));
         },
-        data: (d) => Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(JobifySpacing.lg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      d.employer.name,
-                      style: Theme.of(context).textTheme.labelLarge,
+        data:
+            (d) => Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(JobifySpacing.lg),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          d.employer.name,
+                          style: Theme.of(context).textTheme.labelLarge,
+                        ),
+                        const SizedBox(height: JobifySpacing.xs),
+                        Text(
+                          d.job.title,
+                          style: Theme.of(context).textTheme.headlineMedium,
+                        ),
+                        const SizedBox(height: JobifySpacing.xs),
+                        Text(
+                          d.job.locations.join(', '),
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        if (d.application != null) ...[
+                          const SizedBox(height: JobifySpacing.lg),
+                          _ApplicationTimeline(
+                            applicationId: d.application!.id,
+                          ),
+                        ],
+                        if (d.match != null) ...[
+                          const SizedBox(height: JobifySpacing.lg),
+                          _MatchCard(match: d.match!),
+                          _MatchFeedbackRow(
+                            jobId: d.job.id,
+                            current: d.match!.myFeedback,
+                          ),
+                        ],
+                        if (d.job.description != null) ...[
+                          const SizedBox(height: JobifySpacing.xl),
+                          Text(
+                            d.job.description!,
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                        ],
+                      ],
                     ),
-                    const SizedBox(height: JobifySpacing.xs),
-                    Text(
-                      d.job.title,
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                    const SizedBox(height: JobifySpacing.xs),
-                    Text(
-                      d.job.locations.join(', '),
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    if (d.application != null) ...[
-                      const SizedBox(height: JobifySpacing.lg),
-                      _ApplicationTimeline(
-                        applicationId: d.application!.id,
-                      ),
-                    ],
-                    if (d.match != null) ...[
-                      const SizedBox(height: JobifySpacing.lg),
-                      _MatchCard(match: d.match!),
-                      _MatchFeedbackRow(
-                        jobId: d.job.id,
-                        current: d.match!.myFeedback,
-                      ),
-                    ],
-                    if (d.job.description != null) ...[
-                      const SizedBox(height: JobifySpacing.xl),
-                      Text(
-                        d.job.description!,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ],
-                  ],
+                  ),
                 ),
-              ),
+                ActionBar(detail: d),
+              ],
             ),
-            ActionBar(detail: d),
-          ],
-        ),
       ),
     );
   }
@@ -236,8 +240,9 @@ class _MatchFeedbackRow extends ConsumerWidget {
           Expanded(
             child: Text(
               context.l10n.jobDetailMatchFeedbackPrompt,
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
           IconButton(

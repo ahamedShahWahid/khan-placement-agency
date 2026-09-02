@@ -18,11 +18,11 @@ enum UserRole {
 
   /// Parse a wire string; anything unrecognized → [UserRole.unknown].
   static UserRole fromWire(String raw) => switch (raw) {
-        'applicant' => UserRole.applicant,
-        'recruiter' => UserRole.recruiter,
-        'admin' => UserRole.admin,
-        _ => UserRole.unknown,
-      };
+    'applicant' => UserRole.applicant,
+    'recruiter' => UserRole.recruiter,
+    'admin' => UserRole.admin,
+    _ => UserRole.unknown,
+  };
 
   /// True for roles that use the recruiter shell (recruiter + admin).
   bool get usesRecruiterShell =>

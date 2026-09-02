@@ -15,15 +15,15 @@ final bootstrapControllerProvider = BootstrapControllerProvider._();
 final class BootstrapControllerProvider
     extends $AsyncNotifierProvider<BootstrapController, BootstrapOutcome> {
   BootstrapControllerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'bootstrapControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'bootstrapControllerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$bootstrapControllerHash();
@@ -43,11 +43,14 @@ abstract class _$BootstrapController extends $AsyncNotifier<BootstrapOutcome> {
   void runBuild() {
     final ref =
         this.ref as $Ref<AsyncValue<BootstrapOutcome>, BootstrapOutcome>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<BootstrapOutcome>, BootstrapOutcome>,
-        AsyncValue<BootstrapOutcome>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<BootstrapOutcome>, BootstrapOutcome>,
+              AsyncValue<BootstrapOutcome>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

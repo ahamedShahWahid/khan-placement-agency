@@ -10,5 +10,4 @@ part 'application_timeline_controller.g.dart';
 Future<List<StageEventDto>> applicationTimeline(
   Ref ref,
   String applicationId,
-) =>
-    ref.read(applicationsRepositoryProvider).fetchTimeline(applicationId);
+) => ref.read(applicationsRepositoryProvider).fetchTimeline(applicationId);

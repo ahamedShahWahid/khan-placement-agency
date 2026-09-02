@@ -29,85 +29,95 @@ class RecruiterDashboardScreen extends ConsumerWidget {
       ),
       body: AsyncValueWidget<RecruiterDashboardSummary>(
         value: value,
-        onRetry: () =>
-            ref.read(recruiterDashboardControllerProvider.notifier).refresh(),
-        data: (summary) => RefreshIndicator(
-          onRefresh: () =>
-              ref.read(recruiterDashboardControllerProvider.notifier).refresh(),
-          child: ListView(
-            padding: const EdgeInsets.all(JobifySpacing.lg),
-            children: [
-              Row(
+        onRetry:
+            () =>
+                ref
+                    .read(recruiterDashboardControllerProvider.notifier)
+                    .refresh(),
+        data:
+            (summary) => RefreshIndicator(
+              onRefresh:
+                  () =>
+                      ref
+                          .read(recruiterDashboardControllerProvider.notifier)
+                          .refresh(),
+              child: ListView(
+                padding: const EdgeInsets.all(JobifySpacing.lg),
                 children: [
-                  Expanded(
-                    child: _SummaryCard(
-                      label: 'Open jobs',
-                      value: '${summary.openJobs}',
-                      icon: Icons.work_outline,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _SummaryCard(
+                          label: 'Open jobs',
+                          value: '${summary.openJobs}',
+                          icon: Icons.work_outline,
+                        ),
+                      ),
+                      const SizedBox(width: JobifySpacing.md),
+                      Expanded(
+                        child: _SummaryCard(
+                          label: 'Applicants',
+                          value: '${summary.totalApplicants}',
+                          icon: Icons.people_outline,
+                        ),
+                      ),
+                      const SizedBox(width: JobifySpacing.md),
+                      Expanded(
+                        child: _SummaryCard(
+                          label: 'Matches',
+                          value: '${summary.totalSurfacedMatches}',
+                          icon: Icons.bolt_outlined,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: JobifySpacing.md),
-                  Expanded(
-                    child: _SummaryCard(
-                      label: 'Applicants',
-                      value: '${summary.totalApplicants}',
-                      icon: Icons.people_outline,
+                  const SizedBox(height: JobifySpacing.xl),
+                  if (summary.recentJobs.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: JobifySpacing.xxl),
+                      child: JobifyEmptyState(
+                        headline: 'No jobs yet',
+                        body:
+                            'Post your first role to start receiving '
+                            'applicants.',
+                        icon: Icons.work_outline,
+                        primaryAction: FilledButton(
+                          onPressed: () => context.go(Routes.recruiterJobNew),
+                          child: const Text('Post your first job'),
+                        ),
+                      ),
+                    )
+                  else ...[
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Recent jobs',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () => context.go(Routes.recruiterJobs),
+                          child: const Text('View all'),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(width: JobifySpacing.md),
-                  Expanded(
-                    child: _SummaryCard(
-                      label: 'Matches',
-                      value: '${summary.totalSurfacedMatches}',
-                      icon: Icons.bolt_outlined,
-                    ),
-                  ),
+                    const SizedBox(height: JobifySpacing.sm),
+                    for (final job in summary.recentJobs) ...[
+                      RecruiterJobCard(
+                        job: job,
+                        onTap:
+                            () => context.go(
+                              '${Routes.recruiterJobs}/${job.id}',
+                              extra: job,
+                            ),
+                      ),
+                      const SizedBox(height: JobifySpacing.md),
+                    ],
+                  ],
                 ],
               ),
-              const SizedBox(height: JobifySpacing.xl),
-              if (summary.recentJobs.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: JobifySpacing.xxl),
-                  child: JobifyEmptyState(
-                    headline: 'No jobs yet',
-                    body: 'Post your first role to start receiving applicants.',
-                    icon: Icons.work_outline,
-                    primaryAction: FilledButton(
-                      onPressed: () => context.go(Routes.recruiterJobNew),
-                      child: const Text('Post your first job'),
-                    ),
-                  ),
-                )
-              else ...[
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Recent jobs',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () => context.go(Routes.recruiterJobs),
-                      child: const Text('View all'),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: JobifySpacing.sm),
-                for (final job in summary.recentJobs) ...[
-                  RecruiterJobCard(
-                    job: job,
-                    onTap: () => context.go(
-                      '${Routes.recruiterJobs}/${job.id}',
-                      extra: job,
-                    ),
-                  ),
-                  const SizedBox(height: JobifySpacing.md),
-                ],
-              ],
-            ],
-          ),
-        ),
+            ),
       ),
     );
   }

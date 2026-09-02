@@ -9,11 +9,8 @@ import 'package:jobify_app/presentation/recruiter/job_form_screen.dart';
 
 import '../helpers/fake_recruiter_jobs_repository.dart';
 
-EmployerDto _employer() => EmployerDto(
-      id: 'e1',
-      name: 'Acme Corp',
-      createdAt: DateTime.utc(2026),
-    );
+EmployerDto _employer() =>
+    EmployerDto(id: 'e1', name: 'Acme Corp', createdAt: DateTime.utc(2026));
 
 Widget _wrap(FakeRecruiterJobsRepository repo) {
   final router = GoRouter(

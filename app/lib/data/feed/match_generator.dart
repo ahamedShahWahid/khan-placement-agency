@@ -14,8 +14,8 @@ enum MatchGenerator {
 
 extension MatchGeneratorLabel on MatchGenerator {
   String get label => switch (this) {
-        MatchGenerator.templated => 'templated',
-        MatchGenerator.llm => 'LLM',
-        MatchGenerator.unknown => '',
-      };
+    MatchGenerator.templated => 'templated',
+    MatchGenerator.llm => 'LLM',
+    MatchGenerator.unknown => '',
+  };
 }

@@ -41,37 +41,38 @@ void main() {
       });
       final repo = DsrRepositoryImpl(DsrApi(dio));
       await repo.deleteAccount();
-      expect(
-        mock.lastDataFor('DELETE', '/v1/me/dsr'),
-        {'confirmation': 'DELETE_MY_ACCOUNT'},
-      );
+      expect(mock.lastDataFor('DELETE', '/v1/me/dsr'), {
+        'confirmation': 'DELETE_MY_ACCOUNT',
+      });
     });
 
-    test('deleteAccount() parses sectionCounts + warnings from the response',
-        () async {
-      final dio = Dio(BaseOptions(baseUrl: 'http://test.local'));
-      final mock = MockInterceptor();
-      dio.interceptors.add(mock);
-      mock.on('DELETE', '/v1/me/dsr', 200, {
-        'deleted_at': '2026-05-29T12:00:00Z',
-        'section_counts': {'notifications': 5, 'user_tombstoned': 1},
-        'warnings': [
-          {
-            'type': 'ownerless_employer',
-            'employer_id': 'e1',
-            'employer_name': 'Acme',
-            'message': 'Employer has no other owners.',
-          },
-        ],
-      });
-      final repo = DsrRepositoryImpl(DsrApi(dio));
-      final res = await repo.deleteAccount();
-      expect(res.sectionCounts['notifications'], 5);
-      expect(res.sectionCounts['user_tombstoned'], 1);
-      expect(res.warnings.length, 1);
-      expect(res.warnings.single.employerId, 'e1');
-      expect(res.warnings.single.employerName, 'Acme');
-      expect(res.deletedAt, DateTime.utc(2026, 5, 29, 12));
-    });
+    test(
+      'deleteAccount() parses sectionCounts + warnings from the response',
+      () async {
+        final dio = Dio(BaseOptions(baseUrl: 'http://test.local'));
+        final mock = MockInterceptor();
+        dio.interceptors.add(mock);
+        mock.on('DELETE', '/v1/me/dsr', 200, {
+          'deleted_at': '2026-05-29T12:00:00Z',
+          'section_counts': {'notifications': 5, 'user_tombstoned': 1},
+          'warnings': [
+            {
+              'type': 'ownerless_employer',
+              'employer_id': 'e1',
+              'employer_name': 'Acme',
+              'message': 'Employer has no other owners.',
+            },
+          ],
+        });
+        final repo = DsrRepositoryImpl(DsrApi(dio));
+        final res = await repo.deleteAccount();
+        expect(res.sectionCounts['notifications'], 5);
+        expect(res.sectionCounts['user_tombstoned'], 1);
+        expect(res.warnings.length, 1);
+        expect(res.warnings.single.employerId, 'e1');
+        expect(res.warnings.single.employerName, 'Acme');
+        expect(res.deletedAt, DateTime.utc(2026, 5, 29, 12));
+      },
+    );
   });
 }

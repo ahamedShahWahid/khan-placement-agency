@@ -15,11 +15,7 @@ void main() {
       'id': 'u1',
       'email': 'u@e.com',
       'role': 'applicant',
-      'applicant': {
-        'id': 'a1',
-        'full_name': 'U',
-        'notice_period_days': null,
-      },
+      'applicant': {'id': 'a1', 'full_name': 'U', 'notice_period_days': null},
     });
     final repo = MeRepositoryImpl(MeApi(dio));
     final me = await repo.fetch();
@@ -43,9 +39,7 @@ void main() {
     });
     final repo = MeRepositoryImpl(MeApi(dio));
     final me = await repo.updateProfile(
-      const ProfileUpdateDto(
-        fullName: 'Alice Khan',
-      ),
+      const ProfileUpdateDto(fullName: 'Alice Khan'),
     );
     expect(me.applicant?.fullName, 'Alice Khan');
     final sent =

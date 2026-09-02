@@ -32,8 +32,9 @@ class PrivacyController extends _$PrivacyController {
         else
           c,
     ];
-    state =
-        AsyncData(current.copyWith(consents: optimistic, mutationError: null));
+    state = AsyncData(
+      current.copyWith(consents: optimistic, mutationError: null),
+    );
 
     try {
       final updated = await repo.patch(scope, granted: granted);
@@ -45,12 +46,7 @@ class PrivacyController extends _$PrivacyController {
       state = AsyncData(current.copyWith(consents: canonical));
     } catch (e) {
       // Rollback on error.
-      state = AsyncData(
-        current.copyWith(
-          consents: previous,
-          mutationError: e,
-        ),
-      );
+      state = AsyncData(current.copyWith(consents: previous, mutationError: e));
     }
   }
 
@@ -69,10 +65,7 @@ class PrivacyController extends _$PrivacyController {
       return envelope;
     } catch (e) {
       state = AsyncData(
-        current.copyWith(
-          exportInProgress: false,
-          mutationError: e,
-        ),
+        current.copyWith(exportInProgress: false, mutationError: e),
       );
       return null;
     }

@@ -22,9 +22,10 @@ abstract final class JobifyTypography {
   ];
 
   static TextTheme textTheme(Brightness brightness) {
-    final base = brightness == Brightness.dark
-        ? Typography.whiteMountainView
-        : Typography.blackMountainView;
+    final base =
+        brightness == Brightness.dark
+            ? Typography.whiteMountainView
+            : Typography.blackMountainView;
     return GoogleFonts.interTextTheme(base)
         .copyWith(
           displayLarge: GoogleFonts.schibstedGrotesk(
@@ -101,11 +102,10 @@ abstract final class JobifyTypography {
     FontWeight fontWeight = FontWeight.w500,
     Color? color,
     double? letterSpacing,
-  }) =>
-      GoogleFonts.ibmPlexMono(
-        fontSize: fontSize,
-        fontWeight: fontWeight,
-        color: color,
-        letterSpacing: letterSpacing,
-      ).copyWith(fontFamilyFallback: _devanagariFallback);
+  }) => GoogleFonts.ibmPlexMono(
+    fontSize: fontSize,
+    fontWeight: fontWeight,
+    color: color,
+    letterSpacing: letterSpacing,
+  ).copyWith(fontFamilyFallback: _devanagariFallback);
 }

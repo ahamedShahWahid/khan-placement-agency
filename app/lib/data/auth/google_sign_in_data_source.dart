@@ -24,15 +24,16 @@ class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
   // button path (see GoogleWebSignIn) is used instead — but this construction
   // still runs on web because `signOut()` lazily inits the plugin, which would
   // hit the `serverClientId is not supported on Web` assert otherwise.
-  static GoogleSignIn _defaultSdk() => kIsWeb
-      ? GoogleSignIn(
-          clientId: Env.googleWebClientId,
-          scopes: const ['email', 'profile', 'openid'],
-        )
-      : GoogleSignIn(
-          serverClientId: Env.googleWebClientId,
-          scopes: const ['email', 'profile', 'openid'],
-        );
+  static GoogleSignIn _defaultSdk() =>
+      kIsWeb
+          ? GoogleSignIn(
+            clientId: Env.googleWebClientId,
+            scopes: const ['email', 'profile', 'openid'],
+          )
+          : GoogleSignIn(
+            serverClientId: Env.googleWebClientId,
+            scopes: const ['email', 'profile', 'openid'],
+          );
 
   final GoogleSignIn _sdk;
 

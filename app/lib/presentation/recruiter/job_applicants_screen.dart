@@ -112,53 +112,67 @@ class _JobApplicantsScreenState extends ConsumerState<JobApplicantsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final value =
-        ref.watch(recruiterApplicantsControllerProvider(widget.jobId));
+    final value = ref.watch(
+      recruiterApplicantsControllerProvider(widget.jobId),
+    );
 
     return Scaffold(
       appBar: AppBar(title: const Text('Applicants')),
       body: AsyncValueWidget<RecruiterApplicantsState>(
         value: value,
-        onRetry: () => ref
-            .read(recruiterApplicantsControllerProvider(widget.jobId).notifier)
-            .refresh(),
+        onRetry:
+            () =>
+                ref
+                    .read(
+                      recruiterApplicantsControllerProvider(
+                        widget.jobId,
+                      ).notifier,
+                    )
+                    .refresh(),
         isEmpty: (s) => s.items.isEmpty,
-        empty: () => const JobifyEmptyState(
-          headline: 'No applicants yet',
-          body: 'When candidates apply, they will show up here.',
-          icon: Icons.people_outline,
-        ),
-        data: (s) => RefreshIndicator(
-          onRefresh: () => ref
-              .read(
-                recruiterApplicantsControllerProvider(widget.jobId).notifier,
-              )
-              .refresh(),
-          child: ListView.separated(
-            controller: _scroll,
-            padding: const EdgeInsets.all(JobifySpacing.lg),
-            itemCount: s.items.length + 1,
-            separatorBuilder: (_, __) =>
-                const SizedBox(height: JobifySpacing.md),
-            itemBuilder: (context, i) {
-              if (i == s.items.length) {
-                if (s.isLoadingMore) {
-                  return const Padding(
-                    padding: EdgeInsets.all(JobifySpacing.lg),
-                    child: JobifyLoadingView(),
+        empty:
+            () => const JobifyEmptyState(
+              headline: 'No applicants yet',
+              body: 'When candidates apply, they will show up here.',
+              icon: Icons.people_outline,
+            ),
+        data:
+            (s) => RefreshIndicator(
+              onRefresh:
+                  () =>
+                      ref
+                          .read(
+                            recruiterApplicantsControllerProvider(
+                              widget.jobId,
+                            ).notifier,
+                          )
+                          .refresh(),
+              child: ListView.separated(
+                controller: _scroll,
+                padding: const EdgeInsets.all(JobifySpacing.lg),
+                itemCount: s.items.length + 1,
+                separatorBuilder:
+                    (_, __) => const SizedBox(height: JobifySpacing.md),
+                itemBuilder: (context, i) {
+                  if (i == s.items.length) {
+                    if (s.isLoadingMore) {
+                      return const Padding(
+                        padding: EdgeInsets.all(JobifySpacing.lg),
+                        child: JobifyLoadingView(),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  }
+                  return _ApplicantCard(
+                    applicant: s.items[i],
+                    onDownload: () => _download(s.items[i].applicationId),
+                    onChangeStage:
+                        (stage) =>
+                            _changeStage(s.items[i].applicationId, stage),
                   );
-                }
-                return const SizedBox.shrink();
-              }
-              return _ApplicantCard(
-                applicant: s.items[i],
-                onDownload: () => _download(s.items[i].applicationId),
-                onChangeStage: (stage) =>
-                    _changeStage(s.items[i].applicationId, stage),
-              );
-            },
-          ),
-        ),
+                },
+              ),
+            ),
       ),
     );
   }
@@ -190,9 +204,7 @@ class _ApplicantCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Text(name, style: theme.textTheme.titleMedium),
-                ),
+                Expanded(child: Text(name, style: theme.textTheme.titleMedium)),
                 if (applicant.matchScore != null) ...[
                   const SizedBox(width: JobifySpacing.sm),
                   JobifyScoreBadge(score: applicant.matchScore!),
@@ -225,20 +237,22 @@ class _ApplicantCard extends StatelessWidget {
                   tooltip: 'Change stage',
                   initialValue: applicant.stage,
                   onSelected: onChangeStage,
-                  itemBuilder: (context) => const [
-                    ApplicationStage.shortlisted,
-                    ApplicationStage.interview,
-                    ApplicationStage.offer,
-                    ApplicationStage.hired,
-                    ApplicationStage.rejected,
-                  ]
-                      .map(
-                        (s) => PopupMenuItem(
-                          value: s,
-                          child: Text(stageLabel(s)),
-                        ),
-                      )
-                      .toList(),
+                  itemBuilder:
+                      (context) =>
+                          const [
+                                ApplicationStage.shortlisted,
+                                ApplicationStage.interview,
+                                ApplicationStage.offer,
+                                ApplicationStage.hired,
+                                ApplicationStage.rejected,
+                              ]
+                              .map(
+                                (s) => PopupMenuItem(
+                                  value: s,
+                                  child: Text(stageLabel(s)),
+                                ),
+                              )
+                              .toList(),
                   child: _StageChip(stage: applicant.stage),
                 ),
               ],
@@ -272,8 +286,9 @@ class _StageChip extends StatelessWidget {
         children: [
           Text(
             stageLabel(stage),
-            style: theme.textTheme.labelSmall
-                ?.copyWith(color: theme.colorScheme.onPrimaryContainer),
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onPrimaryContainer,
+            ),
           ),
           const SizedBox(width: JobifySpacing.xs),
           Icon(

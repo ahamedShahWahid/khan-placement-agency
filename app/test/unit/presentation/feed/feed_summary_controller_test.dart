@@ -20,8 +20,7 @@ class _FakeApplicationsRepo implements ApplicationsRepository {
   Future<ApplicationsPageDto> fetchPage({
     String? cursor,
     int limit = 20,
-  }) async =>
-      _page;
+  }) async => _page;
 
   @override
   Future<ApplicationDto> withdraw(String applicationId) async =>
@@ -46,8 +45,7 @@ class _ThrowingApplicationsRepo implements ApplicationsRepository {
   Future<ApplicationsPageDto> fetchPage({
     String? cursor,
     int limit = 20,
-  }) async =>
-      throw Exception('applications boom');
+  }) async => throw Exception('applications boom');
 
   @override
   Future<ApplicationDto> withdraw(String applicationId) async =>
@@ -74,54 +72,58 @@ final _job = JobSummaryDto(
 const _employer = EmployerSummaryDto(id: 'e1', name: 'Acme Co');
 
 ApplicationListItemDto _application(String id) => ApplicationListItemDto(
-      application: ApplicationDto(
-        id: id,
-        jobId: 'j1',
-        status: ApplicationStatus.applied,
-        source: ApplicationSource.feed,
-        stage: ApplicationStage.applied,
-        createdAt: DateTime.parse('2026-05-18T00:00:00Z'),
-        updatedAt: DateTime.parse('2026-05-18T00:00:00Z'),
-      ),
-      job: _job,
-      employer: _employer,
-    );
+  application: ApplicationDto(
+    id: id,
+    jobId: 'j1',
+    status: ApplicationStatus.applied,
+    source: ApplicationSource.feed,
+    stage: ApplicationStage.applied,
+    createdAt: DateTime.parse('2026-05-18T00:00:00Z'),
+    updatedAt: DateTime.parse('2026-05-18T00:00:00Z'),
+  ),
+  job: _job,
+  employer: _employer,
+);
 
 SavedJobListItemDto _saved(String id) => SavedJobListItemDto(
-      saved: SavedJobDto(
-        id: id,
-        jobId: 'j1',
-        createdAt: DateTime.parse('2026-05-18T00:00:00Z'),
-      ),
-      job: _job,
-      employer: _employer,
-    );
+  saved: SavedJobDto(
+    id: id,
+    jobId: 'j1',
+    createdAt: DateTime.parse('2026-05-18T00:00:00Z'),
+  ),
+  job: _job,
+  employer: _employer,
+);
 
 void main() {
-  test('counts items and reports no approximation when nextCursor is null',
-      () async {
-    final container = ProviderContainer(
-      overrides: [
-        applicationsRepositoryProvider.overrideWithValue(
-          _FakeApplicationsRepo(
-            ApplicationsPageDto(
-              items: [_application('a1'), _application('a2')],
+  test(
+    'counts items and reports no approximation when nextCursor is null',
+    () async {
+      final container = ProviderContainer(
+        overrides: [
+          applicationsRepositoryProvider.overrideWithValue(
+            _FakeApplicationsRepo(
+              ApplicationsPageDto(
+                items: [_application('a1'), _application('a2')],
+              ),
             ),
           ),
-        ),
-        savedJobsRepositoryProvider.overrideWithValue(
-          _FakeSavedJobsRepo(SavedJobsPageDto(items: [_saved('s1')])),
-        ),
-      ],
-    );
-    addTearDown(container.dispose);
+          savedJobsRepositoryProvider.overrideWithValue(
+            _FakeSavedJobsRepo(SavedJobsPageDto(items: [_saved('s1')])),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
 
-    final summary = await container.read(feedSummaryControllerProvider.future);
-    expect(summary.applicationsCount, 2);
-    expect(summary.applicationsApprox, isFalse);
-    expect(summary.savedCount, 1);
-    expect(summary.savedApprox, isFalse);
-  });
+      final summary = await container.read(
+        feedSummaryControllerProvider.future,
+      );
+      expect(summary.applicationsCount, 2);
+      expect(summary.applicationsApprox, isFalse);
+      expect(summary.savedCount, 1);
+      expect(summary.savedApprox, isFalse);
+    },
+  );
 
   test('reports approximation when nextCursor is present', () async {
     final container = ProviderContainer(
@@ -164,8 +166,7 @@ void main() {
     expect(summary.savedCount, 0);
   });
 
-  test(
-      'both repos rejecting completes with a single clean error '
+  test('both repos rejecting completes with a single clean error '
       '(no hang, no separate unhandled-rejection zone error)', () async {
     final container = ProviderContainer(
       // Riverpod's default automatic retry (up to 10 retries, 200ms-6.4s
@@ -176,8 +177,9 @@ void main() {
       // unhandled-rejection zone error) surfaces promptly.
       retry: (_, __) => null,
       overrides: [
-        applicationsRepositoryProvider
-            .overrideWithValue(_ThrowingApplicationsRepo()),
+        applicationsRepositoryProvider.overrideWithValue(
+          _ThrowingApplicationsRepo(),
+        ),
         savedJobsRepositoryProvider.overrideWithValue(_ThrowingSavedJobsRepo()),
       ],
     );

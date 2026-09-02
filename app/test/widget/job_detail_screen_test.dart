@@ -24,62 +24,57 @@ class _FakeJobsRepo implements JobsRepository {
   Future<ApplicationDto> applyTo(
     String id, {
     ApplicationSource source = ApplicationSource.feed,
-  }) async =>
-      ApplicationDto(
-        id: 'a1',
-        jobId: id,
-        status: ApplicationStatus.applied,
-        source: source,
-        stage: ApplicationStage.applied,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
+  }) async => ApplicationDto(
+    id: 'a1',
+    jobId: id,
+    status: ApplicationStatus.applied,
+    source: source,
+    stage: ApplicationStage.applied,
+    createdAt: DateTime.now(),
+    updatedAt: DateTime.now(),
+  );
   @override
-  Future<SavedJobDto> save(String id) async => SavedJobDto(
-        id: 's1',
-        jobId: id,
-        createdAt: DateTime.now(),
-      );
+  Future<SavedJobDto> save(String id) async =>
+      SavedJobDto(id: 's1', jobId: id, createdAt: DateTime.now());
   @override
   Future<void> unsave(String id) async {}
   @override
   Future<MatchFeedbackDto> rateMatch(
     String id,
     MatchFeedbackRating rating,
-  ) async =>
-      MatchFeedbackDto(
-        id: 'f1',
-        jobId: id,
-        rating: rating,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
+  ) async => MatchFeedbackDto(
+    id: 'f1',
+    jobId: id,
+    rating: rating,
+    createdAt: DateTime.now(),
+    updatedAt: DateTime.now(),
+  );
   @override
   Future<void> clearMatchFeedback(String id) async {}
 }
 
 JobDetailDto _detail({ApplicationDto? app, SavedJobDto? saved}) => JobDetailDto(
-      job: JobSummaryDto(
-        id: 'j1',
-        title: 'Senior Engineer',
-        locations: const ['BLR'],
-        status: JobStatus.open,
-        postedAt: DateTime.parse('2026-05-18T00:00:00Z'),
-      ),
-      employer: const EmployerSummaryDto(id: 'e1', name: 'Acme Co'),
-      match: const MatchSummaryDto(
-        id: 'm1',
-        totalScore: 0.82,
-        scoreComponents: {},
-        explanation: ExplanationDto(
-          fit: 'great fit',
-          generator: MatchGenerator.templated,
-          generatorVersion: '1',
-        ),
-      ),
-      application: app,
-      savedJob: saved,
-    );
+  job: JobSummaryDto(
+    id: 'j1',
+    title: 'Senior Engineer',
+    locations: const ['BLR'],
+    status: JobStatus.open,
+    postedAt: DateTime.parse('2026-05-18T00:00:00Z'),
+  ),
+  employer: const EmployerSummaryDto(id: 'e1', name: 'Acme Co'),
+  match: const MatchSummaryDto(
+    id: 'm1',
+    totalScore: 0.82,
+    scoreComponents: {},
+    explanation: ExplanationDto(
+      fit: 'great fit',
+      generator: MatchGenerator.templated,
+      generatorVersion: '1',
+    ),
+  ),
+  application: app,
+  savedJob: saved,
+);
 
 Widget _wrap(Widget child, {required JobsRepository repo}) {
   return ProviderScope(
@@ -96,10 +91,7 @@ Widget _wrap(Widget child, {required JobsRepository repo}) {
 void main() {
   testWidgets('shows Apply button when no application', (tester) async {
     await tester.pumpWidget(
-      _wrap(
-        const JobDetailScreen(jobId: 'j1'),
-        repo: _FakeJobsRepo(_detail()),
-      ),
+      _wrap(const JobDetailScreen(jobId: 'j1'), repo: _FakeJobsRepo(_detail())),
     );
     await tester.pumpAndSettle();
     expect(find.text('Apply'), findsOneWidget);
@@ -127,11 +119,7 @@ void main() {
   });
 
   testWidgets('shows filled heart when saved', (tester) async {
-    final s = SavedJobDto(
-      id: 's1',
-      jobId: 'j1',
-      createdAt: DateTime.now(),
-    );
+    final s = SavedJobDto(id: 's1', jobId: 'j1', createdAt: DateTime.now());
     await tester.pumpWidget(
       _wrap(
         const JobDetailScreen(jobId: 'j1'),
@@ -144,10 +132,7 @@ void main() {
 
   testWidgets('renders explanation card', (tester) async {
     await tester.pumpWidget(
-      _wrap(
-        const JobDetailScreen(jobId: 'j1'),
-        repo: _FakeJobsRepo(_detail()),
-      ),
+      _wrap(const JobDetailScreen(jobId: 'j1'), repo: _FakeJobsRepo(_detail())),
     );
     await tester.pumpAndSettle();
     expect(find.text('Why this match'), findsOneWidget);

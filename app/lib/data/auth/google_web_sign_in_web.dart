@@ -12,13 +12,13 @@ GoogleWebSignIn createGoogleWebSignIn() => _WebGoogleSignIn();
 
 class _WebGoogleSignIn implements GoogleWebSignIn {
   _WebGoogleSignIn()
-      : _sdk = GoogleSignIn(
-          // Web uses `clientId` (NOT `serverClientId`, which asserts on web).
-          // The returned credential's `aud` is this web client id, which is
-          // what the backend's JOBIFY_GOOGLE_OAUTH_CLIENT_IDS verifies against.
-          clientId: Env.googleWebClientId,
-          scopes: const ['email', 'profile', 'openid'],
-        );
+    : _sdk = GoogleSignIn(
+        // Web uses `clientId` (NOT `serverClientId`, which asserts on web).
+        // The returned credential's `aud` is this web client id, which is
+        // what the backend's JOBIFY_GOOGLE_OAUTH_CLIENT_IDS verifies against.
+        clientId: Env.googleWebClientId,
+        scopes: const ['email', 'profile', 'openid'],
+      );
 
   final GoogleSignIn _sdk;
   final StreamController<String> _tokens = StreamController<String>.broadcast();

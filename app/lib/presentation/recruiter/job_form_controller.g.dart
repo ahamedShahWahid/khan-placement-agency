@@ -15,15 +15,15 @@ final jobFormControllerProvider = JobFormControllerProvider._();
 final class JobFormControllerProvider
     extends $AsyncNotifierProvider<JobFormController, RecruiterJobDto?> {
   JobFormControllerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'jobFormControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'jobFormControllerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$jobFormControllerHash();
@@ -42,11 +42,14 @@ abstract class _$JobFormController extends $AsyncNotifier<RecruiterJobDto?> {
   void runBuild() {
     final ref =
         this.ref as $Ref<AsyncValue<RecruiterJobDto?>, RecruiterJobDto?>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<RecruiterJobDto?>, RecruiterJobDto?>,
-        AsyncValue<RecruiterJobDto?>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<RecruiterJobDto?>, RecruiterJobDto?>,
+              AsyncValue<RecruiterJobDto?>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

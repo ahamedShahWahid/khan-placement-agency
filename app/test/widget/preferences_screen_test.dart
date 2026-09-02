@@ -32,18 +32,18 @@ class _ThrowingRepo implements PreferencesRepository {
 }
 
 ResumeDto _resumeWithParsed() => ResumeDto(
-      id: 'r1',
-      applicantId: 'a1',
-      originalFilename: 'cv.pdf',
-      contentType: 'application/pdf',
-      sizeBytes: 1,
-      parseStatus: ResumeParseStatus.parsed,
-      parsedJson: const {
-        'name': 'Ada Lovelace',
-        'skills': ['Python', 'SQL'],
-      },
-      createdAt: DateTime(2026),
-    );
+  id: 'r1',
+  applicantId: 'a1',
+  originalFilename: 'cv.pdf',
+  contentType: 'application/pdf',
+  sizeBytes: 1,
+  parseStatus: ResumeParseStatus.parsed,
+  parsedJson: const {
+    'name': 'Ada Lovelace',
+    'skills': ['Python', 'SQL'],
+  },
+  createdAt: DateTime(2026),
+);
 
 Future<void> _pump(
   WidgetTester tester, {
@@ -52,10 +52,7 @@ Future<void> _pump(
 }) async {
   final router = GoRouter(
     routes: [
-      GoRoute(
-        path: '/',
-        builder: (_, __) => PreferencesScreen(resume: resume),
-      ),
+      GoRoute(path: '/', builder: (_, __) => PreferencesScreen(resume: resume)),
     ],
   );
   await tester.pumpWidget(
@@ -125,8 +122,9 @@ void main() {
     expect(repo.captured, isNull);
   });
 
-  testWidgets('fetch error shows Retry and keeps Skip available',
-      (tester) async {
+  testWidgets('fetch error shows Retry and keeps Skip available', (
+    tester,
+  ) async {
     await _pump(tester, repo: _ThrowingRepo(), resume: _resumeWithParsed());
     expect(find.text('Retry'), findsOneWidget);
     expect(find.text('Skip'), findsOneWidget);

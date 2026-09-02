@@ -20,13 +20,15 @@ class ActionBar extends ConsumerWidget {
     final jobId = detail.job.id;
 
     final applyState = ref.watch(applyToJobControllerProvider(jobId));
-    final withdrawState = app == null
-        ? const AsyncValue<ApplicationDto?>.data(null)
-        : ref.watch(withdrawApplicationControllerProvider(app.id));
+    final withdrawState =
+        app == null
+            ? const AsyncValue<ApplicationDto?>.data(null)
+            : ref.watch(withdrawApplicationControllerProvider(app.id));
     final saveState = ref.watch(saveJobControllerProvider(jobId));
     final unsaveState = ref.watch(unsaveJobControllerProvider(jobId));
 
-    final isBusy = applyState.isLoading ||
+    final isBusy =
+        applyState.isLoading ||
         withdrawState.isLoading ||
         saveState.isLoading ||
         unsaveState.isLoading;
@@ -37,9 +39,7 @@ class ActionBar extends ConsumerWidget {
         padding: const EdgeInsets.all(JobifySpacing.lg),
         child: Row(
           children: [
-            Expanded(
-              child: _applyOrWithdraw(context, ref, app, jobId, isBusy),
-            ),
+            Expanded(child: _applyOrWithdraw(context, ref, app, jobId, isBusy)),
             const SizedBox(width: JobifySpacing.md),
             _saveHeart(context, ref, saved, jobId, isBusy),
           ],
@@ -57,10 +57,13 @@ class ActionBar extends ConsumerWidget {
   ) {
     if (app == null || app.status == ApplicationStatus.withdrawn) {
       return FilledButton(
-        onPressed: isBusy
-            ? null
-            : () =>
-                ref.read(applyToJobControllerProvider(jobId).notifier).submit(),
+        onPressed:
+            isBusy
+                ? null
+                : () =>
+                    ref
+                        .read(applyToJobControllerProvider(jobId).notifier)
+                        .submit(),
         child: Text(ctx.l10n.jobDetailApplyButton),
       );
     }
@@ -79,15 +82,18 @@ class ActionBar extends ConsumerWidget {
   ) {
     final filled = saved != null;
     return IconButton.filledTonal(
-      onPressed: isBusy
-          ? null
-          : () {
-              if (filled) {
-                ref.read(unsaveJobControllerProvider(jobId).notifier).submit();
-              } else {
-                ref.read(saveJobControllerProvider(jobId).notifier).submit();
-              }
-            },
+      onPressed:
+          isBusy
+              ? null
+              : () {
+                if (filled) {
+                  ref
+                      .read(unsaveJobControllerProvider(jobId).notifier)
+                      .submit();
+                } else {
+                  ref.read(saveJobControllerProvider(jobId).notifier).submit();
+                }
+              },
       icon: Icon(filled ? Icons.bookmark : Icons.bookmark_outline),
     );
   }
@@ -101,20 +107,21 @@ class ActionBar extends ConsumerWidget {
     final l10n = ctx.l10n;
     final ok = await showDialog<bool>(
       context: ctx,
-      builder: (c) => AlertDialog(
-        title: Text(l10n.jobDetailWithdrawDialogTitle),
-        content: Text(l10n.jobDetailWithdrawDialogBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(c, false),
-            child: Text(l10n.commonCancel),
+      builder:
+          (c) => AlertDialog(
+            title: Text(l10n.jobDetailWithdrawDialogTitle),
+            content: Text(l10n.jobDetailWithdrawDialogBody),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(c, false),
+                child: Text(l10n.commonCancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(c, true),
+                child: Text(l10n.jobDetailWithdrawButton),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(c, true),
-            child: Text(l10n.jobDetailWithdrawButton),
-          ),
-        ],
-      ),
     );
     if (ok ?? false) {
       await ref

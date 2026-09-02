@@ -49,12 +49,13 @@ class _ResumeScreenState extends ConsumerState<ResumeScreen> {
       _snack(context.l10n.resumeUnsupportedFileType);
       return;
     }
-    final ok =
-        await ref.read(resumeControllerProvider.notifier).uploadFromPicked(
-              bytes: bytes,
-              filename: file.name,
-              contentType: contentType,
-            );
+    final ok = await ref
+        .read(resumeControllerProvider.notifier)
+        .uploadFromPicked(
+          bytes: bytes,
+          filename: file.name,
+          contentType: contentType,
+        );
     if (!mounted) return;
     if (ok) {
       Future.delayed(const Duration(seconds: 2), _refreshIfMounted);
@@ -147,10 +148,13 @@ class _ResumeScreenState extends ConsumerState<ResumeScreen> {
           children: [
             AsyncValueWidget<ResumeDto?>(
               value: state,
-              onRetry: () =>
-                  ref.read(resumeControllerProvider.notifier).refresh(),
-              data: (resume) =>
-                  resume == null ? const _Empty() : _ResumeCard(resume: resume),
+              onRetry:
+                  () => ref.read(resumeControllerProvider.notifier).refresh(),
+              data:
+                  (resume) =>
+                      resume == null
+                          ? const _Empty()
+                          : _ResumeCard(resume: resume),
             ),
             const SizedBox(height: JobifySpacing.xl),
             FilledButton.icon(
@@ -174,12 +178,12 @@ class _Empty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: JobifySpacing.xl),
-        child: Text(
-          context.l10n.resumeEmptyBody,
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-      );
+    padding: const EdgeInsets.symmetric(vertical: JobifySpacing.xl),
+    child: Text(
+      context.l10n.resumeEmptyBody,
+      style: Theme.of(context).textTheme.bodyMedium,
+    ),
+  );
 }
 
 class _ResumeCard extends StatelessWidget {
@@ -230,8 +234,9 @@ class _ResumeCard extends StatelessWidget {
               context.l10n.resumeUploadedOn(
                 jobifyLongDateFormat.format(resume.createdAt),
               ),
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: JobifySpacing.sm),
             Container(

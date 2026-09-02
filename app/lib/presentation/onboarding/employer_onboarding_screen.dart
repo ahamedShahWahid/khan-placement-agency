@@ -41,7 +41,9 @@ class _EmployerOnboardingScreenState
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    await ref.read(employerOnboardingControllerProvider.notifier).submit(
+    await ref
+        .read(employerOnboardingControllerProvider.notifier)
+        .submit(
           name: _name.text.trim(),
           gst: _gst.text.trim().isEmpty ? null : _gst.text.trim(),
         );
@@ -55,9 +57,10 @@ class _EmployerOnboardingScreenState
     ref.listen(employerOnboardingControllerProvider, (_, next) {
       if (next.hasError && context.mounted) {
         final err = next.error;
-        final msg = err is ApiException && err.slug == 'employer_name_taken'
-            ? context.l10n.onboardingCompanyNameTaken
-            : context.l10n.onboardingCreateEmployerFailed;
+        final msg =
+            err is ApiException && err.slug == 'employer_name_taken'
+                ? context.l10n.onboardingCompanyNameTaken
+                : context.l10n.onboardingCreateEmployerFailed;
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(SnackBar(content: Text(msg)));
@@ -95,13 +98,14 @@ class _EmployerOnboardingScreenState
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: isLoading ? null : _submit,
-                child: isLoading
-                    ? const SizedBox(
-                        height: 18,
-                        width: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(context.l10n.onboardingCreateCompanyButton),
+                child:
+                    isLoading
+                        ? const SizedBox(
+                          height: 18,
+                          width: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                        : Text(context.l10n.onboardingCreateCompanyButton),
               ),
             ],
           ),

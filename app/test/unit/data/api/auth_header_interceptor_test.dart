@@ -26,10 +26,7 @@ void main() {
     final handler = _TestHandler();
 
     interceptor.onRequest(options, handler);
-    expect(
-      handler.capturedOptions.headers['Authorization'],
-      'Bearer tok-123',
-    );
+    expect(handler.capturedOptions.headers['Authorization'], 'Bearer tok-123');
   });
 
   test('omits Authorization when no token', () {
@@ -44,10 +41,7 @@ void main() {
   test('omits Authorization when kSkipAuth=true even with token', () {
     holder.set('tok-xyz');
     final interceptor = AuthHeaderInterceptor(holder);
-    final options = RequestOptions(
-      path: '/foo',
-      extra: {kSkipAuth: true},
-    );
+    final options = RequestOptions(path: '/foo', extra: {kSkipAuth: true});
     final handler = _TestHandler();
 
     interceptor.onRequest(options, handler);

@@ -19,10 +19,11 @@ Widget _wrap(Widget child, {List<Override> overrides = const []}) {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: Builder(
-        builder: (context) => MediaQuery(
-          data: MediaQuery.of(context).copyWith(disableAnimations: true),
-          child: child,
-        ),
+        builder:
+            (context) => MediaQuery(
+              data: MediaQuery.of(context).copyWith(disableAnimations: true),
+              child: child,
+            ),
       ),
     ),
   );
@@ -41,8 +42,9 @@ void main() {
     expect(find.text('Continue with Google'), findsOneWidget);
   });
 
-  testWidgets('wide two-pane layout renders scene + sign-in without overflow',
-      (tester) async {
+  testWidgets('wide two-pane layout renders scene + sign-in without overflow', (
+    tester,
+  ) async {
     await tester.binding.setSurfaceSize(const Size(1200, 900));
     addTearDown(() => tester.binding.setSurfaceSize(null));
     await tester.pumpWidget(_wrap(const SignInScreen()));
@@ -59,9 +61,7 @@ void main() {
     await tester.pumpWidget(
       _wrap(
         const SignInScreen(),
-        overrides: [
-          signInControllerProvider.overrideWith(_LoadingStub.new),
-        ],
+        overrides: [signInControllerProvider.overrideWith(_LoadingStub.new)],
       ),
     );
     await tester.pump();

@@ -23,12 +23,12 @@ class AuthRepositoryImpl implements AuthRepository {
     required GoogleSignInDataSource google,
     required void Function(AuthState) emit,
     required AuthState Function() readState,
-  })  : _dio = dio,
-        _accessHolder = accessHolder,
-        _tokenStorage = tokenStorage,
-        _google = google,
-        _emit = emit,
-        _readState = readState;
+  }) : _dio = dio,
+       _accessHolder = accessHolder,
+       _tokenStorage = tokenStorage,
+       _google = google,
+       _emit = emit,
+       _readState = readState;
 
   final Dio _dio;
   final AccessTokenHolder _accessHolder;

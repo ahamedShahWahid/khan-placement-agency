@@ -24,15 +24,15 @@ final class AuthStateNotifierProvider
   /// controller (Task 24), the sign-in controller (Task 25), the sign-out
   /// controller (Task 30), and the refresh interceptor's onSignedOut callback.
   AuthStateNotifierProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'authStateProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'authStateProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$authStateNotifierHash();
@@ -62,8 +62,14 @@ abstract class _$AuthStateNotifier extends $Notifier<AuthState> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<AuthState, AuthState>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AuthState, AuthState>, AuthState, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AuthState, AuthState>,
+              AuthState,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

@@ -129,9 +129,8 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
     final amount = (filters.minCtc! / 100000).toStringAsFixed(decimals);
     return InputChip(
       label: Text(context.l10n.feedMinCtcChipLabel(amount)),
-      onDeleted: () => _mutateSelf(
-        () => notifier.set(filters.copyWith(minCtc: null)),
-      ),
+      onDeleted:
+          () => _mutateSelf(() => notifier.set(filters.copyWith(minCtc: null))),
     );
   }
 
@@ -165,16 +164,18 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
             const SizedBox(width: JobifySpacing.sm),
             IconButton(
               tooltip: context.l10n.feedFiltersTooltip,
-              onPressed: () => showModalBottomSheet<void>(
-                context: context,
-                isScrollControlled: true,
-                builder: (_) => const FeedFilterSheet(),
-              ),
+              onPressed:
+                  () => showModalBottomSheet<void>(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (_) => const FeedFilterSheet(),
+                  ),
               icon: Icon(
                 Icons.tune,
-                color: filters.isEmpty
-                    ? null
-                    : Theme.of(context).colorScheme.primary,
+                color:
+                    filters.isEmpty
+                        ? null
+                        : Theme.of(context).colorScheme.primary,
               ),
             ),
           ],
@@ -188,48 +189,47 @@ class _FeedFilterBarState extends ConsumerState<FeedFilterBar> {
               for (final loc in filters.locations)
                 InputChip(
                   label: Text(loc),
-                  onDeleted: () => _mutateSelf(
-                    () => notifier.set(
-                      filters.copyWith(
-                        locations: [
-                          for (final l in filters.locations)
-                            if (l != loc) l,
-                        ],
+                  onDeleted:
+                      () => _mutateSelf(
+                        () => notifier.set(
+                          filters.copyWith(
+                            locations: [
+                              for (final l in filters.locations)
+                                if (l != loc) l,
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
                 ),
               if (filters.minYears != null)
                 InputChip(
-                  label: Text(
-                    context.l10n.feedYearsSuffix(filters.minYears!),
-                  ),
-                  onDeleted: () => _mutateSelf(
-                    () => notifier.set(filters.copyWith(minYears: null)),
-                  ),
+                  label: Text(context.l10n.feedYearsSuffix(filters.minYears!)),
+                  onDeleted:
+                      () => _mutateSelf(
+                        () => notifier.set(filters.copyWith(minYears: null)),
+                      ),
                 ),
               if (filters.minCtc != null) ...[
-                _buildCtcChip(
-                  filters: filters,
-                  notifier: notifier,
-                ),
+                _buildCtcChip(filters: filters, notifier: notifier),
               ],
               ActionChip(
                 label: Text(context.l10n.feedClearAllButton),
-                onPressed: () => _mutateSelf(() {
-                  // Cancel HERE, not in the listener: this is a self-
-                  // mutation, so `_syncControllerFromExternalClear` short-
-                  // circuits on `_selfMutation` and never reaches its
-                  // `_debounce?.cancel()`. And `_searchController.clear()`
-                  // does not fire `onChanged`, so nothing else touches the
-                  // timer — an in-flight debounce would fire at its original
-                  // deadline and silently reinstate the query the user just
-                  // cleared. (Deliberately NOT hoisted into `_mutateSelf`:
-                  // chip removals must leave a pending debounce running.)
-                  _debounce?.cancel();
-                  _searchController.clear();
-                  notifier.clear();
-                }),
+                onPressed:
+                    () => _mutateSelf(() {
+                      // Cancel HERE, not in the listener: this is a self-
+                      // mutation, so `_syncControllerFromExternalClear` short-
+                      // circuits on `_selfMutation` and never reaches its
+                      // `_debounce?.cancel()`. And `_searchController.clear()`
+                      // does not fire `onChanged`, so nothing else touches the
+                      // timer — an in-flight debounce would fire at its
+                      // original
+                      // deadline and silently reinstate the query the user just
+                      // cleared. (Deliberately NOT hoisted into `_mutateSelf`:
+                      // chip removals must leave a pending debounce running.)
+                      _debounce?.cancel();
+                      _searchController.clear();
+                      notifier.clear();
+                    }),
               ),
             ],
           ),

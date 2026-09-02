@@ -34,15 +34,15 @@ class ThemeModeController extends _$ThemeModeController {
   }
 
   static String _toString(ThemeMode mode) => switch (mode) {
-        ThemeMode.light => 'light',
-        ThemeMode.dark => 'dark',
-        ThemeMode.system => 'system',
-      };
+    ThemeMode.light => 'light',
+    ThemeMode.dark => 'dark',
+    ThemeMode.system => 'system',
+  };
 
   static ThemeMode? _fromString(String value) => switch (value) {
-        'light' => ThemeMode.light,
-        'dark' => ThemeMode.dark,
-        'system' => ThemeMode.system,
-        _ => null,
-      };
+    'light' => ThemeMode.light,
+    'dark' => ThemeMode.dark,
+    'system' => ThemeMode.system,
+    _ => null,
+  };
 }

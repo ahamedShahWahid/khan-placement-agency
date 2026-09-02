@@ -28,7 +28,8 @@ final class AuthException extends JobifyException {
   final String? detail; // backend's user-facing detail (problem+json)
 
   @override
-  String toString() => 'AuthException($slug'
+  String toString() =>
+      'AuthException($slug'
       '${detail == null ? '' : ': $detail'})';
 }
 
@@ -47,7 +48,8 @@ final class ApiException extends JobifyException {
   final String? detail;
 
   @override
-  String toString() => 'ApiException($statusCode'
+  String toString() =>
+      'ApiException($statusCode'
       '${slug == null ? '' : ' $slug'}'
       '${detail == null ? '' : ': $detail'})';
 }

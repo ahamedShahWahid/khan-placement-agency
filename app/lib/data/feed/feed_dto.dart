@@ -7,10 +7,7 @@ part 'feed_dto.g.dart';
 
 @JsonSerializable()
 class FeedPageDto {
-  const FeedPageDto({
-    required this.items,
-    this.nextCursor,
-  });
+  const FeedPageDto({required this.items, this.nextCursor});
 
   factory FeedPageDto.fromJson(Map<String, dynamic> json) =>
       _$FeedPageDtoFromJson(json);

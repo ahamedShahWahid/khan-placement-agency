@@ -21,11 +21,11 @@ import '../helpers/fake_repositories.dart';
 class _SignedInAuthStateNotifier extends AuthStateNotifier {
   @override
   AuthState build() => const SignedIn(
-        userId: 'u1',
-        email: 'u@e.com',
-        role: UserRole.applicant,
-        displayName: 'U',
-      );
+    userId: 'u1',
+    email: 'u@e.com',
+    role: UserRole.applicant,
+    displayName: 'U',
+  );
 }
 
 class _Bootstrapped extends BootstrapController {
@@ -55,16 +55,8 @@ void main() {
           generatorVersion: '1',
         ),
       );
-      final feedItem = FeedItemDto(
-        match: match,
-        job: job,
-        employer: employer,
-      );
-      final detail = JobDetailDto(
-        job: job,
-        employer: employer,
-        match: match,
-      );
+      final feedItem = FeedItemDto(match: match, job: job, employer: employer);
+      final detail = JobDetailDto(job: job, employer: employer, match: match);
 
       await tester.pumpWidget(
         ProviderScope(

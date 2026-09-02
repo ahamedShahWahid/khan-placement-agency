@@ -16,15 +16,15 @@ final class JobsRepositoryProvider
     extends $FunctionalProvider<JobsRepository, JobsRepository, JobsRepository>
     with $Provider<JobsRepository> {
   JobsRepositoryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'jobsRepositoryProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'jobsRepositoryProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$jobsRepositoryHash();

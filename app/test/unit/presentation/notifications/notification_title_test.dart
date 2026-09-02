@@ -6,10 +6,7 @@ import 'package:jobify_app/presentation/notifications/notification_title.dart';
 
 final _en = lookupAppLocalizations(const Locale('en'));
 
-NotificationDto _n(
-  String kind,
-  Map<String, dynamic> payload,
-) =>
+NotificationDto _n(String kind, Map<String, dynamic> payload) =>
     NotificationDto(
       id: 'n1',
       kind: kind,
@@ -25,10 +22,10 @@ void main() {
     expect(
       notificationTitle(
         _en,
-        _n(
-          'application_received',
-          {'job_title': 'Engineer', 'employer_name': 'Acme'},
-        ),
+        _n('application_received', {
+          'job_title': 'Engineer',
+          'employer_name': 'Acme',
+        }),
       ),
       'Application received for Engineer at Acme',
     );

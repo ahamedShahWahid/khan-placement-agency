@@ -45,56 +45,57 @@ Widget _wrap(
 ApplicationListItemDto _item({
   required String id,
   required ApplicationStage stage,
-}) =>
-    ApplicationListItemDto(
-      application: ApplicationDto(
-        id: id,
-        jobId: 'j1',
-        status: ApplicationStatus.applied,
-        source: ApplicationSource.feed,
-        stage: stage,
-        createdAt: DateTime(2026, 5),
-        updatedAt: DateTime(2026, 5),
-      ),
-      job: JobSummaryDto(
-        id: 'j1',
-        title: 'QA Engineer',
-        locations: const ['BLR'],
-        status: JobStatus.open,
-        postedAt: DateTime(2026, 4),
-      ),
-      employer: const EmployerSummaryDto(id: 'e1', name: 'Acme'),
-    );
+}) => ApplicationListItemDto(
+  application: ApplicationDto(
+    id: id,
+    jobId: 'j1',
+    status: ApplicationStatus.applied,
+    source: ApplicationSource.feed,
+    stage: stage,
+    createdAt: DateTime(2026, 5),
+    updatedAt: DateTime(2026, 5),
+  ),
+  job: JobSummaryDto(
+    id: 'j1',
+    title: 'QA Engineer',
+    locations: const ['BLR'],
+    status: JobStatus.open,
+    postedAt: DateTime(2026, 4),
+  ),
+  employer: const EmployerSummaryDto(id: 'e1', name: 'Acme'),
+);
 
 JobDetailDto _detail({ApplicationDto? app}) => JobDetailDto(
-      job: JobSummaryDto(
-        id: 'j1',
-        title: 'Senior Engineer',
-        locations: const ['BLR'],
-        status: JobStatus.open,
-        postedAt: DateTime.parse('2026-05-18T00:00:00Z'),
-      ),
-      employer: const EmployerSummaryDto(id: 'e1', name: 'Acme Co'),
-      match: const MatchSummaryDto(
-        id: 'm1',
-        totalScore: 0.82,
-        scoreComponents: {},
-        explanation: ExplanationDto(
-          fit: 'great fit',
-          generator: MatchGenerator.templated,
-          generatorVersion: '1',
-        ),
-      ),
-      application: app,
-    );
+  job: JobSummaryDto(
+    id: 'j1',
+    title: 'Senior Engineer',
+    locations: const ['BLR'],
+    status: JobStatus.open,
+    postedAt: DateTime.parse('2026-05-18T00:00:00Z'),
+  ),
+  employer: const EmployerSummaryDto(id: 'e1', name: 'Acme Co'),
+  match: const MatchSummaryDto(
+    id: 'm1',
+    totalScore: 0.82,
+    scoreComponents: {},
+    explanation: ExplanationDto(
+      fit: 'great fit',
+      generator: MatchGenerator.templated,
+      generatorVersion: '1',
+    ),
+  ),
+  application: app,
+);
 
 void main() {
-  testWidgets('applications row shows the stage label, not raw status',
-      (tester) async {
-    final repo = FakeApplicationsRepository()
-      ..fetchPageOverride = ApplicationsPageDto(
-        items: [_item(id: 'a1', stage: ApplicationStage.interview)],
-      );
+  testWidgets('applications row shows the stage label, not raw status', (
+    tester,
+  ) async {
+    final repo =
+        FakeApplicationsRepository()
+          ..fetchPageOverride = ApplicationsPageDto(
+            items: [_item(id: 'a1', stage: ApplicationStage.interview)],
+          );
     await tester.pumpWidget(
       _wrap(const ApplicationsScreen(), applicationsRepo: repo),
     );
@@ -103,10 +104,11 @@ void main() {
   });
 
   testWidgets('rejected renders as "Not selected"', (tester) async {
-    final repo = FakeApplicationsRepository()
-      ..fetchPageOverride = ApplicationsPageDto(
-        items: [_item(id: 'a2', stage: ApplicationStage.rejected)],
-      );
+    final repo =
+        FakeApplicationsRepository()
+          ..fetchPageOverride = ApplicationsPageDto(
+            items: [_item(id: 'a2', stage: ApplicationStage.rejected)],
+          );
     await tester.pumpWidget(
       _wrap(const ApplicationsScreen(), applicationsRepo: repo),
     );
@@ -114,8 +116,9 @@ void main() {
     expect(find.text('Not selected'), findsOneWidget);
   });
 
-  testWidgets('job detail shows the timeline when events exist',
-      (tester) async {
+  testWidgets('job detail shows the timeline when events exist', (
+    tester,
+  ) async {
     final app = ApplicationDto(
       id: 'a1',
       jobId: 'j1',
@@ -125,14 +128,15 @@ void main() {
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
-    final applicationsRepo = FakeApplicationsRepository()
-      ..timelines['a1'] = [
-        StageEventDto(
-          fromStage: ApplicationStage.applied,
-          toStage: ApplicationStage.shortlisted,
-          createdAt: DateTime(2026, 5, 2),
-        ),
-      ];
+    final applicationsRepo =
+        FakeApplicationsRepository()
+          ..timelines['a1'] = [
+            StageEventDto(
+              fromStage: ApplicationStage.applied,
+              toStage: ApplicationStage.shortlisted,
+              createdAt: DateTime(2026, 5, 2),
+            ),
+          ];
     final jobsRepo = FakeJobsRepository(detail: _detail(app: app));
     await tester.pumpWidget(
       _wrap(
@@ -145,8 +149,9 @@ void main() {
     expect(find.textContaining('Shortlisted'), findsWidgets);
   });
 
-  testWidgets('timeline fetch error degrades to the chip alone',
-      (tester) async {
+  testWidgets('timeline fetch error degrades to the chip alone', (
+    tester,
+  ) async {
     final app = ApplicationDto(
       id: 'a1',
       jobId: 'j1',
@@ -156,8 +161,8 @@ void main() {
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
-    final applicationsRepo = FakeApplicationsRepository()
-      ..fetchTimelineError = Exception('boom');
+    final applicationsRepo =
+        FakeApplicationsRepository()..fetchTimelineError = Exception('boom');
     final jobsRepo = FakeJobsRepository(detail: _detail(app: app));
     await tester.pumpWidget(
       _wrap(

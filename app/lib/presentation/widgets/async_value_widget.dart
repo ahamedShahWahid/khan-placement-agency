@@ -37,16 +37,17 @@ class AsyncValueWidget<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return value.when(
       loading: () => (loading ?? () => const JobifyLoadingView())(),
-      error: (e, s) => (error ??
-          (Object err, StackTrace st) =>
-              JobifyErrorView(error: err, onRetry: onRetry))(e, s),
+      error:
+          (e, s) => (error ??
+              (Object err, StackTrace st) =>
+                  JobifyErrorView(error: err, onRetry: onRetry))(e, s),
       data: (d) {
         if (isEmpty?.call(d) ?? false) {
           return (empty ??
               () => JobifyEmptyState(
-                    headline: context.l10n.commonNothingHereYet,
-                    body: '',
-                  ))();
+                headline: context.l10n.commonNothingHereYet,
+                body: '',
+              ))();
         }
         return data(d);
       },

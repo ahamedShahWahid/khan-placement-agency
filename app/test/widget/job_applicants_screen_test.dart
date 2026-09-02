@@ -8,12 +8,12 @@ import 'package:jobify_app/presentation/recruiter/job_applicants_screen.dart';
 import '../helpers/fake_recruiter_jobs_repository.dart';
 
 Widget _wrap(FakeRecruiterJobsRepository repo) => ProviderScope(
-      overrides: [recruiterJobsRepositoryProvider.overrideWithValue(repo)],
-      child: MaterialApp(
-        theme: ThemeData.light(useMaterial3: true),
-        home: const JobApplicantsScreen(jobId: 'j1'),
-      ),
-    );
+  overrides: [recruiterJobsRepositoryProvider.overrideWithValue(repo)],
+  child: MaterialApp(
+    theme: ThemeData.light(useMaterial3: true),
+    home: const JobApplicantsScreen(jobId: 'j1'),
+  ),
+);
 
 void main() {
   testWidgets('empty state when no applicants', (tester) async {
@@ -23,12 +23,11 @@ void main() {
     expect(find.text('No applicants yet'), findsOneWidget);
   });
 
-  testWidgets('renders an applicant with score, fit, and download button',
-      (tester) async {
+  testWidgets('renders an applicant with score, fit, and download button', (
+    tester,
+  ) async {
     final repo = FakeRecruiterJobsRepository(
-      applicantsPage: ApplicantsOfJobPageDto(
-        items: [fakeApplicantOfJob()],
-      ),
+      applicantsPage: ApplicantsOfJobPageDto(items: [fakeApplicantOfJob()]),
     );
     await tester.pumpWidget(_wrap(repo));
     await tester.pumpAndSettle();

@@ -24,15 +24,15 @@ final class FeedFiltersControllerProvider
   /// exactly as long as the applicant shell (FeedScreen watches FeedController,
   /// which watches this) and resets on sign-out for free.
   FeedFiltersControllerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'feedFiltersControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'feedFiltersControllerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$feedFiltersControllerHash();
@@ -63,8 +63,14 @@ abstract class _$FeedFiltersController extends $Notifier<FeedFilters> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<FeedFilters, FeedFilters>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<FeedFilters, FeedFilters>, FeedFilters, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<FeedFilters, FeedFilters>,
+              FeedFilters,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

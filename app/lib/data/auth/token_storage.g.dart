@@ -16,15 +16,15 @@ final class TokenStorageProvider
     extends $FunctionalProvider<TokenStorage, TokenStorage, TokenStorage>
     with $Provider<TokenStorage> {
   TokenStorageProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'tokenStorageProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'tokenStorageProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$tokenStorageHash();

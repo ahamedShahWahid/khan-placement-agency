@@ -21,15 +21,15 @@ final class DeleteSuccessSnackbarProvider
   /// One-time flag — Sign-in screen reads it and clears it after showing
   /// the "Your account has been deleted." snackbar.
   DeleteSuccessSnackbarProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'deleteSuccessSnackbarProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'deleteSuccessSnackbarProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$deleteSuccessSnackbarHash();
@@ -59,8 +59,14 @@ abstract class _$DeleteSuccessSnackbar extends $Notifier<bool> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<bool, bool>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<bool, bool>, bool, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

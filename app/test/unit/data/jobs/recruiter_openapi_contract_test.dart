@@ -5,9 +5,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('backend recruiter schemas pin the expected wire fields', () {
-    final snapshot = jsonDecode(
-      File('../tests/unit/openapi_snapshot.json').readAsStringSync(),
-    ) as Map<String, dynamic>;
+    final snapshot =
+        jsonDecode(
+              File('../tests/unit/openapi_snapshot.json').readAsStringSync(),
+            )
+            as Map<String, dynamic>;
     final components = snapshot['components'] as Map<String, dynamic>;
     final schemas = components['schemas'] as Map<String, dynamic>;
 

@@ -60,38 +60,40 @@ class _FakeFeedRepo implements FeedRepository {
 }
 
 FeedItemDto _item(String jobId) => FeedItemDto(
-      match: MatchSummaryDto(
-        id: 'm-$jobId',
-        totalScore: 0.8,
-        scoreComponents: const {},
-      ),
-      job: JobSummaryDto(
-        id: jobId,
-        title: 'T-$jobId',
-        locations: const ['BLR'],
-        status: JobStatus.open,
-        postedAt: DateTime.parse('2026-05-18T00:00:00Z'),
-      ),
-      employer: const EmployerSummaryDto(id: 'e1', name: 'Acme'),
-    );
+  match: MatchSummaryDto(
+    id: 'm-$jobId',
+    totalScore: 0.8,
+    scoreComponents: const {},
+  ),
+  job: JobSummaryDto(
+    id: jobId,
+    title: 'T-$jobId',
+    locations: const ['BLR'],
+    status: JobStatus.open,
+    postedAt: DateTime.parse('2026-05-18T00:00:00Z'),
+  ),
+  employer: const EmployerSummaryDto(id: 'e1', name: 'Acme'),
+);
 
 void main() {
-  test('initial build returns first page; hasMore tracks next_cursor',
-      () async {
-    final c = ProviderContainer(
-      overrides: [
-        feedRepositoryProvider.overrideWithValue(
-          _FakeFeedRepo([
-            FeedPageDto(items: [_item('j1'), _item('j2')], nextCursor: 'c1'),
-          ]),
-        ),
-      ],
-    );
-    final s = await c.read(feedControllerProvider.future);
-    expect(s.items, hasLength(2));
-    expect(s.hasMore, isTrue);
-    expect(s.cursor, 'c1');
-  });
+  test(
+    'initial build returns first page; hasMore tracks next_cursor',
+    () async {
+      final c = ProviderContainer(
+        overrides: [
+          feedRepositoryProvider.overrideWithValue(
+            _FakeFeedRepo([
+              FeedPageDto(items: [_item('j1'), _item('j2')], nextCursor: 'c1'),
+            ]),
+          ),
+        ],
+      );
+      final s = await c.read(feedControllerProvider.future);
+      expect(s.items, hasLength(2));
+      expect(s.hasMore, isTrue);
+      expect(s.cursor, 'c1');
+    },
+  );
 
   test('loadMore appends items + updates cursor + flips hasMore', () async {
     final c = ProviderContainer(
@@ -99,9 +101,7 @@ void main() {
         feedRepositoryProvider.overrideWithValue(
           _FakeFeedRepo([
             FeedPageDto(items: [_item('j1')], nextCursor: 'c1'),
-            FeedPageDto(
-              items: [_item('j2'), _item('j3')],
-            ),
+            FeedPageDto(items: [_item('j2'), _item('j3')]),
           ]),
         ),
       ],
@@ -128,31 +128,33 @@ void main() {
     expect(c.read(feedControllerProvider).value!.items, hasLength(1));
   });
 
-  test('filter change rebuilds feed from page 1 with filters applied',
-      () async {
-    final repo = _FakeFeedRepo([
-      FeedPageDto(items: [_item('j1')], nextCursor: 'c1'),
-      FeedPageDto(items: [_item('j2')]),
-    ]);
-    final c = ProviderContainer(
-      overrides: [feedRepositoryProvider.overrideWithValue(repo)],
-    );
-    addTearDown(c.dispose);
-    final sub = c.listen(feedControllerProvider, (_, __) {});
-    addTearDown(sub.close);
+  test(
+    'filter change rebuilds feed from page 1 with filters applied',
+    () async {
+      final repo = _FakeFeedRepo([
+        FeedPageDto(items: [_item('j1')], nextCursor: 'c1'),
+        FeedPageDto(items: [_item('j2')]),
+      ]);
+      final c = ProviderContainer(
+        overrides: [feedRepositoryProvider.overrideWithValue(repo)],
+      );
+      addTearDown(c.dispose);
+      final sub = c.listen(feedControllerProvider, (_, __) {});
+      addTearDown(sub.close);
 
-    await c.read(feedControllerProvider.future);
-    expect(repo.receivedFilters, [null]); // empty filters sent as null
+      await c.read(feedControllerProvider.future);
+      expect(repo.receivedFilters, [null]); // empty filters sent as null
 
-    c
-        .read(feedFiltersControllerProvider.notifier)
-        .set(const FeedFilters(locations: ['Pune']));
-    final s = await c.read(feedControllerProvider.future);
+      c
+          .read(feedFiltersControllerProvider.notifier)
+          .set(const FeedFilters(locations: ['Pune']));
+      final s = await c.read(feedControllerProvider.future);
 
-    expect(s.items.single.job.id, 'j2');
-    expect(repo.receivedCursors.last, isNull); // reset to page 1
-    expect(repo.receivedFilters.last, const FeedFilters(locations: ['Pune']));
-  });
+      expect(s.items.single.job.id, 'j2');
+      expect(repo.receivedCursors.last, isNull); // reset to page 1
+      expect(repo.receivedFilters.last, const FeedFilters(locations: ['Pune']));
+    },
+  );
 
   test('loadMore carries the active filters', () async {
     final repo = _FakeFeedRepo([
@@ -174,8 +176,7 @@ void main() {
     expect(repo.receivedFilters.last, const FeedFilters(query: 'x'));
   });
 
-  test(
-      'stale in-flight loadMore fetch is discarded once filters change '
+  test('stale in-flight loadMore fetch is discarded once filters change '
       'mid-flight', () async {
     final repo = _SlowLoadMoreFeedRepo();
     final c = ProviderContainer(
@@ -187,10 +188,9 @@ void main() {
 
     // Initial build under filters A (empty) — one page, more available.
     await c.read(feedControllerProvider.future);
-    expect(
-      c.read(feedControllerProvider).value!.items.map((i) => i.job.id),
-      ['a1'],
-    );
+    expect(c.read(feedControllerProvider).value!.items.map((i) => i.job.id), [
+      'a1',
+    ]);
 
     // Start loadMore. Its fetch (call #2) hangs on the completer.
     final loadMoreFuture = c.read(feedControllerProvider.notifier).loadMore();
@@ -212,8 +212,7 @@ void main() {
     expect(finalState.items.map((i) => i.job.id), ['b1']);
   });
 
-  test(
-      'stale in-flight loadMore fetch is discarded even when filters return '
+  test('stale in-flight loadMore fetch is discarded even when filters return '
       'to their original value (A -> B -> A)', () async {
     // The case a value-equality guard CANNOT catch. `FeedFilters` is @freezed,
     // so after toggling away and back the live filters compare EQUAL to the

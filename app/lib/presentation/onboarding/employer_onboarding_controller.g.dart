@@ -16,15 +16,15 @@ final employerOnboardingControllerProvider =
 final class EmployerOnboardingControllerProvider
     extends $AsyncNotifierProvider<EmployerOnboardingController, EmployerDto?> {
   EmployerOnboardingControllerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'employerOnboardingControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'employerOnboardingControllerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$employerOnboardingControllerHash();
@@ -44,11 +44,14 @@ abstract class _$EmployerOnboardingController
   @override
   void runBuild() {
     final ref = this.ref as $Ref<AsyncValue<EmployerDto?>, EmployerDto?>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<EmployerDto?>, EmployerDto?>,
-        AsyncValue<EmployerDto?>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<EmployerDto?>, EmployerDto?>,
+              AsyncValue<EmployerDto?>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

@@ -15,20 +15,25 @@ final membersControllerProvider = MembersControllerFamily._();
 
 /// The roster for one employer. Family keyed by employerId.
 
-final class MembersControllerProvider extends $FunctionalProvider<
-        AsyncValue<List<MemberDto>>, List<MemberDto>, FutureOr<List<MemberDto>>>
+final class MembersControllerProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<MemberDto>>,
+          List<MemberDto>,
+          FutureOr<List<MemberDto>>
+        >
     with $FutureModifier<List<MemberDto>>, $FutureProvider<List<MemberDto>> {
   /// The roster for one employer. Family keyed by employerId.
-  MembersControllerProvider._(
-      {required MembersControllerFamily super.from,
-      required String super.argument})
-      : super(
-          retry: null,
-          name: r'membersControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+  MembersControllerProvider._({
+    required MembersControllerFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'membersControllerProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$membersControllerHash();
@@ -43,16 +48,13 @@ final class MembersControllerProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<List<MemberDto>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<MemberDto>> create(Ref ref) {
     final argument = this.argument as String;
-    return membersController(
-      ref,
-      argument,
-    );
+    return membersController(ref, argument);
   }
 
   @override
@@ -73,19 +75,17 @@ String _$membersControllerHash() => r'3ce53453062c1d03b4ddb1c5ae72df41683071ae';
 final class MembersControllerFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<MemberDto>>, String> {
   MembersControllerFamily._()
-      : super(
-          retry: null,
-          name: r'membersControllerProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
+    : super(
+        retry: null,
+        name: r'membersControllerProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
   /// The roster for one employer. Family keyed by employerId.
 
-  MembersControllerProvider call(
-    String employerId,
-  ) =>
+  MembersControllerProvider call(String employerId) =>
       MembersControllerProvider._(argument: employerId, from: this);
 
   @override

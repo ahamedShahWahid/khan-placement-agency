@@ -12,20 +12,24 @@ part of 'saved_jobs_repository_impl.dart';
 @ProviderFor(savedJobsRepository)
 final savedJobsRepositoryProvider = SavedJobsRepositoryProvider._();
 
-final class SavedJobsRepositoryProvider extends $FunctionalProvider<
-    SavedJobsRepository,
-    SavedJobsRepository,
-    SavedJobsRepository> with $Provider<SavedJobsRepository> {
+final class SavedJobsRepositoryProvider
+    extends
+        $FunctionalProvider<
+          SavedJobsRepository,
+          SavedJobsRepository,
+          SavedJobsRepository
+        >
+    with $Provider<SavedJobsRepository> {
   SavedJobsRepositoryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'savedJobsRepositoryProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'savedJobsRepositoryProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$savedJobsRepositoryHash();
@@ -33,8 +37,8 @@ final class SavedJobsRepositoryProvider extends $FunctionalProvider<
   @$internal
   @override
   $ProviderElement<SavedJobsRepository> $createElement(
-          $ProviderPointer pointer) =>
-      $ProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   SavedJobsRepository create(Ref ref) {

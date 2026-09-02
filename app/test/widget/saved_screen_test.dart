@@ -13,10 +13,7 @@ class _FakeRepo implements SavedJobsRepository {
   _FakeRepo(this.page);
   final SavedJobsPageDto page;
   @override
-  Future<SavedJobsPageDto> fetchPage({
-    String? cursor,
-    int limit = 20,
-  }) async =>
+  Future<SavedJobsPageDto> fetchPage({String? cursor, int limit = 20}) async =>
       page;
 }
 
@@ -36,9 +33,7 @@ void main() {
     await tester.pumpWidget(
       _wrap(
         const SavedScreen(),
-        repo: _FakeRepo(
-          const SavedJobsPageDto(items: []),
-        ),
+        repo: _FakeRepo(const SavedJobsPageDto(items: [])),
       ),
     );
     await tester.pumpAndSettle();
@@ -48,11 +43,7 @@ void main() {
   testWidgets('renders open + closed jobs differently', (tester) async {
     final items = [
       SavedJobListItemDto(
-        saved: SavedJobDto(
-          id: 's1',
-          jobId: 'j1',
-          createdAt: DateTime(2026, 5),
-        ),
+        saved: SavedJobDto(id: 's1', jobId: 'j1', createdAt: DateTime(2026, 5)),
         job: JobSummaryDto(
           id: 'j1',
           title: 'Open Eng',
@@ -86,9 +77,7 @@ void main() {
     await tester.pumpWidget(
       _wrap(
         const SavedScreen(),
-        repo: _FakeRepo(
-          SavedJobsPageDto(items: items),
-        ),
+        repo: _FakeRepo(SavedJobsPageDto(items: items)),
       ),
     );
     await tester.pumpAndSettle();

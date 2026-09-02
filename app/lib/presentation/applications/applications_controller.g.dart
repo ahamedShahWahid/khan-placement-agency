@@ -15,15 +15,15 @@ final applicationsControllerProvider = ApplicationsControllerProvider._();
 final class ApplicationsControllerProvider
     extends $AsyncNotifierProvider<ApplicationsController, ApplicationsState> {
   ApplicationsControllerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'applicationsControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'applicationsControllerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$applicationsControllerHash();
@@ -44,11 +44,14 @@ abstract class _$ApplicationsController
   void runBuild() {
     final ref =
         this.ref as $Ref<AsyncValue<ApplicationsState>, ApplicationsState>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<ApplicationsState>, ApplicationsState>,
-        AsyncValue<ApplicationsState>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<ApplicationsState>, ApplicationsState>,
+              AsyncValue<ApplicationsState>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

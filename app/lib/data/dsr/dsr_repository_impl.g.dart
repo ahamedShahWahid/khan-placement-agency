@@ -16,15 +16,15 @@ final class DsrRepositoryProvider
     extends $FunctionalProvider<DsrRepository, DsrRepository, DsrRepository>
     with $Provider<DsrRepository> {
   DsrRepositoryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'dsrRepositoryProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'dsrRepositoryProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$dsrRepositoryHash();

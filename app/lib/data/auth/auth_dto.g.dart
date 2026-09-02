@@ -11,10 +11,12 @@ SignInResponseDto _$SignInResponseDtoFromJson(Map<String, dynamic> json) =>
       access: json['access_token'] as String,
       refresh: json['refresh_token'] as String,
       user: AuthUserDto.fromJson(json['user'] as Map<String, dynamic>),
-      applicant: json['applicant'] == null
-          ? null
-          : AuthApplicantDto.fromJson(
-              json['applicant'] as Map<String, dynamic>),
+      applicant:
+          json['applicant'] == null
+              ? null
+              : AuthApplicantDto.fromJson(
+                json['applicant'] as Map<String, dynamic>,
+              ),
     );
 
 Map<String, dynamic> _$SignInResponseDtoToJson(SignInResponseDto instance) =>
@@ -38,11 +40,11 @@ Map<String, dynamic> _$RefreshResponseDtoToJson(RefreshResponseDto instance) =>
     };
 
 AuthUserDto _$AuthUserDtoFromJson(Map<String, dynamic> json) => AuthUserDto(
-      id: json['id'] as String,
-      email: json['email'] as String,
-      role: json['role'] as String,
-      displayName: json['display_name'] as String?,
-    );
+  id: json['id'] as String,
+  email: json['email'] as String,
+  role: json['role'] as String,
+  displayName: json['display_name'] as String?,
+);
 
 Map<String, dynamic> _$AuthUserDtoToJson(AuthUserDto instance) =>
     <String, dynamic>{
@@ -59,7 +61,4 @@ AuthApplicantDto _$AuthApplicantDtoFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$AuthApplicantDtoToJson(AuthApplicantDto instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'user_id': instance.userId,
-    };
+    <String, dynamic>{'id': instance.id, 'user_id': instance.userId};

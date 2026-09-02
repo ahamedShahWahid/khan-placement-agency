@@ -17,10 +17,10 @@ class RefreshOn401Interceptor extends Interceptor {
     required RefreshCallback refresh,
     required Dio dio,
     OnSignedOut? onSignedOut,
-  })  : _holder = holder,
-        _refresh = refresh,
-        _dio = dio,
-        _onSignedOut = onSignedOut;
+  }) : _holder = holder,
+       _refresh = refresh,
+       _dio = dio,
+       _onSignedOut = onSignedOut;
 
   final AccessTokenHolder _holder;
   final RefreshCallback _refresh;
@@ -118,14 +118,8 @@ class RefreshOn401Interceptor extends Interceptor {
     String newAccess,
   ) {
     return original.copyWith(
-      headers: {
-        ...original.headers,
-        'Authorization': 'Bearer $newAccess',
-      },
-      extra: {
-        ...original.extra,
-        _kReplayedFlag: true,
-      },
+      headers: {...original.headers, 'Authorization': 'Bearer $newAccess'},
+      extra: {...original.extra, _kReplayedFlag: true},
     );
   }
 }

@@ -12,20 +12,24 @@ part of 'consents_repository_impl.dart';
 @ProviderFor(consentsRepository)
 final consentsRepositoryProvider = ConsentsRepositoryProvider._();
 
-final class ConsentsRepositoryProvider extends $FunctionalProvider<
-    ConsentsRepository,
-    ConsentsRepository,
-    ConsentsRepository> with $Provider<ConsentsRepository> {
+final class ConsentsRepositoryProvider
+    extends
+        $FunctionalProvider<
+          ConsentsRepository,
+          ConsentsRepository,
+          ConsentsRepository
+        >
+    with $Provider<ConsentsRepository> {
   ConsentsRepositoryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'consentsRepositoryProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'consentsRepositoryProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$consentsRepositoryHash();
@@ -33,8 +37,8 @@ final class ConsentsRepositoryProvider extends $FunctionalProvider<
   @$internal
   @override
   $ProviderElement<ConsentsRepository> $createElement(
-          $ProviderPointer pointer) =>
-      $ProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   ConsentsRepository create(Ref ref) {

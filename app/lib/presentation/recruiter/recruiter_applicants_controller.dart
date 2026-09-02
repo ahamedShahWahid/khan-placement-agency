@@ -13,8 +13,9 @@ typedef RecruiterApplicantsState = PagedState<ApplicantOfJobDto>;
 class RecruiterApplicantsController extends _$RecruiterApplicantsController {
   @override
   Future<RecruiterApplicantsState> build(String jobId) async {
-    final page =
-        await ref.read(recruiterJobsRepositoryProvider).listApplicants(jobId);
+    final page = await ref
+        .read(recruiterJobsRepositoryProvider)
+        .listApplicants(jobId);
     return PagedState(
       items: page.items,
       cursor: page.nextCursor,
@@ -28,26 +29,23 @@ class RecruiterApplicantsController extends _$RecruiterApplicantsController {
   }
 
   Future<void> loadMore() => loadNextPage<ApplicantOfJobDto>(
-        currentState: state,
-        fetch: ({String? cursor}) async {
-          final page = await ref
-              .read(recruiterJobsRepositoryProvider)
-              .listApplicants(jobId, cursor: cursor);
-          return PagedState(
-            items: page.items,
-            cursor: page.nextCursor,
-            hasMore: page.nextCursor != null,
-          );
-        },
-        setState: (s) => state = s,
+    currentState: state,
+    fetch: ({String? cursor}) async {
+      final page = await ref
+          .read(recruiterJobsRepositoryProvider)
+          .listApplicants(jobId, cursor: cursor);
+      return PagedState(
+        items: page.items,
+        cursor: page.nextCursor,
+        hasMore: page.nextCursor != null,
       );
+    },
+    setState: (s) => state = s,
+  );
 
   /// Optimistic stage change: patch the row locally, call the API, revert on
   /// error and rethrow so the screen can snackbar.
-  Future<void> setStage(
-    String applicationId,
-    ApplicationStage stage,
-  ) async {
+  Future<void> setStage(String applicationId, ApplicationStage stage) async {
     final prev = state;
     _patchRow(applicationId, stage);
     try {

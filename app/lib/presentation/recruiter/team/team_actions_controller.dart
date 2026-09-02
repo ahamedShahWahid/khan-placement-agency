@@ -24,44 +24,41 @@ class TeamActionsController extends _$TeamActionsController {
     String employerId, {
     required String email,
     required String role,
-  }) =>
-      _run(() async {
-        await ref
-            .read(employerTeamRepositoryProvider)
-            .addMember(employerId, email: email, role: role);
-        _invalidate(employerId);
-      });
+  }) => _run(() async {
+    await ref
+        .read(employerTeamRepositoryProvider)
+        .addMember(employerId, email: email, role: role);
+    _invalidate(employerId);
+  });
 
   Future<bool> changeRole(
     String employerId,
     String userId, {
     required String role,
-  }) =>
-      _run(() async {
-        await ref
-            .read(employerTeamRepositoryProvider)
-            .changeMemberRole(employerId, userId, role: role);
-        _invalidate(employerId);
-      });
+  }) => _run(() async {
+    await ref
+        .read(employerTeamRepositoryProvider)
+        .changeMemberRole(employerId, userId, role: role);
+    _invalidate(employerId);
+  });
 
   Future<bool> removeMember(String employerId, String userId) => _run(() async {
-        await ref
-            .read(employerTeamRepositoryProvider)
-            .removeMember(employerId, userId);
-        _invalidate(employerId);
-      });
+    await ref
+        .read(employerTeamRepositoryProvider)
+        .removeMember(employerId, userId);
+    _invalidate(employerId);
+  });
 
   Future<bool> createInvite(
     String employerId, {
     required String email,
     required String role,
-  }) =>
-      _run(() async {
-        await ref
-            .read(employerTeamRepositoryProvider)
-            .createInvite(employerId, email: email, role: role);
-        _invalidate(employerId);
-      });
+  }) => _run(() async {
+    await ref
+        .read(employerTeamRepositoryProvider)
+        .createInvite(employerId, email: email, role: role);
+    _invalidate(employerId);
+  });
 
   Future<bool> revokeInvite(String employerId, String inviteId) =>
       _run(() async {

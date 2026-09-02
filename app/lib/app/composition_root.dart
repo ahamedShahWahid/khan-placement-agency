@@ -75,9 +75,7 @@ final accessTokenHolderProvider = Provider<AccessTokenHolder>(
   (ref) => ref.watch(appServicesProvider).accessTokenHolder,
 );
 
-final dioProvider = Provider<Dio>(
-  (ref) => ref.watch(appServicesProvider).dio,
-);
+final dioProvider = Provider<Dio>((ref) => ref.watch(appServicesProvider).dio);
 
 final authRepositoryProvider = Provider<AuthRepository>(
   (ref) => ref.watch(appServicesProvider).authRepository,

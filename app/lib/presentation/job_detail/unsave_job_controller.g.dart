@@ -14,16 +14,16 @@ final unsaveJobControllerProvider = UnsaveJobControllerFamily._();
 
 final class UnsaveJobControllerProvider
     extends $AsyncNotifierProvider<UnsaveJobController, void> {
-  UnsaveJobControllerProvider._(
-      {required UnsaveJobControllerFamily super.from,
-      required String super.argument})
-      : super(
-          retry: null,
-          name: r'unsaveJobControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+  UnsaveJobControllerProvider._({
+    required UnsaveJobControllerFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'unsaveJobControllerProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$unsaveJobControllerHash();
@@ -55,20 +55,23 @@ String _$unsaveJobControllerHash() =>
 
 final class UnsaveJobControllerFamily extends $Family
     with
-        $ClassFamilyOverride<UnsaveJobController, AsyncValue<void>, void,
-            FutureOr<void>, String> {
+        $ClassFamilyOverride<
+          UnsaveJobController,
+          AsyncValue<void>,
+          void,
+          FutureOr<void>,
+          String
+        > {
   UnsaveJobControllerFamily._()
-      : super(
-          retry: null,
-          name: r'unsaveJobControllerProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
+    : super(
+        retry: null,
+        name: r'unsaveJobControllerProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
-  UnsaveJobControllerProvider call(
-    String jobId,
-  ) =>
+  UnsaveJobControllerProvider call(String jobId) =>
       UnsaveJobControllerProvider._(argument: jobId, from: this);
 
   @override
@@ -79,22 +82,19 @@ abstract class _$UnsaveJobController extends $AsyncNotifier<void> {
   late final _$args = ref.$arg as String;
   String get jobId => _$args;
 
-  FutureOr<void> build(
-    String jobId,
-  );
+  FutureOr<void> build(String jobId);
   @$mustCallSuper
   @override
   void runBuild() {
     final ref = this.ref as $Ref<AsyncValue<void>, void>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<void>, void>,
-        AsyncValue<void>,
-        Object?,
-        Object?>;
-    element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<void>, void>,
+              AsyncValue<void>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, () => build(_$args));
   }
 }

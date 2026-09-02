@@ -26,25 +26,26 @@ class NotificationsController extends _$NotificationsController {
   }
 
   Future<void> loadMore() => loadNextPage<NotificationDto>(
-        currentState: state,
-        fetch: ({String? cursor}) async {
-          final page = await ref
-              .read(notificationsRepositoryProvider)
-              .fetchPage(cursor: cursor);
-          return PagedState(
-            items: [for (final it in page.items) it.notification],
-            cursor: page.nextCursor,
-            hasMore: page.nextCursor != null,
-          );
-        },
-        setState: (s) => state = s,
+    currentState: state,
+    fetch: ({String? cursor}) async {
+      final page = await ref
+          .read(notificationsRepositoryProvider)
+          .fetchPage(cursor: cursor);
+      return PagedState(
+        items: [for (final it in page.items) it.notification],
+        cursor: page.nextCursor,
+        hasMore: page.nextCursor != null,
       );
+    },
+    setState: (s) => state = s,
+  );
 
   /// Mark one notification read and replace it in the loaded list in place
   /// (no invalidate — that would refetch page 1 and reset scroll).
   Future<void> markRead(String id) async {
-    final updated =
-        await ref.read(notificationsRepositoryProvider).markRead(id);
+    final updated = await ref
+        .read(notificationsRepositoryProvider)
+        .markRead(id);
     final current = state.value;
     if (current == null) return;
     state = AsyncValue.data(

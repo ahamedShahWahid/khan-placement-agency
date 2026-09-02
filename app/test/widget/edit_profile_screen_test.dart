@@ -19,11 +19,11 @@ class _CapturingMeRepo implements MeRepository {
   ProfileUpdateDto? captured;
   @override
   Future<MeDto> fetch() async => const MeDto(
-        id: 'u1',
-        email: 'e@e.com',
-        role: 'applicant',
-        applicant: ApplicantSummaryDto(id: 'a1', fullName: 'Alice'),
-      );
+    id: 'u1',
+    email: 'e@e.com',
+    role: 'applicant',
+    applicant: ApplicantSummaryDto(id: 'a1', fullName: 'Alice'),
+  );
   @override
   Future<MeDto> updateProfile(ProfileUpdateDto update) async {
     captured = update;
@@ -70,9 +70,7 @@ Future<void> _pump(
   bool settle = true,
 }) async {
   final router = GoRouter(
-    routes: [
-      GoRoute(path: '/', builder: (_, __) => const EditProfileScreen()),
-    ],
+    routes: [GoRoute(path: '/', builder: (_, __) => const EditProfileScreen())],
   );
   await tester.pumpWidget(
     ProviderScope(
@@ -91,8 +89,9 @@ Future<void> _pump(
 }
 
 void main() {
-  testWidgets('renders seeded values, adds a chip, saves both endpoints',
-      (tester) async {
+  testWidgets('renders seeded values, adds a chip, saves both endpoints', (
+    tester,
+  ) async {
     final meRepo = _CapturingMeRepo();
     final prefsRepo = _CapturingPrefsRepo();
     await _pump(tester, meRepo: meRepo, prefsRepo: prefsRepo);
@@ -133,8 +132,9 @@ void main() {
     expect(prefsRepo.captured, isNull);
   });
 
-  testWidgets('clearing the expected CTC field sends an explicit null',
-      (tester) async {
+  testWidgets('clearing the expected CTC field sends an explicit null', (
+    tester,
+  ) async {
     final prefsRepo = _CapturingPrefsRepo(
       dto: const PreferencesDto(
         desiredRole: null,
@@ -171,25 +171,29 @@ void main() {
   });
 
   testWidgets(
-      'partial failure (profile saved, preferences failed) says which half',
-      (tester) async {
-    final meRepo = _CapturingMeRepo();
-    final prefsRepo = _CapturingPrefsRepo(failUpdate: true);
-    await _pump(tester, meRepo: meRepo, prefsRepo: prefsRepo);
+    'partial failure (profile saved, preferences failed) says which half',
+    (tester) async {
+      final meRepo = _CapturingMeRepo();
+      final prefsRepo = _CapturingPrefsRepo(failUpdate: true);
+      await _pump(tester, meRepo: meRepo, prefsRepo: prefsRepo);
 
-    await tester.tap(find.widgetWithText(TextButton, 'Save'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(TextButton, 'Save'));
+      await tester.pumpAndSettle();
 
-    expect(meRepo.captured, isNotNull); // profile half went through
-    expect(
-      find.text("Saved your profile, but couldn't save preferences. "
-          'Try again.'),
-      findsOneWidget,
-    );
-  });
+      expect(meRepo.captured, isNotNull); // profile half went through
+      expect(
+        find.text(
+          "Saved your profile, but couldn't save preferences. "
+          'Try again.',
+        ),
+        findsOneWidget,
+      );
+    },
+  );
 
-  testWidgets('form is unreachable while the preferences fetch is pending',
-      (tester) async {
+  testWidgets('form is unreachable while the preferences fetch is pending', (
+    tester,
+  ) async {
     await _pump(
       tester,
       meRepo: _CapturingMeRepo(),

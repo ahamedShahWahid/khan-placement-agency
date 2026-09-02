@@ -8,12 +8,12 @@ import 'package:jobify_app/presentation/recruiter/recruiter_jobs_screen.dart';
 import '../helpers/fake_recruiter_jobs_repository.dart';
 
 Widget _wrap(FakeRecruiterJobsRepository repo) => ProviderScope(
-      overrides: [recruiterJobsRepositoryProvider.overrideWithValue(repo)],
-      child: MaterialApp(
-        theme: ThemeData.light(useMaterial3: true),
-        home: const RecruiterJobsScreen(),
-      ),
-    );
+  overrides: [recruiterJobsRepositoryProvider.overrideWithValue(repo)],
+  child: MaterialApp(
+    theme: ThemeData.light(useMaterial3: true),
+    home: const RecruiterJobsScreen(),
+  ),
+);
 
 void main() {
   testWidgets('empty state prompts to post a role', (tester) async {
@@ -48,9 +48,7 @@ void main() {
 
   testWidgets('show-closed toggle is present and flips', (tester) async {
     final repo = FakeRecruiterJobsRepository(
-      jobsPage: RecruiterJobsPageDto(
-        items: [fakeRecruiterJob(id: 'j1')],
-      ),
+      jobsPage: RecruiterJobsPageDto(items: [fakeRecruiterJob(id: 'j1')]),
     );
     await tester.pumpWidget(_wrap(repo));
     await tester.pumpAndSettle();

@@ -27,15 +27,15 @@ final class TeamActionsControllerProvider
   /// controllers so the lists refetch (no in-place list mutation — mirrors the
   /// applicant-side convention).
   TeamActionsControllerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'teamActionsControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'teamActionsControllerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$teamActionsControllerHash();
@@ -59,11 +59,14 @@ abstract class _$TeamActionsController extends $AsyncNotifier<void> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<AsyncValue<void>, void>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<void>, void>,
-        AsyncValue<void>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<void>, void>,
+              AsyncValue<void>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }
