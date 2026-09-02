@@ -58,7 +58,9 @@ class FeedController extends _$FeedController {
       currentState: state,
       fetch: ({String? cursor}) async {
         final filters = ref.read(feedFiltersControllerProvider);
-        final page = await ref.read(feedRepositoryProvider).fetchPage(
+        final page = await ref
+            .read(feedRepositoryProvider)
+            .fetchPage(
               cursor: cursor,
               filters: filters.isEmpty ? null : filters,
             );

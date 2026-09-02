@@ -22,9 +22,7 @@ class JobsApi {
   }
 
   Future<SavedJobDto> save(String jobId) async {
-    final res = await _dio.post<Map<String, dynamic>>(
-      '/v1/jobs/$jobId/save',
-    );
+    final res = await _dio.post<Map<String, dynamic>>('/v1/jobs/$jobId/save');
     return SavedJobDto.fromJson(res.data!);
   }
 

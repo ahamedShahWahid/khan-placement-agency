@@ -90,6 +90,16 @@ def decode_cursor_apps(cursor: str) -> tuple[datetime, uuid.UUID]:
     "/jobs/{job_id}/apply",
     status_code=status.HTTP_201_CREATED,
     response_model=ApplicationRead,
+    # The idempotent branch returns a hand-built 200 (existing row, or a
+    # withdrawn row flipped back to applied). Declaring it keeps OpenAPI — and
+    # therefore the hand-written Dart/TS clients generated FROM the snapshot —
+    # honest about both outcomes.
+    responses={
+        status.HTTP_200_OK: {
+            "model": ApplicationRead,
+            "description": "Already applied — the existing application is returned unchanged.",
+        }
+    },
 )
 async def apply_to_job(
     job_id: uuid.UUID,

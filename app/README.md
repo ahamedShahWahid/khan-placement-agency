@@ -4,7 +4,7 @@ iOS + Android + Web client for the Jobify platform. Built on the foundation laid
 
 ## Stack
 
-- Flutter 3.27.x (stable channel)
+- Flutter 3.44.x (stable channel) — Dart ^3.7 is the hard floor (build_runner 2.15)
 - Riverpod 4.x (upgraded from spec's 2.x to unblock build_runner)
 - freezed 3.x, dio 5.7, go_router 14.6
 - google_sign_in 6.2 + google_sign_in_web 0.12 for auth

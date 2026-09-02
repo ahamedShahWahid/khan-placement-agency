@@ -19,8 +19,7 @@ class _FakeRepo implements ApplicationsRepository {
   Future<ApplicationsPageDto> fetchPage({
     String? cursor,
     int limit = 20,
-  }) async =>
-      page;
+  }) async => page;
   @override
   Future<ApplicationDto> withdraw(String id) async =>
       throw UnimplementedError();
@@ -45,9 +44,7 @@ void main() {
     await tester.pumpWidget(
       _wrap(
         const ApplicationsScreen(),
-        repo: _FakeRepo(
-          const ApplicationsPageDto(items: []),
-        ),
+        repo: _FakeRepo(const ApplicationsPageDto(items: [])),
       ),
     );
     await tester.pumpAndSettle();
@@ -98,9 +95,7 @@ void main() {
     await tester.pumpWidget(
       _wrap(
         const ApplicationsScreen(),
-        repo: _FakeRepo(
-          ApplicationsPageDto(items: items),
-        ),
+        repo: _FakeRepo(ApplicationsPageDto(items: items)),
       ),
     );
     await tester.pumpAndSettle();

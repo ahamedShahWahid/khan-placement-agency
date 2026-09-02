@@ -28,22 +28,25 @@ class PendingInvitesScreen extends ConsumerWidget {
         value: invites,
         onRetry: () => ref.read(myInvitesControllerProvider.notifier).refresh(),
         isEmpty: (list) => list.isEmpty,
-        empty: () => JobifyEmptyState(
-          headline: l10n.invitesEmptyHeadline,
-          body: l10n.invitesEmptyBody,
-          icon: Icons.mail_outline,
-        ),
-        data: (list) => RefreshIndicator(
-          onRefresh: () =>
-              ref.read(myInvitesControllerProvider.notifier).refresh(),
-          child: ListView.separated(
-            padding: const EdgeInsets.all(JobifySpacing.lg),
-            itemCount: list.length,
-            separatorBuilder: (_, __) =>
-                const SizedBox(height: JobifySpacing.md),
-            itemBuilder: (_, i) => _InviteCard(invite: list[i]),
-          ),
-        ),
+        empty:
+            () => JobifyEmptyState(
+              headline: l10n.invitesEmptyHeadline,
+              body: l10n.invitesEmptyBody,
+              icon: Icons.mail_outline,
+            ),
+        data:
+            (list) => RefreshIndicator(
+              onRefresh:
+                  () =>
+                      ref.read(myInvitesControllerProvider.notifier).refresh(),
+              child: ListView.separated(
+                padding: const EdgeInsets.all(JobifySpacing.lg),
+                itemCount: list.length,
+                separatorBuilder:
+                    (_, __) => const SizedBox(height: JobifySpacing.md),
+                itemBuilder: (_, i) => _InviteCard(invite: list[i]),
+              ),
+            ),
       ),
     );
   }

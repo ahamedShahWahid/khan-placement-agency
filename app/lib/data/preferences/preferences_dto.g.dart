@@ -9,8 +9,10 @@ part of 'preferences_dto.dart';
 PreferencesDto _$PreferencesDtoFromJson(Map<String, dynamic> json) =>
     PreferencesDto(
       desiredRole: $enumDecodeNullable(
-          _$DesiredRoleEnumMap, json['desired_role'],
-          unknownValue: DesiredRole.unknown),
+        _$DesiredRoleEnumMap,
+        json['desired_role'],
+        unknownValue: DesiredRole.unknown,
+      ),
       locations:
           (json['locations'] as List<dynamic>).map((e) => e as String).toList(),
       expectedCtc: json['expected_ctc'] as String?,

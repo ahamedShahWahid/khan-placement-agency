@@ -17,25 +17,28 @@ final applicationTimelineProvider = ApplicationTimelineFamily._();
 /// Stage-change events for one application. Family keyed by applicationId;
 /// consumed by `_ApplicationTimeline` in job_detail_screen.dart.
 
-final class ApplicationTimelineProvider extends $FunctionalProvider<
-        AsyncValue<List<StageEventDto>>,
-        List<StageEventDto>,
-        FutureOr<List<StageEventDto>>>
+final class ApplicationTimelineProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<StageEventDto>>,
+          List<StageEventDto>,
+          FutureOr<List<StageEventDto>>
+        >
     with
         $FutureModifier<List<StageEventDto>>,
         $FutureProvider<List<StageEventDto>> {
   /// Stage-change events for one application. Family keyed by applicationId;
   /// consumed by `_ApplicationTimeline` in job_detail_screen.dart.
-  ApplicationTimelineProvider._(
-      {required ApplicationTimelineFamily super.from,
-      required String super.argument})
-      : super(
-          retry: null,
-          name: r'applicationTimelineProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+  ApplicationTimelineProvider._({
+    required ApplicationTimelineFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'applicationTimelineProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$applicationTimelineHash();
@@ -50,16 +53,13 @@ final class ApplicationTimelineProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<List<StageEventDto>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<StageEventDto>> create(Ref ref) {
     final argument = this.argument as String;
-    return applicationTimeline(
-      ref,
-      argument,
-    );
+    return applicationTimeline(ref, argument);
   }
 
   @override
@@ -82,20 +82,18 @@ String _$applicationTimelineHash() =>
 final class ApplicationTimelineFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<StageEventDto>>, String> {
   ApplicationTimelineFamily._()
-      : super(
-          retry: null,
-          name: r'applicationTimelineProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
+    : super(
+        retry: null,
+        name: r'applicationTimelineProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
   /// Stage-change events for one application. Family keyed by applicationId;
   /// consumed by `_ApplicationTimeline` in job_detail_screen.dart.
 
-  ApplicationTimelineProvider call(
-    String applicationId,
-  ) =>
+  ApplicationTimelineProvider call(String applicationId) =>
       ApplicationTimelineProvider._(argument: applicationId, from: this);
 
   @override

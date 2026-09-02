@@ -22,11 +22,9 @@ class ResumeController extends _$ResumeController {
   }) async {
     state = const AsyncValue.loading();
     final result = await AsyncValue.guard(
-      () => ref.read(resumeRepositoryProvider).upload(
-            bytes: bytes,
-            filename: filename,
-            contentType: contentType,
-          ),
+      () => ref
+          .read(resumeRepositoryProvider)
+          .upload(bytes: bytes, filename: filename, contentType: contentType),
     );
     if (result.hasError) {
       state = AsyncValue.error(result.error!, result.stackTrace!);

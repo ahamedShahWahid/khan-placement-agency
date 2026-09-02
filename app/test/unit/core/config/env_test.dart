@@ -16,10 +16,7 @@ void main() {
     test('validateOrThrow lists every missing required var in one message', () {
       // We can't drive --dart-define from a test, so we test the helper
       // directly with explicit args.
-      final missing = Env.collectMissing(
-        apiBaseUrl: '',
-        googleWebClientId: '',
-      );
+      final missing = Env.collectMissing(apiBaseUrl: '', googleWebClientId: '');
       expect(
         missing,
         equals(['JOBIFY_API_BASE_URL', 'JOBIFY_GOOGLE_WEB_CLIENT_ID']),

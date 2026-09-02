@@ -122,13 +122,6 @@ class BoldScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          header,
-          Expanded(child: child),
-        ],
-      ),
-    );
+    return Scaffold(body: Column(children: [header, Expanded(child: child)]));
   }
 }

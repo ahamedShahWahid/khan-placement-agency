@@ -12,20 +12,24 @@ part of 'preferences_repository_impl.dart';
 @ProviderFor(preferencesRepository)
 final preferencesRepositoryProvider = PreferencesRepositoryProvider._();
 
-final class PreferencesRepositoryProvider extends $FunctionalProvider<
-    PreferencesRepository,
-    PreferencesRepository,
-    PreferencesRepository> with $Provider<PreferencesRepository> {
+final class PreferencesRepositoryProvider
+    extends
+        $FunctionalProvider<
+          PreferencesRepository,
+          PreferencesRepository,
+          PreferencesRepository
+        >
+    with $Provider<PreferencesRepository> {
   PreferencesRepositoryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'preferencesRepositoryProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'preferencesRepositoryProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$preferencesRepositoryHash();
@@ -33,8 +37,8 @@ final class PreferencesRepositoryProvider extends $FunctionalProvider<
   @$internal
   @override
   $ProviderElement<PreferencesRepository> $createElement(
-          $ProviderPointer pointer) =>
-      $ProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   PreferencesRepository create(Ref ref) {

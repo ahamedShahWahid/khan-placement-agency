@@ -27,17 +27,17 @@ class SavedController extends _$SavedController {
   }
 
   Future<void> loadMore() => loadNextPage<SavedJobListItemDto>(
-        currentState: state,
-        fetch: ({String? cursor}) async {
-          final page = await ref
-              .read(savedJobsRepositoryProvider)
-              .fetchPage(cursor: cursor);
-          return PagedState(
-            items: page.items,
-            cursor: page.nextCursor,
-            hasMore: page.nextCursor != null,
-          );
-        },
-        setState: (s) => state = s,
+    currentState: state,
+    fetch: ({String? cursor}) async {
+      final page = await ref
+          .read(savedJobsRepositoryProvider)
+          .fetchPage(cursor: cursor);
+      return PagedState(
+        items: page.items,
+        cursor: page.nextCursor,
+        hasMore: page.nextCursor != null,
       );
+    },
+    setState: (s) => state = s,
+  );
 }

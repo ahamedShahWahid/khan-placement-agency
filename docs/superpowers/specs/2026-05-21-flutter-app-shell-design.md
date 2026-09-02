@@ -1,5 +1,14 @@
 # Flutter App Shell — Design
 
+> ⚠️ **PARTIALLY SUPERSEDED — read this first.** The `domain/` layer described
+> below (repository interfaces in their own layer, the dependency rules, the
+> file tree) was **deliberately simplified away and never shipped**. The app
+> has `data/` + `presentation/` + `core/` only, with abstract repository
+> interfaces sitting next to their impls (`data/<feature>/<x>_repository.dart`
+> + `_impl.dart`). See `app/CLAUDE.md` for the real structure. Everything else
+> here — notably the two Google sign-in flows, which is what other docs link
+> here for — is still accurate.
+
 **Status:** Approved (brainstorm 2026-05-21). Awaiting implementation plan.
 **Author:** Claude + Ahamed
 **Phase:** First slice of the Flutter mobile + web client. Not aligned with backend P-numbering.

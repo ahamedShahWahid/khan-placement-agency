@@ -7,36 +7,32 @@ import 'package:jobify_app/data/feed/feed_repository_impl.dart';
 import '../../../helpers/mock_interceptor.dart';
 
 Map<String, dynamic> _samplePage({String? next}) => {
-      'items': [
-        {
-          'match': {
-            'id': 'm1',
-            'total_score': 0.81,
-            'components': {'vec': 0.9, 'rules': 0.7},
-            'explanation': {
-              'fit': 'great',
-              'caveat': null,
-              'generator': 'templated',
-              'generator_version': '1',
-            },
-            'surfaced_at': '2026-05-20T10:00:00Z',
-          },
-          'job': {
-            'id': 'j1',
-            'title': 'Eng',
-            'locations': ['Bangalore'],
-            'status': 'open',
-            'posted_at': '2026-05-18T00:00:00Z',
-          },
-          'employer': {
-            'id': 'e1',
-            'name': 'Acme',
-            'verified': true,
-          },
-        }
-      ],
-      'next_cursor': next,
-    };
+  'items': [
+    {
+      'match': {
+        'id': 'm1',
+        'total_score': 0.81,
+        'components': {'vec': 0.9, 'rules': 0.7},
+        'explanation': {
+          'fit': 'great',
+          'caveat': null,
+          'generator': 'templated',
+          'generator_version': '1',
+        },
+        'surfaced_at': '2026-05-20T10:00:00Z',
+      },
+      'job': {
+        'id': 'j1',
+        'title': 'Eng',
+        'locations': ['Bangalore'],
+        'status': 'open',
+        'posted_at': '2026-05-18T00:00:00Z',
+      },
+      'employer': {'id': 'e1', 'name': 'Acme', 'verified': true},
+    },
+  ],
+  'next_cursor': next,
+};
 
 void main() {
   late Dio dio;

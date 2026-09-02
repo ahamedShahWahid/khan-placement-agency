@@ -55,45 +55,55 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       appBar: AppBar(title: Text(l10n.notificationsTitle)),
       body: AsyncValueWidget<NotificationsState>(
         value: value,
-        onRetry: () =>
-            ref.read(notificationsControllerProvider.notifier).refresh(),
+        onRetry:
+            () => ref.read(notificationsControllerProvider.notifier).refresh(),
         isEmpty: (s) => s.items.isEmpty,
         empty: () => Center(child: Text(l10n.notificationsEmpty)),
-        data: (s) => RefreshIndicator(
-          onRefresh: () =>
-              ref.read(notificationsControllerProvider.notifier).refresh(),
-          child: ListView.separated(
-            controller: _scroll,
-            padding: const EdgeInsets.all(JobifySpacing.lg),
-            itemCount: s.items.length + 1,
-            separatorBuilder: (_, __) => const Divider(height: 1),
-            itemBuilder: (context, i) {
-              if (i == s.items.length) {
-                return s.isLoadingMore
-                    ? const Padding(
-                        padding: EdgeInsets.all(JobifySpacing.lg),
-                        child: JobifyLoadingView(),
-                      )
-                    : const SizedBox.shrink();
-              }
-              final n = s.items[i];
-              final unread = n.readAt == null;
-              return ListTile(
-                leading: unread
-                    ? const Icon(Icons.circle, size: 10, color: Colors.blue)
-                    : const SizedBox(width: 10),
-                title: Text(
-                  notificationTitle(l10n, n),
-                  style: TextStyle(
-                    fontWeight: unread ? FontWeight.w600 : FontWeight.normal,
-                  ),
-                ),
-                subtitle: Text(jobifyShortDateFormat.format(n.createdAt)),
-                onTap: () => _onTap(n),
-              );
-            },
-          ),
-        ),
+        data:
+            (s) => RefreshIndicator(
+              onRefresh:
+                  () =>
+                      ref
+                          .read(notificationsControllerProvider.notifier)
+                          .refresh(),
+              child: ListView.separated(
+                controller: _scroll,
+                padding: const EdgeInsets.all(JobifySpacing.lg),
+                itemCount: s.items.length + 1,
+                separatorBuilder: (_, __) => const Divider(height: 1),
+                itemBuilder: (context, i) {
+                  if (i == s.items.length) {
+                    return s.isLoadingMore
+                        ? const Padding(
+                          padding: EdgeInsets.all(JobifySpacing.lg),
+                          child: JobifyLoadingView(),
+                        )
+                        : const SizedBox.shrink();
+                  }
+                  final n = s.items[i];
+                  final unread = n.readAt == null;
+                  return ListTile(
+                    leading:
+                        unread
+                            ? const Icon(
+                              Icons.circle,
+                              size: 10,
+                              color: Colors.blue,
+                            )
+                            : const SizedBox(width: 10),
+                    title: Text(
+                      notificationTitle(l10n, n),
+                      style: TextStyle(
+                        fontWeight:
+                            unread ? FontWeight.w600 : FontWeight.normal,
+                      ),
+                    ),
+                    subtitle: Text(jobifyShortDateFormat.format(n.createdAt)),
+                    onTap: () => _onTap(n),
+                  );
+                },
+              ),
+            ),
       ),
     );
   }

@@ -14,26 +14,26 @@ import 'package:jobify_app/presentation/job_detail/job_detail_screen.dart';
 import '../helpers/fake_repositories.dart';
 
 JobDetailDto _detail({MatchFeedbackRating? myFeedback}) => JobDetailDto(
-      job: JobSummaryDto(
-        id: 'j1',
-        title: 'Senior Engineer',
-        locations: const ['BLR'],
-        status: JobStatus.open,
-        postedAt: DateTime.parse('2026-05-18T00:00:00Z'),
-      ),
-      employer: const EmployerSummaryDto(id: 'e1', name: 'Acme Co'),
-      match: MatchSummaryDto(
-        id: 'm1',
-        totalScore: 0.82,
-        scoreComponents: const {},
-        explanation: const ExplanationDto(
-          fit: 'great fit',
-          generator: MatchGenerator.templated,
-          generatorVersion: '1',
-        ),
-        myFeedback: myFeedback,
-      ),
-    );
+  job: JobSummaryDto(
+    id: 'j1',
+    title: 'Senior Engineer',
+    locations: const ['BLR'],
+    status: JobStatus.open,
+    postedAt: DateTime.parse('2026-05-18T00:00:00Z'),
+  ),
+  employer: const EmployerSummaryDto(id: 'e1', name: 'Acme Co'),
+  match: MatchSummaryDto(
+    id: 'm1',
+    totalScore: 0.82,
+    scoreComponents: const {},
+    explanation: const ExplanationDto(
+      fit: 'great fit',
+      generator: MatchGenerator.templated,
+      generatorVersion: '1',
+    ),
+    myFeedback: myFeedback,
+  ),
+);
 
 Widget _wrap(Widget child, {required JobsRepository repo}) {
   return ProviderScope(

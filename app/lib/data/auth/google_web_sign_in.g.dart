@@ -19,22 +19,27 @@ final googleWebSignInProvider = GoogleWebSignInProvider._();
 /// guarantees the widget tree only reaches [GoogleWebSignIn.button] after the
 /// GIS client is ready.
 
-final class GoogleWebSignInProvider extends $FunctionalProvider<
-        AsyncValue<GoogleWebSignIn>, GoogleWebSignIn, FutureOr<GoogleWebSignIn>>
+final class GoogleWebSignInProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<GoogleWebSignIn>,
+          GoogleWebSignIn,
+          FutureOr<GoogleWebSignIn>
+        >
     with $FutureModifier<GoogleWebSignIn>, $FutureProvider<GoogleWebSignIn> {
   /// Initialized [GoogleWebSignIn]. Awaiting initialization inside the provider
   /// guarantees the widget tree only reaches [GoogleWebSignIn.button] after the
   /// GIS client is ready.
   GoogleWebSignInProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'googleWebSignInProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'googleWebSignInProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$googleWebSignInHash();
@@ -42,8 +47,8 @@ final class GoogleWebSignInProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<GoogleWebSignIn> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<GoogleWebSignIn> create(Ref ref) {

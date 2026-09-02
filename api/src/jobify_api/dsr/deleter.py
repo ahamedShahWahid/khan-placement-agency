@@ -8,6 +8,11 @@ per-table policy table and §5 for the order of operations.
 Pure executor — does NOT write audit rows. The route handler writes
 ``user.dsr_delete_requested`` BEFORE this call and
 ``user.dsr_deleted`` AFTER, in the same transaction.
+
+It DOES redact PII out of existing ``audit_logs.context`` values — see
+:func:`_redact_audit_context_pii`. That is the one place this module UPDATEs
+``audit_logs``, and it is required by IMPLEMENTATION_SPEC §9.2
+("anonymize audit records (keep action/timestamp, drop actor PII)").
 """
 
 from __future__ import annotations
@@ -17,7 +22,7 @@ from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
-from sqlalchemy import delete, exists, func, or_, select, update
+from sqlalchemy import delete, exists, func, or_, select, text, update
 from sqlalchemy.engine import CursorResult
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
@@ -26,6 +31,7 @@ from jobify.db.models import (
     Applicant,
     ApplicantEmbedding,
     ApplicantPreferences,
+    AuditLog,
     Employer,
     EmployerInvite,
     EmployerUser,
@@ -103,6 +109,61 @@ async def _detect_ownerless_employers(
     ]
 
 
+# `audit_logs.context` keys that hold a raw email address. Four employer-team
+# call sites write one (`add_member`, `create_invite`, `revoke_invite`, and
+# `routes/invites.decline_invite`), so an invitee's address outlives their
+# erasure unless we strip it here: audit rows deliberately SURVIVE a DSR delete,
+# `actor_user_id ON DELETE SET NULL` never fires because we only SOFT-delete the
+# user, and the `_REDACTED_COLUMN_NAMES` denylist in the export builder cannot
+# reach inside JSONB. Extend this set when a new audit context carries PII.
+_AUDIT_CONTEXT_PII_KEYS: tuple[str, ...] = ("email",)
+
+# Derived from the model rather than hardcoded so the raw-SQL statement below
+# cannot drift from the mapping (and so `AuditLog` is a real reference — the
+# DSR coverage guard in tests/unit/dsr/test_dsr_coverage.py uses each module's
+# imported-model set as its proxy for "tables this module touches").
+_AUDIT_LOGS_TABLE = f"{AuditLog.__table__.schema}.{AuditLog.__tablename__}"
+
+
+async def _redact_audit_context_pii(session: AsyncSession, *, email: str | None) -> int:
+    """Strip this user's PII out of every ``audit_logs.context`` that holds it.
+
+    Per IMPLEMENTATION_SPEC §9.2 erasure must "anonymize audit records (keep
+    action/timestamp, drop actor PII)". The row, its action, its timestamp and
+    its non-PII context all survive — only the matching key is removed, and a
+    ``<key>_redacted: true`` marker replaces it so the trail shows a redaction
+    happened rather than looking like the value was never recorded.
+
+    Matched case-insensitively because the invite/member call sites normalise
+    email to lowercase while ``users.email`` preserves the provider's casing.
+    Returns the number of rows changed (0 when the user had no email).
+
+    Takes ``email`` as a value rather than reading ``user.email``: the bulk
+    ``update(User).values(email=None)`` in :func:`delete_user_data`
+    synchronizes the ORM identity map, so by the time this runs the attribute
+    is already ``None``. The caller captures it before any mutation.
+    """
+    if not email:
+        return 0
+
+    redacted = 0
+    # Same `CursorResult` dance as the deletes below: `Session.execute` is typed
+    # as returning `Result[Any]`, which has no `rowcount`.
+    result: CursorResult[Any]
+    for key in _AUDIT_CONTEXT_PII_KEYS:
+        result = await session.execute(  # type: ignore[assignment]
+            text(
+                f"UPDATE {_AUDIT_LOGS_TABLE} "  # noqa: S608 — table name from the ORM mapping
+                "SET context = (context - :key) "
+                "  || jsonb_build_object(:marker, true) "
+                "WHERE context ? :key "
+                "  AND lower(context ->> :key) = lower(:value)"
+            ).bindparams(key=key, marker=f"{key}_redacted", value=email)
+        )
+        redacted += result.rowcount or 0
+    return redacted
+
+
 async def delete_user_data(
     session: AsyncSession,
     *,
@@ -113,6 +174,10 @@ async def delete_user_data(
     rolls back atomically.
     """
     counts: dict[str, int] = {}
+    # Captured BEFORE any mutation: the bulk `update(User)` below nulls
+    # `users.email` AND synchronizes the identity map, so `user.email` is None
+    # by the time the audit-context redaction runs at step 13.
+    original_email = user.email
 
     # Detect sole-owner employers BEFORE deleting memberships.
     warnings = await _detect_ownerless_employers(session, user=user)
@@ -260,6 +325,13 @@ async def delete_user_data(
         )
     )
     counts["user_tombstoned"] = 1
+
+    # 13. Audit context — the rows stay (DPDP evidence) but the user's PII
+    # inside `context` does not. Runs LAST so it can still read `user.email`
+    # from the in-memory object after the UPDATE above nulled the column.
+    counts["audit_context_redacted"] = await _redact_audit_context_pii(
+        session, email=original_email
+    )
 
     await session.flush()
 

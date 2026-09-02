@@ -14,18 +14,21 @@ final recruiterApplicantsControllerProvider =
     RecruiterApplicantsControllerFamily._();
 
 final class RecruiterApplicantsControllerProvider
-    extends $AsyncNotifierProvider<RecruiterApplicantsController,
-        RecruiterApplicantsState> {
-  RecruiterApplicantsControllerProvider._(
-      {required RecruiterApplicantsControllerFamily super.from,
-      required String super.argument})
-      : super(
-          retry: null,
-          name: r'recruiterApplicantsControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    extends
+        $AsyncNotifierProvider<
+          RecruiterApplicantsController,
+          RecruiterApplicantsState
+        > {
+  RecruiterApplicantsControllerProvider._({
+    required RecruiterApplicantsControllerFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'recruiterApplicantsControllerProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$recruiterApplicantsControllerHash();
@@ -59,23 +62,22 @@ String _$recruiterApplicantsControllerHash() =>
 final class RecruiterApplicantsControllerFamily extends $Family
     with
         $ClassFamilyOverride<
-            RecruiterApplicantsController,
-            AsyncValue<RecruiterApplicantsState>,
-            RecruiterApplicantsState,
-            FutureOr<RecruiterApplicantsState>,
-            String> {
+          RecruiterApplicantsController,
+          AsyncValue<RecruiterApplicantsState>,
+          RecruiterApplicantsState,
+          FutureOr<RecruiterApplicantsState>,
+          String
+        > {
   RecruiterApplicantsControllerFamily._()
-      : super(
-          retry: null,
-          name: r'recruiterApplicantsControllerProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
+    : super(
+        retry: null,
+        name: r'recruiterApplicantsControllerProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
-  RecruiterApplicantsControllerProvider call(
-    String jobId,
-  ) =>
+  RecruiterApplicantsControllerProvider call(String jobId) =>
       RecruiterApplicantsControllerProvider._(argument: jobId, from: this);
 
   @override
@@ -87,24 +89,27 @@ abstract class _$RecruiterApplicantsController
   late final _$args = ref.$arg as String;
   String get jobId => _$args;
 
-  FutureOr<RecruiterApplicantsState> build(
-    String jobId,
-  );
+  FutureOr<RecruiterApplicantsState> build(String jobId);
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref
-        as $Ref<AsyncValue<RecruiterApplicantsState>, RecruiterApplicantsState>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<RecruiterApplicantsState>,
-            RecruiterApplicantsState>,
-        AsyncValue<RecruiterApplicantsState>,
-        Object?,
-        Object?>;
-    element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<RecruiterApplicantsState>,
+              RecruiterApplicantsState
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<RecruiterApplicantsState>,
+                RecruiterApplicantsState
+              >,
+              AsyncValue<RecruiterApplicantsState>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, () => build(_$args));
   }
 }

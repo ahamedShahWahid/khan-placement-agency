@@ -7,11 +7,12 @@ part of 'feed_dto.dart';
 // **************************************************************************
 
 FeedPageDto _$FeedPageDtoFromJson(Map<String, dynamic> json) => FeedPageDto(
-      items: (json['items'] as List<dynamic>)
+  items:
+      (json['items'] as List<dynamic>)
           .map((e) => FeedItemDto.fromJson(e as Map<String, dynamic>))
           .toList(),
-      nextCursor: json['next_cursor'] as String?,
-    );
+  nextCursor: json['next_cursor'] as String?,
+);
 
 Map<String, dynamic> _$FeedPageDtoToJson(FeedPageDto instance) =>
     <String, dynamic>{
@@ -20,11 +21,12 @@ Map<String, dynamic> _$FeedPageDtoToJson(FeedPageDto instance) =>
     };
 
 FeedItemDto _$FeedItemDtoFromJson(Map<String, dynamic> json) => FeedItemDto(
-      match: MatchSummaryDto.fromJson(json['match'] as Map<String, dynamic>),
-      job: JobSummaryDto.fromJson(json['job'] as Map<String, dynamic>),
-      employer:
-          EmployerSummaryDto.fromJson(json['employer'] as Map<String, dynamic>),
-    );
+  match: MatchSummaryDto.fromJson(json['match'] as Map<String, dynamic>),
+  job: JobSummaryDto.fromJson(json['job'] as Map<String, dynamic>),
+  employer: EmployerSummaryDto.fromJson(
+    json['employer'] as Map<String, dynamic>,
+  ),
+);
 
 Map<String, dynamic> _$FeedItemDtoToJson(FeedItemDto instance) =>
     <String, dynamic>{
@@ -38,16 +40,21 @@ MatchSummaryDto _$MatchSummaryDtoFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       totalScore: (json['total_score'] as num).toDouble(),
       scoreComponents: json['components'] as Map<String, dynamic>,
-      explanation: json['explanation'] == null
-          ? null
-          : ExplanationDto.fromJson(
-              json['explanation'] as Map<String, dynamic>),
-      surfacedAt: json['surfaced_at'] == null
-          ? null
-          : DateTime.parse(json['surfaced_at'] as String),
+      explanation:
+          json['explanation'] == null
+              ? null
+              : ExplanationDto.fromJson(
+                json['explanation'] as Map<String, dynamic>,
+              ),
+      surfacedAt:
+          json['surfaced_at'] == null
+              ? null
+              : DateTime.parse(json['surfaced_at'] as String),
       myFeedback: $enumDecodeNullable(
-          _$MatchFeedbackRatingEnumMap, json['my_feedback'],
-          unknownValue: MatchFeedbackRating.unknown),
+        _$MatchFeedbackRatingEnumMap,
+        json['my_feedback'],
+        unknownValue: MatchFeedbackRating.unknown,
+      ),
     );
 
 Map<String, dynamic> _$MatchSummaryDtoToJson(MatchSummaryDto instance) =>
@@ -69,8 +76,11 @@ const _$MatchFeedbackRatingEnumMap = {
 ExplanationDto _$ExplanationDtoFromJson(Map<String, dynamic> json) =>
     ExplanationDto(
       fit: json['fit'] as String,
-      generator: $enumDecode(_$MatchGeneratorEnumMap, json['generator'],
-          unknownValue: MatchGenerator.unknown),
+      generator: $enumDecode(
+        _$MatchGeneratorEnumMap,
+        json['generator'],
+        unknownValue: MatchGenerator.unknown,
+      ),
       generatorVersion: json['generator_version'] as String,
       caveat: json['caveat'] as String?,
     );
@@ -93,10 +103,14 @@ JobSummaryDto _$JobSummaryDtoFromJson(Map<String, dynamic> json) =>
     JobSummaryDto(
       id: json['id'] as String,
       title: json['title'] as String,
-      status: $enumDecode(_$JobStatusEnumMap, json['status'],
-          unknownValue: JobStatus.unknown),
+      status: $enumDecode(
+        _$JobStatusEnumMap,
+        json['status'],
+        unknownValue: JobStatus.unknown,
+      ),
       postedAt: DateTime.parse(json['posted_at'] as String),
-      locations: (json['locations'] as List<dynamic>?)
+      locations:
+          (json['locations'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           const [],

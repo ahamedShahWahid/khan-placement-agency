@@ -24,8 +24,7 @@ class _FakeApplicationsRepo implements ApplicationsRepository {
   Future<ApplicationsPageDto> fetchPage({
     String? cursor,
     int limit = 20,
-  }) async =>
-      const ApplicationsPageDto(items: []);
+  }) async => const ApplicationsPageDto(items: []);
   @override
   Future<ApplicationDto> withdraw(String applicationId) async =>
       throw UnimplementedError();
@@ -59,8 +58,7 @@ class _ThrowingApplicationsRepo implements ApplicationsRepository {
   Future<ApplicationsPageDto> fetchPage({
     String? cursor,
     int limit = 20,
-  }) async =>
-      throw Exception('boom');
+  }) async => throw Exception('boom');
   @override
   Future<ApplicationDto> withdraw(String applicationId) async =>
       throw UnimplementedError();
@@ -121,8 +119,7 @@ class _FakeResumeRepo implements ResumeRepository {
     required List<int> bytes,
     required String filename,
     required String contentType,
-  }) async =>
-      throw UnimplementedError();
+  }) async => throw UnimplementedError();
 }
 
 class _FakePrefsRepo implements PreferencesRepository {
@@ -150,8 +147,11 @@ const _completePrefs = PreferencesDto(
   expectedCtc: '1800000.00',
 );
 
-const _incompletePrefs =
-    PreferencesDto(desiredRole: null, locations: [], expectedCtc: null);
+const _incompletePrefs = PreferencesDto(
+  desiredRole: null,
+  locations: [],
+  expectedCtc: null,
+);
 
 Future<void> _pump(
   WidgetTester tester, {
@@ -209,20 +209,23 @@ void main() {
   });
 
   testWidgets(
-      'shows finish-profile prompt when résumé exists but prefs incomplete',
-      (tester) async {
-    await _pump(tester, resume: _resume, prefs: _incompletePrefs);
-    expect(find.text('Finish your profile'), findsOneWidget);
-  });
+    'shows finish-profile prompt when résumé exists but prefs incomplete',
+    (tester) async {
+      await _pump(tester, resume: _resume, prefs: _incompletePrefs);
+      expect(find.text('Finish your profile'), findsOneWidget);
+    },
+  );
 
-  testWidgets('shows complete state when résumé and prefs are complete',
-      (tester) async {
+  testWidgets('shows complete state when résumé and prefs are complete', (
+    tester,
+  ) async {
     await _pump(tester, resume: _resume);
     expect(find.text('Profile complete'), findsOneWidget);
   });
 
-  testWidgets('tapping Applications tile navigates to /applications',
-      (tester) async {
+  testWidgets('tapping Applications tile navigates to /applications', (
+    tester,
+  ) async {
     await _pump(tester, resume: _resume);
     await tester.tap(find.text('Applications'));
     await tester.pumpAndSettle();
@@ -236,16 +239,16 @@ void main() {
     expect(find.text('Saved'), findsOneWidget);
   });
 
-  testWidgets('tapping upload-résumé prompt navigates to /profile/resume',
-      (tester) async {
+  testWidgets('tapping upload-résumé prompt navigates to /profile/resume', (
+    tester,
+  ) async {
     await _pump(tester);
     await tester.tap(find.text('Upload résumé'));
     await tester.pumpAndSettle();
     expect(find.text('Resume'), findsOneWidget);
   });
 
-  testWidgets(
-      'shows a retry icon on both count tiles when BOTH repos throw, '
+  testWidgets('shows a retry icon on both count tiles when BOTH repos throw, '
       'without blocking the match-profile tile', (tester) async {
     await _pump(
       tester,
@@ -270,33 +273,35 @@ void main() {
   });
 
   testWidgets(
-      'tapping an errored count tile retries (not navigates) and recovers '
-      'to a real count', (tester) async {
-    final applicationsRepo = _FlakyApplicationsRepo();
-    final savedJobsRepo = _FlakySavedJobsRepo();
-    await _pump(
-      tester,
-      resume: _resume,
-      applicationsRepo: applicationsRepo,
-      savedJobsRepo: savedJobsRepo,
-    );
+    'tapping an errored count tile retries (not navigates) and recovers '
+    'to a real count',
+    (tester) async {
+      final applicationsRepo = _FlakyApplicationsRepo();
+      final savedJobsRepo = _FlakySavedJobsRepo();
+      await _pump(
+        tester,
+        resume: _resume,
+        applicationsRepo: applicationsRepo,
+        savedJobsRepo: savedJobsRepo,
+      );
 
-    // Both repos rejected on the first fetch — both tiles start errored.
-    expect(find.byIcon(Icons.refresh), findsNWidgets(2));
+      // Both repos rejected on the first fetch — both tiles start errored.
+      expect(find.byIcon(Icons.refresh), findsNWidgets(2));
 
-    await tester.tap(find.byIcon(Icons.refresh).first);
-    await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.refresh).first);
+      await tester.pumpAndSettle();
 
-    // Tapping an errored tile invoked `onRetry` (ref.invalidate), not
-    // `onTap` (navigation): we're still on the Feed row (no push to
-    // /applications or /saved), and the provider's re-fetch — this time
-    // succeeding — recovered both tiles to a real count instead of leaving
-    // them on the retry icon.
-    expect(find.text('Applications'), findsOneWidget);
-    expect(find.text('Saved'), findsOneWidget);
-    expect(find.byIcon(Icons.refresh), findsNothing);
-    expect(find.text('0'), findsNWidgets(2));
-    expect(applicationsRepo.callCount, 2);
-    expect(savedJobsRepo.callCount, 2);
-  });
+      // Tapping an errored tile invoked `onRetry` (ref.invalidate), not
+      // `onTap` (navigation): we're still on the Feed row (no push to
+      // /applications or /saved), and the provider's re-fetch — this time
+      // succeeding — recovered both tiles to a real count instead of leaving
+      // them on the retry icon.
+      expect(find.text('Applications'), findsOneWidget);
+      expect(find.text('Saved'), findsOneWidget);
+      expect(find.byIcon(Icons.refresh), findsNothing);
+      expect(find.text('0'), findsNWidgets(2));
+      expect(applicationsRepo.callCount, 2);
+      expect(savedJobsRepo.callCount, 2);
+    },
+  );
 }

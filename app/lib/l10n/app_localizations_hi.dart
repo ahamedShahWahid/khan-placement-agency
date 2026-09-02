@@ -434,7 +434,9 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String notificationApplicationReceivedWithEmployer(
-      String job, String employer) {
+    String job,
+    String employer,
+  ) {
     return '$employer में $job के लिए आवेदन प्राप्त हुआ';
   }
 

@@ -20,9 +20,10 @@ class JobifyMatchChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final tint = isDark
-        ? JobifyColors.brandBlueTintDark
-        : JobifyColors.brandBlueTintLight;
+    final tint =
+        isDark
+            ? JobifyColors.brandBlueTintDark
+            : JobifyColors.brandBlueTintLight;
     final ink =
         isDark ? JobifyColors.brandBlueDark : JobifyColors.brandBlueLight;
     return Chip(

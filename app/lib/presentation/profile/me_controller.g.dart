@@ -15,15 +15,15 @@ final meControllerProvider = MeControllerProvider._();
 final class MeControllerProvider
     extends $AsyncNotifierProvider<MeController, MeDto> {
   MeControllerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'meControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'meControllerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$meControllerHash();
@@ -41,11 +41,14 @@ abstract class _$MeController extends $AsyncNotifier<MeDto> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<AsyncValue<MeDto>, MeDto>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<MeDto>, MeDto>,
-        AsyncValue<MeDto>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<MeDto>, MeDto>,
+              AsyncValue<MeDto>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

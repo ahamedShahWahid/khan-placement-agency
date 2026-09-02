@@ -36,8 +36,10 @@ class PreferencesController extends _$PreferencesController {
       () => ref.read(preferencesRepositoryProvider).update(update),
     );
     if (result.hasError) {
-      final error =
-          AsyncValue<PreferencesDto>.error(result.error!, result.stackTrace!);
+      final error = AsyncValue<PreferencesDto>.error(
+        result.error!,
+        result.stackTrace!,
+      );
       // ignore: invalid_use_of_internal_member
       state = error.copyWithPrevious(previous);
       // The language switcher optimistically flips the app locale before

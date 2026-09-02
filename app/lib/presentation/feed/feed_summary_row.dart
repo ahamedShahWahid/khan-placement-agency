@@ -30,9 +30,11 @@ class FeedSummaryRow extends ConsumerWidget {
             icon: Icons.send_outlined,
             label: context.l10n.shellTabApplications,
             value: summary.whenOrNull(
-              data: (s) => s.applicationsApprox
-                  ? '${s.applicationsCount}+'
-                  : '${s.applicationsCount}',
+              data:
+                  (s) =>
+                      s.applicationsApprox
+                          ? '${s.applicationsCount}+'
+                          : '${s.applicationsCount}',
             ),
             isError: summary.hasError,
             onTap: () => context.go(Routes.applications),
@@ -45,8 +47,8 @@ class FeedSummaryRow extends ConsumerWidget {
             icon: Icons.bookmark_outline,
             label: context.l10n.shellTabSaved,
             value: summary.whenOrNull(
-              data: (s) =>
-                  s.savedApprox ? '${s.savedCount}+' : '${s.savedCount}',
+              data:
+                  (s) => s.savedApprox ? '${s.savedCount}+' : '${s.savedCount}',
             ),
             isError: summary.hasError,
             onTap: () => context.go(Routes.saved),

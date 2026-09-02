@@ -7,6 +7,7 @@ Covers:
 3. Recruiter happy path — sole-owner employer warning in response.
 4. Application + match survive anonymized after applicant delete.
 5. JWT becomes invalid after delete (401 user_not_found).
+6. Audit-context PII redaction (spec §9.2).
 """
 
 from __future__ import annotations
@@ -284,6 +285,83 @@ async def test_delete_erases_invites_addressed_to_the_user(
         await session.execute(select(EmployerInvite).where(EmployerInvite.id == invite_id))
     ).scalar_one_or_none()
     assert gone is None
+
+
+@pytest.mark.asyncio
+async def test_delete_redacts_the_users_email_from_audit_context(
+    async_client: AsyncClient, session: AsyncSession
+) -> None:
+    """IMPLEMENTATION_SPEC §9.2 requires erasure to "anonymize audit records
+    (keep action/timestamp, drop actor PII)".
+
+    `audit_logs` rows deliberately SURVIVE a DSR delete (they are the DPDP
+    evidence trail, and `actor_user_id` is ON DELETE SET NULL). But four
+    employer-team call sites write the target's raw email into
+    `audit_logs.context`, and DSR only SOFT-deletes the user — so the FK
+    action never fires and the address stayed readable forever via
+    GET /v1/admin/audit-logs. The `_REDACTED_COLUMN_NAMES` denylist cannot
+    reach inside JSONB. The delete must strip the key and leave a marker so
+    the trail shows a redaction happened rather than looking like the email
+    was never recorded.
+    """
+    user, _applicant, token = await _make_applicant_with_dependencies(session)
+    email = user.email
+    assert email is not None
+
+    # Exactly what employers/team_service.py writes on invite create/revoke.
+    session.add(
+        AuditLog(
+            actor_user_id=None,
+            actor_role="recruiter",
+            action="employer.invite_created",
+            resource_type="employer_invite",
+            resource_id=uuid4(),
+            context={"email": email, "role": "member"},
+        )
+    )
+    # A row for somebody else must NOT be touched.
+    other_email = "someone-else@example.com"
+    session.add(
+        AuditLog(
+            actor_user_id=None,
+            actor_role="recruiter",
+            action="employer.invite_created",
+            resource_type="employer_invite",
+            resource_id=uuid4(),
+            context={"email": other_email, "role": "owner"},
+        )
+    )
+    await session.commit()
+
+    resp = await async_client.request(
+        "DELETE",
+        "/v1/me/dsr",
+        headers={"Authorization": f"Bearer {token}"},
+        json=_CONFIRMATION,
+    )
+    assert resp.status_code == 200
+    assert resp.json()["section_counts"]["audit_context_redacted"] == 1
+
+    rows = (
+        (
+            await session.execute(
+                select(AuditLog).where(AuditLog.action == "employer.invite_created")
+            )
+        )
+        .scalars()
+        .all()
+    )
+    contexts = [r.context for r in rows]
+
+    # The deleted user's address is gone from every audit context...
+    assert all(c.get("email") != email for c in contexts)
+    # ...replaced by an explicit marker, with the non-PII context preserved.
+    redacted = [c for c in contexts if c.get("email_redacted") is True]
+    assert len(redacted) == 1
+    assert "email" not in redacted[0]
+    assert redacted[0]["role"] == "member"
+    # ...and the other person's row is untouched.
+    assert any(c.get("email") == other_email for c in contexts)
 
 
 @pytest.mark.asyncio

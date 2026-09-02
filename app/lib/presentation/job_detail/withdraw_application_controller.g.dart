@@ -14,18 +14,18 @@ final withdrawApplicationControllerProvider =
     WithdrawApplicationControllerFamily._();
 
 final class WithdrawApplicationControllerProvider
-    extends $AsyncNotifierProvider<WithdrawApplicationController,
-        ApplicationDto?> {
-  WithdrawApplicationControllerProvider._(
-      {required WithdrawApplicationControllerFamily super.from,
-      required String super.argument})
-      : super(
-          retry: null,
-          name: r'withdrawApplicationControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    extends
+        $AsyncNotifierProvider<WithdrawApplicationController, ApplicationDto?> {
+  WithdrawApplicationControllerProvider._({
+    required WithdrawApplicationControllerFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'withdrawApplicationControllerProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$withdrawApplicationControllerHash();
@@ -59,25 +59,26 @@ String _$withdrawApplicationControllerHash() =>
 final class WithdrawApplicationControllerFamily extends $Family
     with
         $ClassFamilyOverride<
-            WithdrawApplicationController,
-            AsyncValue<ApplicationDto?>,
-            ApplicationDto?,
-            FutureOr<ApplicationDto?>,
-            String> {
+          WithdrawApplicationController,
+          AsyncValue<ApplicationDto?>,
+          ApplicationDto?,
+          FutureOr<ApplicationDto?>,
+          String
+        > {
   WithdrawApplicationControllerFamily._()
-      : super(
-          retry: null,
-          name: r'withdrawApplicationControllerProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
+    : super(
+        retry: null,
+        name: r'withdrawApplicationControllerProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
-  WithdrawApplicationControllerProvider call(
-    String applicationId,
-  ) =>
+  WithdrawApplicationControllerProvider call(String applicationId) =>
       WithdrawApplicationControllerProvider._(
-          argument: applicationId, from: this);
+        argument: applicationId,
+        from: this,
+      );
 
   @override
   String toString() => r'withdrawApplicationControllerProvider';
@@ -88,22 +89,19 @@ abstract class _$WithdrawApplicationController
   late final _$args = ref.$arg as String;
   String get applicationId => _$args;
 
-  FutureOr<ApplicationDto?> build(
-    String applicationId,
-  );
+  FutureOr<ApplicationDto?> build(String applicationId);
   @$mustCallSuper
   @override
   void runBuild() {
     final ref = this.ref as $Ref<AsyncValue<ApplicationDto?>, ApplicationDto?>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<ApplicationDto?>, ApplicationDto?>,
-        AsyncValue<ApplicationDto?>,
-        Object?,
-        Object?>;
-    element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<ApplicationDto?>, ApplicationDto?>,
+              AsyncValue<ApplicationDto?>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, () => build(_$args));
   }
 }

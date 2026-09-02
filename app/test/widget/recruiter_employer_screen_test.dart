@@ -12,16 +12,13 @@ import 'package:jobify_app/presentation/recruiter/recruiter_employer_screen.dart
 import '../helpers/fake_employer_team_repository.dart';
 
 EmployerDto _employer() => EmployerDto(
-      id: 'e1',
-      name: 'Acme Corp',
-      gst: '22AAAAA0000A1Z5',
-      createdAt: DateTime.utc(2026),
-    );
+  id: 'e1',
+  name: 'Acme Corp',
+  gst: '22AAAAA0000A1Z5',
+  createdAt: DateTime.utc(2026),
+);
 
-Widget _wrap(
-  FakeEmployerTeamRepository repo, {
-  required String myUserId,
-}) =>
+Widget _wrap(FakeEmployerTeamRepository repo, {required String myUserId}) =>
     ProviderScope(
       overrides: [
         employerTeamRepositoryProvider.overrideWithValue(repo),
@@ -41,8 +38,9 @@ Widget _wrap(
     );
 
 void main() {
-  testWidgets('owner sees roster, invite form, and member menus',
-      (tester) async {
+  testWidgets('owner sees roster, invite form, and member menus', (
+    tester,
+  ) async {
     final repo = FakeEmployerTeamRepository(
       members: [
         fakeMember(userId: 'u1', role: 'owner', displayName: 'Olivia Owner'),
@@ -65,8 +63,9 @@ void main() {
     expect(find.text('pending@example.com'), findsOneWidget);
   });
 
-  testWidgets('member sees read-only roster (no invite form, no menus)',
-      (tester) async {
+  testWidgets('member sees read-only roster (no invite form, no menus)', (
+    tester,
+  ) async {
     final repo = FakeEmployerTeamRepository(
       members: [
         fakeMember(userId: 'u1', role: 'owner', displayName: 'Olivia Owner'),

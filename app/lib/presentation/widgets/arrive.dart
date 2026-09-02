@@ -21,8 +21,10 @@ class _ArriveState extends State<Arrive> with SingleTickerProviderStateMixin {
     vsync: this,
     duration: JobifyMotion.durationArrive,
   );
-  late final Animation<double> _t =
-      CurvedAnimation(parent: _c, curve: JobifyMotion.curveArrive);
+  late final Animation<double> _t = CurvedAnimation(
+    parent: _c,
+    curve: JobifyMotion.curveArrive,
+  );
 
   bool _started = false;
 

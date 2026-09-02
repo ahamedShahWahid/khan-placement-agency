@@ -7,16 +7,19 @@ part of 'resume_dto.dart';
 // **************************************************************************
 
 ResumeDto _$ResumeDtoFromJson(Map<String, dynamic> json) => ResumeDto(
-      id: json['id'] as String,
-      applicantId: json['applicant_id'] as String,
-      originalFilename: json['original_filename'] as String,
-      contentType: json['content_type'] as String,
-      sizeBytes: (json['size_bytes'] as num).toInt(),
-      parseStatus: $enumDecode(_$ResumeParseStatusEnumMap, json['parse_status'],
-          unknownValue: ResumeParseStatus.unknown),
-      createdAt: DateTime.parse(json['created_at'] as String),
-      parsedJson: json['parsed_json'] as Map<String, dynamic>?,
-    );
+  id: json['id'] as String,
+  applicantId: json['applicant_id'] as String,
+  originalFilename: json['original_filename'] as String,
+  contentType: json['content_type'] as String,
+  sizeBytes: (json['size_bytes'] as num).toInt(),
+  parseStatus: $enumDecode(
+    _$ResumeParseStatusEnumMap,
+    json['parse_status'],
+    unknownValue: ResumeParseStatus.unknown,
+  ),
+  createdAt: DateTime.parse(json['created_at'] as String),
+  parsedJson: json['parsed_json'] as Map<String, dynamic>?,
+);
 
 const _$ResumeParseStatusEnumMap = {
   ResumeParseStatus.pending: 'pending',

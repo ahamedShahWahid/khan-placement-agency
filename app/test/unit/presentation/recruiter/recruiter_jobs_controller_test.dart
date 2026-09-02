@@ -33,8 +33,7 @@ class FakeRecruiterJobsRepository implements RecruiterJobsRepository {
   Future<RecruiterJobDto> patchJob(
     String id,
     Map<String, dynamic> body,
-  ) async =>
-      throw UnimplementedError();
+  ) async => throw UnimplementedError();
 
   @override
   Future<void> deleteJob(String id) async => throw UnimplementedError();
@@ -44,8 +43,7 @@ class FakeRecruiterJobsRepository implements RecruiterJobsRepository {
     String jobId, {
     String? cursor,
     int limit = 20,
-  }) async =>
-      throw UnimplementedError();
+  }) async => throw UnimplementedError();
 
   @override
   Future<ResumeDownload> downloadResume(String applicationId) async =>
@@ -56,41 +54,36 @@ class FakeRecruiterJobsRepository implements RecruiterJobsRepository {
     String jobId,
     String applicationId,
     ApplicationStage stage,
-  ) async =>
-      throw UnimplementedError();
+  ) async => throw UnimplementedError();
 }
 
 RecruiterJobDto _job(String id, {String status = 'open'}) => RecruiterJobDto(
-      id: id,
-      title: 'Job $id',
-      description: 'Desc',
-      locations: const ['BLR'],
-      minExpYears: 1,
-      maxExpYears: 3,
-      status: status,
-      postedAt: DateTime.utc(2026),
-      employerVerified: true,
-    );
+  id: id,
+  title: 'Job $id',
+  description: 'Desc',
+  locations: const ['BLR'],
+  minExpYears: 1,
+  maxExpYears: 3,
+  status: status,
+  postedAt: DateTime.utc(2026),
+  employerVerified: true,
+);
 
 void main() {
   test('build loads first page and returns PagedState with items', () async {
     final fake = FakeRecruiterJobsRepository(
       pages: [
-        RecruiterJobsPageDto(
-          items: [_job('j1'), _job('j2')],
-          nextCursor: 'c1',
-        ),
+        RecruiterJobsPageDto(items: [_job('j1'), _job('j2')], nextCursor: 'c1'),
       ],
     );
     final container = ProviderContainer(
-      overrides: [
-        recruiterJobsRepositoryProvider.overrideWithValue(fake),
-      ],
+      overrides: [recruiterJobsRepositoryProvider.overrideWithValue(fake)],
     );
     addTearDown(container.dispose);
 
-    final state =
-        await container.read(recruiterJobsControllerProvider(false).future);
+    final state = await container.read(
+      recruiterJobsControllerProvider(false).future,
+    );
     expect(state.items, hasLength(2));
     expect(state.hasMore, isTrue);
     expect(state.cursor, 'c1');
@@ -103,9 +96,7 @@ void main() {
       ],
     );
     final container = ProviderContainer(
-      overrides: [
-        recruiterJobsRepositoryProvider.overrideWithValue(fake),
-      ],
+      overrides: [recruiterJobsRepositoryProvider.overrideWithValue(fake)],
     );
     addTearDown(container.dispose);
 
@@ -120,9 +111,7 @@ void main() {
       ],
     );
     final container = ProviderContainer(
-      overrides: [
-        recruiterJobsRepositoryProvider.overrideWithValue(fake),
-      ],
+      overrides: [recruiterJobsRepositoryProvider.overrideWithValue(fake)],
     );
     addTearDown(container.dispose);
 
@@ -133,17 +122,12 @@ void main() {
   test('loadMore preserves status=null for includeClosed=false', () async {
     final fake = FakeRecruiterJobsRepository(
       pages: [
-        RecruiterJobsPageDto(
-          items: [_job('j1')],
-          nextCursor: 'c1',
-        ),
+        RecruiterJobsPageDto(items: [_job('j1')], nextCursor: 'c1'),
         RecruiterJobsPageDto(items: [_job('j2')]),
       ],
     );
     final container = ProviderContainer(
-      overrides: [
-        recruiterJobsRepositoryProvider.overrideWithValue(fake),
-      ],
+      overrides: [recruiterJobsRepositoryProvider.overrideWithValue(fake)],
     );
     addTearDown(container.dispose);
 
@@ -157,17 +141,12 @@ void main() {
   test('loadMore preserves status=closed for includeClosed=true', () async {
     final fake = FakeRecruiterJobsRepository(
       pages: [
-        RecruiterJobsPageDto(
-          items: [_job('j1')],
-          nextCursor: 'c1',
-        ),
+        RecruiterJobsPageDto(items: [_job('j1')], nextCursor: 'c1'),
         RecruiterJobsPageDto(items: [_job('j2')]),
       ],
     );
     final container = ProviderContainer(
-      overrides: [
-        recruiterJobsRepositoryProvider.overrideWithValue(fake),
-      ],
+      overrides: [recruiterJobsRepositoryProvider.overrideWithValue(fake)],
     );
     addTearDown(container.dispose);
 
@@ -181,19 +160,12 @@ void main() {
   test('loadMore appends second page and updates cursor/hasMore', () async {
     final fake = FakeRecruiterJobsRepository(
       pages: [
-        RecruiterJobsPageDto(
-          items: [_job('j1')],
-          nextCursor: 'c1',
-        ),
-        RecruiterJobsPageDto(
-          items: [_job('j2'), _job('j3')],
-        ),
+        RecruiterJobsPageDto(items: [_job('j1')], nextCursor: 'c1'),
+        RecruiterJobsPageDto(items: [_job('j2'), _job('j3')]),
       ],
     );
     final container = ProviderContainer(
-      overrides: [
-        recruiterJobsRepositoryProvider.overrideWithValue(fake),
-      ],
+      overrides: [recruiterJobsRepositoryProvider.overrideWithValue(fake)],
     );
     addTearDown(container.dispose);
 
@@ -215,9 +187,7 @@ void main() {
       ],
     );
     final container = ProviderContainer(
-      overrides: [
-        recruiterJobsRepositoryProvider.overrideWithValue(fake),
-      ],
+      overrides: [recruiterJobsRepositoryProvider.overrideWithValue(fake)],
     );
     addTearDown(container.dispose);
 

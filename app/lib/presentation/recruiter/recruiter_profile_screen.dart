@@ -22,37 +22,39 @@ class RecruiterProfileScreen extends ConsumerWidget {
       body: AsyncValueWidget(
         value: me,
         onRetry: () => ref.read(meControllerProvider.notifier).refresh(),
-        data: (data) => ListView(
-          padding: const EdgeInsets.all(JobifySpacing.lg),
-          children: [
-            Text(
-              data.displayName ?? data.email ?? 'Profile',
-              style: theme.textTheme.headlineSmall,
-            ),
-            const SizedBox(height: JobifySpacing.xs),
-            if (data.email case final email?)
-              Text(
-                email,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+        data:
+            (data) => ListView(
+              padding: const EdgeInsets.all(JobifySpacing.lg),
+              children: [
+                Text(
+                  data.displayName ?? data.email ?? 'Profile',
+                  style: theme.textTheme.headlineSmall,
                 ),
-              ),
-            const SizedBox(height: JobifySpacing.xl),
-            ListTile(
-              leading: const Icon(Icons.shield_outlined),
-              title: const Text('Privacy & data'),
-              subtitle: const Text('Preferences, export, delete'),
-              onTap: () => context.go(Routes.privacy),
+                const SizedBox(height: JobifySpacing.xs),
+                if (data.email case final email?)
+                  Text(
+                    email,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                const SizedBox(height: JobifySpacing.xl),
+                ListTile(
+                  leading: const Icon(Icons.shield_outlined),
+                  title: const Text('Privacy & data'),
+                  subtitle: const Text('Preferences, export, delete'),
+                  onTap: () => context.go(Routes.privacy),
+                ),
+                const SizedBox(height: JobifySpacing.xxl),
+                OutlinedButton(
+                  onPressed:
+                      signOut.isLoading
+                          ? null
+                          : () => _confirmSignOut(context, ref),
+                  child: Text(signOut.isLoading ? 'Signing out…' : 'Sign out'),
+                ),
+              ],
             ),
-            const SizedBox(height: JobifySpacing.xxl),
-            OutlinedButton(
-              onPressed: signOut.isLoading
-                  ? null
-                  : () => _confirmSignOut(context, ref),
-              child: Text(signOut.isLoading ? 'Signing out…' : 'Sign out'),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -60,20 +62,21 @@ class RecruiterProfileScreen extends ConsumerWidget {
   Future<void> _confirmSignOut(BuildContext ctx, WidgetRef ref) async {
     final ok = await showDialog<bool>(
       context: ctx,
-      builder: (c) => AlertDialog(
-        title: const Text('Sign out?'),
-        content: const Text("You'll need to sign in again to continue."),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(c, false),
-            child: const Text('Cancel'),
+      builder:
+          (c) => AlertDialog(
+            title: const Text('Sign out?'),
+            content: const Text("You'll need to sign in again to continue."),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(c, false),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(c, true),
+                child: const Text('Sign out'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(c, true),
-            child: const Text('Sign out'),
-          ),
-        ],
-      ),
     );
     if (ok ?? false) {
       await ref.read(signOutControllerProvider.notifier).submit();

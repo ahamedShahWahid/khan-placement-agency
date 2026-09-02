@@ -28,10 +28,7 @@ class SignInResponseDto {
 
 @JsonSerializable()
 class RefreshResponseDto {
-  const RefreshResponseDto({
-    required this.access,
-    required this.refresh,
-  });
+  const RefreshResponseDto({required this.access, required this.refresh});
 
   factory RefreshResponseDto.fromJson(Map<String, dynamic> json) =>
       _$RefreshResponseDtoFromJson(json);
@@ -66,10 +63,7 @@ class AuthUserDto {
 
 @JsonSerializable()
 class AuthApplicantDto {
-  const AuthApplicantDto({
-    required this.id,
-    required this.userId,
-  });
+  const AuthApplicantDto({required this.id, required this.userId});
 
   factory AuthApplicantDto.fromJson(Map<String, dynamic> json) =>
       _$AuthApplicantDtoFromJson(json);

@@ -45,9 +45,8 @@ This document stitches together the per-package READMEs into one onboarding path
 | → Liveness probe | http://localhost:8000/health | 8000 | — |
 | → Readiness probe | http://localhost:8000/ready | 8000 | — |
 | **Web frontend** (Vite) | http://localhost:5173 | 5173 | `npm run dev` (§6) |
-| → web surface | http://localhost:5173/#/ | 5173 | — |
-| → employers surface | http://localhost:5173/#/employers | 5173 | — |
-| → console surface | http://localhost:5173/#/console/signin | 5173 | — |
+| → employers surface | http://localhost:5173/#/employers | 5173 | `/` redirects here |
+| → console surface | http://localhost:5173/#/console/signin | 5173 | admin-only |
 | **Flutter web** | http://localhost:8080 | 8080 | `flutter run -d web-server --web-port=8080` (§7) |
 | **Postgres** | localhost:5432 (`jobify`, `jobify_test`) | 5432 | `brew services start postgresql@16` |
 | **Redis** (Celery broker) | localhost:6379 (db 0) | 6379 | `brew services start redis` |
@@ -80,7 +79,7 @@ The backend is a **uv workspace** with three packages, all driven from the repo 
 | pgvector | 0.8.0 | build from source (§4.4) | embedding worker |
 | Redis | latest | `brew install redis` | Celery broker |
 | Node.js | 18+ | `brew install node` | web frontend |
-| Flutter | 3.27.x (stable) | [flutter.dev](https://docs.flutter.dev/get-started/install) | mobile/web app |
+| Flutter | 3.44.x (stable) | [flutter.dev](https://docs.flutter.dev/get-started/install) | mobile/web app |
 
 > **No Docker for MVP.** Local dev uses Homebrew services directly. Containerization rejoins the project at the deploy-target step.
 >
@@ -277,13 +276,17 @@ The remaining ~18 optional vars (logging, upload limits, JWT TTLs, CORS, embeddi
 
 ## 6. Web frontend (`frontend/`)
 
-One Vite + React + TS app; three surfaces under one HashRouter (all URLs live under `/#/`):
+One Vite + React + TS app; **two** surfaces under one HashRouter (all URLs live under `/#/`):
 
 | Surface | Dev URL | Purpose |
 |---------|---------|---------|
-| **web** | `http://localhost:5173/#/` | applicant + public marketing |
-| **employers** | `http://localhost:5173/#/employers` | recruiter marketing |
-| **console** | `http://localhost:5173/#/console/signin` | internal admin + recruiter ops |
+| **employers** | `http://localhost:5173/#/employers` | recruiter marketing + authenticated recruiter workspace |
+| **console** | `http://localhost:5173/#/console/signin` | jobify-internal admin ops only |
+
+`/` redirects to `/employers`. The applicant **web** surface was removed in
+2026-07 — the Flutter app (`app/`) is the applicant client. Recruiter ops moved
+out of console to `/employers` at the same time, so a recruiter never reaches
+`/console`.
 
 ```bash
 cd frontend
@@ -299,7 +302,7 @@ npm run build             # tsc -b && vite build → dist/
 
 ## 7. Flutter client (`app/`)
 
-iOS + Android + Web client. Stack: Flutter 3.27.x, Riverpod 4.x, freezed 3.x, dio 5.7, go_router 14.6, google_sign_in.
+iOS + Android + Web client. Stack: Flutter 3.44.x (Dart ^3.7 is the hard floor — build_runner 2.15), Riverpod 3.1 runtime + 4.x codegen, freezed 3.x, dio 5.7, go_router 14.6, google_sign_in.
 
 ```bash
 cd app

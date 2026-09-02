@@ -11,7 +11,7 @@ part of 'locale_controller.dart';
 /// The app's current locale override.
 ///
 /// `null` means "follow the device locale" (resolved by
-/// [AppLocalizations.localizationsDelegates] / `localeResolutionCallback` in
+/// `AppLocalizations.localizationsDelegates` / `localeResolutionCallback` in
 /// `lib/app.dart`). Set explicitly by the language switcher (Task 8) and by
 /// the post-sign-in preferences load path once the server's `language`
 /// preference arrives.
@@ -29,7 +29,7 @@ final localeControllerProvider = LocaleControllerProvider._();
 /// The app's current locale override.
 ///
 /// `null` means "follow the device locale" (resolved by
-/// [AppLocalizations.localizationsDelegates] / `localeResolutionCallback` in
+/// `AppLocalizations.localizationsDelegates` / `localeResolutionCallback` in
 /// `lib/app.dart`). Set explicitly by the language switcher (Task 8) and by
 /// the post-sign-in preferences load path once the server's `language`
 /// preference arrives.
@@ -45,7 +45,7 @@ final class LocaleControllerProvider
   /// The app's current locale override.
   ///
   /// `null` means "follow the device locale" (resolved by
-  /// [AppLocalizations.localizationsDelegates] / `localeResolutionCallback` in
+  /// `AppLocalizations.localizationsDelegates` / `localeResolutionCallback` in
   /// `lib/app.dart`). Set explicitly by the language switcher (Task 8) and by
   /// the post-sign-in preferences load path once the server's `language`
   /// preference arrives.
@@ -57,15 +57,15 @@ final class LocaleControllerProvider
   /// `ref.invalidate(preferencesControllerProvider)` calls) so the next
   /// session doesn't inherit the previous applicant's language.
   LocaleControllerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'localeControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'localeControllerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$localeControllerHash();
@@ -88,7 +88,7 @@ String _$localeControllerHash() => r'7814734ea38bbc994c10aa5ad9db6a3fa8739c88';
 /// The app's current locale override.
 ///
 /// `null` means "follow the device locale" (resolved by
-/// [AppLocalizations.localizationsDelegates] / `localeResolutionCallback` in
+/// `AppLocalizations.localizationsDelegates` / `localeResolutionCallback` in
 /// `lib/app.dart`). Set explicitly by the language switcher (Task 8) and by
 /// the post-sign-in preferences load path once the server's `language`
 /// preference arrives.
@@ -106,8 +106,14 @@ abstract class _$LocaleController extends $Notifier<Locale?> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<Locale?, Locale?>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<Locale?, Locale?>, Locale?, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<Locale?, Locale?>,
+              Locale?,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

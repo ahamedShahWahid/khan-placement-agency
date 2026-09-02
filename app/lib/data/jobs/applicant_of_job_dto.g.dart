@@ -11,16 +11,17 @@ ApplicantOfJobDto _$ApplicantOfJobDtoFromJson(Map<String, dynamic> json) =>
       applicationId: json['application_id'] as String,
       applicantId: json['applicant_id'] as String,
       status: json['status'] as String,
-      stage: $enumDecode(_$ApplicationStageEnumMap, json['stage'],
-          unknownValue: ApplicationStage.unknown),
+      stage: $enumDecode(
+        _$ApplicationStageEnumMap,
+        json['stage'],
+        unknownValue: ApplicationStage.unknown,
+      ),
       appliedAt: DateTime.parse(json['applied_at'] as String),
       displayName: json['display_name'] as String?,
       email: json['email'] as String?,
       matchScore: (json['match_score'] as num?)?.toDouble(),
-      matchExplanation:
-          (json['match_explanation'] as Map<String, dynamic>?)?.map(
-        (k, e) => MapEntry(k, e as String),
-      ),
+      matchExplanation: (json['match_explanation'] as Map<String, dynamic>?)
+          ?.map((k, e) => MapEntry(k, e as String)),
     );
 
 Map<String, dynamic> _$ApplicantOfJobDtoToJson(ApplicantOfJobDto instance) =>
@@ -47,17 +48,18 @@ const _$ApplicationStageEnumMap = {
 };
 
 ApplicantsOfJobPageDto _$ApplicantsOfJobPageDtoFromJson(
-        Map<String, dynamic> json) =>
-    ApplicantsOfJobPageDto(
-      items: (json['items'] as List<dynamic>)
+  Map<String, dynamic> json,
+) => ApplicantsOfJobPageDto(
+  items:
+      (json['items'] as List<dynamic>)
           .map((e) => ApplicantOfJobDto.fromJson(e as Map<String, dynamic>))
           .toList(),
-      nextCursor: json['next_cursor'] as String?,
-    );
+  nextCursor: json['next_cursor'] as String?,
+);
 
 Map<String, dynamic> _$ApplicantsOfJobPageDtoToJson(
-        ApplicantsOfJobPageDto instance) =>
-    <String, dynamic>{
-      'items': instance.items.map((e) => e.toJson()).toList(),
-      'next_cursor': instance.nextCursor,
-    };
+  ApplicantsOfJobPageDto instance,
+) => <String, dynamic>{
+  'items': instance.items.map((e) => e.toJson()).toList(),
+  'next_cursor': instance.nextCursor,
+};

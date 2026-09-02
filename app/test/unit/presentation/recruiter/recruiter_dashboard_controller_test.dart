@@ -19,8 +19,7 @@ class _FakeRepo implements RecruiterJobsRepository {
     String? status,
     String? cursor,
     int limit = 20,
-  }) async =>
-      _page;
+  }) async => _page;
 
   @override
   Future<RecruiterJobDto> createJob(Map<String, dynamic> body) async =>
@@ -30,8 +29,7 @@ class _FakeRepo implements RecruiterJobsRepository {
   Future<RecruiterJobDto> patchJob(
     String id,
     Map<String, dynamic> body,
-  ) async =>
-      throw UnimplementedError();
+  ) async => throw UnimplementedError();
 
   @override
   Future<void> deleteJob(String id) async => throw UnimplementedError();
@@ -41,8 +39,7 @@ class _FakeRepo implements RecruiterJobsRepository {
     String jobId, {
     String? cursor,
     int limit = 20,
-  }) async =>
-      throw UnimplementedError();
+  }) async => throw UnimplementedError();
 
   @override
   Future<ResumeDownload> downloadResume(String applicationId) async =>
@@ -53,8 +50,7 @@ class _FakeRepo implements RecruiterJobsRepository {
     String jobId,
     String applicationId,
     ApplicationStage stage,
-  ) async =>
-      throw UnimplementedError();
+  ) async => throw UnimplementedError();
 }
 
 RecruiterJobDto _job(
@@ -62,28 +58,23 @@ RecruiterJobDto _job(
   String status = 'open',
   int applicantCount = 0,
   int surfacedMatchCount = 0,
-}) =>
-    RecruiterJobDto(
-      id: id,
-      title: 'Job $id',
-      description: 'Desc',
-      locations: const ['BLR'],
-      minExpYears: 1,
-      maxExpYears: 3,
-      status: status,
-      postedAt: DateTime.utc(2026),
-      employerVerified: true,
-      applicantCount: applicantCount,
-      surfacedMatchCount: surfacedMatchCount,
-    );
+}) => RecruiterJobDto(
+  id: id,
+  title: 'Job $id',
+  description: 'Desc',
+  locations: const ['BLR'],
+  minExpYears: 1,
+  maxExpYears: 3,
+  status: status,
+  postedAt: DateTime.utc(2026),
+  employerVerified: true,
+  applicantCount: applicantCount,
+  surfacedMatchCount: surfacedMatchCount,
+);
 
 void main() {
   test('computes openJobs count correctly', () async {
-    final items = [
-      _job('j1'),
-      _job('j2'),
-      _job('j3', status: 'closed'),
-    ];
+    final items = [_job('j1'), _job('j2'), _job('j3', status: 'closed')];
     final container = ProviderContainer(
       overrides: [
         recruiterJobsRepositoryProvider.overrideWithValue(
@@ -93,8 +84,9 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final summary =
-        await container.read(recruiterDashboardControllerProvider.future);
+    final summary = await container.read(
+      recruiterDashboardControllerProvider.future,
+    );
     expect(summary.openJobs, 2);
   });
 
@@ -113,8 +105,9 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final summary =
-        await container.read(recruiterDashboardControllerProvider.future);
+    final summary = await container.read(
+      recruiterDashboardControllerProvider.future,
+    );
     expect(summary.totalApplicants, 18);
   });
 
@@ -132,8 +125,9 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final summary =
-        await container.read(recruiterDashboardControllerProvider.future);
+    final summary = await container.read(
+      recruiterDashboardControllerProvider.future,
+    );
     expect(summary.totalSurfacedMatches, 9);
   });
 
@@ -148,8 +142,9 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final summary =
-        await container.read(recruiterDashboardControllerProvider.future);
+    final summary = await container.read(
+      recruiterDashboardControllerProvider.future,
+    );
     expect(summary.recentJobs, hasLength(5));
   });
 
@@ -164,8 +159,9 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final summary =
-        await container.read(recruiterDashboardControllerProvider.future);
+    final summary = await container.read(
+      recruiterDashboardControllerProvider.future,
+    );
     expect(summary.recentJobs, hasLength(2));
   });
 
@@ -179,8 +175,9 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final summary =
-        await container.read(recruiterDashboardControllerProvider.future);
+    final summary = await container.read(
+      recruiterDashboardControllerProvider.future,
+    );
     expect(summary.openJobs, 0);
     expect(summary.totalApplicants, 0);
     expect(summary.totalSurfacedMatches, 0);

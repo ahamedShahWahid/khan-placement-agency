@@ -15,15 +15,15 @@ final privacyControllerProvider = PrivacyControllerProvider._();
 final class PrivacyControllerProvider
     extends $AsyncNotifierProvider<PrivacyController, PrivacyState> {
   PrivacyControllerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'privacyControllerProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'privacyControllerProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$privacyControllerHash();
@@ -41,11 +41,14 @@ abstract class _$PrivacyController extends $AsyncNotifier<PrivacyState> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<AsyncValue<PrivacyState>, PrivacyState>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<PrivacyState>, PrivacyState>,
-        AsyncValue<PrivacyState>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<PrivacyState>, PrivacyState>,
+              AsyncValue<PrivacyState>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

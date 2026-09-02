@@ -13,10 +13,7 @@ class AuthHeaderInterceptor extends Interceptor {
   final AccessTokenHolder _holder;
 
   @override
-  void onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) {
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     final skip = options.extra[kSkipAuth] == true;
     if (!skip) {
       final token = _holder.current;

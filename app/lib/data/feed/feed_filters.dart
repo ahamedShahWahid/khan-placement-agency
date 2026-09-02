@@ -24,9 +24,9 @@ abstract class FeedFilters with _$FeedFilters {
   /// Dio's default ListFormat.multi serializes the list value as repeated
   /// `location=` params, matching the backend's `list[str]` Query.
   Map<String, dynamic> toQueryParameters() => {
-        if (query != null && query!.trim().isNotEmpty) 'q': query!.trim(),
-        if (locations.isNotEmpty) 'location': locations,
-        if (minYears != null) 'min_years': minYears,
-        if (minCtc != null) 'min_ctc': minCtc,
-      };
+    if (query != null && query!.trim().isNotEmpty) 'q': query!.trim(),
+    if (locations.isNotEmpty) 'location': locations,
+    if (minYears != null) 'min_years': minYears,
+    if (minCtc != null) 'min_ctc': minCtc,
+  };
 }

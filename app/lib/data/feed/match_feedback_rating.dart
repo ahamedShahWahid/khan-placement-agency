@@ -16,9 +16,9 @@ enum MatchFeedbackRating {
 
 extension MatchFeedbackRatingWire on MatchFeedbackRating {
   String get wireValue => switch (this) {
-        MatchFeedbackRating.up => 'up',
-        MatchFeedbackRating.down => 'down',
-        MatchFeedbackRating.unknown =>
-          throw StateError('MatchFeedbackRating.unknown is not a wire value'),
-      };
+    MatchFeedbackRating.up => 'up',
+    MatchFeedbackRating.down => 'down',
+    MatchFeedbackRating.unknown =>
+      throw StateError('MatchFeedbackRating.unknown is not a wire value'),
+  };
 }

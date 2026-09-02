@@ -75,7 +75,7 @@ void main() {
             'applied_at': '2026-05-15T10:00:00Z',
             'match_score': null,
             'match_explanation': null,
-          }
+          },
         ],
         'next_cursor': 'cursor-xyz',
       };
@@ -88,10 +88,7 @@ void main() {
     });
 
     test('parses empty page with null cursor', () {
-      final json = <String, dynamic>{
-        'items': <dynamic>[],
-        'next_cursor': null,
-      };
+      final json = <String, dynamic>{'items': <dynamic>[], 'next_cursor': null};
 
       final page = ApplicantsOfJobPageDto.fromJson(json);
       expect(page.items, isEmpty);

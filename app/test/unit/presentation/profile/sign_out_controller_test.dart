@@ -27,24 +27,19 @@ class _FakeAuthRepo implements AuthRepository {
 }
 
 void main() {
-  test(
-    'submit() resets the locale override back to device-follow',
-    () async {
-      final c = ProviderContainer(
-        overrides: [
-          authRepositoryProvider.overrideWithValue(_FakeAuthRepo()),
-        ],
-      );
-      addTearDown(c.dispose);
-      final localeSub = c.listen(localeControllerProvider, (_, __) {});
-      addTearDown(localeSub.close);
+  test('submit() resets the locale override back to device-follow', () async {
+    final c = ProviderContainer(
+      overrides: [authRepositoryProvider.overrideWithValue(_FakeAuthRepo())],
+    );
+    addTearDown(c.dispose);
+    final localeSub = c.listen(localeControllerProvider, (_, __) {});
+    addTearDown(localeSub.close);
 
-      c.read(localeControllerProvider.notifier).setFromLanguage('hi');
-      expect(c.read(localeControllerProvider), const Locale('hi'));
+    c.read(localeControllerProvider.notifier).setFromLanguage('hi');
+    expect(c.read(localeControllerProvider), const Locale('hi'));
 
-      await c.read(signOutControllerProvider.notifier).submit();
+    await c.read(signOutControllerProvider.notifier).submit();
 
-      expect(c.read(localeControllerProvider), isNull);
-    },
-  );
+    expect(c.read(localeControllerProvider), isNull);
+  });
 }

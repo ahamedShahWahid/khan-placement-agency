@@ -12,18 +12,19 @@ part of 'recruiter_jobs_controller.dart';
 @ProviderFor(RecruiterJobsController)
 final recruiterJobsControllerProvider = RecruiterJobsControllerFamily._();
 
-final class RecruiterJobsControllerProvider extends $AsyncNotifierProvider<
-    RecruiterJobsController, RecruiterJobsState> {
-  RecruiterJobsControllerProvider._(
-      {required RecruiterJobsControllerFamily super.from,
-      required bool super.argument})
-      : super(
-          retry: null,
-          name: r'recruiterJobsControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+final class RecruiterJobsControllerProvider
+    extends
+        $AsyncNotifierProvider<RecruiterJobsController, RecruiterJobsState> {
+  RecruiterJobsControllerProvider._({
+    required RecruiterJobsControllerFamily super.from,
+    required bool super.argument,
+  }) : super(
+         retry: null,
+         name: r'recruiterJobsControllerProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$recruiterJobsControllerHash();
@@ -57,23 +58,22 @@ String _$recruiterJobsControllerHash() =>
 final class RecruiterJobsControllerFamily extends $Family
     with
         $ClassFamilyOverride<
-            RecruiterJobsController,
-            AsyncValue<RecruiterJobsState>,
-            RecruiterJobsState,
-            FutureOr<RecruiterJobsState>,
-            bool> {
+          RecruiterJobsController,
+          AsyncValue<RecruiterJobsState>,
+          RecruiterJobsState,
+          FutureOr<RecruiterJobsState>,
+          bool
+        > {
   RecruiterJobsControllerFamily._()
-      : super(
-          retry: null,
-          name: r'recruiterJobsControllerProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
+    : super(
+        retry: null,
+        name: r'recruiterJobsControllerProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
-  RecruiterJobsControllerProvider call(
-    bool includeClosed,
-  ) =>
+  RecruiterJobsControllerProvider call(bool includeClosed) =>
       RecruiterJobsControllerProvider._(argument: includeClosed, from: this);
 
   @override
@@ -85,23 +85,20 @@ abstract class _$RecruiterJobsController
   late final _$args = ref.$arg as bool;
   bool get includeClosed => _$args;
 
-  FutureOr<RecruiterJobsState> build(
-    bool includeClosed,
-  );
+  FutureOr<RecruiterJobsState> build(bool includeClosed);
   @$mustCallSuper
   @override
   void runBuild() {
     final ref =
         this.ref as $Ref<AsyncValue<RecruiterJobsState>, RecruiterJobsState>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<RecruiterJobsState>, RecruiterJobsState>,
-        AsyncValue<RecruiterJobsState>,
-        Object?,
-        Object?>;
-    element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<RecruiterJobsState>, RecruiterJobsState>,
+              AsyncValue<RecruiterJobsState>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, () => build(_$args));
   }
 }

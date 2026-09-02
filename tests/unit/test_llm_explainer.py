@@ -133,7 +133,7 @@ async def test_non_dict_json_falls_back_to_templated() -> None:
     assert out["generator"] == "templated"
 
 
-@pytest.mark.anyio
+@pytest.mark.asyncio
 async def test_generation_config_disables_thinking() -> None:
     """gemini-2.5 thinking is ON by default and its tokens count against
     max_output_tokens — with the 200 cap the model burned ~190 tokens thinking
@@ -150,7 +150,7 @@ async def test_generation_config_disables_thinking() -> None:
     assert config.max_output_tokens >= 200
 
 
-@pytest.mark.anyio
+@pytest.mark.asyncio
 async def test_parse_failure_logs_raw_text_snippet() -> None:
     """The fallback is silent by design — the warning must carry the raw
     model text or the failure mode is undiagnosable from logs."""

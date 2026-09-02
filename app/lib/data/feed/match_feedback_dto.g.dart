@@ -10,8 +10,11 @@ MatchFeedbackDto _$MatchFeedbackDtoFromJson(Map<String, dynamic> json) =>
     MatchFeedbackDto(
       id: json['id'] as String,
       jobId: json['job_id'] as String,
-      rating: $enumDecode(_$MatchFeedbackRatingEnumMap, json['rating'],
-          unknownValue: MatchFeedbackRating.unknown),
+      rating: $enumDecode(
+        _$MatchFeedbackRatingEnumMap,
+        json['rating'],
+        unknownValue: MatchFeedbackRating.unknown,
+      ),
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
     );

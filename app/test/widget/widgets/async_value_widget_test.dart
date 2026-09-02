@@ -42,15 +42,13 @@ void main() {
     expect(find.text('42'), findsOneWidget);
   });
 
-  testWidgets('renders JobifyErrorView with typed exception copy on error',
-      (tester) async {
+  testWidgets('renders JobifyErrorView with typed exception copy on error', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _wrap(
         AsyncValueWidget<int>(
-          value: AsyncValue.error(
-            const NetworkException(),
-            StackTrace.current,
-          ),
+          value: AsyncValue.error(const NetworkException(), StackTrace.current),
           data: (d) => Text('$d'),
         ),
       ),

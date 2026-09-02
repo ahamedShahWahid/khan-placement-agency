@@ -12,20 +12,24 @@ part of 'employer_repository_impl.dart';
 @ProviderFor(employerRepository)
 final employerRepositoryProvider = EmployerRepositoryProvider._();
 
-final class EmployerRepositoryProvider extends $FunctionalProvider<
-    EmployerRepository,
-    EmployerRepository,
-    EmployerRepository> with $Provider<EmployerRepository> {
+final class EmployerRepositoryProvider
+    extends
+        $FunctionalProvider<
+          EmployerRepository,
+          EmployerRepository,
+          EmployerRepository
+        >
+    with $Provider<EmployerRepository> {
   EmployerRepositoryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'employerRepositoryProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'employerRepositoryProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$employerRepositoryHash();
@@ -33,8 +37,8 @@ final class EmployerRepositoryProvider extends $FunctionalProvider<
   @$internal
   @override
   $ProviderElement<EmployerRepository> $createElement(
-          $ProviderPointer pointer) =>
-      $ProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   EmployerRepository create(Ref ref) {

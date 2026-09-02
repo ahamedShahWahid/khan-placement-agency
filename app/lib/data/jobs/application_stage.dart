@@ -23,13 +23,13 @@ enum ApplicationStage {
 
 extension ApplicationStageWire on ApplicationStage {
   String get wireValue => switch (this) {
-        ApplicationStage.applied => 'applied',
-        ApplicationStage.shortlisted => 'shortlisted',
-        ApplicationStage.interview => 'interview',
-        ApplicationStage.offer => 'offer',
-        ApplicationStage.hired => 'hired',
-        ApplicationStage.rejected => 'rejected',
-        ApplicationStage.unknown =>
-          throw StateError('ApplicationStage.unknown is not a wire value'),
-      };
+    ApplicationStage.applied => 'applied',
+    ApplicationStage.shortlisted => 'shortlisted',
+    ApplicationStage.interview => 'interview',
+    ApplicationStage.offer => 'offer',
+    ApplicationStage.hired => 'hired',
+    ApplicationStage.rejected => 'rejected',
+    ApplicationStage.unknown =>
+      throw StateError('ApplicationStage.unknown is not a wire value'),
+  };
 }

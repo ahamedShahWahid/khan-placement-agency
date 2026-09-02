@@ -5,11 +5,7 @@ import 'package:jobify_app/presentation/profile/ctc_format.dart';
 import 'package:jobify_app/presentation/theme/jobify_spacing.dart';
 
 class RecruiterJobCard extends StatelessWidget {
-  const RecruiterJobCard({
-    required this.job,
-    required this.onTap,
-    super.key,
-  });
+  const RecruiterJobCard({required this.job, required this.onTap, super.key});
 
   final RecruiterJobDto job;
   final VoidCallback onTap;
@@ -33,10 +29,7 @@ class RecruiterJobCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: Text(
-                      job.title,
-                      style: theme.textTheme.titleMedium,
-                    ),
+                    child: Text(job.title, style: theme.textTheme.titleMedium),
                   ),
                   const SizedBox(width: JobifySpacing.sm),
                   _StatusChip(isOpen: isOpen),
@@ -98,17 +91,18 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final (label, bg, fg) = isOpen
-        ? (
-            'Open',
-            theme.colorScheme.primaryContainer,
-            theme.colorScheme.onPrimaryContainer,
-          )
-        : (
-            'Closed',
-            theme.colorScheme.surfaceContainerHighest,
-            theme.colorScheme.onSurfaceVariant,
-          );
+    final (label, bg, fg) =
+        isOpen
+            ? (
+              'Open',
+              theme.colorScheme.primaryContainer,
+              theme.colorScheme.onPrimaryContainer,
+            )
+            : (
+              'Closed',
+              theme.colorScheme.surfaceContainerHighest,
+              theme.colorScheme.onSurfaceVariant,
+            );
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: JobifySpacing.sm,

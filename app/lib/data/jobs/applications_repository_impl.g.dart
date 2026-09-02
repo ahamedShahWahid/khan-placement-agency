@@ -12,20 +12,24 @@ part of 'applications_repository_impl.dart';
 @ProviderFor(applicationsRepository)
 final applicationsRepositoryProvider = ApplicationsRepositoryProvider._();
 
-final class ApplicationsRepositoryProvider extends $FunctionalProvider<
-    ApplicationsRepository,
-    ApplicationsRepository,
-    ApplicationsRepository> with $Provider<ApplicationsRepository> {
+final class ApplicationsRepositoryProvider
+    extends
+        $FunctionalProvider<
+          ApplicationsRepository,
+          ApplicationsRepository,
+          ApplicationsRepository
+        >
+    with $Provider<ApplicationsRepository> {
   ApplicationsRepositoryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'applicationsRepositoryProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'applicationsRepositoryProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$applicationsRepositoryHash();
@@ -33,8 +37,8 @@ final class ApplicationsRepositoryProvider extends $FunctionalProvider<
   @$internal
   @override
   $ProviderElement<ApplicationsRepository> $createElement(
-          $ProviderPointer pointer) =>
-      $ProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   ApplicationsRepository create(Ref ref) {

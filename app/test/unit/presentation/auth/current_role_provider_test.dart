@@ -12,7 +12,9 @@ void main() {
 
     expect(container.read(currentRoleProvider), isNull);
 
-    container.read(authStateProvider.notifier).set(
+    container
+        .read(authStateProvider.notifier)
+        .set(
           const SignedIn(
             userId: 'u1',
             email: 'e@e.com',

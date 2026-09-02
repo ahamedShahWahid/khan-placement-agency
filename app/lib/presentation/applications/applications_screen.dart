@@ -52,91 +52,104 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> {
       ),
       child: AsyncValueWidget<ApplicationsState>(
         value: value,
-        onRetry: () =>
-            ref.read(applicationsControllerProvider.notifier).refresh(),
+        onRetry:
+            () => ref.read(applicationsControllerProvider.notifier).refresh(),
         isEmpty: (s) => s.items.isEmpty,
-        empty: () => JobifyEmptyState(
-          headline: l10n.applicationsEmptyHeadline,
-          body: l10n.applicationsEmptyBody,
-          icon: Icons.assignment_outlined,
-          primaryAction: FilledButton(
-            onPressed: () => context.go(Routes.feed),
-            child: Text(l10n.applicationsBrowseFeedButton),
-          ),
-        ),
-        data: (s) => RefreshIndicator(
-          onRefresh: () =>
-              ref.read(applicationsControllerProvider.notifier).refresh(),
-          child: ListView.separated(
-            controller: _scroll,
-            padding: const EdgeInsets.all(JobifySpacing.lg),
-            itemCount: s.items.length + 1,
-            separatorBuilder: (_, __) =>
-                const SizedBox(height: JobifySpacing.md),
-            itemBuilder: (context, i) {
-              if (i == s.items.length) {
-                if (s.isLoadingMore) {
-                  return const Padding(
-                    padding: EdgeInsets.all(JobifySpacing.lg),
-                    child: JobifyLoadingView(),
-                  );
-                }
-                return const SizedBox.shrink();
-              }
-              final item = s.items[i];
-              return Card(
-                child: InkWell(
-                  onTap: () => context.go(
-                    '${Routes.applications}/jobs/${item.job.id}',
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(JobifySpacing.lg),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
+        empty:
+            () => JobifyEmptyState(
+              headline: l10n.applicationsEmptyHeadline,
+              body: l10n.applicationsEmptyBody,
+              icon: Icons.assignment_outlined,
+              primaryAction: FilledButton(
+                onPressed: () => context.go(Routes.feed),
+                child: Text(l10n.applicationsBrowseFeedButton),
+              ),
+            ),
+        data:
+            (s) => RefreshIndicator(
+              onRefresh:
+                  () =>
+                      ref
+                          .read(applicationsControllerProvider.notifier)
+                          .refresh(),
+              child: ListView.separated(
+                controller: _scroll,
+                padding: const EdgeInsets.all(JobifySpacing.lg),
+                itemCount: s.items.length + 1,
+                separatorBuilder:
+                    (_, __) => const SizedBox(height: JobifySpacing.md),
+                itemBuilder: (context, i) {
+                  if (i == s.items.length) {
+                    if (s.isLoadingMore) {
+                      return const Padding(
+                        padding: EdgeInsets.all(JobifySpacing.lg),
+                        child: JobifyLoadingView(),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  }
+                  final item = s.items[i];
+                  return Card(
+                    child: InkWell(
+                      onTap:
+                          () => context.go(
+                            '${Routes.applications}/jobs/${item.job.id}',
+                          ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(JobifySpacing.lg),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: Text(
-                                item.employer.name,
-                                style: Theme.of(context).textTheme.labelLarge,
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    item.employer.name,
+                                    style:
+                                        Theme.of(context).textTheme.labelLarge,
+                                  ),
+                                ),
+                                _StagePill(application: item.application),
+                              ],
+                            ),
+                            const SizedBox(height: JobifySpacing.sm),
+                            Text(
+                              item.job.title,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            const SizedBox(height: JobifySpacing.xs),
+                            Text(
+                              () {
+                                final isWithdrawn =
+                                    item.application.status ==
+                                    ApplicationStatus.withdrawn;
+                                final whenDate =
+                                    isWithdrawn
+                                        ? item.application.updatedAt
+                                        : item.application.createdAt;
+                                final when = jobifyLongDateFormat.format(
+                                  whenDate,
+                                );
+                                return isWithdrawn
+                                    ? l10n.applicationsWithdrawnOn(when)
+                                    : l10n.applicationsAppliedOn(when);
+                              }(),
+                              style: JobifyTypography.mono(
+                                fontSize: 12,
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                               ),
                             ),
-                            _StagePill(application: item.application),
                           ],
                         ),
-                        const SizedBox(height: JobifySpacing.sm),
-                        Text(
-                          item.job.title,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: JobifySpacing.xs),
-                        Text(
-                          () {
-                            final isWithdrawn = item.application.status ==
-                                ApplicationStatus.withdrawn;
-                            final whenDate = isWithdrawn
-                                ? item.application.updatedAt
-                                : item.application.createdAt;
-                            final when = jobifyLongDateFormat.format(whenDate);
-                            return isWithdrawn
-                                ? l10n.applicationsWithdrawnOn(when)
-                                : l10n.applicationsAppliedOn(when);
-                          }(),
-                          style: JobifyTypography.mono(
-                            fontSize: 12,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
+                  );
+                },
+              ),
+            ),
       ),
     );
   }
@@ -147,14 +160,14 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> {
 /// unlocalized) recruiter pipeline view (`job_applicants_screen.dart`).
 /// Applicant-facing surfaces must use [applicationStageLabel] instead.
 String stageLabel(ApplicationStage stage) => switch (stage) {
-      ApplicationStage.applied => 'Applied',
-      ApplicationStage.shortlisted => 'Shortlisted',
-      ApplicationStage.interview => 'Interview',
-      ApplicationStage.offer => 'Offer',
-      ApplicationStage.hired => 'Hired',
-      ApplicationStage.rejected => 'Not selected',
-      ApplicationStage.unknown => 'In progress',
-    };
+  ApplicationStage.applied => 'Applied',
+  ApplicationStage.shortlisted => 'Shortlisted',
+  ApplicationStage.interview => 'Interview',
+  ApplicationStage.offer => 'Offer',
+  ApplicationStage.hired => 'Hired',
+  ApplicationStage.rejected => 'Not selected',
+  ApplicationStage.unknown => 'In progress',
+};
 
 /// Localized applicant-facing stage copy. Reused by the job-detail
 /// application timeline.
@@ -177,29 +190,30 @@ class _StagePill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = Theme.of(context);
-    final (label, bg, fg) = application.status == ApplicationStatus.withdrawn
-        ? (
-            context.l10n.stageWithdrawn,
-            c.colorScheme.surfaceContainerHighest,
-            c.colorScheme.onSurfaceVariant,
-          )
-        : switch (application.stage) {
-            ApplicationStage.offer || ApplicationStage.hired => (
+    final (label, bg, fg) =
+        application.status == ApplicationStatus.withdrawn
+            ? (
+              context.l10n.stageWithdrawn,
+              c.colorScheme.surfaceContainerHighest,
+              c.colorScheme.onSurfaceVariant,
+            )
+            : switch (application.stage) {
+              ApplicationStage.offer || ApplicationStage.hired => (
                 applicationStageLabel(context, application.stage),
                 c.colorScheme.tertiaryContainer,
                 c.colorScheme.onTertiaryContainer,
               ),
-            ApplicationStage.rejected => (
+              ApplicationStage.rejected => (
                 applicationStageLabel(context, application.stage),
                 c.colorScheme.surfaceContainerHighest,
                 c.colorScheme.onSurfaceVariant,
               ),
-            _ => (
+              _ => (
                 applicationStageLabel(context, application.stage),
                 c.colorScheme.primaryContainer,
                 c.colorScheme.onPrimaryContainer,
               ),
-          };
+            };
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: JobifySpacing.sm,
@@ -209,10 +223,7 @@ class _StagePill extends StatelessWidget {
         color: bg,
         borderRadius: BorderRadius.circular(999),
       ),
-      child: Text(
-        label,
-        style: c.textTheme.labelSmall?.copyWith(color: fg),
-      ),
+      child: Text(label, style: c.textTheme.labelSmall?.copyWith(color: fg)),
     );
   }
 }

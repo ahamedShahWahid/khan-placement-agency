@@ -49,8 +49,7 @@ class _FakeFeedRepo implements FeedRepository {
     String? cursor,
     int limit = 20,
     FeedFilters? filters,
-  }) async =>
-      page;
+  }) async => page;
 }
 
 class _FakeResumeRepo implements ResumeRepository {
@@ -61,17 +60,16 @@ class _FakeResumeRepo implements ResumeRepository {
     required List<int> bytes,
     required String filename,
     required String contentType,
-  }) async =>
-      throw UnimplementedError();
+  }) async => throw UnimplementedError();
 }
 
 class _FakePrefsRepo implements PreferencesRepository {
   @override
   Future<PreferencesDto> fetch() async => const PreferencesDto(
-        desiredRole: DesiredRole.softwareEngineering,
-        locations: ['Pune'],
-        expectedCtc: '1800000.00',
-      );
+    desiredRole: DesiredRole.softwareEngineering,
+    locations: ['Pune'],
+    expectedCtc: '1800000.00',
+  );
   @override
   Future<PreferencesDto> update(PreferencesUpdateDto update) async => fetch();
 }
@@ -81,8 +79,7 @@ class _FakeApplicationsRepo implements ApplicationsRepository {
   Future<ApplicationsPageDto> fetchPage({
     String? cursor,
     int limit = 20,
-  }) async =>
-      const ApplicationsPageDto(items: []);
+  }) async => const ApplicationsPageDto(items: []);
   @override
   Future<ApplicationDto> withdraw(String applicationId) async =>
       throw UnimplementedError();
@@ -100,12 +97,12 @@ class _FakeSavedJobsRepo implements SavedJobsRepository {
 class _FakeMeRepo implements MeRepository {
   @override
   Future<MeDto> fetch() async => const MeDto(
-        id: 'u1',
-        email: 'eng@example.com',
-        displayName: 'Eng U',
-        role: 'applicant',
-        applicant: ApplicantSummaryDto(id: 'a1', fullName: 'Eng U'),
-      );
+    id: 'u1',
+    email: 'eng@example.com',
+    displayName: 'Eng U',
+    role: 'applicant',
+    applicant: ApplicantSummaryDto(id: 'a1', fullName: 'Eng U'),
+  );
   @override
   Future<MeDto> updateProfile(ProfileUpdateDto update) async => fetch();
 }
@@ -127,28 +124,28 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  testWidgets('Feed empty state renders Hindi copy without throwing',
-      (tester) async {
+  testWidgets('Feed empty state renders Hindi copy without throwing', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _wrap(
         const FeedScreen(),
         overrides: [
-          feedRepositoryProvider
-              .overrideWithValue(_FakeFeedRepo(const FeedPageDto(items: []))),
+          feedRepositoryProvider.overrideWithValue(
+            _FakeFeedRepo(const FeedPageDto(items: [])),
+          ),
           resumeRepositoryProvider.overrideWithValue(_FakeResumeRepo()),
           preferencesRepositoryProvider.overrideWithValue(_FakePrefsRepo()),
-          applicationsRepositoryProvider
-              .overrideWithValue(_FakeApplicationsRepo()),
+          applicationsRepositoryProvider.overrideWithValue(
+            _FakeApplicationsRepo(),
+          ),
           savedJobsRepositoryProvider.overrideWithValue(_FakeSavedJobsRepo()),
         ],
       ),
     );
     await tester.pumpAndSettle();
 
-    expect(
-      find.text('हम अभी भी आपके लिए मैच ढूंढ रहे हैं'),
-      findsOneWidget,
-    );
+    expect(find.text('हम अभी भी आपके लिए मैच ढूंढ रहे हैं'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -176,14 +173,16 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Applications empty state renders Hindi copy without throwing',
-      (tester) async {
+  testWidgets('Applications empty state renders Hindi copy without throwing', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _wrap(
         const ApplicationsScreen(),
         overrides: [
-          applicationsRepositoryProvider
-              .overrideWithValue(_FakeApplicationsRepo()),
+          applicationsRepositoryProvider.overrideWithValue(
+            _FakeApplicationsRepo(),
+          ),
         ],
       ),
     );

@@ -12,20 +12,24 @@ part of 'feed_visit_repository_impl.dart';
 @ProviderFor(feedVisitRepository)
 final feedVisitRepositoryProvider = FeedVisitRepositoryProvider._();
 
-final class FeedVisitRepositoryProvider extends $FunctionalProvider<
-    FeedVisitRepository,
-    FeedVisitRepository,
-    FeedVisitRepository> with $Provider<FeedVisitRepository> {
+final class FeedVisitRepositoryProvider
+    extends
+        $FunctionalProvider<
+          FeedVisitRepository,
+          FeedVisitRepository,
+          FeedVisitRepository
+        >
+    with $Provider<FeedVisitRepository> {
   FeedVisitRepositoryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'feedVisitRepositoryProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'feedVisitRepositoryProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$feedVisitRepositoryHash();
@@ -33,8 +37,8 @@ final class FeedVisitRepositoryProvider extends $FunctionalProvider<
   @$internal
   @override
   $ProviderElement<FeedVisitRepository> $createElement(
-          $ProviderPointer pointer) =>
-      $ProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   FeedVisitRepository create(Ref ref) {

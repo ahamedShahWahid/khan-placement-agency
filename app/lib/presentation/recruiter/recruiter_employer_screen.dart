@@ -29,21 +29,23 @@ class RecruiterEmployerScreen extends ConsumerWidget {
         value: employers,
         onRetry: () => ref.invalidate(recruiterEmployersProvider),
         isEmpty: (list) => list.isEmpty,
-        empty: () => const Center(
-          child: Padding(
-            padding: EdgeInsets.all(JobifySpacing.xl),
-            child: Text('You are not part of any company yet.'),
-          ),
-        ),
+        empty:
+            () => const Center(
+              child: Padding(
+                padding: EdgeInsets.all(JobifySpacing.xl),
+                child: Text('You are not part of any company yet.'),
+              ),
+            ),
         data: (list) {
           // Reconcile the (keepAlive) active employer against the current list:
           // if it dropped out (e.g. membership removed by another owner), fall
           // back to the first so the switcher's initialValue always matches an
           // item — a DropdownButtonFormField asserts otherwise.
           final stored = ref.watch(activeEmployerProvider);
-          final active = stored != null && list.any((e) => e.id == stored.id)
-              ? stored
-              : list.first;
+          final active =
+              stored != null && list.any((e) => e.id == stored.id)
+                  ? stored
+                  : list.first;
           return _TeamView(employers: list, active: active);
         },
       ),
@@ -181,9 +183,9 @@ class _EmployerSwitcher extends ConsumerWidget {
       ],
       onChanged: (id) {
         if (id == null) return;
-        ref.read(activeEmployerProvider.notifier).select(
-              employers.firstWhere((e) => e.id == id),
-            );
+        ref
+            .read(activeEmployerProvider.notifier)
+            .select(employers.firstWhere((e) => e.id == id));
       },
     );
   }
@@ -215,9 +217,10 @@ class _MemberTile extends ConsumerWidget {
       // menu would strand the UI (stale switcher, 403'd roster refetch) and a
       // self-demotion wouldn't leave the recruiter shell. Self-leave is a
       // separate deferred feature.
-      trailing: (amOwner && !isSelf)
-          ? _MemberMenu(member: member, employerId: employerId)
-          : null,
+      trailing:
+          (amOwner && !isSelf)
+              ? _MemberMenu(member: member, employerId: employerId)
+              : null,
     );
   }
 }
@@ -232,13 +235,17 @@ class _MemberMenu extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return PopupMenuButton<String>(
       onSelected: (action) => _onSelected(context, ref, action),
-      itemBuilder: (_) => [
-        if (member.isOwner)
-          const PopupMenuItem(value: 'demote', child: Text('Change to member'))
-        else
-          const PopupMenuItem(value: 'promote', child: Text('Make owner')),
-        const PopupMenuItem(value: 'remove', child: Text('Remove')),
-      ],
+      itemBuilder:
+          (_) => [
+            if (member.isOwner)
+              const PopupMenuItem(
+                value: 'demote',
+                child: Text('Change to member'),
+              )
+            else
+              const PopupMenuItem(value: 'promote', child: Text('Make owner')),
+            const PopupMenuItem(value: 'remove', child: Text('Remove')),
+          ],
     );
   }
 
@@ -264,9 +271,7 @@ class _MemberMenu extends ConsumerWidget {
       ok = await notifier.changeRole(employerId, member.userId, role: role);
     }
     if (!ok) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(_actionError(ref))),
-      );
+      messenger.showSnackBar(SnackBar(content: Text(_actionError(ref))));
     }
   }
 }
@@ -359,36 +364,39 @@ class _PendingInvites extends ConsumerWidget {
     final invites = ref.watch(employerInvitesControllerProvider(employerId));
     return AsyncValueWidget<List<InviteDto>>(
       value: invites,
-      onRetry: () =>
-          ref.invalidate(employerInvitesControllerProvider(employerId)),
+      onRetry:
+          () => ref.invalidate(employerInvitesControllerProvider(employerId)),
       isEmpty: (list) => list.isEmpty,
-      empty: () => Padding(
-        padding: const EdgeInsets.symmetric(vertical: JobifySpacing.sm),
-        child: Text(
-          'No pending invitations.',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+      empty:
+          () => Padding(
+            padding: const EdgeInsets.symmetric(vertical: JobifySpacing.sm),
+            child: Text(
+              'No pending invitations.',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
-        ),
-      ),
-      data: (list) => Column(
-        children: [
-          for (final inv in list)
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.mail_outline),
-              title: Text(inv.email),
-              subtitle: Text('${_roleLabel(inv.role)} · Pending'),
-              trailing: amOwner
-                  ? IconButton(
-                      icon: const Icon(Icons.close),
-                      tooltip: 'Revoke',
-                      onPressed: () => _revoke(context, ref, inv.id),
-                    )
-                  : null,
             ),
-        ],
-      ),
+          ),
+      data:
+          (list) => Column(
+            children: [
+              for (final inv in list)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.mail_outline),
+                  title: Text(inv.email),
+                  subtitle: Text('${_roleLabel(inv.role)} · Pending'),
+                  trailing:
+                      amOwner
+                          ? IconButton(
+                            icon: const Icon(Icons.close),
+                            tooltip: 'Revoke',
+                            onPressed: () => _revoke(context, ref, inv.id),
+                          )
+                          : null,
+                ),
+            ],
+          ),
     );
   }
 
@@ -415,20 +423,21 @@ Future<bool> _confirm(
 }) async {
   final ok = await showDialog<bool>(
     context: context,
-    builder: (c) => AlertDialog(
-      title: Text(title),
-      content: Text(body),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(c, false),
-          child: const Text('Cancel'),
+    builder:
+        (c) => AlertDialog(
+          title: Text(title),
+          content: Text(body),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(c, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(c, true),
+              child: const Text('Confirm'),
+            ),
+          ],
         ),
-        FilledButton(
-          onPressed: () => Navigator.pop(c, true),
-          child: const Text('Confirm'),
-        ),
-      ],
-    ),
   );
   return ok ?? false;
 }

@@ -41,10 +41,9 @@ void main() {
       final res = await repo.patch('email_marketing', granted: true);
       expect(res.granted, isTrue);
       expect(res.scope, 'email_marketing');
-      expect(
-        mock.lastDataFor('PATCH', '/v1/me/consents/email_marketing'),
-        {'granted': true},
-      );
+      expect(mock.lastDataFor('PATCH', '/v1/me/consents/email_marketing'), {
+        'granted': true,
+      });
     });
   });
 }

@@ -1,0 +1,253 @@
+/* Candidate preview card (`.jc-*`) — SHARED by the console and employers
+ * surfaces.
+ *
+ * Why this file exists: these 233 lines were duplicated byte-for-byte in
+ * `sites/console/styles/console.css` and `sites/employers/styles/dashboard.css`,
+ * differing only in the surface prefix. A palette edit had to be applied twice
+ * with nothing forcing parity.
+ *
+ * Why it is still scoped: `:is(.surface-console, .surface-employers .dash)`
+ * keeps every rule inside the two surfaces that actually render the card, so
+ * this does NOT become global CSS (frontend/CLAUDE.md — per-surface scoping).
+ *
+ * DESIGN EXCEPTION — this card is intentionally ALWAYS-LIGHT: the `--c-*`
+ * custom properties below are a hardcoded warm palette and must NOT be
+ * tokenized or made theme-aware. Note they are card-local NEW names, not
+ * overrides of the global `--paper`/`--ink` tokens, so the
+ * "never redefine tokens on .surface-*" rule still holds.
+ * See docs/design-system.md §2.3.
+ */
+
+:is(.surface-console, .surface-employers .dash) .jc-top {
+  margin-bottom: 10px;
+}
+:is(.surface-console, .surface-employers .dash) .jc-back {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  transition: color 120ms;
+}
+:is(.surface-console, .surface-employers .dash) .jc-back:hover {
+  color: var(--brand-blue);
+}
+:is(.surface-console, .surface-employers .dash) .jc-resolving {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink-faint);
+  padding: 60px 0;
+  text-align: center;
+}
+
+:is(.surface-console, .surface-employers .dash) .jc-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 26px;
+  align-items: start;
+}
+@media (max-width: 980px) {
+  :is(.surface-console, .surface-employers .dash) .jc-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- authoring column --------------------------------------------------- */
+:is(.surface-console, .surface-employers .dash) .jc-form .field input:disabled {
+  color: var(--ink-faint);
+  background: var(--paper);
+  cursor: not-allowed;
+}
+:is(.surface-console, .surface-employers .dash) .jc-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--line);
+}
+
+/* ---- live preview column ------------------------------------------------ */
+:is(.surface-console, .surface-employers .dash) .jc-preview-col {
+  position: sticky;
+  top: 22px;
+}
+:is(.surface-console, .surface-employers .dash) .jc-preview-label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 12px;
+}
+:is(.surface-console, .surface-employers .dash) .jc-preview-label .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 38%, transparent);
+  animation: jc-pulse 2s ease-out infinite;
+}
+@keyframes jc-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 38%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 7px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+:is(.surface-console, .surface-employers .dash) .jc-preview-note {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink-faint);
+  margin: 14px 2px 0;
+}
+
+/* the candidate card — warm paper, persimmon accent, forest "verified" */
+:is(.surface-console, .surface-employers .dash) .jc-card {
+  --c-paper: #f4efe3;
+  --c-ink: #221c16;
+  --c-soft: #6c6354;
+  --c-line: #d9cfb9;
+  --c-accent: #b23a20;
+  --c-forest: #1f4034;
+  background: var(--c-paper);
+  color: var(--c-ink);
+  border: 1px solid #cdbf9f;
+  border-radius: 3px;
+  padding: 22px 24px 24px;
+  box-shadow:
+    0 1px 0 #fff8 inset,
+    0 24px 48px -24px rgba(0, 0, 0, 0.7);
+  font-family: "Hanken Grotesk", system-ui, sans-serif;
+}
+:is(.surface-console, .surface-employers .dash) .jc-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+:is(.surface-console, .surface-employers .dash) .jc-status {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border: 1px solid var(--c-line);
+  color: var(--c-soft);
+  background: #ece4d3;
+}
+:is(.surface-console, .surface-employers .dash) .jc-status.open {
+  border-color: var(--c-forest);
+  color: var(--c-forest);
+  background: #cfdcd2;
+}
+:is(.surface-console, .surface-employers .dash) .jc-status.closed {
+  opacity: 0.7;
+}
+:is(.surface-console, .surface-employers .dash) .jc-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border: 1px solid var(--c-line);
+  color: var(--c-soft);
+}
+:is(.surface-console, .surface-employers .dash) .jc-badge.ok {
+  border-color: var(--c-forest);
+  color: var(--c-forest);
+  background: #cfdcd2;
+}
+:is(.surface-console, .surface-employers .dash) .jc-company {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-soft);
+  margin-bottom: 4px;
+}
+:is(.surface-console, .surface-employers .dash) .jc-title {
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-weight: 560;
+  font-size: 25px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--c-ink);
+  margin: 0 0 16px;
+}
+:is(.surface-console, .surface-employers .dash) .jc-facts {
+  border-top: 1px solid var(--c-line);
+  border-bottom: 1px solid var(--c-line);
+  padding: 4px 0;
+  margin-bottom: 14px;
+}
+:is(.surface-console, .surface-employers .dash) .jc-fact {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 8px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--c-line) 55%, transparent);
+}
+:is(.surface-console, .surface-employers .dash) .jc-fact:last-child {
+  border-bottom: 0;
+}
+:is(.surface-console, .surface-employers .dash) .jc-fact .k {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-soft);
+}
+:is(.surface-console, .surface-employers .dash) .jc-fact .v {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--c-ink);
+  text-align: right;
+}
+:is(.surface-console, .surface-employers .dash) .jc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+:is(.surface-console, .surface-employers .dash) .jc-chip {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  border: 1px solid var(--c-line);
+  color: var(--c-soft);
+  background: #ece4d3;
+}
+:is(.surface-console, .surface-employers .dash) .jc-desc {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #3a3228;
+  max-height: 320px;
+  overflow-y: auto;
+}
+:is(.surface-console, .surface-employers .dash) .jc-desc p {
+  margin: 0 0 10px;
+}
+:is(.surface-console, .surface-employers .dash) .jc-desc p:last-child {
+  margin-bottom: 0;
+}
+:is(.surface-console, .surface-employers .dash) .jc-placeholder {
+  color: #a99e88;
+  font-style: italic;
+}
+
+/* invalid CTC entry flagged in the live preview (vs. silent "Undisclosed") */
+:is(.surface-console, .surface-employers .dash) .jc-card .jc-invalid {
+  color: #b23a20;
+  font-weight: 600;
+}

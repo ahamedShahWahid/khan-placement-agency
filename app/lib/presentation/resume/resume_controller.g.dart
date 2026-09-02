@@ -15,15 +15,15 @@ final resumeControllerProvider = ResumeControllerProvider._();
 final class ResumeControllerProvider
     extends $AsyncNotifierProvider<ResumeController, ResumeDto?> {
   ResumeControllerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'resumeControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'resumeControllerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$resumeControllerHash();
@@ -41,11 +41,14 @@ abstract class _$ResumeController extends $AsyncNotifier<ResumeDto?> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<AsyncValue<ResumeDto?>, ResumeDto?>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<ResumeDto?>, ResumeDto?>,
-        AsyncValue<ResumeDto?>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<ResumeDto?>, ResumeDto?>,
+              AsyncValue<ResumeDto?>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

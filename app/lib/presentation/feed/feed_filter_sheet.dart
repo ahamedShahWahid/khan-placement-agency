@@ -76,7 +76,9 @@ class _FeedFilterSheetState extends ConsumerState<FeedFilterSheet> {
   void _apply() {
     final current = ref.read(feedFiltersControllerProvider);
     final lakh = double.tryParse(_ctcLakhController.text.trim());
-    ref.read(feedFiltersControllerProvider.notifier).set(
+    ref
+        .read(feedFiltersControllerProvider.notifier)
+        .set(
           FeedFilters(
             query: current.query,
             locations: _locations,
@@ -142,11 +144,13 @@ class _FeedFilterSheetState extends ConsumerState<FeedFilterSheet> {
           Row(
             children: [
               IconButton(
-                onPressed: _minYears == null
-                    ? null
-                    : () => setState(
-                          () => _minYears =
-                              _minYears! > 0 ? _minYears! - 1 : null,
+                onPressed:
+                    _minYears == null
+                        ? null
+                        : () => setState(
+                          () =>
+                              _minYears =
+                                  _minYears! > 0 ? _minYears! - 1 : null,
                         ),
                 icon: const Icon(Icons.remove),
               ),
@@ -162,9 +166,11 @@ class _FeedFilterSheetState extends ConsumerState<FeedFilterSheet> {
                 // stepper let a determined tap reach 81 and turn the whole
                 // feed into an error view on a 422. Keep in lockstep with the
                 // route's `le=`.
-                onPressed: _minYears != null && _minYears! >= _kMaxMinYears
-                    ? null
-                    : () => setState(() => _minYears = (_minYears ?? -1) + 1),
+                onPressed:
+                    _minYears != null && _minYears! >= _kMaxMinYears
+                        ? null
+                        : () =>
+                            setState(() => _minYears = (_minYears ?? -1) + 1),
                 icon: const Icon(Icons.add),
               ),
             ],

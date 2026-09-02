@@ -3,16 +3,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:jobify_app/presentation/widgets/arrive.dart';
 
 Widget _wrap(Widget child, {bool disableAnimations = false}) => MediaQuery(
-      data: MediaQueryData(disableAnimations: disableAnimations),
-      child: MaterialApp(
-        theme: ThemeData.light(useMaterial3: true),
-        home: Scaffold(body: child),
-      ),
-    );
+  data: MediaQueryData(disableAnimations: disableAnimations),
+  child: MaterialApp(
+    theme: ThemeData.light(useMaterial3: true),
+    home: Scaffold(body: child),
+  ),
+);
 
 void main() {
-  testWidgets('reduced motion renders child immediately, fully opaque',
-      (tester) async {
+  testWidgets('reduced motion renders child immediately, fully opaque', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _wrap(const Arrive(index: 3, child: Text('hi')), disableAnimations: true),
     );

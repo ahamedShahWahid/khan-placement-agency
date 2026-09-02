@@ -40,10 +40,7 @@ part 'router.g.dart';
 /// Bridges Riverpod's AuthState changes into GoRouter's `refreshListenable`.
 class _AuthChangeNotifier extends ChangeNotifier {
   _AuthChangeNotifier(Ref ref) {
-    ref.listen<AuthState>(
-      authStateProvider,
-      (_, __) => notifyListeners(),
-    );
+    ref.listen<AuthState>(authStateProvider, (_, __) => notifyListeners());
   }
 }
 
@@ -99,14 +96,8 @@ GoRouter router(Ref ref) {
       return null;
     },
     routes: [
-      GoRoute(
-        path: Routes.splash,
-        builder: (_, __) => const SplashScreen(),
-      ),
-      GoRoute(
-        path: Routes.signIn,
-        builder: (_, __) => const SignInScreen(),
-      ),
+      GoRoute(path: Routes.splash, builder: (_, __) => const SplashScreen()),
+      GoRoute(path: Routes.signIn, builder: (_, __) => const SignInScreen()),
       GoRoute(
         path: Routes.onboardingEmployer,
         builder: (_, __) => const EmployerOnboardingScreen(),
@@ -122,8 +113,9 @@ GoRouter router(Ref ref) {
                 routes: [
                   GoRoute(
                     path: 'jobs/:id',
-                    builder: (_, s) =>
-                        JobDetailScreen(jobId: s.pathParameters['id']!),
+                    builder:
+                        (_, s) =>
+                            JobDetailScreen(jobId: s.pathParameters['id']!),
                   ),
                 ],
               ),
@@ -137,8 +129,9 @@ GoRouter router(Ref ref) {
                 routes: [
                   GoRoute(
                     path: 'jobs/:id',
-                    builder: (_, s) =>
-                        JobDetailScreen(jobId: s.pathParameters['id']!),
+                    builder:
+                        (_, s) =>
+                            JobDetailScreen(jobId: s.pathParameters['id']!),
                   ),
                 ],
               ),
@@ -152,8 +145,9 @@ GoRouter router(Ref ref) {
                 routes: [
                   GoRoute(
                     path: 'jobs/:id',
-                    builder: (_, s) =>
-                        JobDetailScreen(jobId: s.pathParameters['id']!),
+                    builder:
+                        (_, s) =>
+                            JobDetailScreen(jobId: s.pathParameters['id']!),
                   ),
                 ],
               ),
@@ -175,8 +169,9 @@ GoRouter router(Ref ref) {
                   ),
                   GoRoute(
                     path: 'preferences',
-                    builder: (_, s) =>
-                        PreferencesScreen(resume: s.extra as ResumeDto?),
+                    builder:
+                        (_, s) =>
+                            PreferencesScreen(resume: s.extra as ResumeDto?),
                   ),
                   GoRoute(
                     path: 'notifications',
@@ -184,8 +179,9 @@ GoRouter router(Ref ref) {
                     routes: [
                       GoRoute(
                         path: 'jobs/:id',
-                        builder: (_, s) =>
-                            JobDetailScreen(jobId: s.pathParameters['id']!),
+                        builder:
+                            (_, s) =>
+                                JobDetailScreen(jobId: s.pathParameters['id']!),
                       ),
                     ],
                   ),
@@ -211,8 +207,9 @@ GoRouter router(Ref ref) {
       ),
       // Recruiter shell — gated by roleAwareRedirect in the redirect callback.
       StatefulShellRoute.indexedStack(
-        builder: (context, state, shell) =>
-            JobifyRecruiterShellScaffold(shell: shell),
+        builder:
+            (context, state, shell) =>
+                JobifyRecruiterShellScaffold(shell: shell),
         branches: [
           StatefulShellBranch(
             routes: [
@@ -237,22 +234,25 @@ GoRouter router(Ref ref) {
                   ),
                   GoRoute(
                     path: ':id',
-                    builder: (_, s) => RecruiterJobDetailScreen(
-                      jobId: s.pathParameters['id']!,
-                      initialJob: s.extra as RecruiterJobDto?,
-                    ),
+                    builder:
+                        (_, s) => RecruiterJobDetailScreen(
+                          jobId: s.pathParameters['id']!,
+                          initialJob: s.extra as RecruiterJobDto?,
+                        ),
                   ),
                   GoRoute(
                     path: ':id/edit',
-                    builder: (_, s) => EditJobResolver(
-                      jobId: s.pathParameters['id']!,
-                      initialJob: s.extra as RecruiterJobDto?,
-                    ),
+                    builder:
+                        (_, s) => EditJobResolver(
+                          jobId: s.pathParameters['id']!,
+                          initialJob: s.extra as RecruiterJobDto?,
+                        ),
                   ),
                   GoRoute(
                     path: ':id/applicants',
-                    builder: (_, s) =>
-                        JobApplicantsScreen(jobId: s.pathParameters['id']!),
+                    builder:
+                        (_, s) =>
+                            JobApplicantsScreen(jobId: s.pathParameters['id']!),
                   ),
                 ],
               ),

@@ -23,7 +23,7 @@ import 'package:jobify_app/data/me/profile_update_dto.dart';
 
 class FakeAuthRepository implements AuthRepository {
   FakeAuthRepository({AuthState initial = const SignedOut()})
-      : _state = initial;
+    : _state = initial;
   AuthState _state;
 
   @override
@@ -125,11 +125,7 @@ class FakeJobsRepository implements JobsRepository {
 
   @override
   Future<SavedJobDto> save(String jobId) async {
-    final s = SavedJobDto(
-      id: 's1',
-      jobId: jobId,
-      createdAt: DateTime.now(),
-    );
+    final s = SavedJobDto(id: 's1', jobId: jobId, createdAt: DateTime.now());
     _detail = _detail.copyWith(savedJob: s);
     return s;
   }
@@ -203,19 +199,18 @@ class FakeApplicationsRepository implements ApplicationsRepository {
   Future<ApplicationsPageDto> fetchPage({
     String? cursor,
     int limit = 20,
-  }) async =>
-      fetchPageOverride ?? const ApplicationsPageDto(items: []);
+  }) async => fetchPageOverride ?? const ApplicationsPageDto(items: []);
 
   @override
   Future<ApplicationDto> withdraw(String id) async => ApplicationDto(
-        id: id,
-        jobId: 'j1',
-        status: ApplicationStatus.withdrawn,
-        source: ApplicationSource.feed,
-        stage: ApplicationStage.applied,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
+    id: id,
+    jobId: 'j1',
+    status: ApplicationStatus.withdrawn,
+    source: ApplicationSource.feed,
+    stage: ApplicationStage.applied,
+    createdAt: DateTime.now(),
+    updatedAt: DateTime.now(),
+  );
 
   @override
   Future<List<StageEventDto>> fetchTimeline(String applicationId) async {
@@ -228,36 +223,33 @@ class FakeApplicationsRepository implements ApplicationsRepository {
 
 class FakeSavedJobsRepository implements SavedJobsRepository {
   @override
-  Future<SavedJobsPageDto> fetchPage({
-    String? cursor,
-    int limit = 20,
-  }) async =>
+  Future<SavedJobsPageDto> fetchPage({String? cursor, int limit = 20}) async =>
       const SavedJobsPageDto(items: []);
 }
 
 class FakeMeRepository implements MeRepository {
   @override
   Future<MeDto> fetch() async => const MeDto(
-        id: 'u1',
-        email: 'u@e.com',
-        displayName: 'U',
-        role: 'applicant',
-        applicant: ApplicantSummaryDto(id: 'a1', fullName: 'U'),
-      );
+    id: 'u1',
+    email: 'u@e.com',
+    displayName: 'U',
+    role: 'applicant',
+    applicant: ApplicantSummaryDto(id: 'a1', fullName: 'U'),
+  );
 
   @override
   Future<MeDto> updateProfile(ProfileUpdateDto update) async => const MeDto(
-        id: 'u1',
-        email: 'u@e.com',
-        displayName: 'U',
-        role: 'applicant',
-        applicant: ApplicantSummaryDto(id: 'a1', fullName: 'U'),
-      );
+    id: 'u1',
+    email: 'u@e.com',
+    displayName: 'U',
+    role: 'applicant',
+    applicant: ApplicantSummaryDto(id: 'a1', fullName: 'U'),
+  );
 }
 
 class FakeConsentsRepository implements ConsentsRepository {
   FakeConsentsRepository({List<ConsentDto>? initial})
-      : items = initial ?? _defaultItems();
+    : items = initial ?? _defaultItems();
 
   List<ConsentDto> items;
   int patchCallCount = 0;
@@ -280,22 +272,22 @@ class FakeConsentsRepository implements ConsentsRepository {
   }
 
   static List<ConsentDto> _defaultItems() => [
-        ConsentDto(
-          scope: 'email_transactional',
-          granted: true,
-          updatedAt: DateTime.utc(2026),
-        ),
-        ConsentDto(
-          scope: 'email_marketing',
-          granted: false,
-          updatedAt: DateTime.utc(2026),
-        ),
-        ConsentDto(
-          scope: 'in_app_notifications',
-          granted: true,
-          updatedAt: DateTime.utc(2026),
-        ),
-      ];
+    ConsentDto(
+      scope: 'email_transactional',
+      granted: true,
+      updatedAt: DateTime.utc(2026),
+    ),
+    ConsentDto(
+      scope: 'email_marketing',
+      granted: false,
+      updatedAt: DateTime.utc(2026),
+    ),
+    ConsentDto(
+      scope: 'in_app_notifications',
+      granted: true,
+      updatedAt: DateTime.utc(2026),
+    ),
+  ];
 }
 
 class FakeDsrRepository implements DsrRepository {

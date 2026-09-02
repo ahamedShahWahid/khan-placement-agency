@@ -50,41 +50,45 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
         value: value,
         onRetry: () => ref.read(savedControllerProvider.notifier).refresh(),
         isEmpty: (s) => s.items.isEmpty,
-        empty: () => JobifyEmptyState(
-          headline: context.l10n.savedEmptyHeadline,
-          body: context.l10n.savedEmptyBody,
-          icon: Icons.bookmark_outline,
-        ),
-        data: (s) => RefreshIndicator(
-          onRefresh: () => ref.read(savedControllerProvider.notifier).refresh(),
-          child: ListView.separated(
-            controller: _scroll,
-            padding: const EdgeInsets.all(JobifySpacing.lg),
-            itemCount: s.items.length + 1,
-            separatorBuilder: (_, __) =>
-                const SizedBox(height: JobifySpacing.md),
-            itemBuilder: (context, i) {
-              if (i == s.items.length) {
-                if (s.isLoadingMore) {
-                  return const Padding(
-                    padding: EdgeInsets.all(JobifySpacing.lg),
-                    child: JobifyLoadingView(),
+        empty:
+            () => JobifyEmptyState(
+              headline: context.l10n.savedEmptyHeadline,
+              body: context.l10n.savedEmptyBody,
+              icon: Icons.bookmark_outline,
+            ),
+        data:
+            (s) => RefreshIndicator(
+              onRefresh:
+                  () => ref.read(savedControllerProvider.notifier).refresh(),
+              child: ListView.separated(
+                controller: _scroll,
+                padding: const EdgeInsets.all(JobifySpacing.lg),
+                itemCount: s.items.length + 1,
+                separatorBuilder:
+                    (_, __) => const SizedBox(height: JobifySpacing.md),
+                itemBuilder: (context, i) {
+                  if (i == s.items.length) {
+                    if (s.isLoadingMore) {
+                      return const Padding(
+                        padding: EdgeInsets.all(JobifySpacing.lg),
+                        child: JobifyLoadingView(),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  }
+                  final item = s.items[i];
+                  return FeedItemCard(
+                    job: item.job,
+                    employer: item.employer,
+                    match: item.match,
+                    explanation: item.match?.explanation,
+                    showScore: item.job.status == JobStatus.open,
+                    onTap:
+                        () => context.go('${Routes.saved}/jobs/${item.job.id}'),
                   );
-                }
-                return const SizedBox.shrink();
-              }
-              final item = s.items[i];
-              return FeedItemCard(
-                job: item.job,
-                employer: item.employer,
-                match: item.match,
-                explanation: item.match?.explanation,
-                showScore: item.job.status == JobStatus.open,
-                onTap: () => context.go('${Routes.saved}/jobs/${item.job.id}'),
-              );
-            },
-          ),
-        ),
+                },
+              ),
+            ),
       ),
     );
   }

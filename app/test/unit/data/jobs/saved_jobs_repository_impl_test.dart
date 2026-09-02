@@ -27,7 +27,7 @@ void main() {
           },
           'employer': {'id': 'e1', 'name': 'Acme', 'verified': false},
           'match': null,
-        }
+        },
       ],
       'next_cursor': null,
     });

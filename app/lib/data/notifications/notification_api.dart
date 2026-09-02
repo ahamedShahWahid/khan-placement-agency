@@ -9,10 +9,7 @@ class NotificationApi {
   Future<NotificationsPageDto> list({String? cursor, int limit = 20}) async {
     final res = await _dio.get<Map<String, dynamic>>(
       '/v1/notifications',
-      queryParameters: {
-        'limit': limit,
-        if (cursor != null) 'cursor': cursor,
-      },
+      queryParameters: {'limit': limit, if (cursor != null) 'cursor': cursor},
     );
     return NotificationsPageDto.fromJson(res.data!);
   }

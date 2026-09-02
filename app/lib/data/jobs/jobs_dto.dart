@@ -73,10 +73,7 @@ class SavedJobDto {
 
 @JsonSerializable()
 class ApplicationsPageDto {
-  const ApplicationsPageDto({
-    required this.items,
-    this.nextCursor,
-  });
+  const ApplicationsPageDto({required this.items, this.nextCursor});
 
   factory ApplicationsPageDto.fromJson(Map<String, dynamic> json) =>
       _$ApplicationsPageDtoFromJson(json);
@@ -107,10 +104,7 @@ class ApplicationListItemDto {
 
 @JsonSerializable()
 class SavedJobsPageDto {
-  const SavedJobsPageDto({
-    required this.items,
-    this.nextCursor,
-  });
+  const SavedJobsPageDto({required this.items, this.nextCursor});
 
   factory SavedJobsPageDto.fromJson(Map<String, dynamic> json) =>
       _$SavedJobsPageDtoFromJson(json);

@@ -30,10 +30,10 @@ class _FakeRepo implements MeRepository {
 class _FakePrefsRepo implements PreferencesRepository {
   @override
   Future<PreferencesDto> fetch() async => const PreferencesDto(
-        desiredRole: null,
-        locations: ['Pune'],
-        expectedCtc: '1800000.00',
-      );
+    desiredRole: null,
+    locations: ['Pune'],
+    expectedCtc: '1800000.00',
+  );
   @override
   Future<PreferencesDto> update(PreferencesUpdateDto update) async => fetch();
 }
@@ -45,10 +45,10 @@ class _RecordingPrefsRepo implements PreferencesRepository {
 
   @override
   Future<PreferencesDto> fetch() async => const PreferencesDto(
-        desiredRole: null,
-        locations: ['Pune'],
-        expectedCtc: '1800000.00',
-      );
+    desiredRole: null,
+    locations: ['Pune'],
+    expectedCtc: '1800000.00',
+  );
 
   @override
   Future<PreferencesDto> update(PreferencesUpdateDto update) async {
@@ -70,10 +70,7 @@ const _me = MeDto(
   applicant: ApplicantSummaryDto(id: 'a1', fullName: 'Eng U'),
 );
 
-ProviderScope _buildScope({
-  required Widget home,
-  AuthState? authState,
-}) {
+ProviderScope _buildScope({required Widget home, AuthState? authState}) {
   return ProviderScope(
     overrides: [
       meRepositoryProvider.overrideWithValue(_FakeRepo(_me)),
@@ -125,87 +122,82 @@ void main() {
     },
   );
 
-  testWidgets(
-    "shows 'I'm hiring' CTA when signed in as applicant",
-    (tester) async {
-      await tester.pumpWidget(
-        _buildScope(
+  testWidgets("shows 'I'm hiring' CTA when signed in as applicant", (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _buildScope(
+        home: const ProfileScreen(),
+        authState: const SignedIn(
+          userId: 'u1',
+          email: 'eng@example.com',
+          role: UserRole.applicant,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text("I'm hiring — post a job"), findsOneWidget);
+  });
+
+  testWidgets("hides 'I'm hiring' CTA when signed in as recruiter", (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _buildScope(
+        home: const ProfileScreen(),
+        authState: const SignedIn(
+          userId: 'u1',
+          email: 'eng@example.com',
+          role: UserRole.recruiter,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text("I'm hiring — post a job"), findsNothing);
+  });
+
+  testWidgets('tapping हिन्दी on the language switcher saves language "hi" and '
+      'flips the app locale', (tester) async {
+    final repo = _RecordingPrefsRepo();
+    final container = ProviderContainer(
+      overrides: [
+        meRepositoryProvider.overrideWithValue(_FakeRepo(_me)),
+        preferencesRepositoryProvider.overrideWithValue(repo),
+        packageInfoProvider.overrideWith(
+          (_) async => PackageInfo(
+            appName: 'Jobify',
+            packageName: 'com.jobify.app',
+            version: '1.0.0',
+            buildNumber: '1',
+          ),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          theme: ThemeData.light(useMaterial3: true),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: const ProfileScreen(),
-          authState: const SignedIn(
-            userId: 'u1',
-            email: 'eng@example.com',
-            role: UserRole.applicant,
-          ),
         ),
-      );
-      await tester.pumpAndSettle();
-      expect(find.text("I'm hiring — post a job"), findsOneWidget);
-    },
-  );
+      ),
+    );
+    await tester.pumpAndSettle();
 
-  testWidgets(
-    "hides 'I'm hiring' CTA when signed in as recruiter",
-    (tester) async {
-      await tester.pumpWidget(
-        _buildScope(
-          home: const ProfileScreen(),
-          authState: const SignedIn(
-            userId: 'u1',
-            email: 'eng@example.com',
-            role: UserRole.recruiter,
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(find.text("I'm hiring — post a job"), findsNothing);
-    },
-  );
+    await tester.scrollUntilVisible(
+      find.text('हिन्दी'),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('हिन्दी'));
+    await tester.pumpAndSettle();
 
-  testWidgets(
-    'tapping हिन्दी on the language switcher saves language "hi" and '
-    'flips the app locale',
-    (tester) async {
-      final repo = _RecordingPrefsRepo();
-      final container = ProviderContainer(
-        overrides: [
-          meRepositoryProvider.overrideWithValue(_FakeRepo(_me)),
-          preferencesRepositoryProvider.overrideWithValue(repo),
-          packageInfoProvider.overrideWith(
-            (_) async => PackageInfo(
-              appName: 'Jobify',
-              packageName: 'com.jobify.app',
-              version: '1.0.0',
-              buildNumber: '1',
-            ),
-          ),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: MaterialApp(
-            theme: ThemeData.light(useMaterial3: true),
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: const ProfileScreen(),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      await tester.scrollUntilVisible(
-        find.text('हिन्दी'),
-        100,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.tap(find.text('हिन्दी'));
-      await tester.pumpAndSettle();
-
-      expect(repo.updates, isNotEmpty);
-      expect(repo.updates.last.language, 'hi');
-      expect(container.read(localeControllerProvider), const Locale('hi'));
-    },
-  );
+    expect(repo.updates, isNotEmpty);
+    expect(repo.updates.last.language, 'hi');
+    expect(container.read(localeControllerProvider), const Locale('hi'));
+  });
 }

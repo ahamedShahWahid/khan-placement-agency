@@ -6,16 +6,16 @@ import 'package:jobify_app/data/notifications/notifications_repository_impl.dart
 import '../../../helpers/mock_interceptor.dart';
 
 Map<String, dynamic> _n(String id, {String? readAt}) => {
-      'id': id,
-      'kind': 'application_received',
-      'channel': 'in_app',
-      'status': 'sent',
-      'payload': {'job_id': 'j1'},
-      'send_after': '2026-05-01T00:00:00Z',
-      'sent_at': '2026-05-01T00:00:01Z',
-      'read_at': readAt,
-      'created_at': '2026-05-01T00:00:00Z',
-    };
+  'id': id,
+  'kind': 'application_received',
+  'channel': 'in_app',
+  'status': 'sent',
+  'payload': {'job_id': 'j1'},
+  'send_after': '2026-05-01T00:00:00Z',
+  'sent_at': '2026-05-01T00:00:01Z',
+  'read_at': readAt,
+  'created_at': '2026-05-01T00:00:00Z',
+};
 
 void main() {
   test('fetchPage parses items + next_cursor', () async {

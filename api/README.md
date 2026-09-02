@@ -235,6 +235,7 @@ All settings are read from environment variables prefixed `JOBIFY_`. The `.env` 
 | `JOBIFY_AUTH_REQUIRE_EMAIL_VERIFIED`   | no | `false` | Reject unverified Google sign-ins |
 | `JOBIFY_AUTH_GOOGLE_RATE_LIMIT_PER_MINUTE` | no | `10` | Google sign-in attempts per client IP per minute |
 | `JOBIFY_AUTH_REFRESH_RATE_LIMIT_PER_MINUTE` | no | `30` | Refresh attempts per IP/token fingerprint per minute |
+| `JOBIFY_EMPLOYER_INVITE_TTL_DAYS` | no | `14` | Days a pending employer invite stays valid before lazy-expiring (1-365). |
 | `JOBIFY_CORS_ALLOW_ORIGINS` | no | `http://localhost:8080` | Comma-separated list of allowed CORS origins (web frontend). |
 | `JOBIFY_REDIS_URL`    | yes      | —       | Redis for API rate limits and readiness. |
 | `JOBIFY_METRICS_BEARER_TOKEN` | staging/prod | — | Bearer token protecting `/metrics` |

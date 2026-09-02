@@ -3,8 +3,7 @@ import 'package:jobify_app/data/preferences/desired_role.dart';
 import 'package:jobify_app/data/preferences/preferences_dto.dart';
 
 void main() {
-  test(
-      'every real role round-trips: wireValue parses back to the same enum '
+  test('every real role round-trips: wireValue parses back to the same enum '
       '(pins the hand-maintained @JsonValue and wireValue maps together)', () {
     for (final role in DesiredRole.values) {
       if (role == DesiredRole.unknown) continue;

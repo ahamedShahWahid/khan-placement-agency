@@ -15,20 +15,25 @@ final employerInvitesControllerProvider = EmployerInvitesControllerFamily._();
 
 /// Pending invites for one employer. Family keyed by employerId.
 
-final class EmployerInvitesControllerProvider extends $FunctionalProvider<
-        AsyncValue<List<InviteDto>>, List<InviteDto>, FutureOr<List<InviteDto>>>
+final class EmployerInvitesControllerProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<InviteDto>>,
+          List<InviteDto>,
+          FutureOr<List<InviteDto>>
+        >
     with $FutureModifier<List<InviteDto>>, $FutureProvider<List<InviteDto>> {
   /// Pending invites for one employer. Family keyed by employerId.
-  EmployerInvitesControllerProvider._(
-      {required EmployerInvitesControllerFamily super.from,
-      required String super.argument})
-      : super(
-          retry: null,
-          name: r'employerInvitesControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+  EmployerInvitesControllerProvider._({
+    required EmployerInvitesControllerFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'employerInvitesControllerProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$employerInvitesControllerHash();
@@ -43,16 +48,13 @@ final class EmployerInvitesControllerProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<List<InviteDto>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<InviteDto>> create(Ref ref) {
     final argument = this.argument as String;
-    return employerInvitesController(
-      ref,
-      argument,
-    );
+    return employerInvitesController(ref, argument);
   }
 
   @override
@@ -75,19 +77,17 @@ String _$employerInvitesControllerHash() =>
 final class EmployerInvitesControllerFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<InviteDto>>, String> {
   EmployerInvitesControllerFamily._()
-      : super(
-          retry: null,
-          name: r'employerInvitesControllerProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
+    : super(
+        retry: null,
+        name: r'employerInvitesControllerProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
   /// Pending invites for one employer. Family keyed by employerId.
 
-  EmployerInvitesControllerProvider call(
-    String employerId,
-  ) =>
+  EmployerInvitesControllerProvider call(String employerId) =>
       EmployerInvitesControllerProvider._(argument: employerId, from: this);
 
   @override

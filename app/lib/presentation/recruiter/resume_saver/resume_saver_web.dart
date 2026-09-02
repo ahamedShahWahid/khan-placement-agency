@@ -10,9 +10,10 @@ void saveResume(Uint8List bytes, String filename, String contentType) {
     web.BlobPropertyBag(type: contentType),
   );
   final url = web.URL.createObjectURL(blob);
-  final anchor = web.document.createElement('a') as web.HTMLAnchorElement
-    ..href = url
-    ..download = filename;
+  final anchor =
+      web.document.createElement('a') as web.HTMLAnchorElement
+        ..href = url
+        ..download = filename;
   web.document.body?.appendChild(anchor);
   anchor.click();
   web.document.body?.removeChild(anchor);

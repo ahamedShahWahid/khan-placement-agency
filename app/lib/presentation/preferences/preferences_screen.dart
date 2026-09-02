@@ -81,8 +81,9 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
       expectedCtc: num.tryParse(_expectedCtc.text.trim()),
       language: _language,
     );
-    final ok =
-        await ref.read(preferencesControllerProvider.notifier).submit(update);
+    final ok = await ref
+        .read(preferencesControllerProvider.notifier)
+        .submit(update);
     if (!mounted) return;
     if (ok) {
       if (context.canPop()) context.pop();
@@ -119,20 +120,21 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
           ],
         ),
         body: Center(
-          child: prefsState.hasError
-              ? Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(l10n.preferencesLoadError),
-                    const SizedBox(height: JobifySpacing.sm),
-                    TextButton(
-                      onPressed: () =>
-                          ref.invalidate(preferencesControllerProvider),
-                      child: Text(l10n.commonRetry),
-                    ),
-                  ],
-                )
-              : const CircularProgressIndicator(),
+          child:
+              prefsState.hasError
+                  ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(l10n.preferencesLoadError),
+                      const SizedBox(height: JobifySpacing.sm),
+                      TextButton(
+                        onPressed:
+                            () => ref.invalidate(preferencesControllerProvider),
+                        child: Text(l10n.commonRetry),
+                      ),
+                    ],
+                  )
+                  : const CircularProgressIndicator(),
         ),
       );
     }
@@ -169,9 +171,10 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
                       // the raw `unknown` until the user picks something, so
                       // an untouched save omits the key and preserves the
                       // server value.
-                      initialValue: _desiredRole == DesiredRole.unknown
-                          ? null
-                          : _desiredRole,
+                      initialValue:
+                          _desiredRole == DesiredRole.unknown
+                              ? null
+                              : _desiredRole,
                       decoration: InputDecoration(
                         labelText: l10n.preferencesDesiredRoleLabel,
                       ),
@@ -181,8 +184,9 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
                         DropdownMenuItem<DesiredRole>(
                           child: Text(l10n.preferencesNoPreferenceOption),
                         ),
-                        for (final role in DesiredRole.values
-                            .where((r) => r != DesiredRole.unknown))
+                        for (final role in DesiredRole.values.where(
+                          (r) => r != DesiredRole.unknown,
+                        ))
                           DropdownMenuItem(
                             value: role,
                             child: Text(desiredRoleLabel(context, role)),
@@ -204,8 +208,8 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
                           for (final loc in _locations)
                             JobifyMatchChip(
                               label: loc,
-                              onDeleted: () =>
-                                  setState(() => _locations.remove(loc)),
+                              onDeleted:
+                                  () => setState(() => _locations.remove(loc)),
                             ),
                         ],
                       ),

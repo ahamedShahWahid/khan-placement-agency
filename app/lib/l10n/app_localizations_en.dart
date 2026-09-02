@@ -430,7 +430,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String notificationApplicationReceivedWithEmployer(
-      String job, String employer) {
+    String job,
+    String employer,
+  ) {
     return 'Application received for $job at $employer';
   }
 

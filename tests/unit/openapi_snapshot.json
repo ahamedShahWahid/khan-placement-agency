@@ -5041,6 +5041,16 @@
           }
         ],
         "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationRead"
+                }
+              }
+            },
+            "description": "Already applied \u2014 the existing application is returned unchanged."
+          },
           "201": {
             "content": {
               "application/json": {
@@ -5209,6 +5219,16 @@
           }
         ],
         "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedJobRead"
+                }
+              }
+            },
+            "description": "Already saved \u2014 the existing saved-job row is returned."
+          },
           "201": {
             "content": {
               "application/json": {
@@ -5504,7 +5524,7 @@
     },
     "/v1/notifications": {
       "get": {
-        "description": "Paginated list of the current applicant's notifications.\n\nReturns pending, dispatching, and sent rows. Failed rows are excluded\n(admin-only). Cursor: base64 of {\"created_at\": ISO8601, \"notification_id\": uuid}.\nOrder: created_at DESC, id DESC. ETag: W/\"sha256(user_id|max_updated_at|count)\".",
+        "description": "Paginated list of the current user's notifications.\n\nReturns pending, dispatching, and sent rows. Failed rows are excluded\n(admin-only). Cursor: base64 of {\"created_at\": ISO8601, \"notification_id\": uuid}.\nOrder: created_at DESC, id DESC. ETag: W/\"sha256(user_id|max_updated_at|count)\".\n\nOpen to ANY authenticated role, not just applicants: `notifications.user_id`\nis the only scope that matters, and recruiters legitimately receive rows\n(kind `employer_invite` is written for an invited email that already maps to\na user \u2014 who may already be a recruiter at another employer). Gating on\n`require_applicant` made those rows unreachable for the very person they\nwere addressed to.",
         "operationId": "list_notifications_v1_notifications_get",
         "parameters": [
           {
@@ -5566,7 +5586,7 @@
     },
     "/v1/notifications/{notification_id}/read": {
       "post": {
-        "description": "Mark a notification as read.\n\nScoped to the current user. 404 for missing or another user's notification.\nIdempotent: already-read notifications return 200 with the existing read_at.",
+        "description": "Mark a notification as read.\n\nScoped to the current user. 404 for missing or another user's notification.\nIdempotent: already-read notifications return 200 with the existing read_at.\nAny authenticated role \u2014 see the inbox handler's note on `employer_invite`.",
         "operationId": "mark_notification_read_v1_notifications__notification_id__read_post",
         "parameters": [
           {

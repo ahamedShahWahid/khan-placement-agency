@@ -11,16 +11,16 @@ class SplashScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.listen<AsyncValue<BootstrapOutcome>>(
-      bootstrapControllerProvider,
-      (prev, next) {
-        next.whenData((outcome) {
-          final target =
-              outcome == BootstrapOutcome.feed ? Routes.feed : Routes.signIn;
-          context.go(target);
-        });
-      },
-    );
+    ref.listen<AsyncValue<BootstrapOutcome>>(bootstrapControllerProvider, (
+      prev,
+      next,
+    ) {
+      next.whenData((outcome) {
+        final target =
+            outcome == BootstrapOutcome.feed ? Routes.feed : Routes.signIn;
+        context.go(target);
+      });
+    });
 
     final value = ref.watch(bootstrapControllerProvider);
     return Scaffold(

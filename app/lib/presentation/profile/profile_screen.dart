@@ -55,15 +55,17 @@ class ProfileScreen extends ConsumerWidget {
           Widget arrive(Widget child) =>
               Arrive(index: arriveIndex++, child: child);
 
-          final rows = data.applicant != null
-              ? _matchProfileRows(
-                  context: context,
-                  a: data.applicant!,
-                  preferences: preferences,
-                  onRetry: () => ref.invalidate(preferencesControllerProvider),
-                  onAdd: () => context.go(Routes.profileEdit),
-                )
-              : const <Widget>[];
+          final rows =
+              data.applicant != null
+                  ? _matchProfileRows(
+                    context: context,
+                    a: data.applicant!,
+                    preferences: preferences,
+                    onRetry:
+                        () => ref.invalidate(preferencesControllerProvider),
+                    onAdd: () => context.go(Routes.profileEdit),
+                  )
+                  : const <Widget>[];
 
           return ListView(
             padding: const EdgeInsets.all(JobifySpacing.lg),
@@ -226,9 +228,10 @@ class ProfileScreen extends ConsumerWidget {
               const SizedBox(height: JobifySpacing.xxl),
               arrive(
                 OutlinedButton(
-                  onPressed: signOut.isLoading
-                      ? null
-                      : () => _confirmSignOut(context, ref),
+                  onPressed:
+                      signOut.isLoading
+                          ? null
+                          : () => _confirmSignOut(context, ref),
                   child: Text(
                     signOut.isLoading
                         ? l10n.profileSigningOutButton
@@ -237,19 +240,22 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: JobifySpacing.xxl),
-              ref.watch(packageInfoProvider).when(
-                    data: (info) => Center(
-                      child: Text(
-                        l10n.profileVersionLabel(
-                          info.version,
-                          info.buildNumber,
+              ref
+                  .watch(packageInfoProvider)
+                  .when(
+                    data:
+                        (info) => Center(
+                          child: Text(
+                            l10n.profileVersionLabel(
+                              info.version,
+                              info.buildNumber,
+                            ),
+                            style: JobifyTypography.mono(
+                              fontSize: 11,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
                         ),
-                        style: JobifyTypography.mono(
-                          fontSize: 11,
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
                     loading: () => const SizedBox.shrink(),
                     error: (_, __) => const SizedBox.shrink(),
                   ),
@@ -264,20 +270,21 @@ class ProfileScreen extends ConsumerWidget {
     final l10n = ctx.l10n;
     final ok = await showDialog<bool>(
       context: ctx,
-      builder: (c) => AlertDialog(
-        title: Text(l10n.profileSignOutDialogTitle),
-        content: Text(l10n.profileSignOutDialogBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(c, false),
-            child: Text(l10n.commonCancel),
+      builder:
+          (c) => AlertDialog(
+            title: Text(l10n.profileSignOutDialogTitle),
+            content: Text(l10n.profileSignOutDialogBody),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(c, false),
+                child: Text(l10n.commonCancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(c, true),
+                child: Text(l10n.profileSignOutButton),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(c, true),
-            child: Text(l10n.profileSignOutButton),
-          ),
-        ],
-      ),
     );
     if (ok ?? false) {
       await ref.read(signOutControllerProvider.notifier).submit();
@@ -310,9 +317,10 @@ List<Widget> _matchProfileRows({
       ..add(
         _SpecRow(
           label: l10n.preferencesDesiredRoleLabel,
-          value: p.desiredRole == null || p.desiredRole == DesiredRole.unknown
-              ? null
-              : desiredRoleLabel(context, p.desiredRole!),
+          value:
+              p.desiredRole == null || p.desiredRole == DesiredRole.unknown
+                  ? null
+                  : desiredRoleLabel(context, p.desiredRole!),
           onAdd: p.desiredRole == null ? onAdd : null,
         ),
       )
@@ -382,8 +390,10 @@ class _AppearanceSelector extends ConsumerWidget {
         ),
       ],
       selected: {currentMode},
-      onSelectionChanged: (selection) =>
-          ref.read(themeModeControllerProvider.notifier).set(selection.first),
+      onSelectionChanged:
+          (selection) => ref
+              .read(themeModeControllerProvider.notifier)
+              .set(selection.first),
     );
   }
 }
@@ -501,10 +511,11 @@ class _LanguageSelector extends ConsumerWidget {
         ButtonSegment(value: 'hi', label: Text(l10n.profileLanguageHindi)),
       ],
       selected: {selected},
-      onSelectionChanged: preferences.hasValue
-          ? (selection) =>
-              _onChanged(ref, preferences.requireValue, selection.first)
-          : null,
+      onSelectionChanged:
+          preferences.hasValue
+              ? (selection) =>
+                  _onChanged(ref, preferences.requireValue, selection.first)
+              : null,
     );
   }
 
@@ -517,9 +528,10 @@ class _LanguageSelector extends ConsumerWidget {
     final update = PreferencesUpdateDto(
       desiredRole: current.desiredRole,
       locations: current.locations,
-      expectedCtc: current.expectedCtc == null
-          ? null
-          : num.tryParse(current.expectedCtc!),
+      expectedCtc:
+          current.expectedCtc == null
+              ? null
+              : num.tryParse(current.expectedCtc!),
       language: language,
     );
     await ref.read(preferencesControllerProvider.notifier).submit(update);

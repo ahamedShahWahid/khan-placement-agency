@@ -12,20 +12,24 @@ part of 'resume_repository_impl.dart';
 @ProviderFor(resumeRepository)
 final resumeRepositoryProvider = ResumeRepositoryProvider._();
 
-final class ResumeRepositoryProvider extends $FunctionalProvider<
-    ResumeRepository,
-    ResumeRepository,
-    ResumeRepository> with $Provider<ResumeRepository> {
+final class ResumeRepositoryProvider
+    extends
+        $FunctionalProvider<
+          ResumeRepository,
+          ResumeRepository,
+          ResumeRepository
+        >
+    with $Provider<ResumeRepository> {
   ResumeRepositoryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'resumeRepositoryProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'resumeRepositoryProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$resumeRepositoryHash();

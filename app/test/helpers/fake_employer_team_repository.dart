@@ -30,8 +30,7 @@ class FakeEmployerTeamRepository implements EmployerTeamRepository {
     String employerId, {
     required String email,
     required String role,
-  }) async =>
-      fakeMember(userId: 'new', email: email, role: role);
+  }) async => fakeMember(userId: 'new', email: email, role: role);
 
   @override
   Future<MemberDto> changeMemberRole(
@@ -95,42 +94,39 @@ MemberDto fakeMember({
   String role = 'member',
   String? email = 'member@example.com',
   String? displayName = 'Member Person',
-}) =>
-    MemberDto(
-      userId: userId,
-      role: role,
-      email: email,
-      displayName: displayName,
-      addedAt: DateTime.utc(2026),
-    );
+}) => MemberDto(
+  userId: userId,
+  role: role,
+  email: email,
+  displayName: displayName,
+  addedAt: DateTime.utc(2026),
+);
 
 InviteDto fakeInvite({
   String id = 'inv1',
   String employerId = 'e1',
   String email = 'invitee@example.com',
   String role = 'member',
-}) =>
-    InviteDto(
-      id: id,
-      employerId: employerId,
-      email: email,
-      role: role,
-      status: 'pending',
-      expiresAt: DateTime.utc(2026, 12),
-      createdAt: DateTime.utc(2026),
-    );
+}) => InviteDto(
+  id: id,
+  employerId: employerId,
+  email: email,
+  role: role,
+  status: 'pending',
+  expiresAt: DateTime.utc(2026, 12),
+  createdAt: DateTime.utc(2026),
+);
 
 MyInviteDto fakeMyInvite({
   String id = 'inv1',
   String employerId = 'e1',
   String employerName = 'Acme Corp',
   String role = 'member',
-}) =>
-    MyInviteDto(
-      id: id,
-      employerId: employerId,
-      employerName: employerName,
-      role: role,
-      expiresAt: DateTime.utc(2026, 12),
-      createdAt: DateTime.utc(2026),
-    );
+}) => MyInviteDto(
+  id: id,
+  employerId: employerId,
+  employerName: employerName,
+  role: role,
+  expiresAt: DateTime.utc(2026, 12),
+  createdAt: DateTime.utc(2026),
+);

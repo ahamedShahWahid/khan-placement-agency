@@ -1,6 +1,6 @@
 # CLAUDE.md — core (`jobify` domain package)
 
-Load-bearing invariants for the FastAPI- and Celery-free domain package (`core/src/jobify`): db models + Alembic migrations, shared settings contracts, integrations (storage, parser, embeddings, email, scoring, explainer), consent/DSR/audit, eval, and durable outbox primitives. Celery configuration and task implementations live in `worker/`. Auto-loaded when working under `core/`. Repo overview + universal conventions are in the root `CLAUDE.md`.
+Load-bearing invariants for the FastAPI- and Celery-free domain package (`core/src/jobify`): db models + Alembic migrations, shared settings contracts, integrations (storage, parser, embeddings, email, scoring, explainer), consent/audit, eval, and durable outbox primitives (**DSR export/delete lives in `api/src/jobify_api/dsr/`**, not here — it needs the HTTP request context). Celery configuration and task implementations live in `worker/`. Auto-loaded when working under `core/`. Repo overview + universal conventions are in the root `CLAUDE.md`.
 
 > Each section names its paired design doc in `docs/superpowers/specs/` (the **why** + full reserved-slug tables). Below = rules that cause a bug if violated and aren't obvious from the code. Task-side invariants for the parse/embed/score Celery tasks live in `worker/CLAUDE.md`.
 
@@ -31,7 +31,7 @@ Every domain table: `id` (uuid4), `created_at`, `updated_at`, `deleted_at TIMEST
 ## Audit logs (`audit_log()`) — spec `2026-05-28-audit-logs-substrate-design.md`
 
 - **Append-only, caller-owns-txn:** flushes one row in the caller's txn (no commit, no fire-and-forget; rolls back with the business action). The **documented exception** to soft-delete: `AuditLog` skips the `Created/Updated/DeletedAt` types and never filters `deleted_at IS NULL`. No UPDATE/DELETE.
-- `actor_user_id` is `ON DELETE SET NULL` (so a DSR hard-delete leaves the audit row, re-identification impossible). `actor_role` is a plain-TEXT **snapshot** (`'system'` valid for cron/worker, `actor=None`). `audit_log(actor=None, actor_role=None)` raises `ValueError`.
+- `actor_user_id` is `ON DELETE SET NULL` — but note DSR only SOFT-deletes the user, so that action never actually fires; the audit row survives with its actor pointer intact and the user row's PII nulled. **PII inside `context` is a separate problem the FK cannot solve**: four employer-team call sites write a raw email there, so `delete_user_data` strips it (`_redact_audit_context_pii`, replacing the key with `<key>_redacted: true`) per IMPLEMENTATION_SPEC §9.2 "anonymize audit records". That UPDATE is the ONE documented exception to "no UPDATE/DELETE on audit_logs"; extend `_AUDIT_CONTEXT_PII_KEYS` when a new audit context carries PII. `actor_role` is a plain-TEXT **snapshot** (`'system'` valid for cron/worker, `actor=None`). `audit_log(actor=None, actor_role=None)` raises `ValueError`.
 - Slugs dotted-lowercase-verb-past; reserved prefixes `resume.*` `application.*` `job.*` `consent.*` `user.*` `admin.*` `auth.*` `employer.*` (table in spec §4).
 - **structlog FIRST, `audit_log()` SECOND, then side-effect** (canonical `jobify_api.routes.applications:recruiter_download_application_resume`). structlog → Fluent Bit → Elasticsearch is the live channel; the DB row is durable — complementary.
 

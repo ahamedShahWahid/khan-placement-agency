@@ -12,9 +12,9 @@ typedef RecruiterJobsState = PagedState<RecruiterJobDto>;
 class RecruiterJobsController extends _$RecruiterJobsController {
   @override
   Future<RecruiterJobsState> build(bool includeClosed) async {
-    final page = await ref.read(recruiterJobsRepositoryProvider).listMyJobs(
-          status: includeClosed ? 'closed' : null,
-        );
+    final page = await ref
+        .read(recruiterJobsRepositoryProvider)
+        .listMyJobs(status: includeClosed ? 'closed' : null);
     return PagedState(
       items: page.items,
       cursor: page.nextCursor,
@@ -28,19 +28,17 @@ class RecruiterJobsController extends _$RecruiterJobsController {
   }
 
   Future<void> loadMore() => loadNextPage<RecruiterJobDto>(
-        currentState: state,
-        fetch: ({String? cursor}) async {
-          final page =
-              await ref.read(recruiterJobsRepositoryProvider).listMyJobs(
-                    status: includeClosed ? 'closed' : null,
-                    cursor: cursor,
-                  );
-          return PagedState(
-            items: page.items,
-            cursor: page.nextCursor,
-            hasMore: page.nextCursor != null,
-          );
-        },
-        setState: (s) => state = s,
+    currentState: state,
+    fetch: ({String? cursor}) async {
+      final page = await ref
+          .read(recruiterJobsRepositoryProvider)
+          .listMyJobs(status: includeClosed ? 'closed' : null, cursor: cursor);
+      return PagedState(
+        items: page.items,
+        cursor: page.nextCursor,
+        hasMore: page.nextCursor != null,
       );
+    },
+    setState: (s) => state = s,
+  );
 }

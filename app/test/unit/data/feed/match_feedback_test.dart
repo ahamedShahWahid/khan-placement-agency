@@ -17,13 +17,13 @@ void main() {
 
   group('MatchSummaryDto.my_feedback', () {
     Map<String, dynamic> matchJson(Object? myFeedback) => {
-          'id': 'm1',
-          'total_score': 0.8,
-          'components': {'location': 1.0},
-          'explanation': null,
-          'surfaced_at': '2026-07-19T00:00:00Z',
-          'my_feedback': myFeedback,
-        };
+      'id': 'm1',
+      'total_score': 0.8,
+      'components': {'location': 1.0},
+      'explanation': null,
+      'surfaced_at': '2026-07-19T00:00:00Z',
+      'my_feedback': myFeedback,
+    };
 
     test('null stays null', () {
       expect(MatchSummaryDto.fromJson(matchJson(null)).myFeedback, isNull);

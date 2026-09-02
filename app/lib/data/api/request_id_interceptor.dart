@@ -13,10 +13,7 @@ class RequestIdInterceptor extends Interceptor {
   final Uuid _uuid;
 
   @override
-  void onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) {
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     final id = _uuid.v4();
     options.headers[_kRequestIdHeader] = id;
     options.extra[_kRequestIdExtraKey] = id;

@@ -15,15 +15,15 @@ final feedControllerProvider = FeedControllerProvider._();
 final class FeedControllerProvider
     extends $AsyncNotifierProvider<FeedController, FeedState> {
   FeedControllerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'feedControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'feedControllerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$feedControllerHash();
@@ -33,7 +33,7 @@ final class FeedControllerProvider
   FeedController create() => FeedController();
 }
 
-String _$feedControllerHash() => r'337e6f504e4e74cddcfffe5cdc0243cc8d7b93d5';
+String _$feedControllerHash() => r'8f3baa37ba0d7878936fa42b0ebe5074f5d751e6';
 
 abstract class _$FeedController extends $AsyncNotifier<FeedState> {
   FutureOr<FeedState> build();
@@ -41,11 +41,14 @@ abstract class _$FeedController extends $AsyncNotifier<FeedState> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<AsyncValue<FeedState>, FeedState>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<FeedState>, FeedState>,
-        AsyncValue<FeedState>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<FeedState>, FeedState>,
+              AsyncValue<FeedState>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

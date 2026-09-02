@@ -22,24 +22,23 @@ class _FakeRepo implements RecruiterJobsRepository {
   Map<String, dynamic>? lastPatchBody;
 
   RecruiterJobDto _stubJob(String id) => RecruiterJobDto(
-        id: id,
-        title: 'T',
-        description: 'D',
-        locations: const ['BLR'],
-        minExpYears: 1,
-        maxExpYears: 3,
-        status: 'open',
-        postedAt: DateTime.utc(2026),
-        employerVerified: true,
-      );
+    id: id,
+    title: 'T',
+    description: 'D',
+    locations: const ['BLR'],
+    minExpYears: 1,
+    maxExpYears: 3,
+    status: 'open',
+    postedAt: DateTime.utc(2026),
+    employerVerified: true,
+  );
 
   @override
   Future<RecruiterJobsPageDto> listMyJobs({
     String? status,
     String? cursor,
     int limit = 20,
-  }) async =>
-      const RecruiterJobsPageDto(items: []);
+  }) async => const RecruiterJobsPageDto(items: []);
 
   @override
   Future<RecruiterJobDto> createJob(Map<String, dynamic> body) async {
@@ -71,8 +70,7 @@ class _FakeRepo implements RecruiterJobsRepository {
     String jobId, {
     String? cursor,
     int limit = 20,
-  }) async =>
-      throw UnimplementedError();
+  }) async => throw UnimplementedError();
 
   @override
   Future<ResumeDownload> downloadResume(String applicationId) async =>
@@ -83,8 +81,7 @@ class _FakeRepo implements RecruiterJobsRepository {
     String jobId,
     String applicationId,
     ApplicationStage stage,
-  ) async =>
-      throw UnimplementedError();
+  ) async => throw UnimplementedError();
 }
 
 const _testData = JobFormData(
@@ -150,9 +147,7 @@ void main() {
     test('success: calls repo once and state hasValue', () async {
       final fake = _FakeRepo();
       final container = ProviderContainer(
-        overrides: [
-          recruiterJobsRepositoryProvider.overrideWithValue(fake),
-        ],
+        overrides: [recruiterJobsRepositoryProvider.overrideWithValue(fake)],
       );
       addTearDown(container.dispose);
 
@@ -167,9 +162,7 @@ void main() {
     test('success: create body sent to repo contains employer_id', () async {
       final fake = _FakeRepo();
       final container = ProviderContainer(
-        overrides: [
-          recruiterJobsRepositoryProvider.overrideWithValue(fake),
-        ],
+        overrides: [recruiterJobsRepositoryProvider.overrideWithValue(fake)],
       );
       addTearDown(container.dispose);
 
@@ -183,9 +176,7 @@ void main() {
     test('error: state hasError when repo throws ApiException', () async {
       final fake = _FakeRepo(throwOnCreate: true);
       final container = ProviderContainer(
-        overrides: [
-          recruiterJobsRepositoryProvider.overrideWithValue(fake),
-        ],
+        overrides: [recruiterJobsRepositoryProvider.overrideWithValue(fake)],
       );
       addTearDown(container.dispose);
 
@@ -201,9 +192,7 @@ void main() {
     test('success: calls patchJob once and state hasValue', () async {
       final fake = _FakeRepo();
       final container = ProviderContainer(
-        overrides: [
-          recruiterJobsRepositoryProvider.overrideWithValue(fake),
-        ],
+        overrides: [recruiterJobsRepositoryProvider.overrideWithValue(fake)],
       );
       addTearDown(container.dispose);
 
@@ -218,9 +207,7 @@ void main() {
     test('error: state hasError when patch throws', () async {
       final fake = _FakeRepo(throwOnPatch: true);
       final container = ProviderContainer(
-        overrides: [
-          recruiterJobsRepositoryProvider.overrideWithValue(fake),
-        ],
+        overrides: [recruiterJobsRepositoryProvider.overrideWithValue(fake)],
       );
       addTearDown(container.dispose);
 
@@ -236,9 +223,7 @@ void main() {
     test('sends status=closed and state hasValue', () async {
       final fake = _FakeRepo();
       final container = ProviderContainer(
-        overrides: [
-          recruiterJobsRepositoryProvider.overrideWithValue(fake),
-        ],
+        overrides: [recruiterJobsRepositoryProvider.overrideWithValue(fake)],
       );
       addTearDown(container.dispose);
 
@@ -254,9 +239,7 @@ void main() {
     test('calls deleteJob once and state hasValue(null)', () async {
       final fake = _FakeRepo();
       final container = ProviderContainer(
-        overrides: [
-          recruiterJobsRepositoryProvider.overrideWithValue(fake),
-        ],
+        overrides: [recruiterJobsRepositoryProvider.overrideWithValue(fake)],
       );
       addTearDown(container.dispose);
 

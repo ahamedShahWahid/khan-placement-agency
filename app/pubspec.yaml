@@ -4,8 +4,14 @@ publish_to: 'none'
 version: 0.1.0+1
 
 environment:
-  sdk: ^3.6.0
-  flutter: ">=3.27.0"
+  # Dart ^3.7 is a HARD floor, not a preference: dev_dependency
+  # build_runner 2.15.0 declares `sdk: ^3.7.0`, so `flutter pub get` fails to
+  # resolve on anything older. This previously said ^3.6.0 and only "worked"
+  # because everyone happened to have a newer SDK installed — CI had to pin
+  # flutter-version 3.44.x to work around it. Flutter 3.29 is the first
+  # release shipping Dart 3.7; CI pins 3.44.x (Dart 3.12).
+  sdk: ^3.7.0
+  flutter: ">=3.29.0"
 
 dependencies:
   flutter:

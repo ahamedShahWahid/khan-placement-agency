@@ -66,10 +66,7 @@ class RecruiterJobDto {
 /// Mirrors the paginated /v1/jobs/me response.
 @JsonSerializable()
 class RecruiterJobsPageDto {
-  const RecruiterJobsPageDto({
-    required this.items,
-    this.nextCursor,
-  });
+  const RecruiterJobsPageDto({required this.items, this.nextCursor});
 
   factory RecruiterJobsPageDto.fromJson(Map<String, dynamic> json) =>
       _$RecruiterJobsPageDtoFromJson(json);

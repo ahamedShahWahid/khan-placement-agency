@@ -1,6 +1,7 @@
 """Notification inbox endpoints.
 
-GET  /v1/notifications                     — paginated inbox for current applicant.
+GET  /v1/notifications                     — paginated inbox for the current user
+                                             (any role — see the handler note).
 POST /v1/notifications/{notification_id}/read — mark a notification as read.
 
 Cursor format: base64 of {"created_at": ISO8601, "notification_id": uuid}.
@@ -27,12 +28,7 @@ from jobify.db.models import (
     NotificationStatus,
     User,
 )
-from jobify_api.auth.dependencies import (
-    current_user,
-)
-from jobify_api.auth.dependencies import (
-    require_applicant as _require_applicant,
-)
+from jobify_api.auth.dependencies import current_user
 from jobify_api.dependencies import get_session
 from jobify_api.pagination import decode_cursor, encode_cursor, make_weak_etag
 
@@ -112,13 +108,19 @@ async def list_notifications(
     limit: int = Query(20, ge=1, le=50),
     cursor: str | None = Query(None),
 ) -> NotificationListResponse | Response:
-    """Paginated list of the current applicant's notifications.
+    """Paginated list of the current user's notifications.
 
     Returns pending, dispatching, and sent rows. Failed rows are excluded
     (admin-only). Cursor: base64 of {"created_at": ISO8601, "notification_id": uuid}.
     Order: created_at DESC, id DESC. ETag: W/"sha256(user_id|max_updated_at|count)".
+
+    Open to ANY authenticated role, not just applicants: `notifications.user_id`
+    is the only scope that matters, and recruiters legitimately receive rows
+    (kind `employer_invite` is written for an invited email that already maps to
+    a user — who may already be a recruiter at another employer). Gating on
+    `require_applicant` made those rows unreachable for the very person they
+    were addressed to.
     """
-    await _require_applicant(user, session)
 
     cursor_created_at: datetime | None = None
     cursor_notif_id: uuid.UUID | None = None
@@ -196,8 +198,8 @@ async def mark_notification_read(
 
     Scoped to the current user. 404 for missing or another user's notification.
     Idempotent: already-read notifications return 200 with the existing read_at.
+    Any authenticated role — see the inbox handler's note on `employer_invite`.
     """
-    await _require_applicant(user, session)
 
     notification = (
         await session.execute(

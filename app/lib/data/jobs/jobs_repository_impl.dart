@@ -39,10 +39,10 @@ class JobsRepositoryImpl implements JobsRepository {
   }
 
   static String _sourceToWire(ApplicationSource s) => switch (s) {
-        ApplicationSource.feed => 'feed',
-        ApplicationSource.detail => 'detail',
-        ApplicationSource.unknown => 'unknown',
-      };
+    ApplicationSource.feed => 'feed',
+    ApplicationSource.detail => 'detail',
+    ApplicationSource.unknown => 'unknown',
+  };
 
   @override
   Future<SavedJobDto> save(String jobId) async {

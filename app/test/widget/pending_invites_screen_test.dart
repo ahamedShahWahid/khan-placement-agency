@@ -18,10 +18,7 @@ class _RefreshFailsAuthRepository extends FakeAuthRepository {
   Future<SignedIn> refreshSession() async => throw Exception('refresh down');
 }
 
-Widget _wrap(
-  FakeEmployerTeamRepository repo, {
-  AuthRepository? auth,
-}) =>
+Widget _wrap(FakeEmployerTeamRepository repo, {AuthRepository? auth}) =>
     ProviderScope(
       overrides: [
         employerTeamRepositoryProvider.overrideWithValue(repo),
@@ -66,8 +63,9 @@ void main() {
     expect(repo.acceptedId, 'inv42');
   });
 
-  testWidgets('accept still succeeds when the post-accept refresh fails',
-      (tester) async {
+  testWidgets('accept still succeeds when the post-accept refresh fails', (
+    tester,
+  ) async {
     final repo = FakeEmployerTeamRepository(
       myInvites: [fakeMyInvite(id: 'inv9', employerName: 'Globex')],
     );

@@ -46,10 +46,7 @@ class _FakeAuthRepo implements AuthRepository {
   Future<void> signOut() async {}
 }
 
-ProviderContainer _container({
-  TokenStorage? storage,
-  AuthRepository? repo,
-}) {
+ProviderContainer _container({TokenStorage? storage, AuthRepository? repo}) {
   return ProviderContainer(
     overrides: [
       tokenStorageProvider.overrideWithValue(storage ?? _FakeStorage()),

@@ -60,6 +60,16 @@ def upgrade() -> None:
     )
     # HNSW + cosine ops because §6.3 specifies cosine similarity for matching.
     # HNSW at pgvector defaults (m=16, ef_construction=64) — fine for MVP scale.
+    #
+    # NOTE: nothing QUERIES this index yet. Similarity is computed in pure
+    # Python (`jobify.scoring.vector`) because the score workers walk the full
+    # open-jobs / all-applicants list rather than a top-K, and /v1/feed orders
+    # by the precomputed `matches.total_score` via a btree partial index. So
+    # today this is write-side cost only (graph maintenance on every embed
+    # UPSERT). It is the deliberate substrate for the top-K ANN swap
+    # IMPLEMENTATION_SPEC §15 flags as necessary once applicant x job reaches
+    # the millions — the first `ORDER BY embedding <=> :q LIMIT n` query needs
+    # it to already exist. Don't assume the feed is ANN-backed; it isn't.
     # Mirrors the applicant-side index from 0004.
     op.execute(
         "CREATE INDEX ix_job_embeddings_hnsw "

@@ -8,14 +8,14 @@ import 'package:jobify_app/data/resume/resume_repository_impl.dart';
 import 'package:jobify_app/presentation/resume/resume_controller.dart';
 
 ResumeDto _dto(String id, ResumeParseStatus s) => ResumeDto(
-      id: id,
-      applicantId: 'a1',
-      originalFilename: 'cv.pdf',
-      contentType: 'application/pdf',
-      sizeBytes: 1,
-      parseStatus: s,
-      createdAt: DateTime(2026),
-    );
+  id: id,
+  applicantId: 'a1',
+  originalFilename: 'cv.pdf',
+  contentType: 'application/pdf',
+  sizeBytes: 1,
+  parseStatus: s,
+  createdAt: DateTime(2026),
+);
 
 class _Repo implements ResumeRepository {
   _Repo({this.initial, this.fail = false});
@@ -50,17 +50,17 @@ void main() {
 
   test('upload success sets the new resume as state', () async {
     final c = ProviderContainer(
-      overrides: [
-        resumeRepositoryProvider.overrideWithValue(_Repo()),
-      ],
+      overrides: [resumeRepositoryProvider.overrideWithValue(_Repo())],
     );
     addTearDown(c.dispose);
     await c.read(resumeControllerProvider.future);
-    final ok = await c.read(resumeControllerProvider.notifier).uploadFromPicked(
-      bytes: const [1],
-      filename: 'cv.pdf',
-      contentType: 'application/pdf',
-    );
+    final ok = await c
+        .read(resumeControllerProvider.notifier)
+        .uploadFromPicked(
+          bytes: const [1],
+          filename: 'cv.pdf',
+          contentType: 'application/pdf',
+        );
     expect(ok, isTrue);
     expect(
       c.read(resumeControllerProvider).value?.parseStatus,
@@ -76,11 +76,13 @@ void main() {
     );
     addTearDown(c.dispose);
     await c.read(resumeControllerProvider.future);
-    final ok = await c.read(resumeControllerProvider.notifier).uploadFromPicked(
-      bytes: const [1],
-      filename: 'cv.pdf',
-      contentType: 'application/pdf',
-    );
+    final ok = await c
+        .read(resumeControllerProvider.notifier)
+        .uploadFromPicked(
+          bytes: const [1],
+          filename: 'cv.pdf',
+          contentType: 'application/pdf',
+        );
     expect(ok, isFalse);
     expect(c.read(resumeControllerProvider).hasError, isTrue);
   });

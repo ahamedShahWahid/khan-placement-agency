@@ -10,10 +10,7 @@ class ApplicationsApi {
   Future<ApplicationsPageDto> list({String? cursor, int limit = 20}) async {
     final res = await _dio.get<Map<String, dynamic>>(
       '/v1/applications',
-      queryParameters: {
-        'limit': limit,
-        if (cursor != null) 'cursor': cursor,
-      },
+      queryParameters: {'limit': limit, if (cursor != null) 'cursor': cursor},
     );
     return ApplicationsPageDto.fromJson(res.data!);
   }
@@ -27,8 +24,9 @@ class ApplicationsApi {
   }
 
   Future<ApplicationTimelineDto> fetchTimeline(String applicationId) async {
-    final res = await _dio
-        .get<Map<String, dynamic>>('/v1/applications/$applicationId/timeline');
+    final res = await _dio.get<Map<String, dynamic>>(
+      '/v1/applications/$applicationId/timeline',
+    );
     return ApplicationTimelineDto.fromJson(res.data!);
   }
 }

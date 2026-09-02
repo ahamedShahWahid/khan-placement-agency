@@ -134,16 +134,17 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                     foregroundColor: theme.colorScheme.onError,
                   ),
                   onPressed: enabled ? () => _attemptDelete(context) : null,
-                  child: isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Text(l10n.privacyDeleteAccountButton),
+                  child:
+                      isLoading
+                          ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                          : Text(l10n.privacyDeleteAccountButton),
                 );
               },
             ),
@@ -172,9 +173,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text('• '),
-                Expanded(
-                  child: Text(text, style: theme.textTheme.bodyMedium),
-                ),
+                Expanded(child: Text(text, style: theme.textTheme.bodyMedium)),
               ],
             ),
           ),
@@ -186,24 +185,25 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
     final l10n = context.l10n;
     final ok = await showDialog<bool>(
       context: context,
-      builder: (c) => AlertDialog(
-        title: Text(l10n.deleteAccountConfirmDialogTitle),
-        content: Text(l10n.deleteAccountConfirmDialogBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(c, false),
-            child: Text(l10n.commonCancel),
+      builder:
+          (c) => AlertDialog(
+            title: Text(l10n.deleteAccountConfirmDialogTitle),
+            content: Text(l10n.deleteAccountConfirmDialogBody),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(c, false),
+                child: Text(l10n.commonCancel),
+              ),
+              FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: Theme.of(c).colorScheme.error,
+                  foregroundColor: Theme.of(c).colorScheme.onError,
+                ),
+                onPressed: () => Navigator.pop(c, true),
+                child: Text(l10n.deleteAccountYesDeleteButton),
+              ),
+            ],
           ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(c).colorScheme.error,
-              foregroundColor: Theme.of(c).colorScheme.onError,
-            ),
-            onPressed: () => Navigator.pop(c, true),
-            child: Text(l10n.deleteAccountYesDeleteButton),
-          ),
-        ],
-      ),
     );
     if (!(ok ?? false)) return;
     await ref.read(deleteAccountControllerProvider.notifier).submit();

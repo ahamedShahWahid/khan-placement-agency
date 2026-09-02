@@ -8,12 +8,12 @@ import 'package:jobify_app/presentation/recruiter/recruiter_dashboard_screen.dar
 import '../helpers/fake_recruiter_jobs_repository.dart';
 
 Widget _wrap(FakeRecruiterJobsRepository repo) => ProviderScope(
-      overrides: [recruiterJobsRepositoryProvider.overrideWithValue(repo)],
-      child: MaterialApp(
-        theme: ThemeData.light(useMaterial3: true),
-        home: const RecruiterDashboardScreen(),
-      ),
-    );
+  overrides: [recruiterJobsRepositoryProvider.overrideWithValue(repo)],
+  child: MaterialApp(
+    theme: ThemeData.light(useMaterial3: true),
+    home: const RecruiterDashboardScreen(),
+  ),
+);
 
 void main() {
   testWidgets('shows empty CTA when there are no jobs', (tester) async {

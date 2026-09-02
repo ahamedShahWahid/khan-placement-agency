@@ -16,15 +16,15 @@ final class FeedRepositoryProvider
     extends $FunctionalProvider<FeedRepository, FeedRepository, FeedRepository>
     with $Provider<FeedRepository> {
   FeedRepositoryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'feedRepositoryProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'feedRepositoryProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$feedRepositoryHash();

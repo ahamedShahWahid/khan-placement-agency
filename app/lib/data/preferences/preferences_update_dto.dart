@@ -19,9 +19,11 @@ import 'package:jobify_app/data/preferences/desired_role.dart';
 /// includeIfNull: false)` on this project's installed json_serializable +
 /// Dart SDK combination emits generated code using the "null-aware
 /// elements" collection-literal syntax (`'key': ?value`), which this
-/// project's declared language version (pubspec.yaml `sdk: ^3.6.0`) does
-/// not support — build_runner fails with a FormatterException. A
-/// hand-written toJson() avoids the codegen path entirely.
+/// project's declared language version (pubspec.yaml `sdk: ^3.7.0`) does
+/// not support — null-aware elements landed in Dart 3.8, so build_runner
+/// still fails with a FormatterException. A hand-written toJson() avoids the
+/// codegen path entirely; raising the pubspec floor to ^3.8.0 would let the
+/// generated code compile and this could go back to `@JsonSerializable`.
 class PreferencesUpdateDto {
   const PreferencesUpdateDto({
     required this.desiredRole,
@@ -43,13 +45,13 @@ class PreferencesUpdateDto {
   final String language;
 
   Map<String, dynamic> toJson() => {
-        // `unknown` = the server sent a role this app build doesn't know;
-        // omit the key so saving preserves it (an explicit null would
-        // CLEAR it).
-        if (desiredRole != DesiredRole.unknown)
-          'desired_role': desiredRole?.wireValue,
-        'locations': locations,
-        'expected_ctc': expectedCtc,
-        'language': language,
-      };
+    // `unknown` = the server sent a role this app build doesn't know;
+    // omit the key so saving preserves it (an explicit null would
+    // CLEAR it).
+    if (desiredRole != DesiredRole.unknown)
+      'desired_role': desiredRole?.wireValue,
+    'locations': locations,
+    'expected_ctc': expectedCtc,
+    'language': language,
+  };
 }

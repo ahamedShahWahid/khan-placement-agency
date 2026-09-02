@@ -187,8 +187,9 @@ class _ClosedPill extends StatelessWidget {
       ),
       child: Text(
         context.l10n.feedClosedPill,
-        style: theme.textTheme.labelSmall
-            ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
       ),
     );
   }

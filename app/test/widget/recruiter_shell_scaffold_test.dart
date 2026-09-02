@@ -17,51 +17,52 @@ class _Stub extends StatelessWidget {
 }
 
 GoRouter _buildRouter() => GoRouter(
-      initialLocation: '/recruiter/dashboard',
-      routes: [
-        StatefulShellRoute.indexedStack(
-          builder: (_, __, shell) => JobifyRecruiterShellScaffold(shell: shell),
-          branches: [
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: '/recruiter/dashboard',
-                  builder: (_, __) => const _Stub('DASH BODY'),
-                ),
-              ],
+  initialLocation: '/recruiter/dashboard',
+  routes: [
+    StatefulShellRoute.indexedStack(
+      builder: (_, __, shell) => JobifyRecruiterShellScaffold(shell: shell),
+      branches: [
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/recruiter/dashboard',
+              builder: (_, __) => const _Stub('DASH BODY'),
             ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: '/recruiter/jobs',
-                  builder: (_, __) => const _Stub('JOBS BODY'),
-                ),
-              ],
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/recruiter/jobs',
+              builder: (_, __) => const _Stub('JOBS BODY'),
             ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: '/recruiter/employer',
-                  builder: (_, __) => const _Stub('EMPLOYER BODY'),
-                ),
-              ],
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/recruiter/employer',
+              builder: (_, __) => const _Stub('EMPLOYER BODY'),
             ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: '/recruiter/profile',
-                  builder: (_, __) => const _Stub('PROFILE BODY'),
-                ),
-              ],
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/recruiter/profile',
+              builder: (_, __) => const _Stub('PROFILE BODY'),
             ),
           ],
         ),
       ],
-    );
+    ),
+  ],
+);
 
 void main() {
-  testWidgets('recruiter shell shows four tabs and switches branches',
-      (tester) async {
+  testWidgets('recruiter shell shows four tabs and switches branches', (
+    tester,
+  ) async {
     final router = _buildRouter();
 
     await tester.pumpWidget(
@@ -84,8 +85,7 @@ void main() {
     expect(find.text('JOBS BODY'), findsOneWidget);
   });
 
-  testWidgets(
-      'entering the recruiter shell with Locale(hi) already set forces '
+  testWidgets('entering the recruiter shell with Locale(hi) already set forces '
       'English (recruiter surfaces are English-only)', (tester) async {
     final container = ProviderContainer();
     addTearDown(container.dispose);

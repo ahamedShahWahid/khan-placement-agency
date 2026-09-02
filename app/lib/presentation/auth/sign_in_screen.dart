@@ -46,9 +46,9 @@ class SignInScreen extends ConsumerWidget {
             _ => context.l10n.authSignInFailed,
           };
           if (msg != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(msg)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(msg)));
           }
         },
       );
@@ -78,12 +78,15 @@ class SignInScreen extends ConsumerWidget {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final wide = constraints.maxWidth >= 820;
-                final sceneSize = wide
-                    ? 420.0
-                    : (constraints.maxWidth - 48).clamp(0, 340).toDouble();
+                final sceneSize =
+                    wide
+                        ? 420.0
+                        : (constraints.maxWidth - 48).clamp(0, 340).toDouble();
                 final intro = _Intro(isLoading: isLoading, wide: wide);
-                final scene =
-                    Arrive(index: 1, child: _ArrivalScene(size: sceneSize));
+                final scene = Arrive(
+                  index: 1,
+                  child: _ArrivalScene(size: sceneSize),
+                );
                 return Center(
                   child: SingleChildScrollView(
                     child: ConstrainedBox(
@@ -93,26 +96,27 @@ class SignInScreen extends ConsumerWidget {
                           horizontal: wide ? 56 : JobifySpacing.xl,
                           vertical: wide ? 48 : JobifySpacing.xxl,
                         ),
-                        child: wide
-                            ? Row(
-                                children: [
-                                  Expanded(flex: 5, child: intro),
-                                  const SizedBox(width: 40),
-                                  Expanded(
-                                    flex: 4,
-                                    child: Center(child: scene),
-                                  ),
-                                ],
-                              )
-                            : Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Center(child: scene),
-                                  const SizedBox(height: 36),
-                                  intro,
-                                ],
-                              ),
+                        child:
+                            wide
+                                ? Row(
+                                  children: [
+                                    Expanded(flex: 5, child: intro),
+                                    const SizedBox(width: 40),
+                                    Expanded(
+                                      flex: 4,
+                                      child: Center(child: scene),
+                                    ),
+                                  ],
+                                )
+                                : Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Center(child: scene),
+                                    const SizedBox(height: 36),
+                                    intro,
+                                  ],
+                                ),
                       ),
                     ),
                   ),
@@ -184,10 +188,10 @@ class _Wordmark extends StatelessWidget {
         Text(
           context.l10n.authWordmark,
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.5,
-              ),
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.5,
+          ),
         ),
         const SizedBox(width: 8),
         Container(
@@ -358,19 +362,17 @@ class _ArrivalSceneState extends State<_ArrivalScene>
             final p = (t + i / n) % 1.0;
             final radius =
                 rStart + (rEnd - rStart) * Curves.easeIn.transform(p);
-            final op = reduced
-                ? 0.9
-                : (p < _kFadeIn
-                    ? p / _kFadeIn
-                    : (p > _kFadeOut ? (1 - p) / (1 - _kFadeOut) : 1.0));
+            final op =
+                reduced
+                    ? 0.9
+                    : (p < _kFadeIn
+                        ? p / _kFadeIn
+                        : (p > _kFadeOut ? (1 - p) / (1 - _kFadeOut) : 1.0));
             children.add(
               Center(
                 child: Transform.translate(
                   offset: Offset(_cos[i] * radius, _sin[i] * radius),
-                  child: Opacity(
-                    opacity: op.clamp(0.0, 1.0),
-                    child: _chips[i],
-                  ),
+                  child: Opacity(opacity: op.clamp(0.0, 1.0), child: _chips[i]),
                 ),
               ),
             );
@@ -458,25 +460,29 @@ class _SignInBlock extends ConsumerWidget {
         disabledBackgroundColor: Colors.white.withValues(alpha: 0.7),
         padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
       ),
-      icon: isLoading
-          ? const SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: JobifyColors.brandCanvasMid,
-              ),
-            )
-          : const Icon(Icons.login),
+      icon:
+          isLoading
+              ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: JobifyColors.brandCanvasMid,
+                ),
+              )
+              : const Icon(Icons.login),
       label: Text(
         isLoading
             ? context.l10n.authSigningIn
             : context.l10n.authContinueWithGoogle,
       ),
-      onPressed: isLoading
-          ? null
-          : () =>
-              ref.read(signInControllerProvider.notifier).signInWithGoogle(),
+      onPressed:
+          isLoading
+              ? null
+              : () =>
+                  ref
+                      .read(signInControllerProvider.notifier)
+                      .signInWithGoogle(),
     );
   }
 }
@@ -494,19 +500,23 @@ class _WebSignInButton extends ConsumerWidget {
     if (isLoading) {
       return const _LightSpinner();
     }
-    return ref.watch(googleWebSignInProvider).when(
-          data: (google) => Align(
-            alignment: Alignment.centerLeft,
-            child: google.button(),
-          ),
+    return ref
+        .watch(googleWebSignInProvider)
+        .when(
+          data:
+              (google) => Align(
+                alignment: Alignment.centerLeft,
+                child: google.button(),
+              ),
           loading: () => const _LightSpinner(),
-          error: (_, __) => Text(
-            context.l10n.authGoogleSignInLoadError,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          error:
+              (_, __) => Text(
+                context.l10n.authGoogleSignInLoadError,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Colors.white.withValues(alpha: 0.8),
                 ),
-          ),
+              ),
         );
   }
 }
@@ -516,8 +526,8 @@ class _LightSpinner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const SizedBox(
-        width: 24,
-        height: 24,
-        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-      );
+    width: 24,
+    height: 24,
+    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+  );
 }

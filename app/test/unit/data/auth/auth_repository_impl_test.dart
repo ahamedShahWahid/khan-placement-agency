@@ -51,7 +51,8 @@ class _FakeGoogle implements GoogleSignInDataSource {
   _InMemoryStorage storage,
   MockInterceptor mock,
   List<AuthState> emitted,
-}) _buildHarness({
+})
+_buildHarness({
   String? storedRefreshToken,
   String? googleIdToken = 'GOOGLE_ID_TOKEN',
 }) {
@@ -96,46 +97,40 @@ Map<String, dynamic> _signInBody({
   String userId = 'uid-1',
   String email = 'user@example.com',
   String? displayName = 'Test User',
-}) =>
-    {
-      'access_token': access,
-      'refresh_token': refresh,
-      'user': {
-        'id': userId,
-        'email': email,
-        'role': 'applicant',
-        'display_name': displayName,
-      },
-    };
+}) => {
+  'access_token': access,
+  'refresh_token': refresh,
+  'user': {
+    'id': userId,
+    'email': email,
+    'role': 'applicant',
+    'display_name': displayName,
+  },
+};
 
 Map<String, dynamic> _refreshBody({
   String access = 'NEW_ACCESS',
   String refresh = 'NEW_REFRESH',
-}) =>
-    {
-      'access_token': access,
-      'refresh_token': refresh,
-    };
+}) => {'access_token': access, 'refresh_token': refresh};
 
 Map<String, dynamic> _meBody({
   String userId = 'uid-1',
   String email = 'user@example.com',
   String? displayName = 'Test User',
-}) =>
-    {
-      'id': userId,
-      'email': email,
-      'role': 'applicant',
-      'display_name': displayName,
-    };
+}) => {
+  'id': userId,
+  'email': email,
+  'role': 'applicant',
+  'display_name': displayName,
+};
 
 Map<String, dynamic> body401() => {
-      'type': 'about:blank',
-      'title': 'Unauthorized',
-      'status': 401,
-      'slug': 'invalid_access_token',
-      'detail': 'Token expired.',
-    };
+  'type': 'about:blank',
+  'title': 'Unauthorized',
+  'status': 401,
+  'slug': 'invalid_access_token',
+  'detail': 'Token expired.',
+};
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -144,72 +139,75 @@ Map<String, dynamic> body401() => {
 void main() {
   group('AuthRepositoryImpl', () {
     // 1. signInWithGoogle: 200 → SignedIn, holder set, storage written, emit.
-    test('signInWithGoogle: 200 → returns SignedIn and persists tokens',
-        () async {
-      final h = _buildHarness();
-      h.mock.on('POST', '/v1/auth/oauth/google', 200, _signInBody());
+    test(
+      'signInWithGoogle: 200 → returns SignedIn and persists tokens',
+      () async {
+        final h = _buildHarness();
+        h.mock.on('POST', '/v1/auth/oauth/google', 200, _signInBody());
 
-      final result = await h.repo.signInWithGoogle();
+        final result = await h.repo.signInWithGoogle();
 
-      expect(result.userId, 'uid-1');
-      expect(result.email, 'user@example.com');
-      expect(result.displayName, 'Test User');
+        expect(result.userId, 'uid-1');
+        expect(result.email, 'user@example.com');
+        expect(result.displayName, 'Test User');
 
-      // Holder has access token.
-      expect(h.holder.current, 'ACCESS_TOKEN');
-      // Storage has refresh token.
-      expect(await h.storage.readRefreshToken(), 'REFRESH_TOKEN');
+        // Holder has access token.
+        expect(h.holder.current, 'ACCESS_TOKEN');
+        // Storage has refresh token.
+        expect(await h.storage.readRefreshToken(), 'REFRESH_TOKEN');
 
-      // Emitted: Authenticating → SignedIn.
-      expect(h.emitted.length, 2);
-      expect(h.emitted[0], isA<Authenticating>());
-      expect(h.emitted[1], isA<SignedIn>());
-      final emittedIn = h.emitted[1] as SignedIn;
-      expect(emittedIn.userId, 'uid-1');
-      expect(emittedIn.email, 'user@example.com');
-    });
+        // Emitted: Authenticating → SignedIn.
+        expect(h.emitted.length, 2);
+        expect(h.emitted[0], isA<Authenticating>());
+        expect(h.emitted[1], isA<SignedIn>());
+        final emittedIn = h.emitted[1] as SignedIn;
+        expect(emittedIn.userId, 'uid-1');
+        expect(emittedIn.email, 'user@example.com');
+      },
+    );
 
     // 1b. signInWithGoogle: role field is parsed from the OAuth exchange
     // response.
-    test('signInWithGoogle: role is parsed from the exchange response',
-        () async {
-      final h = _buildHarness();
-      h.mock.on(
-        'POST',
-        '/v1/auth/oauth/google',
-        200,
-        _signInBody()
-          ..['user'] = {
-            'id': 'uid-1',
-            'email': 'user@example.com',
-            'role': 'recruiter',
-            'display_name': 'Test User',
-          },
-      );
+    test(
+      'signInWithGoogle: role is parsed from the exchange response',
+      () async {
+        final h = _buildHarness();
+        h.mock.on(
+          'POST',
+          '/v1/auth/oauth/google',
+          200,
+          _signInBody()
+            ..['user'] = {
+              'id': 'uid-1',
+              'email': 'user@example.com',
+              'role': 'recruiter',
+              'display_name': 'Test User',
+            },
+        );
 
-      final result = await h.repo.signInWithGoogle();
+        final result = await h.repo.signInWithGoogle();
 
-      expect(result.role, UserRole.recruiter);
-    });
+        expect(result.role, UserRole.recruiter);
+      },
+    );
 
     // 2. signInWithGoogle: 401 → throws AuthException; emits SignedOut.
-    test('signInWithGoogle: 401 → throws AuthException and emits SignedOut',
-        () async {
-      final h = _buildHarness();
-      h.mock.on('POST', '/v1/auth/oauth/google', 401, body401());
+    test(
+      'signInWithGoogle: 401 → throws AuthException and emits SignedOut',
+      () async {
+        final h = _buildHarness();
+        h.mock.on('POST', '/v1/auth/oauth/google', 401, body401());
 
-      await expectLater(
-        h.repo.signInWithGoogle(),
-        throwsA(isA<Exception>()),
-      );
+        await expectLater(h.repo.signInWithGoogle(), throwsA(isA<Exception>()));
 
-      // Must have emitted Authenticating → SignedOut.
-      expect(h.emitted.length, 2);
-      expect(h.emitted[0], isA<Authenticating>());
-      expect(h.emitted[1], isA<SignedOut>());
-      // Holder must NOT have been set.
-      expect(h.holder.current, isNull);
-    });
+        // Must have emitted Authenticating → SignedOut.
+        expect(h.emitted.length, 2);
+        expect(h.emitted[0], isA<Authenticating>());
+        expect(h.emitted[1], isA<SignedOut>());
+        // Holder must NOT have been set.
+        expect(h.holder.current, isNull);
+      },
+    );
 
     // 3. refreshSession: no stored token → throws AuthException
     // no_refresh_token.
@@ -251,8 +249,9 @@ void main() {
 
       // Request body must use the backend's `refresh_token` key
       // (not `refresh`).
-      final reqData = h.mock.lastDataFor('POST', '/v1/auth/refresh')!
-          as Map<String, dynamic>;
+      final reqData =
+          h.mock.lastDataFor('POST', '/v1/auth/refresh')!
+              as Map<String, dynamic>;
       expect(reqData['refresh_token'], 'OLD_REFRESH');
 
       // Emitted SignedIn.
@@ -261,17 +260,13 @@ void main() {
     });
 
     // 5. refreshSession: 401 from /v1/auth/refresh → clear + emit SignedOut + throws.
-    test(
-        'refreshSession: 401 from refresh endpoint → clears tokens and '
+    test('refreshSession: 401 from refresh endpoint → clears tokens and '
         'emits SignedOut', () async {
       final h = _buildHarness(storedRefreshToken: 'OLD_REFRESH');
       h.holder.set('OLD_ACCESS');
       h.mock.on('POST', '/v1/auth/refresh', 401, body401());
 
-      await expectLater(
-        h.repo.refreshSession(),
-        throwsA(isA<Exception>()),
-      );
+      await expectLater(h.repo.refreshSession(), throwsA(isA<Exception>()));
 
       // Holder cleared.
       expect(h.holder.current, isNull);
@@ -283,8 +278,7 @@ void main() {
     });
 
     // 6. signOut: clears everything even if /v1/auth/logout returns 500.
-    test(
-        'signOut: clears holder + storage + emits SignedOut even if '
+    test('signOut: clears holder + storage + emits SignedOut even if '
         'logout fails', () async {
       final h = _buildHarness(storedRefreshToken: 'REFRESH');
       h.holder.set('ACCESS');

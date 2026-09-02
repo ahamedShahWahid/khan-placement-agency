@@ -30,10 +30,7 @@ void main() {
   testWidgets('renders three v0-visible consent toggles', (tester) async {
     final fakeConsents = FakeConsentsRepository();
     await tester.pumpWidget(
-      _buildApp(
-        consents: fakeConsents,
-        dsr: FakeDsrRepository(),
-      ),
+      _buildApp(consents: fakeConsents, dsr: FakeDsrRepository()),
     );
     await tester.pumpAndSettle();
 
@@ -48,10 +45,7 @@ void main() {
   testWidgets('toggling email_marketing calls patch()', (tester) async {
     final fakeConsents = FakeConsentsRepository();
     await tester.pumpWidget(
-      _buildApp(
-        consents: fakeConsents,
-        dsr: FakeDsrRepository(),
-      ),
+      _buildApp(consents: fakeConsents, dsr: FakeDsrRepository()),
     );
     await tester.pumpAndSettle();
 
@@ -63,14 +57,12 @@ void main() {
     expect(fakeConsents.patchCallCount, 1);
   });
 
-  testWidgets('toggling email_transactional OFF shows confirmation dialog',
-      (tester) async {
+  testWidgets('toggling email_transactional OFF shows confirmation dialog', (
+    tester,
+  ) async {
     final fakeConsents = FakeConsentsRepository();
     await tester.pumpWidget(
-      _buildApp(
-        consents: fakeConsents,
-        dsr: FakeDsrRepository(),
-      ),
+      _buildApp(consents: fakeConsents, dsr: FakeDsrRepository()),
     );
     await tester.pumpAndSettle();
 
