@@ -134,6 +134,16 @@ def test_llm_parser_meets_quality_gate() -> None:
         text = f"{type(cause).__name__}: {cause}" if cause else str(exc)
         if any(sig in text for sig in ("PERMISSION_DENIED", "INVALID_ARGUMENT", "NOT_FOUND")):
             return False
+        # A 429 is two different failures wearing one status. The per-minute
+        # ceiling is transient -- the pacing above is the primary defence and
+        # retry is the net, so RESOURCE_EXHAUSTED on its own must stay
+        # retryable. Depleted billing credits are permanent, and on 2026-09-03
+        # that cost 93s of backoff before surfacing the real message. Match the
+        # message body, not the status. Lowercased into its own name because the
+        # ALL-CAPS signatures above are deliberately case-sensitive.
+        lowered = text.lower()
+        if any(sig in lowered for sig in ("prepayment credits", "credits are depleted")):
+            return False
         return True
 
     async def _parse_one(text: str) -> ParsedResume:
