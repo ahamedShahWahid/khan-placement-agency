@@ -55,7 +55,11 @@ class WorkerSettings(BaseSettings):
     match_explainer: Literal["templated", "llm"] = "llm"
     match_explainer_model: str = "gemini-2.5-flash"
     resume_parser: Literal["library", "llm"] = "llm"
-    resume_parser_model: str = "gemini-2.5-flash"
+    # 2026-09-08: 3.1 Flash-Lite beat 2.5 Flash on the extraction yardstick
+    # (0.973 vs 0.952 synthetic, 0.926 vs 0.937 real, skills FP 7 vs 97) at
+    # ~1/3 the output price. The explainer stays on 2.5 Flash: the lite model
+    # invents facts in explanations (LLM_EVAL_REPORT.md appendix).
+    resume_parser_model: str = "gemini-3.1-flash-lite"
     score_batch_size: int = Field(default=100, ge=1, le=1000)
 
     email_channel: Literal["logging", "ses"] = "logging"

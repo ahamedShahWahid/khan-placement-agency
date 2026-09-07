@@ -51,11 +51,13 @@ contract. Fuzzy matching was rejected: every threshold is an argument, and
 it hides exactly the sloppiness the number should expose. Dates are not
 scored in v1.
 
-**Report-only** fields (added 2026-09-07) are printed by every eval run
-but gate nothing, and `overall` stays the macro mean of the four gated
-fields so the 0.85 (CI) and 0.90 (LLM acceptance) floors keep their
-meaning. Floors for the new fields get set from a measured baseline in a
-follow-up — never before one exists.
+**Report-only** fields (added 2026-09-07) never enter `overall`, which
+stays the macro mean of the four gated fields so the 0.85 (CI) and 0.90
+(LLM acceptance) floors keep their meaning. On the **LLM lane** they gate
+individually since 2026-09-08 (`LLM_PER_FIELD_FLOORS`: languages ≥ 0.75,
+experience ≥ 0.95, education ≥ 0.90, certifications ≥ 0.90), set from the
+prompt-v3 baseline on `gemini-3.1-flash-lite` with margin. The library
+lane prints them and gates nothing on them (it cannot extract them).
 
 ## The skills rule (product decision, 2026-09-07)
 

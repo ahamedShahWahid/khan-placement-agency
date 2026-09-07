@@ -31,6 +31,8 @@ _log = structlog.get_logger(__name__)
 LLM_GENERATOR = "llm"
 LLM_GENERATOR_VERSION = "2"
 
+_NO_CAVEAT_PLACEHOLDERS = frozenset({"none", "null", "n/a", "na", "-", "—", "no caveat"})
+
 _SYSTEM_INSTRUCTION = (
     "You are Jobify's match explainer. Given a candidate-to-job match summary, "
     "produce a one-sentence 'fit' (<=25 words, concrete, no fluff) and an "
@@ -106,7 +108,12 @@ class GeminiMatchExplainer:
             if not isinstance(fit, str) or not fit:
                 raise ValueError("missing or empty 'fit' field")
             caveat_raw = parsed.get("caveat", "")
-            caveat = caveat_raw if isinstance(caveat_raw, str) else ""
+            caveat = caveat_raw.strip() if isinstance(caveat_raw, str) else ""
+            # The model sometimes spells "no caveat" as a literal placeholder
+            # ("None", "N/A", "-") — seen live 2026-09-08 on gemini-2.5-flash.
+            # That is an empty caveat, not one to render.
+            if caveat.casefold().strip(".") in _NO_CAVEAT_PLACEHOLDERS:
+                caveat = ""
             return {
                 "fit": fit,
                 "caveat": caveat,
