@@ -3,9 +3,47 @@
   "email": "sneha.reddy@example.com",
   "phone": "+91 70123 98765",
   "skills": [
-    "agile",
-    "kanban",
-    "python",
-    "sql"
-  ]
+    "SQL",
+    "Python",
+    "Mixpanel",
+    "Amplitude",
+    "Looker",
+    "Tableau",
+    "Figma",
+    "Jira",
+    "Confluence",
+    "Agile",
+    "Kanban",
+    "A/B experiments"
+  ],
+  "languages": [],
+  "experience": [
+    {
+      "company": "Freshworks",
+      "title": "Senior Product Manager",
+      "start": "Aug 2021",
+      "end": "Present"
+    },
+    {
+      "company": "Ola",
+      "title": "Product Manager",
+      "start": "Mar 2018",
+      "end": "Jul 2021"
+    }
+  ],
+  "education": [
+    {
+      "institution": "IIM Bangalore",
+      "degree": "MBA",
+      "field": "Marketing",
+      "end_year": 2018
+    },
+    {
+      "institution": "Delhi University",
+      "degree": "B.Com Honours",
+      "field": null,
+      "end_year": 2014
+    }
+  ],
+  "certifications": []
 }

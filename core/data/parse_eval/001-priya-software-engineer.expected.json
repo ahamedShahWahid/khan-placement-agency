@@ -3,18 +3,51 @@
   "email": "priya.sharma@example.com",
   "phone": "+91 98765 43210",
   "skills": [
-    "aws",
-    "django",
-    "docker",
-    "fastapi",
-    "github actions",
-    "go",
-    "kafka",
-    "kubernetes",
-    "linux",
-    "postgresql",
-    "python",
-    "redis",
-    "terraform"
+    "Python",
+    "Go",
+    "Docker",
+    "Kubernetes",
+    "AWS",
+    "PostgreSQL",
+    "Redis",
+    "Kafka",
+    "Django",
+    "FastAPI",
+    "Terraform",
+    "GitHub Actions",
+    "Linux",
+    "distributed systems",
+    "microservices",
+    "AWS EKS"
+  ],
+  "languages": [],
+  "experience": [
+    {
+      "company": "Razorpay",
+      "title": "Senior Backend Engineer",
+      "start": "Mar 2021",
+      "end": "Present"
+    },
+    {
+      "company": "Flipkart",
+      "title": "Backend Engineer",
+      "start": "Jul 2018",
+      "end": "Feb 2021"
+    }
+  ],
+  "education": [
+    {
+      "institution": "IIT Bombay",
+      "degree": "B.Tech",
+      "field": "Computer Science",
+      "end_year": 2018
+    }
+  ],
+  "certifications": [
+    {
+      "name": "AWS Solutions Architect Associate",
+      "issuer": null,
+      "year": 2022
+    }
   ]
 }

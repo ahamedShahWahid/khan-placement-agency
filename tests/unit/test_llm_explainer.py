@@ -151,6 +151,30 @@ async def test_generation_config_disables_thinking() -> None:
 
 
 @pytest.mark.asyncio
+async def test_generation_config_uses_thinking_level_on_3x_models() -> None:
+    """3.x rejects thinking_budget=0 (400 INVALID_ARGUMENT); the explainer
+    must send the family's knob or every explain silently falls back to
+    templated after a model bump."""
+    from types import SimpleNamespace
+    from unittest.mock import AsyncMock, MagicMock
+
+    from jobify.scoring.llm_explainer import GeminiMatchExplainer
+
+    client = MagicMock()
+    gc_mock = AsyncMock(return_value=SimpleNamespace(text='{"fit": "Solid match."}'))
+    client.aio.models.generate_content = gc_mock
+    explainer = GeminiMatchExplainer(client=client, model="gemini-3.5-flash-lite")
+
+    await explainer.explain(_ctx())
+
+    config = gc_mock.await_args.kwargs["config"]
+    from google.genai import types
+
+    assert config.thinking_config.thinking_budget is None
+    assert config.thinking_config.thinking_level == types.ThinkingLevel.MINIMAL
+
+
+@pytest.mark.asyncio
 async def test_parse_failure_logs_raw_text_snippet() -> None:
     """The fallback is silent by design — the warning must carry the raw
     model text or the failure mode is undiagnosable from logs."""

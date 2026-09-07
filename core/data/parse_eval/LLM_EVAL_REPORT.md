@@ -3,123 +3,104 @@
 Durable record of the on-demand LLM lane (`test_llm_parser_meets_quality_gate`
 in `tests/eval/test_parse_f1_gate.py`). Refresh this file in the same commit as
 any prompt, model, or dataset change — the test is the measurement, this file
-is the evidence that it was taken. Every number and token below is copied
-from the test's own output; nothing is inferred.
+is the evidence that it was taken. Every number below is copied from the
+test's own output; nothing is inferred.
 
 | | |
 |---|---|
-| Measured | 2026-09-07 19:47 IST |
-| Commit | `c9f5313` (main) — parser/prompt/dataset unchanged by the PR that adds this file |
-| Model | `gemini-2.5-flash` (test default; no `JOBIFY_RESUME_PARSER_MODEL` override in `.env`) |
+| Measured | 2026-09-07 23:48 IST |
+| Commit | branch `eval/extraction-yardstick` (yardstick spec `docs/superpowers/specs/2026-09-07-extraction-yardstick-design.md`) |
+| Gated model | `gemini-2.5-flash` (production default) |
+| Compared | `gemini-3.1-flash-lite`, `gemini-3.5-flash-lite` (informational) |
 | Transport | interactive `parse_text` — the same call the live parse path makes |
-| Pacing | `JOBIFY_PARSE_EVAL_DELAY_S=7` (default); test printed `Retries: 0`; 190s wall clock |
-| Key tier | prepaid (recharged 2026-09-07) |
-| Result | **PASS** — overall 0.982 against the 0.90 acceptance floor |
+| Pacing | `JOBIFY_PARSE_EVAL_DELAY_S=2`; test printed `Retries: 0`; 422s for 3 models × 32 resumes |
+| Result | **PASS** — gated overall 0.955 against the 0.90 floor |
 
-## Per-field F1 (20 gold examples, four gated fields)
+## What changed since the 2026-09-07 morning report (0.982)
 
-| Field | LLM F1 | TP | FP | FN | Floor | Library F1 (same commit) |
-|---|---|---|---|---|---|---|
-| name | 1.000 | 20 | 0 | 0 | 0.70 | 0.850 |
-| email | 1.000 | 19 | 0 | 0 | 0.95 | 0.973 |
-| phone | 1.000 | 20 | 0 | 0 | 0.85 | 1.000 |
-| skills | 0.929 | 202 | 16 | 15 | 0.75 | 0.883 |
-| **overall** | **0.982** | | | | **0.90** | 0.927 |
+The yardstick, not the parser. Same commit's parser, same prompt except a
+`languages` field, but the gold files now:
 
-`email` TP is 19 because example 019 has no email by design (phone-only
-resume); the model returned null there, which scores as neither TP nor FP.
-The library column is the deterministic CI lane run at the same commit; its
-authoritative home is `000_README.md`, it is repeated here only for the
-comparison.
+- list **non-tech competencies** on 013/014/019 (previously `[]`) and every
+  tool a resume names in prose (005's Jira/Figma/…, 007's Firebase), under
+  the skills rule in `000_README.md`;
+- carry **all eight fields** — `languages`, `experience`, `education`,
+  `certifications` are scored and printed but **report-only**; `overall`
+  is still the macro mean of name/email/phone/skills, so 0.90 means what
+  it meant;
+- are joined by a **real set** of 12 applicant resumes (local only,
+  gitignored PII; aggregate counts only below).
 
-## Per-example
+So the drop from 0.982 to 0.955 is the metric finally seeing what it was
+blind to. The library parser moved 0.927 → 0.886 for the same reason.
 
-Every example except 005, 013 and 014 scores ≥ 0.97. Every name, email and
-phone prediction across all twenty was exact, so all variance is in
-`skills`. The FP/FN columns list the actual tokens the test printed, after
-the scorer's own case-fold normalisation.
+## Comparison (F1 per field)
 
-| Example | F1 | skills TP/FP/FN | FP tokens | FN tokens |
-|---|---|---|---|---|
-| 001 priya-software-engineer | 1.000 | 13/0/0 | | |
-| 002 arjun-data-scientist | 1.000 | 14/0/0 | | |
-| 003 divya-frontend-dev | 0.982 | 13/1/1 | `tailwind css` | `tailwind` |
-| 004 rohan-fresher | 1.000 | 11/0/0 | | |
-| 005 sneha-product-manager | 0.883 | 4/7/0 | `amplitude` `confluence` `figma` `jira` `looker` `mixpanel` `tableau` | |
-| 006 vikram-devops-lead | 1.000 | 18/0/0 | | |
-| 007 aisha-mobile-dev | 0.987 | 9/1/0 | `firebase` | |
-| 008 karthik-ml-engineer | 1.000 | 13/0/0 | | |
-| 009 meera-sales-manager | 1.000 | 8/0/0 | | |
-| 010 tabular-devjyoti-qa | 0.979 | 11/1/1 | `rest api` | `rest` |
-| 011 anand-career-gap | 0.989 | 11/0/1 | | `aws` |
-| 012 fresher-projects-riya | 0.976 | 14/0/3 | | `render` `vercel` `websocket` |
-| 013 suresh-ops-executive | 0.750 | 0/2/0 | `excel` `wms software` | |
-| 014 kavitha-teacher | 0.750 | 0/4/0 | `academic audits` `lesson planning` `ms office` `report cards` | |
-| 015 rahul-senior-architect | 0.972 | 24/0/6 | | `aws` `ci/cd` `event sourcing` `microservices` `php` `sql` |
-| 016 hinglish-pooja-hr | 1.000 | 8/0/0 | | |
-| 017 unconventional-headers-dev | 0.979 | 11/0/2 | | `kafka` `terraform` |
-| 018 certs-heavy-cloudops | 0.990 | 12/0/1 | | `google cloud` |
-| 019 phone-only-imran | 1.000 | 0/0/0 | | |
-| 020 name-midheader-lakshmi | 1.000 | 8/0/0 | | |
+| Model | Set | name | email | phone | skills | languages | experience | education | certifications | **overall** |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 2.5 Flash (gated) | synthetic | 1.000 | 1.000 | 1.000 | 0.819 | 0.857 | 0.990 | 0.897 | 1.000 | **0.955** |
+| 2.5 Flash | real | 1.000 | 1.000 | 1.000 | 0.756 | 1.000 | 1.000 | 0.800 | 0.917 | 0.939 |
+| 3.1 Flash-Lite | synthetic | 1.000 | 1.000 | 1.000 | 0.863 | 1.000 | 0.990 | 1.000 | 0.977 | 0.966 |
+| 3.1 Flash-Lite | real | 0.917 | 1.000 | 1.000 | 0.772 | 1.000 | 0.962 | 0.741 | 0.880 | 0.922 |
+| 3.5 Flash-Lite | synthetic | 1.000 | 1.000 | 1.000 | 0.863 | 1.000 | 0.990 | 1.000 | 0.952 | 0.966 |
+| 3.5 Flash-Lite | real | 0.917 | 1.000 | 1.000 | 0.726 | 1.000 | 0.962 | 0.667 | 0.880 | 0.911 |
+| library parser | synthetic | 0.850 | 0.973 | 1.000 | 0.721 | 0.000 | 0.000 | 0.000 | 0.000 | 0.886 |
+| library parser | real | 0.522 | 1.000 | 0.917 | 0.286 | 0.000 | 0.000 | 0.057 | 0.000 | 0.681 |
 
-## Reading the skills number
+Gated-model synthetic counts: skills TP 224 / FP 31 / FN 68; languages
+3/1/0; experience 50/1/0; education 26/3/3; certifications 21/0/0.
 
-**No FP is an invented skill.** Each of the 16 FP tokens was grepped in its
-resume text and found there. That is the one error class this gate exists
-to catch (the prompt's "never infer or invent" contract), and it did not
-occur. The 16 split into three kinds:
+## Reading the numbers
 
-- **2 are granularity mismatches, not errors** (003 `tailwind css` vs the
-  expected `tailwind`; 010 `rest api` vs `rest`). Each scores as one FP
-  plus one FN, so they account for 2 of the 15 FNs as well. The scorer
-  matches whole normalised tokens, so a more specific answer than the gold
-  file is penalised twice.
-- **8 are gold-file omissions of tokens the resume states outright.** 005's
-  text has a literal `SKILLS` block naming SQL, Python, Mixpanel, Amplitude,
-  Looker, Tableau, Figma, Jira, plus Confluence in a role bullet; the
-  expectation lists only `agile`, `kanban`, `python`, `sql`. 007's resume
-  names Firebase twice. These are authoring gaps of the kind
-  `000_README.md`'s "Adding examples" step 3 says to fix, and they are the
-  cheapest 0.02 of skills F1 available. Not edited in this PR because the
-  gold data is shared with the library lane and changing it moves the
-  baseline figures recorded in `000_README.md` and `core/CLAUDE.md`; do it
-  as its own dataset commit that refreshes all three.
-- **6 land on examples whose expectation is `[]`** (013: 2, 014: 4). Three
-  gold files expect no skills at all — 013, 014 and 019 — and the parser
-  extracted skill-like phrases from the first two. Both `excel` and
-  `wms software` are in 013's text; all four 014 tokens are in its text.
-  Whether "lesson planning" or "report cards" is a *skill* for a teacher
-  is a product question about non-tech applicants, not a parser question;
-  until it is answered those two rows cap at 0.750 no matter what the
-  model does, and 019's 1.000 depends on the model continuing to return
-  nothing for a delivery-ops resume full of skill-like prose. The rule
-  in `000_README.md` against tuning ground truth to flatter the parser
-  applies to exactly this judgment-call class.
+**Scalar fields are solved** by every LLM model on both sets (one name
+miss on the real set for the lite models). The library parser's real-set
+name F1 of 0.522 is what the LLM lane replaces.
 
-**The 15 FNs are genuine recall misses**: every FN token was grepped in its
-resume text and found there. 13 of them are outright misses (2 are the
-granularity pairs above). They cluster on 015 (6 of 30 expected skills
-missed; the longest resume) and 012 (3 of 17), with singletons on 011, 017
-and 018. `aws` is missed twice (011, 015). No pattern beyond "longer skill
-lists lose a few" is supported by two examples.
+**Skills: the misses are now the story, and they are a prompt gap.** On
+the 17 tech-and-mixed synthetic rows 2.5 Flash has **zero** skills FPs. Its
+68 FNs are competencies the resume states in prose — "distributed
+systems", "FMCG distribution", "team management", "Darwinbox", "GKE" — that
+the current instruction ("extract ONLY information explicitly present … a
+list with no stated items stays empty") never asks it to lift out of
+sentences. All 31 of its FPs sit on the three non-tech rows (013: 7,
+014: 16, 019: 8) and are paraphrases ("customer escalation resolution" for
+"handle escalations") or trait phrases ("calm under pressure", "clear
+communication") — grounded in the text, wrong under the skills rule. The
+lite models paraphrase far less (FP 10 and 7) and score higher on skills
+as a result; that reverses the morning's ranking, when the gold rewarded
+saying nothing on those rows.
 
-**Non-determinism.** Two consecutive runs at the same settings on the same
-commit agreed on every example except 014, which returned 9 skills in the
-first run and 4 in the second (skills F1 0.918 → 0.929, overall 0.980 →
-0.982). A separate one-off re-call of 014 also returned 4. Scalar fields did
-not vary. Since every FP and FN is scored by pooled counts across the 20
-examples, a swing of that size moves overall by ~0.002; the floor is 0.08
-away.
+**Education is a convention field.** The first run of this yardstick scored
+0.59–0.72 because the prompt says copy verbatim ("Anna University,
+Chennai") while gold was authored bare. The scorer now drops a trailing
+location/qualifier from organisation keys on both sides and the field
+reads 0.90–1.00. The three remaining 2.5 Flash mismatches bundle the branch
+into the degree ("MBA Marketing", "B.Tech IT") or add a qualifier
+("Intermediate" vs "Intermediate (12th)") — a degree-vs-field instruction
+for the prompt.
 
-## Versus the library parser
+**Experience and certifications are essentially solved** on the synthetic
+set (one extra experience entry, a "Career Break" row, from every model).
+On the real set experience is 0.96–1.00 and certifications 0.88–0.92.
 
-The LLM lane improves every gated field except `phone`, which both parsers
-max out. The gains are exactly where the library parser is documented as
-weak: `name` 0.850 → 1.000 (regex header heuristics vs. reading the
-document), and `skills` FN 43 → 15 — the non-tech vocabularies (009, 016,
-020) go from near-zero recall to perfect. The library parser remains the CI
-gate at 0.85 because it is deterministic and free; this lane is the
-acceptance measurement and runs on demand only.
+**Real set is harder across the board** (skills 0.73–0.77, education
+0.67–0.80): denser prose, missing section headers on 5 of 12, one
+letter-spaced PDF (now recovered by the extractor fix in this branch), one
+WhatsApp-forwarded DOCX. This is the number that describes the product.
+
+**Model choice, on this yardstick:** the two lite models tie with 2.5 Flash
+on the scalar fields and beat it on skills and education for the synthetic
+set; 2.5 Flash is best on the real set's skills and education. Nothing here
+justifies a switch before the prompt work — the skills FN cluster is the
+same for all three, so improve the prompt first, then re-compare. See
+sub-project 2 in the spec.
+
+## Report-only baseline (for setting floors later)
+
+Gated model, synthetic: languages 0.857, experience 0.990, education
+0.897, certifications 1.000. Real: 1.000 / 1.000 / 0.800 / 0.917. Floors
+should be set from a second measurement after the prompt change, not from
+this one.
 
 ## How to re-run
 
@@ -127,19 +108,19 @@ acceptance measurement and runs on demand only.
 JOBIFY_PARSE_EVAL_PARSER=llm uv run --env-file=.env pytest -m eval -s -k llm
 ```
 
-- Reads the real key from `JOBIFY_GEMINI_API_KEY` in `.env`, which
-  `tests/conftest.py` copies to `JOBIFY_EVAL_GEMINI_API_KEY` under this
-  opt-in. If the key is absent the test **skips** (output says `1 skipped`,
-  not `1 passed`) — never republish these tables from a skipped run.
-- A depleted prepaid key fails on example 001 within seconds: `_is_retryable`
-  recognises the "prepayment credits are depleted" body and does not back
-  off. A `403 PERMISSION_DENIED` instead means the key belongs to a project
-  without billing — a different problem that a top-up will not fix. After a
-  top-up allow about a minute for it to propagate.
-- On a paid-tier key add `JOBIFY_PARSE_EVAL_DELAY_S=0`; the 7s default
-  exists for the free tier's per-minute ceiling and costs ~2 minutes of
-  idle time per run.
-- The test prints the summary, per-example breakdown, retry count, and the
-  per-example skills token diff. Replace the tables above from that output
-  and update the header block; commit alongside whatever prompt, model, or
-  dataset change prompted the re-run.
+- `JOBIFY_PARSE_EVAL_MODELS=a,b,c` compares models in one run; the first
+  is gated. `JOBIFY_PARSE_EVAL_DELAY_S=0` on a paid-tier key.
+- Reads the real key from `JOBIFY_GEMINI_API_KEY` in `.env`, copied by
+  `tests/conftest.py` to `JOBIFY_EVAL_GEMINI_API_KEY` under this opt-in. If
+  the key is absent the test **skips** (`1 skipped`) — never republish
+  these tables from a skipped run.
+- A depleted prepaid key fails on the first example within seconds
+  (`_is_retryable` recognises the "prepayment credits are depleted" body).
+  A `403 PERMISSION_DENIED` means the key's project has no billing; a
+  top-up won't fix it. Allow ~1 minute after a top-up.
+- The real set is scored when `sample_resume/` (or
+  `JOBIFY_PARSE_EVAL_REAL_DIR`) exists. Its output is aggregate counts
+  only; never paste its token diffs anywhere.
+- Replace the tables above from the printed comparison and summaries and
+  commit alongside whatever prompt, model, or dataset change prompted the
+  re-run.

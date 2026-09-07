@@ -3,23 +3,60 @@
   "email": "vikram.iyer@example.com",
   "phone": "+91 96000 88888",
   "skills": [
-    "ansible",
-    "argocd",
-    "aws",
-    "bash",
-    "docker",
-    "elk",
-    "gitlab ci",
-    "grafana",
-    "helm",
-    "jenkins",
-    "kubernetes",
-    "linux",
-    "loki",
-    "mysql",
-    "prometheus",
-    "python",
-    "redis",
-    "terraform"
+    "Kubernetes",
+    "AWS",
+    "Terraform",
+    "Ansible",
+    "Helm",
+    "ArgoCD",
+    "Docker",
+    "Prometheus",
+    "Grafana",
+    "Loki",
+    "ELK",
+    "Jenkins",
+    "GitLab CI",
+    "MySQL",
+    "Redis",
+    "Bash",
+    "Python",
+    "Linux",
+    "observability",
+    "incident response"
+  ],
+  "languages": [],
+  "experience": [
+    {
+      "company": "PhonePe",
+      "title": "Lead DevOps Engineer",
+      "start": "Apr 2019",
+      "end": "Present"
+    },
+    {
+      "company": "OYO",
+      "title": "Senior DevOps Engineer",
+      "start": "Jan 2016",
+      "end": "Mar 2019"
+    }
+  ],
+  "education": [
+    {
+      "institution": "NIT Trichy",
+      "degree": "B.E.",
+      "field": "Computer Engineering",
+      "end_year": 2014
+    }
+  ],
+  "certifications": [
+    {
+      "name": "Certified Kubernetes Administrator (CKA)",
+      "issuer": null,
+      "year": 2021
+    },
+    {
+      "name": "AWS DevOps Professional",
+      "issuer": null,
+      "year": 2020
+    }
   ]
 }

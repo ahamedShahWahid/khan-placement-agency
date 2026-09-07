@@ -36,3 +36,6 @@ hindi_review.html
 
 # Celery beat writes its schedule shelve next to the CWD (repo root).
 celerybeat-schedule*
+
+# Real applicant resumes for local eval only -- PII, never commit
+sample_resume/

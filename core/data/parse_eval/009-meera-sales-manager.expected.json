@@ -3,13 +3,62 @@
   "email": "meera.nair@example.com",
   "phone": "+91 98220 45671",
   "skills": [
-    "business development",
-    "channel sales",
-    "distribution management",
-    "key account management",
-    "negotiation",
-    "retail execution",
-    "team leadership",
-    "trade marketing"
-  ]
+    "Distribution Management",
+    "Channel Sales",
+    "Trade Marketing",
+    "Key Account Management",
+    "Team Leadership",
+    "Negotiation",
+    "Retail Execution",
+    "Business Development",
+    "FMCG distribution",
+    "field sales",
+    "trade promotions",
+    "general trade",
+    "modern trade",
+    "secondary sales",
+    "route-to-market execution",
+    "primary sales",
+    "stock and claims reconciliation"
+  ],
+  "languages": [
+    "English",
+    "Hindi",
+    "Marathi"
+  ],
+  "experience": [
+    {
+      "company": "Dabur India Ltd",
+      "title": "Regional Sales Manager",
+      "start": "Apr 2021",
+      "end": "Present"
+    },
+    {
+      "company": "Marico Limited",
+      "title": "Area Sales Manager",
+      "start": "Jun 2017",
+      "end": "Mar 2021"
+    },
+    {
+      "company": "Godrej Consumer Products",
+      "title": "Sales Officer",
+      "start": "Aug 2015",
+      "end": "May 2017"
+    }
+  ],
+  "education": [
+    {
+      "institution": "Symbiosis Institute of Business Management",
+      "degree": "MBA",
+      "field": "Marketing",
+      "end_year": 2015
+    },
+    {
+      "institution": "University of Pune",
+      "degree": "B.Com",
+      "field": null,
+      "end_year": 2013
+    }
+  ],
+  "certifications": []
 }

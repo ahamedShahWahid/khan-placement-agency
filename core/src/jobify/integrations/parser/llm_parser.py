@@ -34,6 +34,7 @@ import structlog
 from google.genai import types
 from pydantic import ValidationError
 
+from jobify.integrations.gemini_thinking import no_thinking_config
 from jobify.integrations.parser.base import LlmParserError, ParsedResume
 from jobify.integrations.parser.text import extract_text
 
@@ -50,7 +51,10 @@ _SYSTEM_INSTRUCTION = (
     "field that is not stated stays null, a list with no stated items stays "
     "empty. Copy date strings verbatim as written (e.g. 'Jan 2020', "
     "'2020-2022', 'Present') — do not normalize them. skills is a flat list "
-    "of individual skill names. Return JSON matching the response schema."
+    "of individual skill names. languages is a flat list of the human "
+    "languages the person states they speak, read, or write (e.g. 'English', "
+    "'Hindi') — never programming languages, which belong in skills. Return "
+    "JSON matching the response schema."
 )
 
 _ENTRY_STR = types.Schema(type=types.Type.STRING, nullable=True)
@@ -62,6 +66,9 @@ _RESPONSE_SCHEMA = types.Schema(
         "email": _ENTRY_STR,
         "phone": _ENTRY_STR,
         "skills": types.Schema(type=types.Type.ARRAY, items=types.Schema(type=types.Type.STRING)),
+        "languages": types.Schema(
+            type=types.Type.ARRAY, items=types.Schema(type=types.Type.STRING)
+        ),
         "experience": types.Schema(
             type=types.Type.ARRAY,
             items=types.Schema(
@@ -143,9 +150,9 @@ def _raw_shape(raw: str | None) -> dict[str, Any]:
     return shape
 
 
-def _generate_content_config() -> types.GenerateContentConfig:
+def _generate_content_config(model: str) -> types.GenerateContentConfig:
     """Request config for the parse call — system instruction, response
-    schema, temperature, thinking budget.
+    schema, temperature, and the model family's "no thinking" knob.
 
     Still a function rather than a module constant: the on-demand LLM eval
     lane builds its own parser instance, and sharing one mutable config
@@ -158,10 +165,10 @@ def _generate_content_config() -> types.GenerateContentConfig:
         response_schema=_RESPONSE_SCHEMA,
         temperature=0,
         max_output_tokens=8192,
-        # gemini-2.5 thinks by default and thought tokens count against
-        # max_output_tokens (see llm_explainer.py's starvation incident).
-        # Pure extraction needs no thinking.
-        thinking_config=types.ThinkingConfig(thinking_budget=0),
+        # Thought tokens count against max_output_tokens (see
+        # llm_explainer.py's starvation incident) and pure extraction needs
+        # no thinking. The field name differs per family — see the helper.
+        thinking_config=no_thinking_config(model),
     )
 
 
@@ -194,7 +201,7 @@ class GeminiResumeParser:
             resp = await self._client.aio.models.generate_content(
                 model=self._model,
                 contents=text,
-                config=_generate_content_config(),
+                config=_generate_content_config(self._model),
             )
         except Exception as exc:
             raise LlmParserError(f"llm_call_failed: {type(exc).__name__}") from exc

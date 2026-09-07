@@ -3,13 +3,64 @@
   "email": "lakshmi.venkatesan@example.com",
   "phone": "+91 91500 62347",
   "skills": [
-    "budgeting",
-    "excel",
-    "financial modeling",
-    "forecasting",
-    "fp&a",
-    "power bi",
-    "sql",
-    "variance analysis"
+    "Excel",
+    "SQL",
+    "Power BI",
+    "Financial Modeling",
+    "Variance Analysis",
+    "Budgeting",
+    "Forecasting",
+    "FP&A",
+    "management reporting",
+    "MIS reports",
+    "statutory audit",
+    "vendor reconciliation"
+  ],
+  "languages": [],
+  "experience": [
+    {
+      "company": "Ashok Leyland",
+      "title": "Senior Financial Analyst",
+      "start": "Jul 2020",
+      "end": "Present"
+    },
+    {
+      "company": "TVS Motor Company",
+      "title": "Financial Analyst",
+      "start": "May 2016",
+      "end": "Jun 2020"
+    },
+    {
+      "company": "TVS Motor Company",
+      "title": "Finance Executive",
+      "start": "Jun 2014",
+      "end": "Apr 2016"
+    }
+  ],
+  "education": [
+    {
+      "institution": "Great Lakes Institute of Management",
+      "degree": "MBA",
+      "field": "Finance",
+      "end_year": 2014
+    },
+    {
+      "institution": "Loyola College",
+      "degree": "B.Com",
+      "field": null,
+      "end_year": 2012
+    }
+  ],
+  "certifications": [
+    {
+      "name": "CFA Level II Candidate",
+      "issuer": null,
+      "year": null
+    },
+    {
+      "name": "Advanced Excel and Power BI for Finance",
+      "issuer": null,
+      "year": 2021
+    }
   ]
 }

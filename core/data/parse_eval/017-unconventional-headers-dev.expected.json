@@ -3,18 +3,60 @@
   "email": "nikhil.rao@example.com",
   "phone": "+91 90080 34567",
   "skills": [
-    "celery",
-    "docker",
-    "fastapi",
-    "git",
-    "go",
-    "grpc",
-    "kafka",
-    "linux",
-    "postgresql",
-    "python",
-    "rabbitmq",
-    "redis",
-    "terraform"
+    "Python",
+    "Go",
+    "FastAPI",
+    "PostgreSQL",
+    "RabbitMQ",
+    "Redis",
+    "Docker",
+    "Celery",
+    "Git",
+    "Linux",
+    "gRPC",
+    "Kafka",
+    "Docker Compose",
+    "jq"
+  ],
+  "languages": [],
+  "experience": [
+    {
+      "company": "ShipSwift Logistics",
+      "title": "Backend Engineer",
+      "start": "Aug 2022",
+      "end": "Present"
+    },
+    {
+      "company": "Zeta Suite",
+      "title": "Software Engineer",
+      "start": "Jul 2019",
+      "end": "Jul 2022"
+    },
+    {
+      "company": "Zeta Suite",
+      "title": "Junior Developer",
+      "start": "Jun 2018",
+      "end": "Jun 2019"
+    }
+  ],
+  "education": [
+    {
+      "institution": "Osmania University",
+      "degree": "B.Tech",
+      "field": "Computer Science",
+      "end_year": 2019
+    }
+  ],
+  "certifications": [
+    {
+      "name": "HashiCorp Terraform Associate",
+      "issuer": null,
+      "year": 2023
+    },
+    {
+      "name": "Go Developer badge",
+      "issuer": "company-internal bootcamp",
+      "year": 2021
+    }
   ]
 }

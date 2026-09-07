@@ -3,18 +3,53 @@
   "email": "karthik.subramanian@example.com",
   "phone": "+91 91234 56789",
   "skills": [
-    "aws",
-    "docker",
-    "fastapi",
-    "huggingface",
-    "keras",
-    "langchain",
-    "llamaindex",
-    "postgresql",
-    "python",
-    "pytorch",
-    "redis",
+    "Python",
+    "PyTorch",
+    "LangChain",
+    "LlamaIndex",
+    "HuggingFace",
+    "TensorFlow",
+    "Keras",
     "scikit-learn",
-    "tensorflow"
-  ]
+    "AWS",
+    "Docker",
+    "PostgreSQL",
+    "FastAPI",
+    "Redis",
+    "LLM applications",
+    "retrieval systems",
+    "RAG pipelines",
+    "Pinecone",
+    "Postgres pgvector"
+  ],
+  "languages": [],
+  "experience": [
+    {
+      "company": "Sarvam AI",
+      "title": "ML Engineer",
+      "start": "Jul 2023",
+      "end": "Present"
+    },
+    {
+      "company": "Practo",
+      "title": "Software Engineer (ML)",
+      "start": "Mar 2020",
+      "end": "Jun 2023"
+    }
+  ],
+  "education": [
+    {
+      "institution": "BITS Pilani",
+      "degree": "M.S.",
+      "field": "AI",
+      "end_year": 2022
+    },
+    {
+      "institution": "Anna University",
+      "degree": "B.Tech",
+      "field": "Computer Science",
+      "end_year": 2020
+    }
+  ],
+  "certifications": []
 }

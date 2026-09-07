@@ -2,5 +2,40 @@
   "name": "Imran Sheikh",
   "email": null,
   "phone": "97694 55210",
-  "skills": []
+  "skills": [
+    "last-mile delivery",
+    "route planning",
+    "team management",
+    "cash collection"
+  ],
+  "languages": [],
+  "experience": [
+    {
+      "company": "DashKart",
+      "title": "Delivery Operations Lead",
+      "start": "May 2022",
+      "end": "Present"
+    },
+    {
+      "company": "DashKart",
+      "title": "Delivery Supervisor",
+      "start": "Jan 2020",
+      "end": "Apr 2022"
+    },
+    {
+      "company": "QuickHub Logistics",
+      "title": "Field Executive",
+      "start": "Jul 2017",
+      "end": "Dec 2019"
+    }
+  ],
+  "education": [
+    {
+      "institution": "UP Board",
+      "degree": "Intermediate (12th)",
+      "field": null,
+      "end_year": 2016
+    }
+  ],
+  "certifications": []
 }

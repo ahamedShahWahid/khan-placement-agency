@@ -69,3 +69,15 @@ def test_transient_parser_error_is_distinct_class() -> None:
     err = TransientParserError("storage_timeout")
     assert isinstance(err, TransientParserError)
     assert not isinstance(err, ParserError)
+
+
+def test_parsed_resume_languages_defaults_empty_and_round_trips() -> None:
+    """Added 2026-09-07 with a default so stored schema_version-1 payloads
+    without the key still validate; the library parser never sets it."""
+    pr = ParsedResume(parser_name="x", raw_text="")
+    assert pr.languages == []
+    again = ParsedResume.model_validate(
+        {"parser_name": "x", "raw_text": "", "languages": ["English", "Hindi"]}
+    )
+    assert again.languages == ["English", "Hindi"]
+    assert "languages" in ParsedResume.model_fields
