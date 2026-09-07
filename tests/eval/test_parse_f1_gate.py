@@ -5,7 +5,8 @@ and asserts the parser stays above the per-field floors AND the overall
 target. Print full breakdown on failure to make diagnosis cheap.
 
 Gate config:
-- Overall macro-F1 >= 0.85 (spec P2 target; ratchet to 0.90 before launch).
+- Overall macro-F1 >= 0.85 for the library parser (CI). The 0.90 launch
+  target is the LLM lane's floor (``LLM_OVERALL_FLOOR``), measured on demand.
 - Per-field floors: email 0.95, phone 0.85, name 0.70, skills 0.75.
 
 Marked ``@pytest.mark.eval`` so it runs only when explicitly requested:
@@ -100,7 +101,7 @@ def test_llm_parser_meets_quality_gate() -> None:
 
     from google import genai
 
-    from jobify.eval.parse_f1 import DEFAULT_DATA_DIR, _load_examples
+    from jobify.eval.parse_f1 import DEFAULT_DATA_DIR, _load_examples, _normalize_skill_set
     from jobify.integrations.parser.base import LlmParserError, ParsedResume
     from jobify.integrations.parser.llm_parser import GeminiResumeParser
 
@@ -146,7 +147,10 @@ def test_llm_parser_meets_quality_gate() -> None:
             return False
         return True
 
+    retries = 0
+
     async def _parse_one(text: str) -> ParsedResume:
+        nonlocal retries
         backoff = 30.0
         for attempt in range(3):
             try:
@@ -157,6 +161,7 @@ def test_llm_parser_meets_quality_gate() -> None:
                     if cause is not None:
                         raise AssertionError(f"Gemini call failed: {cause}") from exc
                     raise
+                retries += 1
                 await asyncio.sleep(backoff)
                 backoff *= 2
         raise AssertionError("unreachable")
@@ -178,6 +183,24 @@ def test_llm_parser_meets_quality_gate() -> None:
     print(report.summary())
     print()
     print(report.example_breakdown())
+
+    # Counts alone can't distinguish "the model invented a skill" (the one
+    # error class this gate exists to catch) from "the gold file omits a
+    # token the resume really contains". Print the diff with the SAME
+    # normalisation the scorer uses so LLM_EVAL_REPORT.md can name every FP
+    # from the run that produced it -- skills are the only field where the
+    # two parsers disagree, and the model's skills output is not
+    # deterministic, so a re-call can't reconstruct what a gated run saw.
+    print()
+    print(f"Retries: {retries}")
+    print("Skills token diff (FP = predicted but not expected, FN = expected but not predicted):")
+    for (example_id, _text, expected), parsed in zip(examples, parsed_resumes, strict=True):
+        predicted_set = _normalize_skill_set(parsed.skills)
+        expected_set = _normalize_skill_set(expected.get("skills", []))
+        false_positives = sorted(predicted_set - expected_set)
+        false_negatives = sorted(expected_set - predicted_set)
+        if false_positives or false_negatives:
+            print(f"  {example_id}  FP={false_positives}  FN={false_negatives}")
 
     failures: list[str] = []
     for field_name, floor in PER_FIELD_FLOORS.items():

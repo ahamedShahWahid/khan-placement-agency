@@ -30,7 +30,8 @@ ones the regex/keyword parser handles deterministically. `experience`,
 (date-range scanning, degree-keyword + nearby-year). They get F1 reports
 in the eval output for visibility but **do not gate CI** in v0.
 
-When the LLM parser ships, all seven fields will gate.
+The LLM lane (`LLM_EVAL_REPORT.md`) gates the same four fields at a higher
+overall floor (0.90); the non-gated three stay report-only there too.
 
 ## How to score
 
@@ -62,8 +63,11 @@ When the LLM parser ships, all seven fields will gate.
 - Per-field floor: `email` ≥ 0.95, `phone` ≥ 0.85, `name` ≥ 0.70,
   `skills` ≥ 0.75.
 
-Below either gate fails the test. Ratchet upward as the parser improves —
-spec target is ≥ 0.90 before launch.
+Below either gate fails the test. The spec's ≥ 0.90 launch target is met
+by the **LLM lane** (`LLM_EVAL_REPORT.md`, on demand, `LLM_OVERALL_FLOOR`),
+not by ratcheting this deterministic gate — the library parser measures
+0.927 here with 3 documented expectation-gap FPs, so a 0.90 floor on it
+would fail CI on the next legitimate hard example.
 
 ## Documented limitations (non-gated fields)
 
@@ -105,7 +109,19 @@ the LLM parser lane has a concrete bar to clear:
   expected skills, e.g. "financial modeling"/"fp&a"/"power bi", are
   outside the dict) have skills entirely or mostly outside the curated
   tech dictionary by design; this is expected, not a bug, and is exactly
-  the gap the LLM parser is meant to close.
+  the gap the LLM parser is meant to close (it does: 009/016/020 score
+  1.000 on the LLM lane).
+- **013, 014 and 019 expect NO skills (`[]`)** — so on the LLM lane any
+  skill-like phrase the model extracts there ("lesson planning", "excel")
+  counts as an FP even though it is in the resume text, capping those
+  examples' skills F1 at 0. Whether such phrases are "skills" for
+  non-tech applicants is a product decision; take it once and apply it to
+  all three together. Separately, **005's expectation omits seven tools
+  its own `SKILLS` block lists** (Mixpanel, Amplitude, Looker, Tableau,
+  Figma, Jira, plus Confluence) and 007 omits Firebase — plain authoring
+  gaps per step 3 below, worth a dataset commit that refreshes the
+  baseline figures in this file, `core/CLAUDE.md`, and
+  `LLM_EVAL_REPORT.md` together.
 
 ## Adding examples
 

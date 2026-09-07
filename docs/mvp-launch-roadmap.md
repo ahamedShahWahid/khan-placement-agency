@@ -30,7 +30,7 @@ run as parallel tracks off the critical path.
 |---|-------|------|-----------------------------|
 | 1 | ✅ **SHIPPED 2026-07-19 (PR #62)** — Match feedback capture + admin Match QA: thumbs up/down on surfaced matches (down hides from feed), `match_feedback` table DSR-wired, admin Match QA console page with the relevance metric. | S–M | Match relevance ≥ 75 % (data clock now running) |
 | 2 | **Push notifications (FCM)** — device-token table (⇒ DSR wiring), FCM channel adapter beside SES, Flutter integration. | M–L | Core BRD applicant feature ("notifies the applicant when high-quality matches appear") |
-| 3 | **LLM resume parsing** — Gemini impl behind the existing parser Protocol (`integrations/parser`), library parser as fallback, gold-dataset growth, F1 gate 0.85 → 0.90. | M | Parse F1 ≥ 0.90 |
+| 3 | ✅ **SHIPPED 2026-08-01 (PR #65), MEASURED 2026-09-07 (PR #71)** — LLM resume parsing: Gemini impl behind the existing parser Protocol (`integrations/parser`), library parser as fallback, gold dataset grown to 20, on-demand LLM lane at 0.90. Measured overall F1 **0.982** (`core/data/parse_eval/LLM_EVAL_REPORT.md`). | M | Parse F1 ≥ 0.90 ✅ |
 | 4 | **P5 launch phase** — pick deploy target (ap-south-1-adjacent: Fly BOM / Render SIN / EC2), containerize, hosted non-prod, load test, security review, Lighthouse pass. | L | p95 ≤ 400 ms · zero P0/P1 · re-verify 10-min first match |
 | 5 | **Hindi i18n** (spec §3.7) — not acceptance-gated; candidate to slip post-launch. | M–L | — |
 
@@ -53,7 +53,7 @@ run as parallel tracks off the critical path.
 | BRD criterion | Covered by |
 |---|---|
 | First match ≤ 10 min | shipped — re-verify under load (step 4) |
-| Parse F1 ≥ 0.90 | step 3 |
+| Parse F1 ≥ 0.90 | ✅ step 3 — 0.982 measured 2026-09-07 |
 | Match relevance ≥ 75 % | step 1 + calendar time (~500 ratings) |
 | p95 ≤ 400 ms | step 4 |
 | Consent/export/delete functional | done |
