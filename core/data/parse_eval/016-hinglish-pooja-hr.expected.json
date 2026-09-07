@@ -3,13 +3,58 @@
   "email": "pooja.malhotra@example.com",
   "phone": "+91 96500 34521",
   "skills": [
-    "employee engagement",
-    "excel",
-    "exit formalities",
-    "hrms",
-    "onboarding",
-    "payroll processing",
-    "recruitment",
-    "statutory compliance"
-  ]
+    "Recruitment",
+    "Onboarding",
+    "Payroll Processing",
+    "Statutory Compliance",
+    "Employee Engagement",
+    "HRMS",
+    "Exit Formalities",
+    "Excel",
+    "team management",
+    "HR operations",
+    "PF",
+    "ESI",
+    "Darwinbox",
+    "bulk hiring drives",
+    "full-and-final settlement",
+    "resume screening",
+    "interview scheduling"
+  ],
+  "languages": [],
+  "experience": [
+    {
+      "company": "Nexora Solutions Pvt Ltd",
+      "title": "HR Generalist",
+      "start": "Apr 2021",
+      "end": "Present"
+    },
+    {
+      "company": "Vantage BPO Services",
+      "title": "HR Executive",
+      "start": "Jun 2018",
+      "end": "Mar 2021"
+    },
+    {
+      "company": "Vantage BPO Services",
+      "title": "HR Trainee",
+      "start": "Jan 2018",
+      "end": "May 2018"
+    }
+  ],
+  "education": [
+    {
+      "institution": "Amity University",
+      "degree": "MBA",
+      "field": "Human Resources",
+      "end_year": 2017
+    },
+    {
+      "institution": "Delhi University",
+      "degree": "B.A.",
+      "field": "Psychology",
+      "end_year": 2015
+    }
+  ],
+  "certifications": []
 }

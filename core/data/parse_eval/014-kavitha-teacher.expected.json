@@ -2,5 +2,51 @@
   "name": "Kavitha Subramaniam",
   "email": "kavitha.subramaniam@example.com",
   "phone": "+91 94480 71256",
-  "skills": []
+  "skills": [
+    "lesson planning",
+    "MS Office",
+    "classroom management"
+  ],
+  "languages": [],
+  "experience": [
+    {
+      "company": "Sri Vidya Mandir Matriculation School",
+      "title": "Senior English Teacher",
+      "start": "Jun 2016",
+      "end": "Present"
+    },
+    {
+      "company": "Bharatiya Vidya Bhavan School",
+      "title": "English Teacher",
+      "start": "Jun 2012",
+      "end": "May 2016"
+    },
+    {
+      "company": "St. Xavier's Higher Secondary School",
+      "title": "Teaching Assistant",
+      "start": "Jun 2010",
+      "end": "May 2012"
+    }
+  ],
+  "education": [
+    {
+      "institution": "Bharathiar University",
+      "degree": "M.A.",
+      "field": "English Literature",
+      "end_year": 2010
+    },
+    {
+      "institution": "Avinashilingam University",
+      "degree": "B.Ed",
+      "field": null,
+      "end_year": 2008
+    },
+    {
+      "institution": "Bharathiar University",
+      "degree": "B.A.",
+      "field": "English",
+      "end_year": 2006
+    }
+  ],
+  "certifications": []
 }

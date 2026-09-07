@@ -3,14 +3,39 @@
   "email": "aisha.khan@example.com",
   "phone": "9988776655",
   "skills": [
-    "android",
-    "dart",
-    "flutter",
-    "git",
-    "github actions",
-    "ios",
-    "java",
-    "jetpack compose",
-    "kotlin"
-  ]
+    "Flutter",
+    "Dart",
+    "Kotlin",
+    "Java",
+    "Jetpack Compose",
+    "Firebase",
+    "Android",
+    "iOS",
+    "Git",
+    "GitHub Actions"
+  ],
+  "languages": [],
+  "experience": [
+    {
+      "company": "CRED",
+      "title": "Mobile Developer",
+      "start": "Oct 2022",
+      "end": "Present"
+    },
+    {
+      "company": "Paytm",
+      "title": "Android Developer",
+      "start": "Aug 2021",
+      "end": "Sep 2022"
+    }
+  ],
+  "education": [
+    {
+      "institution": "Jamia Millia Islamia",
+      "degree": "B.Tech",
+      "field": "IT",
+      "end_year": 2021
+    }
+  ],
+  "certifications": []
 }

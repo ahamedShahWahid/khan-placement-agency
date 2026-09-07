@@ -3,17 +3,58 @@
   "email": "anand.krishnan@example.com",
   "phone": "+91 89390 27114",
   "skills": [
-    "aws",
-    "docker",
-    "express",
-    "git",
-    "java",
-    "mysql",
-    "node.js",
-    "oauth2",
-    "postgresql",
-    "redis",
-    "rest",
-    "spring boot"
+    "Java",
+    "Node.js",
+    "Express",
+    "Spring Boot",
+    "PostgreSQL",
+    "MySQL",
+    "Redis",
+    "REST",
+    "OAuth2",
+    "Git",
+    "Docker",
+    "load tests"
+  ],
+  "languages": [],
+  "experience": [
+    {
+      "company": "LoanFlow Technologies",
+      "title": "Backend Developer",
+      "start": "Feb 2022",
+      "end": "Present"
+    },
+    {
+      "company": "Freshworks",
+      "title": "Software Engineer",
+      "start": "Jun 2015",
+      "end": "Dec 2018"
+    },
+    {
+      "company": "Freshworks",
+      "title": "Associate Software Engineer",
+      "start": "Aug 2013",
+      "end": "May 2015"
+    }
+  ],
+  "education": [
+    {
+      "institution": "Anna University",
+      "degree": "B.E.",
+      "field": "Computer Science",
+      "end_year": 2013
+    }
+  ],
+  "certifications": [
+    {
+      "name": "Node.js Application Development",
+      "issuer": null,
+      "year": 2021
+    },
+    {
+      "name": "AWS Certified Cloud Practitioner",
+      "issuer": null,
+      "year": 2021
+    }
   ]
 }

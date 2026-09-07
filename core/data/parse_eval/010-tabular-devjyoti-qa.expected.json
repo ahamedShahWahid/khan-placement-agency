@@ -3,17 +3,54 @@
   "email": "devjyoti.chatterjee@qatestlabs.co.in",
   "phone": "+91 90271 63840",
   "skills": [
-    "agile",
-    "cypress",
-    "git",
-    "java",
-    "jenkins",
-    "jira",
-    "manual testing",
-    "postman",
-    "rest",
-    "selenium",
-    "sql",
-    "testng"
+    "Selenium",
+    "Java",
+    "TestNG",
+    "Postman",
+    "JIRA",
+    "REST API",
+    "Cypress",
+    "SQL",
+    "Git",
+    "Agile",
+    "Jenkins",
+    "Manual Testing",
+    "automation testing"
+  ],
+  "languages": [],
+  "experience": [
+    {
+      "company": "PayEase Technologies",
+      "title": "Senior QA Engineer",
+      "start": "Mar 2022",
+      "end": "Present"
+    },
+    {
+      "company": "Cognizant Technology Solutions",
+      "title": "QA Engineer",
+      "start": "Jul 2019",
+      "end": "Feb 2022"
+    },
+    {
+      "company": "Cognizant Technology Solutions",
+      "title": "QA Trainee",
+      "start": "Jan 2019",
+      "end": "Jun 2019"
+    }
+  ],
+  "education": [
+    {
+      "institution": "Jadavpur University",
+      "degree": "B.Tech",
+      "field": "Information Technology",
+      "end_year": 2018
+    }
+  ],
+  "certifications": [
+    {
+      "name": "ISTQB Certified Tester, Foundation Level",
+      "issuer": null,
+      "year": 2020
+    }
   ]
 }

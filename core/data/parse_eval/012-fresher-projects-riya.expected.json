@@ -3,22 +3,33 @@
   "email": "riya.desai@example.com",
   "phone": "+91 81234 56709",
   "skills": [
-    "c++",
-    "express",
-    "firebase",
-    "flutter",
-    "git",
-    "github actions",
-    "mongodb",
-    "next.js",
-    "node.js",
-    "python",
-    "react",
-    "redis",
-    "render",
-    "tailwind",
-    "typescript",
-    "vercel",
-    "websocket"
-  ]
+    "React",
+    "Node.js",
+    "Express",
+    "MongoDB",
+    "TypeScript",
+    "Redis",
+    "Flutter",
+    "Firebase",
+    "Next.js",
+    "Tailwind",
+    "GitHub Actions",
+    "Git",
+    "Python",
+    "C++",
+    "Render",
+    "WebSocket",
+    "Vercel"
+  ],
+  "languages": [],
+  "experience": [],
+  "education": [
+    {
+      "institution": "MS University of Baroda",
+      "degree": "B.E.",
+      "field": "Computer Engineering",
+      "end_year": 2026
+    }
+  ],
+  "certifications": []
 }

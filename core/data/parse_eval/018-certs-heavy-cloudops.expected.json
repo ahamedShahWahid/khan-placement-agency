@@ -3,18 +3,94 @@
   "email": "alok.verma@example.com",
   "phone": "+91 97110 88234",
   "skills": [
-    "ansible",
-    "aws",
-    "azure",
-    "bash",
-    "docker",
-    "gcp",
-    "google cloud",
-    "grafana",
-    "jenkins",
-    "kubernetes",
-    "linux",
-    "prometheus",
-    "terraform"
+    "AWS",
+    "GCP",
+    "Azure",
+    "Kubernetes",
+    "Terraform",
+    "Ansible",
+    "Docker",
+    "Prometheus",
+    "Grafana",
+    "Jenkins",
+    "Linux",
+    "Bash",
+    "cost optimisation",
+    "infrastructure automation",
+    "EKS",
+    "GKE",
+    "L2 support",
+    "networking",
+    "IAM"
+  ],
+  "languages": [],
+  "experience": [
+    {
+      "company": "RouteMetrics",
+      "title": "Cloud Operations Engineer",
+      "start": "Feb 2023",
+      "end": "Present"
+    },
+    {
+      "company": "Netweb Cloud Services",
+      "title": "Cloud Support Engineer",
+      "start": "Jan 2021",
+      "end": "Jan 2023"
+    }
+  ],
+  "education": [
+    {
+      "institution": "ABES Engineering College",
+      "degree": "B.Tech",
+      "field": "Electronics and Communication",
+      "end_year": 2020
+    }
+  ],
+  "certifications": [
+    {
+      "name": "AWS Certified Solutions Architect - Associate",
+      "issuer": null,
+      "year": 2021
+    },
+    {
+      "name": "AWS Certified DevOps Engineer - Professional",
+      "issuer": null,
+      "year": 2022
+    },
+    {
+      "name": "Google Cloud Certified Professional Cloud Architect",
+      "issuer": null,
+      "year": 2022
+    },
+    {
+      "name": "Certified Kubernetes Administrator (CKA)",
+      "issuer": null,
+      "year": 2022
+    },
+    {
+      "name": "Certified Kubernetes Application Developer (CKAD)",
+      "issuer": null,
+      "year": 2023
+    },
+    {
+      "name": "HashiCorp Certified Terraform Associate",
+      "issuer": null,
+      "year": 2023
+    },
+    {
+      "name": "Microsoft Certified Azure Administrator Associate",
+      "issuer": null,
+      "year": 2023
+    },
+    {
+      "name": "Certified Ansible Automation Specialist",
+      "issuer": null,
+      "year": 2023
+    },
+    {
+      "name": "AWS Certified Security - Specialty",
+      "issuer": null,
+      "year": 2024
+    }
   ]
 }

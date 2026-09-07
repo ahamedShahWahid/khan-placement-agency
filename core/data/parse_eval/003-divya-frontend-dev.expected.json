@@ -3,19 +3,43 @@
   "email": "divya.kumar@example.com",
   "phone": "+91 87654 32109",
   "skills": [
-    "css",
-    "cypress",
-    "graphql",
-    "html",
-    "javascript",
-    "jest",
-    "next.js",
-    "node.js",
-    "react",
-    "redux",
-    "tailwind",
-    "typescript",
-    "vite",
-    "webpack"
-  ]
+    "React",
+    "Next.js",
+    "TypeScript",
+    "JavaScript",
+    "Tailwind CSS",
+    "GraphQL",
+    "Redux",
+    "HTML",
+    "CSS",
+    "Jest",
+    "Cypress",
+    "Webpack",
+    "Vite",
+    "Node.js"
+  ],
+  "languages": [],
+  "experience": [
+    {
+      "company": "Swiggy",
+      "title": "Frontend Engineer",
+      "start": "Jan 2022",
+      "end": "Present"
+    },
+    {
+      "company": "Razorpay",
+      "title": "Junior Frontend Engineer",
+      "start": "Aug 2019",
+      "end": "Dec 2021"
+    }
+  ],
+  "education": [
+    {
+      "institution": "BITS Pilani",
+      "degree": "B.Tech",
+      "field": "IT",
+      "end_year": 2019
+    }
+  ],
+  "certifications": []
 }

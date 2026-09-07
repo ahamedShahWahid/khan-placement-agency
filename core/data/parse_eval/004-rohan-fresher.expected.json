@@ -3,16 +3,42 @@
   "email": "rohan.patel@example.com",
   "phone": "+91 90123 45678",
   "skills": [
-    "docker",
-    "fastapi",
-    "git",
-    "java",
-    "kafka",
-    "linux",
-    "mysql",
-    "postgresql",
-    "python",
-    "redis",
-    "spring boot"
-  ]
+    "Java",
+    "Python",
+    "Spring Boot",
+    "FastAPI",
+    "Kafka",
+    "MySQL",
+    "PostgreSQL",
+    "Redis",
+    "Docker",
+    "Git",
+    "Linux",
+    "microservice",
+    "Kafka Streams DSL"
+  ],
+  "languages": [],
+  "experience": [
+    {
+      "company": "ZestMoney",
+      "title": "Software Engineering Intern",
+      "start": "Jan 2024",
+      "end": "Jun 2024"
+    },
+    {
+      "company": "Apache Kafka community",
+      "title": "Open Source Contributor",
+      "start": "Feb 2023",
+      "end": "Dec 2023"
+    }
+  ],
+  "education": [
+    {
+      "institution": "IIT Gandhinagar",
+      "degree": "B.Tech",
+      "field": "Computer Science",
+      "end_year": 2024
+    }
+  ],
+  "certifications": []
 }

@@ -3,35 +3,97 @@
   "email": "rahul.bose@example.com",
   "phone": "+91 98200 11223",
   "skills": [
-    "aws",
-    "c++",
-    "cassandra",
-    "ci/cd",
-    "docker",
-    "event sourcing",
-    "graphql",
-    "grpc",
-    "helm",
-    "java",
-    "jenkins",
-    "kafka",
-    "kotlin",
-    "kubernetes",
+    "Java",
+    "Kotlin",
+    "TypeScript",
+    "Python",
+    "Spring Boot",
+    "Spring",
+    "Node.js",
+    "GraphQL",
+    "Kafka",
+    "Kubernetes",
+    "Docker",
+    "Terraform",
+    "Helm",
+    "gRPC",
+    "PostgreSQL",
+    "MongoDB",
+    "Redis",
+    "MySQL",
+    "Spark",
+    "Redshift",
+    "Cassandra",
+    "Oracle",
+    "Jenkins",
+    "C++",
+    "distributed systems",
+    "team management",
     "microservices",
-    "mongodb",
-    "mysql",
-    "node.js",
-    "oracle",
-    "php",
-    "postgresql",
-    "python",
-    "redis",
-    "redshift",
-    "spark",
-    "spring",
-    "spring boot",
-    "sql",
-    "terraform",
-    "typescript"
+    "event sourcing",
+    "PHP",
+    "CI/CD",
+    "Hadoop",
+    "Oracle PL/SQL",
+    "SQL"
+  ],
+  "languages": [],
+  "experience": [
+    {
+      "company": "PhonePe",
+      "title": "Staff Architect",
+      "start": "Jan 2021",
+      "end": "Present"
+    },
+    {
+      "company": "Myntra",
+      "title": "Principal Engineer",
+      "start": "Mar 2017",
+      "end": "Dec 2020"
+    },
+    {
+      "company": "Freshworks",
+      "title": "Engineering Manager",
+      "start": "Jul 2013",
+      "end": "Feb 2017"
+    },
+    {
+      "company": "Yahoo India",
+      "title": "Senior Software Engineer",
+      "start": "Aug 2009",
+      "end": "Jun 2013"
+    },
+    {
+      "company": "Infosys",
+      "title": "Software Engineer",
+      "start": "Jun 2008",
+      "end": "Jul 2009"
+    }
+  ],
+  "education": [
+    {
+      "institution": "IIT Madras",
+      "degree": "M.Tech",
+      "field": "Computer Science",
+      "end_year": 2008
+    },
+    {
+      "institution": "NIT Trichy",
+      "degree": "B.Tech",
+      "field": "Computer Science",
+      "end_year": 2006
+    }
+  ],
+  "certifications": [
+    {
+      "name": "AWS Certified Solutions Architect - Professional",
+      "issuer": null,
+      "year": 2020
+    },
+    {
+      "name": "Certified Kubernetes Administrator (CKA)",
+      "issuer": null,
+      "year": 2021
+    }
   ]
 }

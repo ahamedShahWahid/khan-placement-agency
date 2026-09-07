@@ -3,19 +3,53 @@
   "email": "arjun.mehta@example.com",
   "phone": "+91 99800 12345",
   "skills": [
-    "airflow",
-    "bigquery",
-    "docker",
-    "gcp",
-    "jupyter",
-    "mlflow",
-    "numpy",
-    "pandas",
-    "postgresql",
-    "python",
-    "pytorch",
+    "Python",
+    "PyTorch",
+    "TensorFlow",
     "scikit-learn",
-    "spark",
-    "tensorflow"
-  ]
+    "Pandas",
+    "NumPy",
+    "MLflow",
+    "Airflow",
+    "BigQuery",
+    "GCP",
+    "Spark",
+    "PostgreSQL",
+    "Docker",
+    "Jupyter",
+    "distributed training",
+    "fraud detection",
+    "Vertex AI",
+    "recommendation systems"
+  ],
+  "languages": [],
+  "experience": [
+    {
+      "company": "Zerodha",
+      "title": "Senior Data Scientist",
+      "start": "Sep 2022",
+      "end": "Present"
+    },
+    {
+      "company": "Myntra",
+      "title": "Data Scientist",
+      "start": "Jun 2020",
+      "end": "Aug 2022"
+    }
+  ],
+  "education": [
+    {
+      "institution": "IISc Bangalore",
+      "degree": "M.Tech",
+      "field": "Data Science",
+      "end_year": 2020
+    },
+    {
+      "institution": "VIT Vellore",
+      "degree": "B.E.",
+      "field": "Electronics",
+      "end_year": 2018
+    }
+  ],
+  "certifications": []
 }

@@ -48,6 +48,27 @@ def test_missing_key_part_renders_as_question_mark_not_empty() -> None:
     assert _experience_keys([{}]) == set()  # nothing to key on → no entry
 
 
+def test_organisation_keys_ignore_trailing_location_and_qualifier() -> None:
+    """The prompt says copy verbatim, so the parser emits "Anna University,
+    Chennai"; a human authoring gold writes "Anna University". Both must key
+    the same, on either side. Measured 2026-09-07: this gap alone was most of
+    the education FP/FN pairs."""
+    verbatim = [EducationEntry(institution="Anna University, Chennai", degree="B.E.")]
+    bare = [{"institution": "Anna University", "degree": "B.E."}]
+    assert _education_keys(verbatim) == _education_keys(bare) == {"anna university|b.e"}
+    assert _education_keys([{"institution": "BITS Pilani (online)", "degree": "M.S"}]) == {
+        "bits pilani|m.s"
+    }
+    # A campus qualifier that is part of the name (no comma) is kept.
+    assert _education_keys([{"institution": "IIT Bombay", "degree": "B.Tech"}]) == {
+        "iit bombay|b.tech"
+    }
+    # Company gets the same treatment; title does not (a comma in a title stays).
+    assert _experience_keys([{"company": "Acme Ltd, Pune", "title": "Lead, Platform"}]) == {
+        "acme ltd|lead, platform"
+    }
+
+
 def test_education_and_certification_keys() -> None:
     assert _education_keys([EducationEntry(institution="IIT Bombay", degree="B.Tech")]) == {
         "iit bombay|b.tech"

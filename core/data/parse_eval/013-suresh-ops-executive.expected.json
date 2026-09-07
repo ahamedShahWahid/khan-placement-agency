@@ -2,5 +2,46 @@
   "name": "Suresh Bhatt",
   "email": "suresh.bhatt@example.com",
   "phone": "98450 12345",
-  "skills": []
+  "skills": [
+    "logistics operations",
+    "dispatch planning",
+    "vendor coordination",
+    "Excel",
+    "MIS reporting",
+    "WMS software",
+    "vendor audits",
+    "returns processing",
+    "stock reconciliation",
+    "team management"
+  ],
+  "languages": [],
+  "experience": [
+    {
+      "company": "QuickCart Logistics",
+      "title": "Operations Executive",
+      "start": "June 2022",
+      "end": "Present"
+    },
+    {
+      "company": "QuickCart Logistics",
+      "title": "Shift Supervisor",
+      "start": "January 2021",
+      "end": "May 2022"
+    },
+    {
+      "company": "Speedex Distribution",
+      "title": "Warehouse Associate",
+      "start": "March 2020",
+      "end": "December 2020"
+    }
+  ],
+  "education": [
+    {
+      "institution": "Karnatak University",
+      "degree": "B.Com",
+      "field": null,
+      "end_year": 2019
+    }
+  ],
+  "certifications": []
 }

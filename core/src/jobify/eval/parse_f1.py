@@ -42,6 +42,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -51,7 +52,10 @@ import anyio
 
 from jobify.integrations.parser.base import ParsedResume
 from jobify.integrations.parser.library import (
+    _extract_certifications,
+    _extract_education,
     _extract_email,
+    _extract_experience,
     _extract_name,
     _extract_phone,
     _extract_skills,
@@ -131,6 +135,29 @@ def _normalize_key_part(value: object) -> str:
     return text or "?"
 
 
+_ORG_PARTS: Final[frozenset[str]] = frozenset({"company", "institution"})
+
+
+def _normalize_org_part(value: object) -> str:
+    """Organisation name with a trailing location / qualifier removed.
+
+    Resumes write "Anna University, Chennai" and "BITS Pilani (online)"; the
+    LLM prompt says copy verbatim, so the parser reproduces that, while a
+    human authoring gold naturally writes the organisation alone (and vice
+    versa). Measured 2026-09-07: this one convention gap produced 8-12 of the
+    ~12 education FP/FN pairs per model. Applied to BOTH sides so either
+    authoring style scores the same. Deliberately narrow — only a trailing
+    ", <segment>" or "(…)" — not fuzzy matching.
+    """
+    text = _normalize_key_part(value)
+    if text == "?":
+        return text
+    text = re.sub(r"\s*\([^)]*\)\s*$", "", text)
+    if "," in text:
+        text = text.rsplit(",", 1)[0]
+    return text.strip(" .,;:") or "?"
+
+
 def _entry_get(entry: Any, name: str) -> object:
     """Read ``name`` from a pydantic entry (parsed) or a dict (expected)."""
     if isinstance(entry, Mapping):
@@ -141,7 +168,12 @@ def _entry_get(entry: Any, name: str) -> object:
 def _entry_keys(entries: Iterable[Any], *parts: str) -> set[str]:
     keys: set[str] = set()
     for entry in entries:
-        key = "|".join(_normalize_key_part(_entry_get(entry, part)) for part in parts)
+        key = "|".join(
+            (_normalize_org_part if part in _ORG_PARTS else _normalize_key_part)(
+                _entry_get(entry, part)
+            )
+            for part in parts
+        )
         if key.replace("|", "").replace("?", ""):
             keys.add(key)
     return keys
@@ -288,6 +320,11 @@ def _parse_text_only(text: str) -> ParsedResume:
         email=_extract_email(text),
         phone=_extract_phone(text),
         skills=_extract_skills(text),
+        # Same heuristics the live library parser runs — without these the
+        # report-only columns read 0.000 for a parser that does extract them.
+        experience=_extract_experience(text),
+        education=_extract_education(text),
+        certifications=_extract_certifications(text),
     )
 
 
