@@ -1,6 +1,6 @@
 """Parse F1 quality gate (spec §13 P1).
 
-Runs the eval harness against the gold dataset in ``api/data/parse_eval/``
+Runs the eval harness against the gold dataset in ``core/data/parse_eval/``
 and asserts the parser stays above the per-field floors AND the overall
 target. Print full breakdown on failure to make diagnosis cheap.
 
@@ -8,17 +8,27 @@ Gate config:
 - Overall macro-F1 >= 0.85 for the library parser (CI). The 0.90 launch
   target is the LLM lane's floor (``LLM_OVERALL_FLOOR``), measured on demand.
 - Per-field floors: email 0.95, phone 0.85, name 0.70, skills 0.75.
+- Report-only fields (languages, experience, education, certifications) are
+  printed by both lanes and gate nothing until a measured baseline exists.
 
 Marked ``@pytest.mark.eval`` so it runs only when explicitly requested:
 ``uv run pytest -m eval``. CI runs this separately from the unit + integration
 suites.
+
+Real set: when ``sample_resume/`` exists locally (gitignored — real
+applicants), both lanes also score it and print AGGREGATE COUNTS ONLY.
 """
 
 from __future__ import annotations
 
 import pytest
 
-from jobify.eval.parse_f1 import eval_gold_dataset
+from jobify.eval.parse_f1 import (
+    EvalReport,
+    eval_examples,
+    eval_gold_dataset,
+    real_examples,
+)
 
 pytestmark = pytest.mark.eval
 
@@ -33,6 +43,18 @@ PER_FIELD_FLOORS: dict[str, float] = {
 }
 
 OVERALL_FLOOR = 0.85
+LLM_OVERALL_FLOOR = 0.90
+
+
+def _gate_failures(report: EvalReport, overall_floor: float) -> list[str]:
+    failures: list[str] = []
+    for field_name, floor in PER_FIELD_FLOORS.items():
+        f1 = report.per_field_f1[field_name]
+        if f1 < floor:
+            failures.append(f"{field_name}: F1={f1:.3f} below floor {floor}")
+    if report.overall_f1 < overall_floor:
+        failures.append(f"overall: F1={report.overall_f1:.3f} below floor {overall_floor}")
+    return failures
 
 
 def test_library_parser_meets_quality_gate() -> None:
@@ -45,20 +67,15 @@ def test_library_parser_meets_quality_gate() -> None:
     print()
     print(report.example_breakdown())
 
-    failures: list[str] = []
+    real = real_examples()
+    if real:
+        from jobify.eval.parse_f1 import _parse_text_only
 
-    for field_name, floor in PER_FIELD_FLOORS.items():
-        f1 = report.per_field_f1[field_name]
-        if f1 < floor:
-            failures.append(f"{field_name}: F1={f1:.3f} below floor {floor}")
+        print()
+        print(eval_examples(real, _parse_text_only, label="real set (local only)").summary())
 
-    if report.overall_f1 < OVERALL_FLOOR:
-        failures.append(f"overall: F1={report.overall_f1:.3f} below floor {OVERALL_FLOOR}")
-
+    failures = _gate_failures(report, OVERALL_FLOOR)
     assert not failures, "Parse F1 gate violated:\n  " + "\n  ".join(failures)
-
-
-LLM_OVERALL_FLOOR = 0.90
 
 
 def _llm_lane_enabled() -> bool:
@@ -77,6 +94,17 @@ def _llm_lane_enabled() -> bool:
     )
 
 
+def _llm_models() -> list[str]:
+    """``JOBIFY_PARSE_EVAL_MODELS=a,b,c`` compares models in one run; the
+    FIRST is the one the gate applies to (default: the production model)."""
+    import os
+
+    raw = os.environ.get("JOBIFY_PARSE_EVAL_MODELS")
+    if raw:
+        return [m.strip() for m in raw.split(",") if m.strip()]
+    return [os.environ.get("JOBIFY_RESUME_PARSER_MODEL", "gemini-2.5-flash")]
+
+
 @pytest.mark.skipif(
     not _llm_lane_enabled(),
     reason="LLM lane: set JOBIFY_PARSE_EVAL_PARSER=llm + JOBIFY_GEMINI_API_KEY (never runs in CI)",
@@ -87,39 +115,36 @@ def test_llm_parser_meets_quality_gate() -> None:
     test is the measurement.
 
     Run: JOBIFY_PARSE_EVAL_PARSER=llm uv run --env-file=.env pytest -m eval -s -k llm
+    Compare models: add JOBIFY_PARSE_EVAL_MODELS=gemini-2.5-flash,gemini-3.1-flash-lite
+    Paid-tier key: add JOBIFY_PARSE_EVAL_DELAY_S=0
 
-    Calls the same `parse_text` the LIVE parse path uses, over the 20 gold
-    examples. This lane originally routed through a `parse_texts_batch` Batch
-    API path, added only because free-tier caps made 20 interactive calls
-    infeasible. That path was never verified against the real API and has
-    since been removed; measuring the interactive path is also strictly
-    better, because the acceptance number then describes what production
-    actually runs rather than a transport nothing else uses.
+    Calls the same `parse_text` the LIVE parse path uses, over the synthetic
+    gold examples and (when present locally) the real set. The gate applies to
+    the first model on the synthetic set only; everything else is printed for
+    comparison. Batch API was removed 2026-08-15 — measuring the interactive
+    path is what production actually runs.
     """
     import asyncio
     import os
 
     from google import genai
 
-    from jobify.eval.parse_f1 import DEFAULT_DATA_DIR, _load_examples, _normalize_skill_set
+    from jobify.eval.parse_f1 import DEFAULT_DATA_DIR, Example, _load_examples
     from jobify.integrations.parser.base import LlmParserError, ParsedResume
     from jobify.integrations.parser.llm_parser import GeminiResumeParser
 
     client = genai.Client(api_key=os.environ["JOBIFY_EVAL_GEMINI_API_KEY"])
-    parser = GeminiResumeParser(
-        client=client,
-        model=os.environ.get("JOBIFY_RESUME_PARSER_MODEL", "gemini-2.5-flash"),
-    )
+    models = _llm_models()
 
-    examples = _load_examples(DEFAULT_DATA_DIR)
-    texts = [text for _example_id, text, _expected in examples]
+    synthetic = _load_examples(DEFAULT_DATA_DIR)
+    real = real_examples()
 
     # Paced sequentially to stay under the request-per-minute ceiling. MEASURED
     # free-tier limit for gemini-2.5-flash (2026-08-14, not the docs' number):
     # 20 requests per DAY -- exactly the size of the gold dataset, so the free
     # tier has ZERO margin and any retry pushes the run over. ~7s spacing keeps
-    # the per-minute ceiling clear and runs the lane in ~2.5min; on a paid-tier
-    # key set JOBIFY_PARSE_EVAL_DELAY_S=0 to run it flat out.
+    # the per-minute ceiling clear; on a paid-tier key set
+    # JOBIFY_PARSE_EVAL_DELAY_S=0 to run it flat out.
     delay_s = float(os.environ.get("JOBIFY_PARSE_EVAL_DELAY_S", "7"))
 
     def _is_retryable(exc: BaseException) -> bool:
@@ -149,7 +174,7 @@ def test_llm_parser_meets_quality_gate() -> None:
 
     retries = 0
 
-    async def _parse_one(text: str) -> ParsedResume:
+    async def _parse_one(parser: GeminiResumeParser, text: str) -> ParsedResume:
         nonlocal retries
         backoff = 30.0
         for attempt in range(3):
@@ -166,47 +191,64 @@ def test_llm_parser_meets_quality_gate() -> None:
                 backoff *= 2
         raise AssertionError("unreachable")
 
-    async def _parse_all() -> list[ParsedResume]:
+    async def _parse_all(parser: GeminiResumeParser, examples: list[Example]) -> list[ParsedResume]:
         out: list[ParsedResume] = []
-        for index, text in enumerate(texts):
+        for index, (_example_id, text, _expected) in enumerate(examples):
             if index:
                 await asyncio.sleep(delay_s)
-            out.append(await _parse_one(text))
+            out.append(await _parse_one(parser, text))
         return out
 
-    parsed_resumes = asyncio.run(_parse_all())
-    results_by_text: dict[str, ParsedResume] = dict(zip(texts, parsed_resumes, strict=True))
+    async def _run_model(model: str) -> dict[str, EvalReport]:
+        parser = GeminiResumeParser(client=client, model=model)
+        reports: dict[str, EvalReport] = {}
+        for label, examples in (("synthetic gold", synthetic), ("real set (local only)", real)):
+            if not examples:
+                continue
+            parsed = await _parse_all(parser, examples)
+            by_text = dict(zip((t for _, t, _ in examples), parsed, strict=True))
+            reports[label] = eval_examples(examples, lambda t, _m=by_text: _m[t], label=label)
+        return reports
 
-    report = eval_gold_dataset(parse_fn=lambda t: results_by_text[t])
+    async def _run_all() -> dict[str, dict[str, EvalReport]]:
+        return {model: await _run_model(model) for model in models}
 
-    print()
-    print(report.summary())
-    print()
-    print(report.example_breakdown())
+    results = asyncio.run(_run_all())
 
-    # Counts alone can't distinguish "the model invented a skill" (the one
-    # error class this gate exists to catch) from "the gold file omits a
-    # token the resume really contains". Print the diff with the SAME
-    # normalisation the scorer uses so LLM_EVAL_REPORT.md can name every FP
-    # from the run that produced it -- skills are the only field where the
-    # two parsers disagree, and the model's skills output is not
-    # deterministic, so a re-call can't reconstruct what a gated run saw.
-    print()
+    for model, reports in results.items():
+        print()
+        print(f"=== {model} ===")
+        for label, report in reports.items():
+            print(report.summary())
+            if label == "synthetic gold":
+                print()
+                print(report.example_breakdown())
+                print()
+                # Counts alone can't distinguish "the model invented a skill"
+                # (the one error class this gate exists to catch) from "the
+                # gold file omits a token the resume really contains", and the
+                # model's output is not deterministic, so a re-call can't
+                # reconstruct what a gated run saw. Synthetic set only.
+                print(report.token_diff())
+            print()
     print(f"Retries: {retries}")
-    print("Skills token diff (FP = predicted but not expected, FN = expected but not predicted):")
-    for (example_id, _text, expected), parsed in zip(examples, parsed_resumes, strict=True):
-        predicted_set = _normalize_skill_set(parsed.skills)
-        expected_set = _normalize_skill_set(expected.get("skills", []))
-        false_positives = sorted(predicted_set - expected_set)
-        false_negatives = sorted(expected_set - predicted_set)
-        if false_positives or false_negatives:
-            print(f"  {example_id}  FP={false_positives}  FN={false_negatives}")
 
-    failures: list[str] = []
-    for field_name, floor in PER_FIELD_FLOORS.items():
-        f1 = report.per_field_f1[field_name]
-        if f1 < floor:
-            failures.append(f"{field_name}: F1={f1:.3f} below floor {floor}")
-    if report.overall_f1 < LLM_OVERALL_FLOOR:
-        failures.append(f"overall: F1={report.overall_f1:.3f} below LLM floor {LLM_OVERALL_FLOOR}")
+    if len(models) > 1 or real:
+        print()
+        print("Comparison (F1 per field; first model is gated):")
+        header = f"{'model':<24} {'set':<22} " + " ".join(f"{f[:8]:>8}" for f in _field_order())
+        print(header + f" {'overall':>8}")
+        for model, reports in results.items():
+            for label, report in reports.items():
+                cells = " ".join(f"{report.per_field_f1[f]:>8.3f}" for f in _field_order())
+                print(f"{model:<24} {label:<22} {cells} {report.overall_f1:>8.3f}")
+
+    gated = results[models[0]]["synthetic gold"]
+    failures = _gate_failures(gated, LLM_OVERALL_FLOOR)
     assert not failures, "LLM parse F1 gate violated:\n  " + "\n  ".join(failures)
+
+
+def _field_order() -> tuple[str, ...]:
+    from jobify.eval.parse_f1 import ALL_FIELDS
+
+    return ALL_FIELDS

@@ -57,6 +57,11 @@ class ParsedResume(BaseModel):
     experience: list[ExperienceEntry] = []
     education: list[EducationEntry] = []
     certifications: list[CertificationEntry] = []
+    # Spoken/written human languages ("English", "Hindi") — never programming
+    # languages, which are skills. Added 2026-09-07 with a default so every
+    # stored parsed_json (schema_version 1) still validates; the library
+    # parser leaves it empty.
+    languages: list[str] = []
 
 
 class ResumeParser(Protocol):

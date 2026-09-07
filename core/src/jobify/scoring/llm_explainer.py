@@ -20,6 +20,7 @@ from typing import TYPE_CHECKING, Any
 import structlog
 from google.genai import types
 
+from jobify.integrations.gemini_thinking import no_thinking_config
 from jobify.scoring.explainer import ExplainContext, _templated_from_ctx
 
 if TYPE_CHECKING:
@@ -86,13 +87,13 @@ class GeminiMatchExplainer:
                     response_schema=_RESPONSE_SCHEMA,
                     temperature=0.3,
                     max_output_tokens=200,
-                    # gemini-2.5 thinks by default and thought tokens count
+                    # Gemini thinks by default and thought tokens count
                     # against max_output_tokens: with the 200 cap the model
                     # burned ~190 tokens thinking, finished MAX_TOKENS, and
                     # emitted an unparsable preamble — every explain silently
                     # fell back to templated. This is a two-sentence JSON task;
-                    # thinking buys nothing.
-                    thinking_config=types.ThinkingConfig(thinking_budget=0),
+                    # thinking buys nothing. The knob differs per model family.
+                    thinking_config=no_thinking_config(self._model),
                 ),
             )
             text = getattr(resp, "text", None)

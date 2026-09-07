@@ -124,3 +124,59 @@ async def test_extract_text_truncates_to_max_bytes() -> None:
     pdf_bytes = _make_pdf([long_line] * 1000)  # ~100 KB of text — over the 64KB cap
     text = await extract_text(content=pdf_bytes, content_type="application/pdf")
     assert len(text.encode("utf-8")) <= MAX_TEXT_BYTES
+
+
+# --- Letter-spaced garble detection (2026-09-07, from a real sample) ---
+
+
+async def test_letter_spaced_pypdf_output_falls_back_to_pdfminer(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    """pypdf can emit every glyph as its own token ("G a n e s h ...") — long
+    enough to clear the length threshold, useless to every downstream regex.
+    pdfminer reads the same bytes cleanly, so it must win."""
+    from jobify.integrations.parser import text as text_mod
+
+    spaced = " ".join("Ganesh Kumar Senior Sales Executive Mumbai email at example dot com" * 3)
+    clean = "Ganesh Kumar\nSenior Sales Executive\nMumbai\nganesh@example.com\n" * 3
+    monkeypatch.setattr(text_mod, "_extract_pdf_pypdf", lambda _c: spaced)
+    monkeypatch.setattr(text_mod, "_extract_pdf_pdfminer", lambda _c: clean)
+
+    out = await extract_text(content=b"%PDF-fake", content_type="application/pdf")
+
+    assert out == clean
+
+
+async def test_readable_pypdf_output_never_calls_pdfminer(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    """The fallback is the slow path; normal prose (initials and bullets
+    included) must not trigger it."""
+    from jobify.integrations.parser import text as text_mod
+
+    readable = "Priya S. Sharma\n- Python - SQL - AWS\nB. Tech, IIT Bombay (2019)\n" * 5
+
+    def _boom(_c: bytes) -> str:
+        raise AssertionError("pdfminer must not run for readable pypdf output")
+
+    monkeypatch.setattr(text_mod, "_extract_pdf_pypdf", lambda _c: readable)
+    monkeypatch.setattr(text_mod, "_extract_pdf_pdfminer", _boom)
+
+    out = await extract_text(content=b"%PDF-fake", content_type="application/pdf")
+
+    assert out == readable
+
+
+async def test_letter_spaced_keeps_pypdf_when_pdfminer_is_no_better(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    from jobify.integrations.parser import text as text_mod
+
+    spaced = " ".join("Ganesh Kumar Senior Sales Executive Mumbai" * 4)
+    monkeypatch.setattr(text_mod, "_extract_pdf_pypdf", lambda _c: spaced)
+    monkeypatch.setattr(text_mod, "_extract_pdf_pdfminer", lambda _c: spaced)
+
+    out = await extract_text(content=b"%PDF-fake", content_type="application/pdf")
+
+    assert out == spaced
+
+
+def test_short_texts_never_look_letter_spaced() -> None:
+    from jobify.integrations.parser.text import _looks_letter_spaced
+
+    assert not _looks_letter_spaced("a b c d e")  # under the token minimum
+    assert _looks_letter_spaced(" ".join("abcdefghij" * 3))  # 30 single-char tokens

@@ -35,6 +35,13 @@ LEGACY_DOC_CONTENT_TYPE: Final[str] = "application/msword"
 
 MAX_TEXT_BYTES: Final[int] = 64 * 1024  # 64 KB cap on extracted text
 _GARBLED_THRESHOLD: Final[int] = 50  # pypdf result shorter than this → try pdfminer
+# Letter-spaced extraction ("G a n e s h") -- a font-encoding artefact where
+# pypdf emits every glyph as its own token. Seen on 1 of 12 real resumes
+# (2026-09-07): 1,651 single-character tokens cleared the length threshold
+# above, so pdfminer (which read the same file cleanly, 7 % single-char
+# tokens) never ran. Normal prose sits well under 0.2 (initials, bullets).
+_LETTER_SPACED_MIN_TOKENS: Final[int] = 20
+_LETTER_SPACED_RATIO: Final[float] = 0.6
 
 
 async def extract_text(*, content: bytes, content_type: str) -> str:
@@ -51,20 +58,30 @@ async def extract_text(*, content: bytes, content_type: str) -> str:
 
 
 def _extract_pdf(content: bytes) -> str:
-    """Try pypdf; fall back to pdfminer if the result looks empty/garbled.
+    """Try pypdf; fall back to pdfminer if the result looks empty or garbled.
 
-    A result is considered garbled/empty if it's shorter than _GARBLED_THRESHOLD
-    characters after stripping (heuristic for image-only PDFs where extractors
-    return near-nothing). Non-empty short results (e.g., single-line PDFs) are
-    returned as-is from pypdf without triggering pdfminer fallback.
+    Two garbled signatures, checked in order:
+    - Empty/near-empty (shorter than _GARBLED_THRESHOLD after stripping):
+      image-only PDFs where extractors return near-nothing.
+    - Letter-spaced (most tokens are single characters): a font-encoding
+      artefact that clears the length check with unusable text. pdfminer
+      usually reads these cleanly; whichever extractor produces the lower
+      single-character-token ratio wins.
+    Non-empty short results (e.g., single-line PDFs) are returned as-is from
+    pypdf without triggering the pdfminer fallback.
     """
     pypdf_text = _extract_pdf_pypdf(content)
     pypdf_stripped = pypdf_text.strip()
-
     if len(pypdf_stripped) >= _GARBLED_THRESHOLD:
-        # pypdf produced substantial text — use it directly.
+        if not _looks_letter_spaced(pypdf_text):
+            # pypdf produced substantial, readable text — use it directly.
+            return pypdf_text
+        pdfminer_text = _extract_pdf_pdfminer(content)
+        if pdfminer_text.strip() and _single_char_token_ratio(
+            pdfminer_text
+        ) < _single_char_token_ratio(pypdf_text):
+            return pdfminer_text
         return pypdf_text
-
     if len(pypdf_stripped) > 0:
         # pypdf produced a short but non-empty result.  For a real resume this
         # would be unusual, but for test fixtures (or trivially short docs) it
@@ -74,14 +91,28 @@ def _extract_pdf(content: bytes) -> str:
         if len(pdfminer_text.strip()) > len(pypdf_stripped):
             return pdfminer_text
         return pypdf_text
-
     # pypdf returned nothing — try pdfminer as the primary fallback.
     pdfminer_text = _extract_pdf_pdfminer(content)
     if pdfminer_text.strip():
         return pdfminer_text
-
     # Both extractors returned nothing. Image-only / scanned PDF.
     raise ParserError("no_text_extracted")
+
+
+def _single_char_token_ratio(text: str) -> float:
+    """Share of whitespace-separated tokens that are exactly one character.
+
+    Returns 0.0 for texts too short to judge (fewer than
+    _LETTER_SPACED_MIN_TOKENS tokens) so tiny fixtures never trip the check.
+    """
+    tokens = text.split()
+    if len(tokens) < _LETTER_SPACED_MIN_TOKENS:
+        return 0.0
+    return sum(1 for token in tokens if len(token) == 1) / len(tokens)
+
+
+def _looks_letter_spaced(text: str) -> bool:
+    return _single_char_token_ratio(text) >= _LETTER_SPACED_RATIO
 
 
 def _extract_pdf_pypdf(content: bytes) -> str:

@@ -178,8 +178,16 @@ All test commands run from the **repo root**:
 # Unit tests (no DB required):
 uv run pytest -v -m "not integration and not eval"
 
-# Parse F1 quality gate (no DB):
+# Parse F1 quality gate (no DB) — library parser, deterministic, gates CI:
 uv run pytest -v -s -m eval
+
+# LLM parse-F1 acceptance lane (live Gemini, on demand, never in CI):
+JOBIFY_PARSE_EVAL_PARSER=llm uv run --env-file=.env pytest -m eval -s -k llm
+#   JOBIFY_PARSE_EVAL_MODELS=gemini-2.5-flash,gemini-3.1-flash-lite  compare models (first is gated)
+#   JOBIFY_PARSE_EVAL_DELAY_S=0        paid-tier key: drop the 7 s free-tier pacing
+#   JOBIFY_PARSE_EVAL_REAL_DIR=<dir>   real-resume set (default sample_resume/, gitignored,
+#                                      loaded only when present; aggregate counts only)
+# Record the result in core/data/parse_eval/LLM_EVAL_REPORT.md.
 
 # Integration tests (require local Postgres + jobify_test database):
 uv run pytest -v -m integration
