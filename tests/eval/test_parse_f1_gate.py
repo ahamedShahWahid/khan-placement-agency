@@ -56,6 +56,20 @@ LIBRARY_PER_FIELD_FLOORS: dict[str, float] = {**PER_FIELD_FLOORS, "skills": 0.70
 OVERALL_FLOOR = 0.85
 LLM_OVERALL_FLOOR = 0.90
 
+# LLM-lane floors for the four report-only fields, set 2026-09-08 from the
+# prompt-v3 baseline on gemini-3.1-flash-lite (languages 1.000, experience
+# 1.000, education 0.966, certifications 1.000 on the synthetic set) with
+# margin for run-to-run drift. They gate the LLM lane only; `overall` stays
+# the mean of the original four so 0.90 keeps its meaning. languages has only
+# 3 gold items, hence the wide floor.
+LLM_PER_FIELD_FLOORS: dict[str, float] = {
+    **PER_FIELD_FLOORS,
+    "languages": 0.75,
+    "experience": 0.95,
+    "education": 0.90,
+    "certifications": 0.90,
+}
+
 
 def _gate_failures(
     report: EvalReport,
@@ -117,7 +131,7 @@ def _llm_models() -> list[str]:
     raw = os.environ.get("JOBIFY_PARSE_EVAL_MODELS")
     if raw:
         return [m.strip() for m in raw.split(",") if m.strip()]
-    return [os.environ.get("JOBIFY_RESUME_PARSER_MODEL", "gemini-2.5-flash")]
+    return [os.environ.get("JOBIFY_RESUME_PARSER_MODEL", "gemini-3.1-flash-lite")]
 
 
 @pytest.mark.skipif(
@@ -259,7 +273,7 @@ def test_llm_parser_meets_quality_gate() -> None:
                 print(f"{model:<24} {label:<22} {cells} {report.overall_f1:>8.3f}")
 
     gated = results[models[0]]["synthetic gold"]
-    failures = _gate_failures(gated, LLM_OVERALL_FLOOR)
+    failures = _gate_failures(gated, LLM_OVERALL_FLOOR, LLM_PER_FIELD_FLOORS)
     assert not failures, "LLM parse F1 gate violated:\n  " + "\n  ".join(failures)
 
 

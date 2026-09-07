@@ -43,18 +43,52 @@ if TYPE_CHECKING:
 
 _log = structlog.get_logger(__name__)
 
-LLM_PARSER_NAME = "llm.gemini.v1"
+# Provenance stamped into parsed_json. Bump on any prompt change that alters
+# what the fields MEAN (v2, 2026-09-08: skills now include competencies stated
+# in prose, degree/field split) so stored payloads can be told apart.
+LLM_PARSER_NAME = "llm.gemini.v2"
 
+# Prompt v2 (2026-09-08). Written against the extraction yardstick
+# (core/data/parse_eval/000_README.md "skills rule"); every rule below maps
+# to a measured error class from LLM_EVAL_REPORT.md: prose competencies were
+# the gated model's 68 skills FNs, paraphrase/trait phrases its 31 FPs,
+# degree/field bundling its remaining education misses. Keep the examples —
+# they are what moves the model, and they cost ~100 tokens per call.
 _SYSTEM_INSTRUCTION = (
-    "You are Jobify's resume parser. Extract ONLY information that is "
-    "explicitly present in the resume text. Never infer or invent values: a "
-    "field that is not stated stays null, a list with no stated items stays "
-    "empty. Copy date strings verbatim as written (e.g. 'Jan 2020', "
-    "'2020-2022', 'Present') — do not normalize them. skills is a flat list "
-    "of individual skill names. languages is a flat list of the human "
-    "languages the person states they speak, read, or write (e.g. 'English', "
-    "'Hindi') — never programming languages, which belong in skills. Return "
-    "JSON matching the response schema."
+    "You are Jobify's resume parser. Extract only what the resume text states; "
+    "never invent a value or a list item. Copy wording verbatim (names, titles, "
+    "organisations, date strings such as 'Jan 2020', '2020-2022', 'Present') — "
+    "do not normalise, translate, or expand abbreviations. A field the resume "
+    "does not state is null; a list with no stated items is empty.\n\n"
+    "skills: (a) every tool, technology, platform, framework, or named software "
+    "the resume says the person used, wherever it appears — skills sections, "
+    "stack lines, or prose ('built dashboards in Looker' -> 'Looker'); and (b) "
+    "recognised competency or domain terms that a recruiter would search for as "
+    "a skill and that the resume states the person practises ('route planning', "
+    "'stock reconciliation', 'lesson planning', 'FMCG distribution', 'team "
+    "management' when the text says they manage a team). Use the resume's own "
+    "wording and granularity ('Tailwind CSS', not 'Tailwind'; 'REST APIs' as "
+    "written); one entry per distinct skill. Prefer fewer, cleaner skills: when "
+    "in doubt, leave it out. NOT skills: coursework or subjects studied; "
+    "project, product, or deliverable names ('payments orchestrator', 'billing "
+    "subsystem'); duties or activities restated as nouns ('bug fixing', "
+    "'documentation', 'onboarding', 'deploys', 'attendance'); outcomes or KPIs "
+    "('on-time delivery targets'); personality traits or generic soft skills "
+    "('communication', 'quick learner', 'calm under pressure'); spoken "
+    "languages; job titles; degrees; hobbies.\n\n"
+    "languages: human languages the person states they speak, read, or write "
+    "('English', 'Hindi'); never programming languages.\n\n"
+    "experience: one entry per role held (internships count; a promotion at "
+    "the same employer is two entries). No entries for career breaks or gaps.\n\n"
+    "education: one entry per qualification. degree is the qualification name "
+    "only ('B.Tech', 'MBA', 'Intermediate (12th)', 'Diploma in Electrical "
+    "Engineering'); field is the branch or specialisation ('Computer Science', "
+    "'Marketing') when stated; institution as written; end_year the completion "
+    "year if stated.\n\n"
+    "certifications: credentials listed under a certifications / courses / "
+    "badges / training heading or clearly presented as a certification; not "
+    "awards or competition results.\n\n"
+    "Return JSON matching the response schema."
 )
 
 _ENTRY_STR = types.Schema(type=types.Type.STRING, nullable=True)

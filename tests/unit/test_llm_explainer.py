@@ -235,3 +235,22 @@ async def test_llm_failure_falls_back_to_hindi_templated_for_hindi_ctx() -> None
 async def test_generator_version_bumped() -> None:
     """LLM_GENERATOR_VERSION should be '2' after the Hindi update."""
     assert LLM_GENERATOR_VERSION == "2"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("placeholder", ["None", "none.", "N/A", "-", " null "])
+async def test_placeholder_caveat_is_treated_as_empty(placeholder: str) -> None:
+    """Seen live 2026-09-08: gemini-2.5-flash returned caveat "None" (the
+    string) for a clean match. Rendering that as a caveat is wrong; it is the
+    absence of one."""
+    import json
+
+    explainer, gc_mock = _make_explainer()
+    gc_mock.return_value = SimpleNamespace(
+        text=json.dumps({"fit": "Great fit at Acme.", "caveat": placeholder})
+    )
+
+    out = await explainer.explain(_ctx())
+
+    assert out["caveat"] == ""
+    assert out["generator"] == "llm"
